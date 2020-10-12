@@ -31,7 +31,7 @@ import annis.service.objects.RawTextWrapper;
 import annis.visualizers.LoadableVisualizer;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.vaadin.server.FontAwesome;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinSession;
@@ -42,7 +42,7 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import com.vaadin.v7.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.ExecutionException;
@@ -108,10 +107,10 @@ public class VisualizerPanel extends CssLayout
 
       Throwable exception = null;
       try {
-        final Component result = future.get(60, TimeUnit.SECONDS);
+        final Component createdComponent = future.get(60, TimeUnit.SECONDS);
 
         ui.accessSynchronously(() -> {
-          vis = result;
+          vis = createdComponent;
           updateGUIAfterLoadingVisualizer(callback);
         });
       } catch (InterruptedException ex) {
@@ -124,9 +123,8 @@ public class VisualizerPanel extends CssLayout
         exception = ex;
       } catch (TimeoutException ex) {
         future.cancel(true);
-        log.error("Could create visualizer "
-            + visPlugin.map(p -> p.getShortName()).orElse("<unknown>") + " in 60 seconds: Timeout",
-            ex);
+        log.error("Could create visualizer {} in 60 seconds: Timeout",
+            visPlugin == null ? UNKNOWN : visPlugin.getShortName(), ex);
         exception = ex;
       }
 
@@ -134,21 +132,58 @@ public class VisualizerPanel extends CssLayout
         final Throwable finalException = exception;
         ui.accessSynchronously(() -> Notification.show(
             "Error when creating visualizer "
-                + visPlugin.map(p -> p.getShortName()).orElse("<unknown>"),
+                + (visPlugin == null ? UNKNOWN : visPlugin.getShortName()),
             finalException.toString(), Notification.Type.WARNING_MESSAGE));
       }
 
     }
+
+    private void updateGUIAfterLoadingVisualizer(LoadableVisualizer.Callback callback) {
+      if (callback != null && vis instanceof LoadableVisualizer) {
+        LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+        if (loadableVis.isLoaded()) {
+          // direct call callback since the visualizer is already ready
+          callback.visualizerLoaded(loadableVis);
+        } else {
+          loadableVis.clearCallbacks();
+          // add listener when player was fully loaded
+          loadableVis.addOnLoadCallBack(callback);
+        }
+      }
+
+      progress.setEnabled(false);
+      progress.setVisible(false);
+
+      if (vis != null) {
+        btEntry.setEnabled(true);
+        vis.setVisible(true);
+        if (vis instanceof PDFViewer) {
+          ((PDFViewer) vis).openPDFPage("-1");
+        }
+        if (vis instanceof MediaPlayer) {
+          // if this is a media player visualizer, close all other media players
+          // since some browsers (e.g. Chrome) have problems if there are multiple
+          // audio/video elements on one page
+          MediaController mediaController =
+              VaadinSession.getCurrent().getAttribute(MediaController.class);
+          mediaController.closeOtherPlayers((MediaPlayer) vis);
+
+        }
+        // add if not already added
+        if (getComponentIndex(vis) < 0) {
+          addComponent(vis);
+        }
+      }
+    }
+
   }
 
-  public static class ByteArrayOutputStreamSource implements StreamResource.StreamSource {
+  public class ByteArrayOutputStreamSource implements StreamResource.StreamSource {
 
     /**
      * 
      */
     private static final long serialVersionUID = 814822953760083712L;
-
-    private static final Logger log = LoggerFactory.getLogger(ByteArrayOutputStreamSource.class);
 
     private transient ByteArrayOutputStream byteStream;
 
@@ -168,9 +203,9 @@ public class VisualizerPanel extends CssLayout
 
   public static final long serialVersionUID = 2L;
 
-  public static final Resource ICON_COLLAPSE = FontAwesome.MINUS_SQUARE_O;
+  public static final Resource ICON_COLLAPSE = VaadinIcons.MINUS_SQUARE_LEFT_O;
 
-  public static final Resource ICON_EXPAND = FontAwesome.PLUS_SQUARE_O;
+  public static final Resource ICON_EXPAND = VaadinIcons.PLUS_SQUARE_LEFT_O;
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
@@ -192,7 +227,7 @@ public class VisualizerPanel extends CssLayout
 
   private final int visId;
 
-  private Optional<VisualizerPlugin> visPlugin = Optional.empty();
+  private VisualizerPlugin visPlugin = null;
 
   private Set<String> visibleTokenAnnos;
 
@@ -207,6 +242,8 @@ public class VisualizerPanel extends CssLayout
 
   private final Pattern validQNamePattern =
       Pattern.compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
+  private static final String UNKNOWN = "<unknown>";
+
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin} Visualizer.
@@ -238,7 +275,7 @@ public class VisualizerPanel extends CssLayout
     this.progress.setVisible(false);
     this.progress.setEnabled(false);
 
-    this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    this.addStyleName(ValoTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
 
   }
@@ -249,19 +286,21 @@ public class VisualizerPanel extends CssLayout
 
     if (visRule != null) {
       visPlugin = ui.getVisualizerPlugins().stream()
-          .filter(plugin -> Objects.equal(plugin.getShortName(), visRule.getVisType())).findAny();
-      if (!visPlugin.isPresent()) {
+          .filter(plugin -> Objects.equal(plugin.getShortName(), visRule.getVisType())).findAny()
+          .orElse(null);
+      if (visPlugin == null) {
         // fallback to default visualizer if original vis type was not found
         visRule.setVisType(VisualizerPlugin.DEFAULT_VISUALIZER);
         visPlugin = ui.getVisualizerPlugins().stream()
-            .filter(plugin -> Objects.equal(plugin.getShortName(), visRule.getVisType())).findAny();
+            .filter(plugin -> Objects.equal(plugin.getShortName(), visRule.getVisType())).findAny()
+            .orElse(null);
       }
 
       if (visRule.getVisibility() == VisibilityEnum.HIDDEN) {
         // build button for visualizer
         btEntry = new Button(visRule.getDisplayName());
         btEntry.setIcon(ICON_EXPAND);
-        btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " " + ChameleonTheme.BUTTON_SMALL);
+        btEntry.setStyleName(ValoTheme.BUTTON_BORDERLESS + " " + ValoTheme.BUTTON_SMALL);
         btEntry.addClickListener(this);
         btEntry.setDisableOnClick(true);
 
@@ -274,8 +313,7 @@ public class VisualizerPanel extends CssLayout
           // build button for visualizer
           btEntry = new Button(visRule.getDisplayName());
           btEntry.setIcon(ICON_COLLAPSE);
-          btEntry
-              .setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " " + ChameleonTheme.BUTTON_SMALL);
+          btEntry.setStyleName(ValoTheme.BUTTON_BORDERLESS + " " + ValoTheme.BUTTON_SMALL);
           btEntry.addClickListener(this);
           addComponent(btEntry);
         }
@@ -284,18 +322,15 @@ public class VisualizerPanel extends CssLayout
 
         // create the visualizer and calc input
         try {
-          vis = createComponent(UI.getCurrent());
+          vis = createComponent();
           if (vis != null) {
             vis.setVisible(true);
             addComponent(vis);
           }
         } catch (Exception ex) {
-          Notification.show(
-              "Could not create visualizer "
-                  + visPlugin.map(p -> p.getShortName()).orElse("<unknown>"),
+          Notification.show("Could not create visualizer " + getVisualizerShortNameDebug(),
               ex.toString(), Notification.Type.TRAY_NOTIFICATION);
-          log.error("Could not create visualizer "
-              + visPlugin.map(p -> p.getShortName()).orElse("<unknown>"), ex);
+          log.error("Could not create visualizer {}", getVisualizerShortNameDebug(), ex);
         }
 
         if (btEntry != null && visRule.getVisibility() == VisibilityEnum.PRELOADED) {
@@ -310,6 +345,7 @@ public class VisualizerPanel extends CssLayout
     } // end if entry not null
   }
 
+
   @Override
   public void buttonClick(ClickEvent event) {
 
@@ -323,14 +359,14 @@ public class VisualizerPanel extends CssLayout
     toggleVisualizer(isVisible, null);
   }
 
-  private Component createComponent(UI ui) {
-    if (!visPlugin.isPresent()) {
+  private Component createComponent() {
+    if (visPlugin == null) {
       return null;
     }
 
     final VisualizerInput input = createInput();
 
-    Component c = visPlugin.get().createComponent(input, this);
+    Component c = visPlugin.createComponent(input, this);
     if (c == null) {
       return c;
     }
@@ -365,13 +401,12 @@ public class VisualizerPanel extends CssLayout
     }
 
     // getting the whole document, when plugin is using text
-    if (visPlugin.isPresent() && visPlugin.get().isUsingText() && result != null
-        && result.getDocumentGraph().getNodes().size() > 0) {
+    if (visPlugin != null && visPlugin.isUsingText() && result != null
+        && !result.getDocumentGraph().getNodes().isEmpty()) {
       List<String> nodeAnnoFilter = null;
-      if (visPlugin.get() instanceof FilteringVisualizerPlugin) {
-        nodeAnnoFilter =
-            ((FilteringVisualizerPlugin) visPlugin.get()).getFilteredNodeAnnotationNames(
-                path.get(0), Joiner.on('/').join(path), input.getMappings(), ui);
+      if (visPlugin instanceof FilteringVisualizerPlugin) {
+        nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
+            path.get(0), Joiner.on('/').join(path), input.getMappings(), ui);
       }
       SaltProject p = getDocument(nodeAnnoFilter, ui);
 
@@ -388,7 +423,7 @@ public class VisualizerPanel extends CssLayout
     }
 
     // getting the raw text, when the visualizer wants to have it
-    if (visPlugin.isPresent() && visPlugin.get().isUsingRawText()) {
+    if (visPlugin != null && visPlugin.isUsingRawText()) {
       input.setRawText(getRawText(path.get(0), path, ui));
     }
 
@@ -442,8 +477,8 @@ public class VisualizerPanel extends CssLayout
       if (nodeAnnoFilter == null || nodeAnnoFilter.isEmpty()) {
         fallbackToAll = true;
       } else {
-        nodeAnnoFilter = nodeAnnoFilter.stream()
-            .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
+        nodeAnnoFilter = nodeAnnoFilter.stream().map(annoName -> annoName.replaceFirst("::", ":"))
+            .collect(Collectors.toList());
         for (String nodeAnno : nodeAnnoFilter) {
           if (!validQNamePattern.matcher(nodeAnno).matches()) {
             // If we can't produce a valid query for this annotation name fallback
@@ -500,29 +535,29 @@ public class VisualizerPanel extends CssLayout
   }
 
   public String getVisualizerShortName() {
-    if (visPlugin.isPresent()) {
-      return visPlugin.get().getShortName();
-    }
-
-    else {
-      return null;
-    }
+    return visPlugin == null ? null : visPlugin.getShortName();
   }
 
+  private String getVisualizerShortNameDebug() {
+    return visPlugin == null ? UNKNOWN : visPlugin.getShortName();
+  }
+
+
+
   private void loadVisualizer(final LoadableVisualizer.Callback callback) {
-    if (visPlugin.isPresent()) {
+    if (visPlugin != null) {
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
-      progress.setDescription("Loading visualizer" + visPlugin.get().getShortName());
+      progress.setDescription("Loading visualizer" + visPlugin.getShortName());
 
       ExecutorService execService = Executors.newSingleThreadExecutor();
 
       final Future<Component> future = execService.submit(() -> {
         // only create component if not already created
         if (vis == null) {
-          return createComponent(ui);
+          return createComponent();
         } else {
           return vis;
         }
@@ -539,15 +574,15 @@ public class VisualizerPanel extends CssLayout
     this.segmentationName = segmentationName;
     this.markedAndCovered = markedAndCovered;
 
-    if (visPlugin.isPresent() && vis != null) {
-      visPlugin.get().setSegmentationLayer(vis, segmentationName, markedAndCovered);
+    if (visPlugin != null && vis != null) {
+      visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
 
   public void setVisibleTokenAnnosVisible(SortedSet<String> annos) {
     this.visibleTokenAnnos = annos;
-    if (visPlugin.isPresent() && vis != null) {
-      visPlugin.get().setVisibleTokenAnnosVisible(vis, annos);
+    if (visPlugin != null && vis != null) {
+      visPlugin.setVisibleTokenAnnosVisible(vis, annos);
     }
   }
 
@@ -572,43 +607,6 @@ public class VisualizerPanel extends CssLayout
     }
   }
 
-  private void updateGUIAfterLoadingVisualizer(LoadableVisualizer.Callback callback) {
-    if (callback != null && vis instanceof LoadableVisualizer) {
-      LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
-      if (loadableVis.isLoaded()) {
-        // direct call callback since the visualizer is already ready
-        callback.visualizerLoaded(loadableVis);
-      } else {
-        loadableVis.clearCallbacks();
-        // add listener when player was fully loaded
-        loadableVis.addOnLoadCallBack(callback);
-      }
-    }
-
-    progress.setEnabled(false);
-    progress.setVisible(false);
-
-    if (vis != null) {
-      btEntry.setEnabled(true);
-      vis.setVisible(true);
-      if (vis instanceof PDFViewer) {
-        ((PDFViewer) vis).openPDFPage("-1");
-      }
-      if (vis instanceof MediaPlayer) {
-        // if this is a media player visualizer, close all other media players
-        // since some browsers (e.g. Chrome) have problems if there are multiple
-        // audio/video elements on one page
-        MediaController mediaController =
-            VaadinSession.getCurrent().getAttribute(MediaController.class);
-        mediaController.closeOtherPlayers((MediaPlayer) vis);
-
-      }
-      // add if not already added
-      if (getComponentIndex(vis) < 0) {
-        addComponent(vis);
-      }
-    }
-  }
 
   @Override
   public boolean visualizerIsVisible() {

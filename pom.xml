@@ -271,11 +271,12 @@
 							<generateApiTests>false</generateApiTests>
 							<generateApiDocumentation>false</generateApiDocumentation>
 							<generateModelTests>false</generateModelTests>
-							<generateModelDocs>false</generateModelDocs>
+							<generateModelDocumentation>false</generateModelDocumentation>
 							<configOptions>
 								<java8>true</java8>
 								<dateLibrary>java8</dateLibrary>
 							</configOptions>
+							<additionalProperties>serializableModel=true</additionalProperties>
 						</configuration>
 					</execution>
 				</executions>
