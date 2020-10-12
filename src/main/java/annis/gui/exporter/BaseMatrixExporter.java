@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.corpus_tools.annis.ApiException;
@@ -88,26 +89,27 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       boolean alignmc, Writer out, EventBus eventBus,
       Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
 
-    try {
 
-      Map<String, String> args = new HashMap<>();
-      for (String s : argsAsString.split("&|;")) {
-        String[] splitted = s.split("=", 2);
-        String key = splitted[0];
-        String val = "";
-        if (splitted.length > 1) {
-          val = splitted[1];
-        }
-        args.put(key, val);
+
+    Map<String, String> args = new HashMap<>();
+    for (String s : argsAsString.split("&|;")) {
+      String[] splitted = s.split("=", 2);
+      String key = splitted[0];
+      String val = "";
+      if (splitted.length > 1) {
+        val = splitted[1];
       }
+      args.put(key, val);
+    }
 
-      SearchApi searchApi = new SearchApi(Helper.getClient(ui));
+    SearchApi searchApi = new SearchApi(Helper.getClient(ui));
 
-      // 1. Get all the matches as Salt ID
-      FindQuery query = new FindQuery();
-      query.setCorpora(new LinkedList<>(corpora));
-      query.setQueryLanguage(queryLanguage);
-      query.setQuery(queryAnnisQL);
+    // 1. Get all the matches as Salt ID
+    FindQuery query = new FindQuery();
+    query.setCorpora(new LinkedList<>(corpora));
+    query.setQueryLanguage(queryLanguage);
+    query.setQuery(queryAnnisQL);
+    try {
       File matches = searchApi.find(query);
 
       // Get the node count for the query by parsing it
@@ -141,8 +143,6 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
             return new InterruptedException("Exporter job was interrupted");
           }
         }
-      } catch (Exception ex) {
-        return ex;
       }
 
       // build the list of ordered match numbers (ordering by occurrence in text)
@@ -173,8 +173,6 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
             return new InterruptedException("Exporter job was interrupted");
           }
         }
-      } catch (Exception ex) {
-        return ex;
       }
 
       out.append("\n");
@@ -182,7 +180,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       return null;
 
     } catch (ApiException | IOException | CacheException | IllegalStateException
-        | ClassCastException ex) {
+        | ClassCastException | XMLStreamException ex) {
       return ex;
     }
 
