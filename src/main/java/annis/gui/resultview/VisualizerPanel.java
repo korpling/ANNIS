@@ -119,6 +119,8 @@ public class VisualizerPanel extends CssLayout
       } catch (InterruptedException ex) {
         log.error(null, ex);
         exception = ex;
+        // Restore interrupted state
+        Thread.currentThread().interrupt();
       } catch (ExecutionException ex) {
         log.error(null, ex);
         exception = ex;
