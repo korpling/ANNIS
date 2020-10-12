@@ -514,17 +514,13 @@ public class VisualizerPanel extends CssLayout
     } else {
       // hide
       btEntry.setEnabled(true);
-
       if (vis != null) {
         vis.setVisible(false);
         if (vis instanceof MediaPlayer) {
           removeComponent(vis);
         }
-
       }
-
       btEntry.setIcon(ICON_EXPAND);
-
     }
   }
 
