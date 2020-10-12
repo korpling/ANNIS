@@ -45,9 +45,6 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
 
   @Override
   public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle) {
-
-
-
     ByteArrayOutputStream outStream = new ByteArrayOutputStream();
     writeOutput(vis, outStream);
 

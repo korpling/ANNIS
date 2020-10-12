@@ -74,8 +74,6 @@ class AbstractIFrameVisualizerTest {
 
   @Test
   void contextPathSet() {
-
-
     IFrameResourceMap attributes = new IFrameResourceMap();
     when(session.getAttribute(any(Class.class))).thenReturn(attributes);
 
@@ -106,5 +104,4 @@ class AbstractIFrameVisualizerTest {
 
     }
   }
-
 }

@@ -26,6 +26,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.v7.ui.TextArea;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -89,7 +90,7 @@ class SearchTest {
   }
 
   @Test
-  void tokenSearchPcc2() throws InterruptedException {
+  void tokenSearchPcc2() throws InterruptedException, IOException {
 
     executeTokenSearch();
 
@@ -113,6 +114,7 @@ class SearchTest {
     _click(btOpenVisualizer);
     awaitCondition(120, () -> !_find(resultPanel, AutoHeightIFrame.class).isEmpty());
     AutoHeightIFrame iframe = _get(resultPanel, AutoHeightIFrame.class, spec -> spec.withCount(1));
+    assertTrue(iframe.getState().getUrl().startsWith("/vis-iframe-res/"));
   }
 
   @Test
