@@ -236,8 +236,8 @@ public class VisualizerPanel extends CssLayout
    */
   public VisualizerPanel(final VisualizerRule visRule, int visId, SDocument result, Match match,
       Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered, String htmlID,
-      String resultID, VisualizerContextChanger parent, String segmentationName,
-      AnnisUI ui) throws IOException {
+      String resultID, VisualizerContextChanger parent, String segmentationName, AnnisUI ui)
+      throws IOException {
     this.ui = ui;
     this.visRule = visRule;
     this.visId = visId;
@@ -392,14 +392,14 @@ public class VisualizerPanel extends CssLayout
         && result.getDocumentGraph().getNodes().size() > 0) {
       List<String> nodeAnnoFilter = null;
       if (visPlugin.get() instanceof FilteringVisualizerPlugin) {
-        nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin.get())
-            .getFilteredNodeAnnotationNames(path.get(0), Joiner.on('/').join(path),
-                input.getMappings(), ui);
+        nodeAnnoFilter =
+            ((FilteringVisualizerPlugin) visPlugin.get()).getFilteredNodeAnnotationNames(
+                path.get(0), Joiner.on('/').join(path), input.getMappings(), ui);
       }
       SaltProject p = getDocument(nodeAnnoFilter, ui);
 
       SDocument wholeDocument = null;
-      if (p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
+      if (p != null && p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
           && p.getCorpusGraphs().get(0).getDocuments() != null
           && !p.getCorpusGraphs().get(0).getDocuments().isEmpty()) {
         wholeDocument = p.getCorpusGraphs().get(0).getDocuments().get(0);
@@ -432,9 +432,8 @@ public class VisualizerPanel extends CssLayout
 
 
       result = new RawTextWrapper();
-      File graphML =
-          api.subgraphForQuery(corpusName, aql.toString(),
-              QueryLanguage.AQL, AnnotationComponentType.ORDERING);
+      File graphML = api.subgraphForQuery(corpusName, aql.toString(), QueryLanguage.AQL,
+          AnnotationComponentType.ORDERING);
       SDocumentGraph graph = DocumentGraphMapper.map(graphML);
       // Reconstruct the text from the token values
       List<String> texts = new ArrayList<>();
@@ -460,24 +459,24 @@ public class VisualizerPanel extends CssLayout
 
     try {
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
-      
+
       // Build a query that includes all (possible filtered by name) node of the document
       boolean fallbackToAll = false;
       if (nodeAnnoFilter == null || nodeAnnoFilter.isEmpty()) {
-          fallbackToAll = true;
-        } else {
-          nodeAnnoFilter = nodeAnnoFilter.stream()
-              .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
-          for (String nodeAnno : nodeAnnoFilter) {
-            if (!validQNamePattern.matcher(nodeAnno).matches()) {
-              // If we can't produce a valid query for this annotation name fallback
-              // to retrieve all annotations.
-              fallbackToAll = true;
-              break;
-            }
+        fallbackToAll = true;
+      } else {
+        nodeAnnoFilter = nodeAnnoFilter.stream()
+            .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
+        for (String nodeAnno : nodeAnnoFilter) {
+          if (!validQNamePattern.matcher(nodeAnno).matches()) {
+            // If we can't produce a valid query for this annotation name fallback
+            // to retrieve all annotations.
+            fallbackToAll = true;
+            break;
           }
+        }
       }
-      
+
       StringBuilder aql = new StringBuilder();
       if (fallbackToAll) {
         aql.append("node @* annis:node_name=/");
@@ -495,8 +494,7 @@ public class VisualizerPanel extends CssLayout
       }
 
 
-      File graphML =
-          api.subgraphForQuery(path.get(0), aql.toString(), QueryLanguage.AQL, null);
+      File graphML = api.subgraphForQuery(path.get(0), aql.toString(), QueryLanguage.AQL, null);
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
@@ -558,7 +556,7 @@ public class VisualizerPanel extends CssLayout
     this.markedAndCovered = markedAndCovered;
 
     if (visPlugin.isPresent() && vis != null) {
-     visPlugin.get().setSegmentationLayer(vis, segmentationName, markedAndCovered);
+      visPlugin.get().setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
 
