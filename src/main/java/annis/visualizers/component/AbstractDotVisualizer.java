@@ -44,11 +44,8 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer {
 
   @Override
   public ImagePanel createComponent(final VisualizerInput visInput, VisualizationToggle visToggle) {
-    try {
-
-      final PipedOutputStream out = new PipedOutputStream();
-      final PipedInputStream in = new PipedInputStream(out);
-
+    try (PipedOutputStream out = new PipedOutputStream();
+        PipedInputStream in = new PipedInputStream(out)) {
 
       new Thread(() -> writeOutput(visInput, out)).start();
 
@@ -61,7 +58,6 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer {
       emb.setStandby("loading image");
       emb.setAlternateText("DOT graph visualization");
       return new ImagePanel(emb);
-
     } catch (IOException ex) {
       log.error(null, ex);
     }
