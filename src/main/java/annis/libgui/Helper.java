@@ -1121,22 +1121,14 @@ public class Helper {
   public static String buildDocumentQuery(List<String> docPath, List<String> nodeAnnoFilter,
       boolean useRawText) {
 
-    boolean fallbackToAll = false;
-    if (!useRawText) {
-      if (nodeAnnoFilter == null) {
-        fallbackToAll = true;
-      } else {
-        nodeAnnoFilter = nodeAnnoFilter.stream()
-            .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
-        for (String nodeAnno : nodeAnnoFilter) {
-          if (!validQNamePattern.matcher(nodeAnno).matches()) {
-            // If we can't produce a valid query for this annotation name fallback
-            // to retrieve all annotations.
-            fallbackToAll = true;
-            break;
-          }
-        }
-      }
+    // Always fallback to all annotation when not using raw text and no filter is given
+    boolean fallbackToAll = !useRawText && nodeAnnoFilter == null;
+    // Check if any of the provided filters is not a valid pattern
+    if (!fallbackToAll && nodeAnnoFilter != null) {
+      // If we can't produce a valid query for this annotation name fallback
+      // to retrieve all annotations.
+      fallbackToAll = nodeAnnoFilter.stream().map(annoName -> annoName.replaceFirst("::", ":"))
+          .anyMatch(nodeAnno -> !validQNamePattern.matcher(nodeAnno).matches());
     }
 
     StringBuilder aql = new StringBuilder();

@@ -58,7 +58,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.regex.Pattern;
 import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -233,9 +232,6 @@ public class VisualizerPanel extends CssLayout
 
   private VisualizerContextChanger visCtxChanger;
 
-
-  private final Pattern validQNamePattern =
-      Pattern.compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
   private static final String UNKNOWN = "<unknown>";
 
 
@@ -404,15 +400,13 @@ public class VisualizerPanel extends CssLayout
       }
       SaltProject p = getDocument(path, nodeAnnoFilter, visPlugin.isUsingRawText(), ui);
 
-      SDocument wholeDocument = null;
       if (p != null && p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
           && p.getCorpusGraphs().get(0).getDocuments() != null
           && !p.getCorpusGraphs().get(0).getDocuments().isEmpty()) {
-        wholeDocument = p.getCorpusGraphs().get(0).getDocuments().get(0);
+        SDocument wholeDocument = p.getCorpusGraphs().get(0).getDocuments().get(0);
+        input.setDocument(wholeDocument);
+        input.setRawText(new RawTextWrapper(wholeDocument.getDocumentGraph()));
       }
-
-      input.setDocument(wholeDocument);
-      input.setRawText(new RawTextWrapper(wholeDocument.getDocumentGraph()));
     } else {
       input.setDocument(result);
     }
