@@ -62,6 +62,7 @@ import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
 import org.corpus_tools.annis.api.model.VisualizerRule;
@@ -216,12 +217,12 @@ public class EmbeddedVisUI extends CommonUI {
     List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
     if (args.containsKey(KEY_FULLTEXT)) {
       
-      StringBuilder aql = new StringBuilder();
-      aql.append("node @* annis:node_name=/");
-      aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(corpusPath)));
-      aql.append("/");
+      boolean isUsingRawText = visPlugin.get().isUsingRawText();
+      String aql = Helper.buildDocumentQuery(corpusPath, null, isUsingRawText);
+
       Background.runWithCallback(
-          () -> api.subgraphForQuery(corpusPath.get(0), aql.toString(), QueryLanguage.AQL, null),
+          () -> api.subgraphForQuery(corpusPath.get(0), aql, QueryLanguage.AQL,
+              isUsingRawText ? AnnotationComponentType.ORDERING : null),
           new GraphMLLoaderCallback(corpusPath, visPlugin.get(), args));
 
 

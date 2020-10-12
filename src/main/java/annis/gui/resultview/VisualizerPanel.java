@@ -59,7 +59,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -403,14 +402,13 @@ public class VisualizerPanel extends CssLayout
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
             path.get(0), Joiner.on('/').join(path), input.getMappings(), ui);
       }
-      SaltProject p = getDocument(nodeAnnoFilter, ui);
+      SaltProject p = getDocument(path, nodeAnnoFilter, visPlugin.isUsingRawText(), ui);
 
       SDocument wholeDocument = null;
       if (p != null && p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
           && p.getCorpusGraphs().get(0).getDocuments() != null
           && !p.getCorpusGraphs().get(0).getDocuments().isEmpty()) {
         wholeDocument = p.getCorpusGraphs().get(0).getDocuments().get(0);
-
       }
 
       input.setDocument(wholeDocument);
@@ -422,46 +420,14 @@ public class VisualizerPanel extends CssLayout
   }
 
 
-  private SaltProject getDocument(List<String> nodeAnnoFilter, UI ui) {
+  private SaltProject getDocument(List<String> docPath, List<String> nodeAnnoFilter,
+      boolean useRawText, UI ui) {
 
     try {
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      String aql = Helper.buildDocumentQuery(docPath, nodeAnnoFilter, useRawText);
 
-      // Build a query that includes all (possible filtered by name) node of the document
-      boolean fallbackToAll = false;
-      if (nodeAnnoFilter == null || nodeAnnoFilter.isEmpty()) {
-        fallbackToAll = true;
-      } else {
-        nodeAnnoFilter = nodeAnnoFilter.stream().map(annoName -> annoName.replaceFirst("::", ":"))
-            .collect(Collectors.toList());
-        for (String nodeAnno : nodeAnnoFilter) {
-          if (!validQNamePattern.matcher(nodeAnno).matches()) {
-            // If we can't produce a valid query for this annotation name fallback
-            // to retrieve all annotations.
-            fallbackToAll = true;
-            break;
-          }
-        }
-      }
-
-      StringBuilder aql = new StringBuilder();
-      if (fallbackToAll) {
-        aql.append("node @* annis:node_name=/");
-        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(path)));
-        aql.append("/");
-      } else {
-        aql.append("(a#tok");
-        for (String nodeAnno : nodeAnnoFilter) {
-          aql.append(" | a#");
-          aql.append(nodeAnno);
-        }
-        aql.append(") & d#annis:node_name=/");
-        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(path)));
-        aql.append("/ & #a @* #d");
-      }
-
-
-      File graphML = api.subgraphForQuery(path.get(0), aql.toString(), QueryLanguage.AQL, null);
+      File graphML = api.subgraphForQuery(path.get(0), aql, QueryLanguage.AQL, null);
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
