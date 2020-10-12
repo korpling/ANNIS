@@ -123,6 +123,10 @@ class IntegrationTest {
     awaitCondition(120, () -> !_find(resultPanel, AutoHeightIFrame.class).isEmpty());
     AutoHeightIFrame iframe = _get(resultPanel, AutoHeightIFrame.class, spec -> spec.withCount(1));
     assertTrue(iframe.getState().getUrl().startsWith("/vis-iframe-res/"));
+
+    // Close the visualizer again
+    _click(btOpenVisualizer);
+    awaitCondition(120, () -> _find(resultPanel, AutoHeightIFrame.class).isEmpty());
   }
 
   @Test
