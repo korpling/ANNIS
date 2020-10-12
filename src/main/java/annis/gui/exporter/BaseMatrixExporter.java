@@ -69,12 +69,10 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
    * 
    * @param p
    * @param args
-   * @param alignmc
    * @param offset
-   * @param out
    */
-  private void processFirstPass(SaltProject p, Map<String, String> args, boolean alignmc,
-      int offset, Writer out, int nodeCount, UI ui) throws IOException {
+  private void processFirstPass(SaltProject p, Map<String, String> args, int offset, int nodeCount)
+      throws IOException {
     int recordNumber = offset;
     if (p != null && p.getCorpusGraphs() != null) {
 
@@ -96,12 +94,6 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
 
     try {
-
-      CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
-      if (keys == null || keys.isEmpty()) {
-        // auto set
-        keys = ExportHelper.getAllAnnotationsAsExporterKey(corpora, corporaApi);
-      }
 
       Map<String, String> args = new HashMap<>();
       for (String s : argsAsString.split("&|;")) {
@@ -138,6 +130,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       LinkedList<SDocument> serializedDocuments = new LinkedList<>();
 
       // 2. iterate over all matches and get the sub-graph for them
+      CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
       Optional<Exception> ex =
           Files.lines(matches.toPath(), StandardCharsets.UTF_8).map((currentLine) -> {
             try {
@@ -145,7 +138,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
                   contextLeft, contextRight, args);
               if (p.isPresent()) {
                 int currentOffset = offset.getAndIncrement();
-                processFirstPass(p.get(), args, alignmc, currentOffset, out, nodeCount, ui);
+                processFirstPass(p.get(), args, currentOffset, nodeCount);
 
                 // Serialize the salt project to a file for later use in the second pass
                 SDocument doc = p.get().getCorpusGraphs().get(0).getDocuments().get(0);
@@ -189,9 +182,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
         URI location = doc.getDocumentGraphLocation();
         // Delete the temporary file
         File tmpFile = new File(location.toFileString());
-        if (!tmpFile.delete()) {
-          log.warn("Could not delete temporary file {}", tmpFile.getAbsolutePath());
-        }
+        Files.deleteIfExists(tmpFile.toPath());
       }
 
       out.append(System.lineSeparator());
