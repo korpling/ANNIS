@@ -13,84 +13,87 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Configuration
 public class SecurityConfiguration {
 
-    private static final String LOGOUT_URL = "/logout";
-    private static final String LOGOUT_SUCCESS_URL = "/";
+  private static final String LOGOUT_URL = "/logout";
+  private static final String LOGOUT_SUCCESS_URL = "/";
 
-    public static final String ROLES_CLAIM = "https://corpus-tools.org/annis/roles";
+  public static final String ROLES_CLAIM = "https://corpus-tools.org/annis/roles";
 
-    public static final String FRAGMENT_TO_RESTORE = "ANNIS_FRAGENT_TO_RESTORE";
+  public static final String FRAGMENT_TO_RESTORE = "ANNIS_FRAGENT_TO_RESTORE";
 
 
-    public static class NoClientsConfiguredCondition extends NoneNestedConditions {
-        NoClientsConfiguredCondition() {
-            super(ConfigurationPhase.REGISTER_BEAN);
-        }
-
-        @Conditional(ClientsConfiguredCondition.class)
-        static class ClientsConfigured {
-        }
+  public static class NoClientsConfiguredCondition extends NoneNestedConditions {
+    NoClientsConfiguredCondition() {
+      super(ConfigurationPhase.REGISTER_BEAN);
     }
 
-    @EnableWebSecurity
     @Conditional(ClientsConfiguredCondition.class)
-    public static class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
+    static class ClientsConfigured {
+    }
+  }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            configureHttpVaadinSecurity(http);
-            // Configure logout
-            http.logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
-                    // Configure OAuth2 for login
-                    .and().oauth2Login();
-        }
+  @EnableWebSecurity
+  @Conditional(ClientsConfiguredCondition.class)
+  public static class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
 
-        @Override
-        public void configure(WebSecurity web) {
-            ignoreVaadinWebSecurity(web);
-        }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+      configureHttpVaadinSecurity(http);
+      // Configure logout
+      http.logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
+          // Configure OAuth2 for login
+          .and().oauth2Login();
     }
 
-    @EnableWebSecurity
-    @Conditional(NoClientsConfiguredCondition.class)
-    public static class NoLoginSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    public void configure(WebSecurity web) {
+      ignoreVaadinWebSecurity(web);
+    }
+  }
 
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            configureHttpVaadinSecurity(http);
-        }
+  @EnableWebSecurity
+  @Conditional(NoClientsConfiguredCondition.class)
+  public static class NoLoginSecurityConfig extends WebSecurityConfigurerAdapter {
 
-        @Override
-        public void configure(WebSecurity web) {
-            ignoreVaadinWebSecurity(web);
-        }
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+      configureHttpVaadinSecurity(http);
     }
 
-    private static void ignoreVaadinWebSecurity(WebSecurity web) {
-        web.ignoring().antMatchers(
-                // client-side JS code
-                "/VAADIN/**",
-
-                // the standard favicon URI
-                "/favicon.ico",
-
-                // web application manifest
-                "/manifest.webmanifest", "/sw.js", "/offline-page.html",
-
-                // icons and images
-                "/icons/**", "/images/**");
-
+    @Override
+    public void configure(WebSecurity web) {
+      ignoreVaadinWebSecurity(web);
     }
+  }
 
-    private static void configureHttpVaadinSecurity(HttpSecurity http) throws Exception {
-        http
-                // Allow all internal Vaadin requests.
-                .authorizeRequests().antMatchers("/PUSH/**").permitAll().antMatchers("/UIDL/**")
-                .permitAll().antMatchers("/HEARTBEAT/**").permitAll().antMatchers("/**").permitAll()
+  private static void ignoreVaadinWebSecurity(WebSecurity web) {
+    web.ignoring().antMatchers(
+        // client-side JS code
+        "/VAADIN/**",
 
-                // Restrict access to our application.
-                .and().authorizeRequests().anyRequest().authenticated()
+        // the standard favicon URI
+        "/favicon.ico",
 
-                // Not using Spring CSRF here to be able to use plain HTML for the login page
-                .and().csrf().disable();
-    }
+        // web application manifest
+        "/manifest.webmanifest", "/sw.js", "/offline-page.html",
+
+        // icons and images
+        "/icons/**", "/images/**");
+
+  }
+
+  private static void configureHttpVaadinSecurity(HttpSecurity http) throws Exception {
+    http
+        // Allow all internal Vaadin requests.
+        .authorizeRequests().antMatchers("/PUSH/**").permitAll().antMatchers("/UIDL/**").permitAll()
+        .antMatchers("/HEARTBEAT/**").permitAll().antMatchers("/**").permitAll()
+
+        // Restrict access to our application.
+        .and().authorizeRequests().anyRequest().authenticated()
+
+        // Not using Spring CSRF here to be able to use plain HTML for the login page
+        .and().csrf().disable();
+
+    // We depend on IFrames embedded into the application
+    http.headers().frameOptions().sameOrigin();
+  }
 }
