@@ -19,7 +19,6 @@ import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import annis.gui.AnnisUI;
 import annis.gui.UIConfig;
 import annis.gui.graphml.CorpusGraphMapper;
-import annis.gui.graphml.DocumentGraphMapper;
 import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
@@ -1104,19 +1103,4 @@ public class Helper {
     }
     return result;
   }
-
-  public static SDocumentGraph getRawTextDocumentGraph(String corpusName, List<String> docPath,
-      UI ui) throws ApiException, IOException, XMLStreamException {
-    SearchApi api = new SearchApi(getClient(ui));
-    StringBuilder aql = new StringBuilder();
-    aql.append("(t#tok | t#annis:ignored-tok) & doc#annis:node_name=/");
-    aql.append(AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-    aql.append("/ & #t @* doc");
-
-    File graphML = api.subgraphForQuery(corpusName, aql.toString(), QueryLanguage.AQL,
-        AnnotationComponentType.ORDERING);
-    
-    return DocumentGraphMapper.map(graphML);
-  }
-
 }
