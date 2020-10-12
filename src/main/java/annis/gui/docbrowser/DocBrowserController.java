@@ -40,7 +40,6 @@ import com.vaadin.ui.VerticalLayout;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,14 +51,12 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
@@ -92,8 +89,7 @@ public class DocBrowserController implements Serializable {
 
 
     public DocVisualizerFetcher(String corpus, List<String> docPath, String canonicalTitle,
-        String type,
-        Panel visHolder, VisualizerRule config, Button btn, final UI ui) {
+        String type, Panel visHolder, VisualizerRule config, Button btn, final UI ui) {
       this.corpus = corpus;
       this.docPath = docPath;
       this.btn = btn;
@@ -109,15 +105,14 @@ public class DocBrowserController implements Serializable {
 
       final boolean createVis = !initiatedVis.containsKey(canonicalTitle);
 
-      Optional<VisualizerPlugin> visualizer = ui.getVisualizerPlugins()
-          .stream()
+      Optional<VisualizerPlugin> visualizer = ui.getVisualizerPlugins().stream()
           .filter(p -> Objects.equal(p.getShortName(), type)).findAny();
 
       List<String> nodeAnnoFilter = null;
       if (visualizer.isPresent() && visualizer.get() instanceof FilteringVisualizerPlugin) {
-        nodeAnnoFilter = ((FilteringVisualizerPlugin) visualizer.get())
-            .getFilteredNodeAnnotationNames(corpus, docPath.get(docPath.size() - 1),
-                config.getMappings(), ui);
+        nodeAnnoFilter =
+            ((FilteringVisualizerPlugin) visualizer.get()).getFilteredNodeAnnotationNames(corpus,
+                docPath.get(docPath.size() - 1), config.getMappings(), ui);
       } else if (visualizer.isPresent() && visualizer.get().isUsingRawText()) {
         nodeAnnoFilter = new LinkedList<>();
       }
@@ -216,62 +211,53 @@ public class DocBrowserController implements Serializable {
         }
       }
 
-      StringBuilder aql = new StringBuilder();
-      if (fallbackToAll) {
-        aql.append("(n#node");
-        if(useRawText) {
-          aql.append(" | n#annis:ignored-tok");
-        }
-        aql.append(") & doc#annis:node_name=/");
-        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-        aql.append("/ & #n @* #doc");
-      } else {
-        aql.append("(a#tok");
-        if (useRawText) {
-          aql.append("| a#annis:ignored-tok");
-        }
-        for (String nodeAnno : nodeAnnoFilter) {
-          aql.append(" | a#");
-          aql.append(nodeAnno);
-        }
+      final SaltProject p = SaltFactory.createSaltProject();
+      SCorpusGraph cg = p.createCorpusGraph();
+      URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPath));
+      SDocument doc = cg.createDocument(docURI);
 
-        aql.append(") & doc#annis:node_name=/");
-        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-        aql.append("/ & #a @* #doc");
-      }
-
-      AnnotationComponentType componentFilter = null;
-      if (nodeAnnoFilter != null && nodeAnnoFilter.isEmpty() && useRawText) {
-        // If only the raw text is requested, limit the edges that are generated to the relevant
-        // ones
-        componentFilter = AnnotationComponentType.ORDERING;
-      }
-
-      File graphML =
-          api.subgraphForQuery(docPath.get(0), aql.toString(), QueryLanguage.AQL, componentFilter);
       try {
-        final SaltProject p = SaltFactory.createSaltProject();
-        SCorpusGraph cg = p.createCorpusGraph();
-        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPath));
-        SDocument doc = cg.createDocument(docURI);
-        SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+      if (useRawText) {
+        SDocumentGraph docGraph = Helper.getRawTextDocumentGraph(docPath.get(0), docPath, ui);
         doc.setDocumentGraph(docGraph);
 
-        SDocument sDoc = p.getCorpusGraphs().get(0).getDocuments().get(0);
-        input.setResult(sDoc);
-        if (useRawText) {
-          List<String> texts = new ArrayList<>();
-          for (STextualDS ds : docGraph.getTextualDSs()) {
-            texts.add(ds.getData());
+        input.setRawText(new RawTextWrapper(docGraph));
+      } else {
+        StringBuilder aql = new StringBuilder();
+        if (fallbackToAll) {
+          aql.append("(n#node");
+          aql.append(") & doc#annis:node_name=/");
+          aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+          aql.append("/ & #n @* #doc");
+        } else {
+          aql.append("(a#tok");
+          for (String nodeAnno : nodeAnnoFilter) {
+            aql.append(" | a#");
+            aql.append(nodeAnno);
           }
-          RawTextWrapper rawText = new RawTextWrapper();
-          rawText.setTexts(texts);
-          input.setRawText(rawText);
+
+          aql.append(") & doc#annis:node_name=/");
+          aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+          aql.append("/ & #a @* #doc");
+
+          File graphML = api.subgraphForQuery(docPath.get(0), aql.toString(), QueryLanguage.AQL,
+              null);
+
+
+            SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+            doc.setDocumentGraph(docGraph);
+
+            SDocument sDoc = p.getCorpusGraphs().get(0).getDocuments().get(0);
+            input.setResult(sDoc);
+
         }
-      } catch (XMLStreamException | IOException ex) {
-        log.error("Could not map GraphML to Salt", ex);
-        ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
       }
+    } catch (XMLStreamException | IOException ex) {
+      log.error("Could not map GraphML to Salt", ex);
+      ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
+    }
+
+
     } catch (ApiException e) {
       log.error("General remote service exception", e);
     }
@@ -317,7 +303,7 @@ public class DocBrowserController implements Serializable {
   public void openDocVis(String corpus, String docId, VisualizerRule visConfig, Button btn) {
 
     List<String> path = Helper.getCorpusPath(docId);
-    
+
     final String canonicalTitle =
         Joiner.on(" > ").join(path) + " - " + "Visualizer: " + visConfig.getDisplayName();
     final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";

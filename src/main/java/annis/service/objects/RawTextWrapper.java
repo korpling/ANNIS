@@ -14,16 +14,30 @@
 package annis.service.objects;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlRootElement;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.STextualDS;
 
 /**
  * Wrapper for the rest api call for extracting the raw text.
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-@XmlRootElement
 public class RawTextWrapper implements Serializable {
+
+  public RawTextWrapper() {
+
+  }
+
+  public RawTextWrapper(SDocumentGraph docGraph) {
+    if (docGraph != null) {
+      List<String> texts = new ArrayList<>();
+      for (STextualDS ds : docGraph.getTextualDSs()) {
+        texts.add(ds.getData());
+      }
+    }
+  }
 
   /**
    * 
