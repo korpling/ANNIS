@@ -53,9 +53,8 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
     res.setMimeType(getContentType());
 
     UUID uuid = UUID.randomUUID();
-    vis.getUI().access(() -> {
-      vis.getUI().getSession().getAttribute(IFrameResourceMap.class).put(uuid, res);
-    });
+    vis.getUI().access(
+        () -> vis.getUI().getSession().getAttribute(IFrameResourceMap.class).put(uuid, res));
 
     URI base;
     try {

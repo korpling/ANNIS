@@ -214,8 +214,7 @@ public class VisualizerPanel extends CssLayout
    */
   public VisualizerPanel(final VisualizerRule visRule, int visId, SDocument result, Match match,
       Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered, String htmlID,
-      String resultID, VisualizerContextChanger parent, String segmentationName, AnnisUI ui)
-      throws IOException {
+      String resultID, VisualizerContextChanger parent, String segmentationName, AnnisUI ui) {
     this.ui = ui;
     this.visRule = visRule;
     this.visId = visId;
