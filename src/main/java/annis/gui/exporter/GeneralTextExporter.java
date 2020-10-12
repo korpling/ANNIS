@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,6 +34,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.xml.stream.XMLStreamException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
@@ -168,36 +170,29 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
       final AtomicInteger offset = new AtomicInteger();
       File matches = searchApi.find(query);
       // 2. iterate over all matches and get the sub-graph for them
-      Optional<Exception> ex =
-          Files.lines(matches.toPath(), StandardCharsets.UTF_8).map((currentLine) -> {
-            try {
-              Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
-                  contextLeft, contextRight, args);
-              if (p.isPresent()) {
-                int currentOffset = offset.getAndIncrement();
-                convertText(p.get(), finalKeys, args, out, currentOffset, ui);
+      try (LineIterator lines = FileUtils.lineIterator(matches, StandardCharsets.UTF_8.name())) {
+        while (lines.hasNext()) {
+          String currentLine = lines.nextLine();
+          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
+              contextLeft, contextRight, args);
+          if (p.isPresent()) {
+            int currentOffset = offset.getAndIncrement();
+            convertText(p.get(), finalKeys, args, out, currentOffset, ui);
 
-                if (eventBus != null) {
-                  eventBus.post(currentOffset + 1);
-                }
-              }
-
-              if (Thread.interrupted()) {
-                return new InterruptedException("Exporter job was interrupted");
-              }
-            } catch (Exception e) {
-              return e;
+            if (eventBus != null) {
+              eventBus.post(currentOffset + 1);
             }
-            return null;
-          }).filter((result) -> result != null).findAny();
+          }
 
-      if (ex.isPresent()) {
-        return ex.get();
+          if (Thread.interrupted()) {
+            return new InterruptedException("Exporter job was interrupted");
+          }
+        }
       }
 
       return null;
 
-    } catch (ApiException | IOException ex) {
+    } catch (ApiException | IOException | XMLStreamException ex) {
       return ex;
     }
   }
