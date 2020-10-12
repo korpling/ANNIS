@@ -58,6 +58,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
@@ -115,6 +116,10 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
  * @author thomas
  */
 public class Helper {
+
+  private static final Pattern validQNamePattern =
+      Pattern.compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
+
 
   public static List<String> getCorpusPath(final SCorpusGraph corpusGraph, final SDocument doc) {
     final List<String> result = new LinkedList<String>();
@@ -1102,5 +1107,57 @@ public class Helper {
       }
     }
     return result;
+  }
+
+  /**
+   * Build a query that includes all (possible filtered by name) node of the document.
+   * 
+   * @param docPath the path of the document
+   * @param nodeAnnoFilter A list of node annotation names for filtering the nodes or null if no
+   *        filtering should be applied.
+   * @param useRawText If true, only extract the original raw text
+   * @return
+   */
+  public static String buildDocumentQuery(List<String> docPath, List<String> nodeAnnoFilter,
+      boolean useRawText) {
+
+    boolean fallbackToAll = false;
+    if (!useRawText) {
+      if (nodeAnnoFilter == null) {
+        fallbackToAll = true;
+      } else {
+        nodeAnnoFilter = nodeAnnoFilter.stream()
+            .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
+        for (String nodeAnno : nodeAnnoFilter) {
+          if (!validQNamePattern.matcher(nodeAnno).matches()) {
+            // If we can't produce a valid query for this annotation name fallback
+            // to retrieve all annotations.
+            fallbackToAll = true;
+            break;
+          }
+        }
+      }
+    }
+
+    StringBuilder aql = new StringBuilder();
+    if (fallbackToAll) {
+      aql.append("(n#node");
+      aql.append(") & doc#annis:node_name=/");
+      aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+      aql.append("/ & #n @* #doc");
+    } else {
+      aql.append("(a#tok");
+      if (nodeAnnoFilter != null) {
+        for (String nodeAnno : nodeAnnoFilter) {
+          aql.append(" | a#");
+          aql.append(nodeAnno);
+        }
+      }
+
+      aql.append(") & doc#annis:node_name=/");
+      aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+      aql.append("/ & #a @* #doc");
+    }
+    return aql.toString();
   }
 }

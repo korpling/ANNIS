@@ -76,9 +76,7 @@ class EmbeddedVisTest {
       request.setParameter("embedded_fulltext", "");
       ui.attachToPath("/embeddedvis/raw_text", VaadinRequest.getCurrent());
       
-      ui.attachToPath("/embeddedvis/grid", VaadinRequest.getCurrent());
-      
-      awaitCondition(30, () -> !_find(Label.class,
+      awaitCondition(60, () -> !_find(Label.class,
           spec -> spec.withPredicate(l -> "raw_text_label".equals(l.getStyleName()))).isEmpty());
       Label labelRawText = _get(Label.class,
           spec -> spec.withPredicate(l -> "raw_text_label".equals(l.getStyleName())));

@@ -25,7 +25,7 @@ import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.RawTextWrapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.vaadin.server.FontAwesome;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Alignment;
@@ -45,12 +45,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.salt.SaltFactory;
@@ -160,13 +159,10 @@ public class DocBrowserController implements Serializable {
 
   private final static Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
-  private static final Resource EYE_ICON = FontAwesome.EYE;
+  private static final Resource EYE_ICON = VaadinIcons.EYE;
 
-  private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
+  private static final Resource DOC_ICON = VaadinIcons.FILE_TEXT_O;
 
-
-  private static final Pattern validQNamePattern =
-      Pattern.compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
 
   /**
    * Creates the input. It only takes the salt project or the raw text from the text table, never
@@ -194,50 +190,15 @@ public class DocBrowserController implements Serializable {
     try {
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
-      // Build a query that includes all (possible filtered by name) node of the document
-      boolean fallbackToAll = false;
-      if (!useRawText) {
-        if (nodeAnnoFilter == null) {
-          fallbackToAll = true;
-        } else {
-          nodeAnnoFilter = nodeAnnoFilter.stream()
-              .map((anno_name) -> anno_name.replaceFirst("::", ":")).collect(Collectors.toList());
-          for (String nodeAnno : nodeAnnoFilter) {
-            if (!validQNamePattern.matcher(nodeAnno).matches()) {
-              // If we can't produce a valid query for this annotation name fallback
-              // to retrieve all annotations.
-              fallbackToAll = true;
-              break;
-            }
-          }
-        }
-      }
-
       final SaltProject p = SaltFactory.createSaltProject();
       SCorpusGraph cg = p.createCorpusGraph();
       URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPath));
       SDocument doc = cg.createDocument(docURI);
 
-      StringBuilder aql = new StringBuilder();
-      if (fallbackToAll) {
-        aql.append("(n#node");
-        aql.append(") & doc#annis:node_name=/");
-        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-        aql.append("/ & #n @* #doc");
-      } else {
-        aql.append("(a#tok");
-        if (nodeAnnoFilter != null) {
-          for (String nodeAnno : nodeAnnoFilter) {
-            aql.append(" | a#");
-            aql.append(nodeAnno);
-          }
-        }
-
-        aql.append(") & doc#annis:node_name=/");
-        aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
-        aql.append("/ & #a @* #doc");
-      }
-      File graphML = api.subgraphForQuery(docPath.get(0), aql.toString(), QueryLanguage.AQL, null);
+      // Build a query that includes all (possible filtered by name) node of the document
+      String aql = Helper.buildDocumentQuery(docPath, nodeAnnoFilter, useRawText);
+      File graphML = api.subgraphForQuery(docPath.get(0), aql, QueryLanguage.AQL,
+          useRawText ? AnnotationComponentType.ORDERING : null);
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
       doc.setDocumentGraph(docGraph);
