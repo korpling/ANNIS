@@ -31,7 +31,6 @@ import annis.service.objects.RawTextWrapper;
 import annis.visualizers.LoadableVisualizer;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.base.Preconditions;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
@@ -56,7 +55,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -165,26 +163,6 @@ public class VisualizerPanel extends CssLayout
         return null;
       }
       return new ByteArrayInputStream(byteStream.toByteArray());
-    }
-  }
-
-  public class LoadComponentTask implements Callable<Component> {
-
-    private final UI ui;
-
-    public LoadComponentTask(UI ui) {
-      Preconditions.checkNotNull(ui);
-      this.ui = ui;
-    }
-
-    @Override
-    public Component call() throws Exception {
-      // only create component if not already created
-      if (vis == null) {
-        return createComponent(ui);
-      } else {
-        return vis;
-      }
     }
   }
 
@@ -542,7 +520,14 @@ public class VisualizerPanel extends CssLayout
 
       ExecutorService execService = Executors.newSingleThreadExecutor();
 
-      final Future<Component> future = execService.submit(new LoadComponentTask(ui));
+      final Future<Component> future = execService.submit(() -> {
+        // only create component if not already created
+        if (vis == null) {
+          return createComponent(ui);
+        } else {
+          return vis;
+        }
+      });
 
       // run the actual code to load the visualizer
       Background.run(new BackgroundJob(future, callback));

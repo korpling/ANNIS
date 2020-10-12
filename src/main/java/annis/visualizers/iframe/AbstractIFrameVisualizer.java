@@ -20,7 +20,6 @@ import annis.libgui.visualizers.IFrameResource;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.libgui.visualizers.ResourcePlugin;
 import annis.libgui.visualizers.VisualizerInput;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -47,7 +46,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
   @Override
   public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle) {
 
-    VaadinSession session = vis.getUI().getSession();
+
 
     ByteArrayOutputStream outStream = new ByteArrayOutputStream();
     writeOutput(vis, outStream);
@@ -57,7 +56,9 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
     res.setMimeType(getContentType());
 
     UUID uuid = UUID.randomUUID();
-    session.getAttribute(IFrameResourceMap.class).put(uuid, res);
+    vis.getUI().access(() -> {
+      vis.getUI().getSession().getAttribute(IFrameResourceMap.class).put(uuid, res);
+    });
 
     URI base;
     try {
