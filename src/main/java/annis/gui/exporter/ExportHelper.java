@@ -50,8 +50,9 @@ public class ExportHelper {
       SubgraphWithContext subgraphQuery = new SubgraphWithContext();
       subgraphQuery.setLeft(contextLeft);
       subgraphQuery.setRight(contextRight);
+      subgraphQuery.segmentation(null);
       subgraphQuery.setNodeIds(parsedMatch.getSaltIDs());
-
+      
       if (args.containsKey("segmentation")) {
         subgraphQuery.setSegmentation(args.get("segmentation"));
       }

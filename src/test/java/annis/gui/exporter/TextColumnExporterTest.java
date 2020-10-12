@@ -29,13 +29,13 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @ActiveProfiles({"desktop", "test"})
 @WebAppConfiguration
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-class CSVExporterTest {
+class TextColumnExporterTest {
 
   @Autowired
   private BeanFactory beanFactory;
 
   @Autowired
-  private CSVExporter exporter;
+  private TextColumnExporter exporter;
   private AnnisUI ui;
 
 
@@ -60,10 +60,11 @@ class CSVExporterTest {
     out.close();
     String[] lines = out.toString().split("\n");
     assertEquals(3, lines.length);
-    assertEquals("1_id\t1_span\t1_anno_tiger::lemma\t1_anno_tiger::morph\t1_anno_tiger::pos",
-        lines[0]);
-    assertEquals("salt:/pcc2/11299#tok_1\tFeigenblatt\tFeigenblatt\tNom.Sg.Neut\tNN", lines[1]);
-    assertEquals("salt:/pcc2/11299#tok_143\tFeigenblatt\tFeigenblatt\tDat.Sg.Neut\tNN", lines[2]);
+    assertEquals("match_number\tspeaker\tleft_context\tmatch_column\tright_context", lines[0]);
+    assertEquals("1\t\t\tFeigenblatt\tDie Jugendlichen in Zossen wollen", lines[1]);
+    assertEquals(
+        "2\t\tJugendlichen wurden somit zum bloßen\tFeigenblatt\tdegradiert . Nicht über sondern",
+        lines[2]);
   }
 
 }
