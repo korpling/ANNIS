@@ -1,4 +1,4 @@
-package annis.gui.it;
+package annis.gui;
 
 import static annis.gui.TestHelper.awaitCondition;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
@@ -7,12 +7,13 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._setValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
-import annis.gui.AnnisUI;
-import annis.gui.EmbeddedVisUI;
 import annis.gui.components.codemirror.AqlCodeEditor;
+import annis.gui.docbrowser.DocBrowserPanel;
+import annis.gui.docbrowser.DocBrowserTable;
 import annis.gui.resultview.SingleResultPanel;
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.gui.widgets.grid.AnnotationGrid;
@@ -21,7 +22,10 @@ import annis.visualizers.component.kwic.KWICComponent;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
@@ -50,7 +54,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @ActiveProfiles({"desktop", "test"})
 @WebAppConfiguration
 @DirtiesContext(classMode = ClassMode.AFTER_CLASS)
-class SearchTest {
+class IntegrationTest {
 
   @Autowired
   private BeanFactory beanFactory;
@@ -69,7 +73,7 @@ class SearchTest {
     MockVaadin.tearDown();
   }
 
-  private void executeTokenSearch() {
+  private void selectCorpus() {
     UI.getCurrent().getNavigator().navigateTo("");
 
     // Filter for the corpus name in case the corpus list has too many entries and does not show
@@ -81,6 +85,10 @@ class SearchTest {
     Grid<String> grid = _get(Grid.class,
         spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
     grid.getSelectionModel().select("pcc2");
+  }
+
+  private void executeTokenSearch() {
+    selectCorpus();
 
     // Set the query and submit query
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
@@ -156,5 +164,83 @@ class SearchTest {
           paramsOriginalUrl.stream().anyMatch(p -> EmbeddedVisUI.KEY_MATCH.equals(p.getName())
               && "pcc2/11299#tok_1".equals(p.getValue())));
     }
+  }
+
+
+  @Test
+  void aboutWindow() throws InterruptedException {
+    UI.getCurrent().getNavigator().navigateTo("");
+
+    _click(_get(Button.class, spec -> spec.withCaption("About ANNIS")));
+
+    // Check that the windows has opened
+    assertNotNull(_get(Window.class, spec -> spec.withCaption("About ANNIS")));
+
+    // Close the window again
+    Button btClose = _get(Button.class, spec -> spec.withCaption("Close"));
+    assertNotNull(btClose);
+    _click(btClose);
+
+    // Window should be closed
+    assertEquals(0, _find(Window.class, spec -> spec.withCaption("About ANNIS")).size());
+  }
+
+  @Test
+  void openSourceWindow() {
+    UI.getCurrent().getNavigator().navigateTo("");
+
+    _click(_get(Button.class, spec -> spec.withCaption("Help us make ANNIS better!")));
+
+    // Check that the windows has opened
+    assertNotNull(_get(Window.class, spec -> spec.withCaption("Help us make ANNIS better!")));
+
+    // Close the window again
+    Button btClose = _get(Button.class, spec -> spec.withCaption("Close"));
+    assertNotNull(btClose);
+    _click(btClose);
+
+    // Window should be closed
+    assertEquals(0,
+        _find(Window.class, spec -> spec.withCaption("Help us make ANNIS better!")).size());
+  }
+
+  @Test
+  void showDocumentRawText() {
+    UI.getCurrent().getNavigator().navigateTo("");
+
+    ui.getSearchView().getDocBrowserController().openDocBrowser("pcc2");
+
+    DocBrowserPanel panel = _get(DocBrowserPanel.class);
+
+    awaitCondition(120, () -> !_find(panel, DocBrowserTable.class).isEmpty());
+
+    DocBrowserTable docBrowserTable = _get(panel, DocBrowserTable.class);
+    List<Button> fullTextButtons =
+        _find(docBrowserTable, Button.class, spec -> spec.withCaption("full text"));
+    assertEquals(2, fullTextButtons.size());
+
+    // Filter by the document name to reduce the number of buttons we can press
+    TextField textFilter = _get(panel, TextField.class);
+    _setValue(textFilter, "11299");
+
+    // Wait until filter is applied
+    awaitCondition(30,
+        () -> _find(docBrowserTable, Button.class, spec -> spec.withCaption("full text"))
+            .size() == 1);
+
+    // Click on the button to open the full text visualization for the first document
+    _click(_get(docBrowserTable, Button.class, spec -> spec.withCaption("full text")));
+
+    Component rawTextPanel = ui.getSearchView().getTabSheet().getSelectedTab();
+    Tab selectedTab = ui.getSearchView().getTabSheet().getTab(rawTextPanel);
+    assertEquals("pcc2 > 11299 - ...", selectedTab.getCaption());
+
+    // Wait for label to appear
+    awaitCondition(20, () -> !_find(rawTextPanel, Label.class).isEmpty());
+    Label rawTextLabel = _get(rawTextPanel, Label.class);
+    assertTrue(rawTextLabel.getValue()
+        .startsWith("Feigenblatt Die Jugendlichen in Zossen wollen ein Musikcafé ."));
+    assertTrue(rawTextLabel.getValue().endsWith("Die glänzten diesmal noch mit Abwesenheit ."));
+
   }
 }

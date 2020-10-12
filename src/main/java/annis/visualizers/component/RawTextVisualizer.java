@@ -20,13 +20,13 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.RawTextWrapper;
 import com.vaadin.server.Sizeable;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.v7.ui.Label;
-import com.vaadin.v7.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.regex.Pattern;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SaltProject;
@@ -79,7 +79,7 @@ public class RawTextVisualizer extends AbstractVisualizer {
     p.setSizeFull();
 
     // some layout configuration
-    p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    p.addStyleName(ValoTheme.PANEL_BORDERLESS);
     p.addStyleName(PANEL_CLASS);
 
     // enable webfonts
