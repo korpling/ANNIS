@@ -32,9 +32,9 @@ public class RawTextWrapper implements Serializable {
 
   public RawTextWrapper(SDocumentGraph docGraph) {
     if (docGraph != null) {
-      List<String> texts = new ArrayList<>();
+      this.texts = new ArrayList<>();
       for (STextualDS ds : docGraph.getTextualDSs()) {
-        texts.add(ds.getData());
+        this.texts.add(ds.getData());
       }
     }
   }

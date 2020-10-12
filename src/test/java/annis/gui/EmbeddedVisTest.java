@@ -4,6 +4,7 @@ import static annis.gui.TestHelper.awaitCondition;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import com.github.mvysny.kaributesting.mockhttp.MockRequest;
@@ -11,6 +12,7 @@ import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.github.mvysny.kaributesting.v8.MockVaadinKt;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.internal.UIScopeImpl;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
 import org.junit.jupiter.api.AfterEach;
@@ -63,6 +65,27 @@ class EmbeddedVisTest {
                 .isEmpty());
         Link link = _get(Link.class, spec -> spec.withCaption("Show in ANNIS search interface"));
         assertEquals("dontprint", link.getStyleName());
+    }
+
+    @Test
+    void showRawText() {
+      EmbeddedVisUI ui = (EmbeddedVisUI) UI.getCurrent();
+
+      MockRequest request = MockVaadinKt.getMock(VaadinRequest.getCurrent());
+      request.setParameter("embedded_match", "pcc2/11299#tok_1");
+      request.setParameter("embedded_fulltext", "");
+      ui.attachToPath("/embeddedvis/raw_text", VaadinRequest.getCurrent());
+      
+      ui.attachToPath("/embeddedvis/grid", VaadinRequest.getCurrent());
+      
+      awaitCondition(30, () -> !_find(Label.class,
+          spec -> spec.withPredicate(l -> "raw_text_label".equals(l.getStyleName()))).isEmpty());
+      Label labelRawText = _get(Label.class,
+          spec -> spec.withPredicate(l -> "raw_text_label".equals(l.getStyleName())));
+      assertTrue(labelRawText.getValue()
+          .startsWith("Feigenblatt Die Jugendlichen in Zossen wollen ein Musikcafé ."));
+      assertTrue(labelRawText.getValue().endsWith("Die glänzten diesmal noch mit Abwesenheit ."));
+
     }
 
 }
