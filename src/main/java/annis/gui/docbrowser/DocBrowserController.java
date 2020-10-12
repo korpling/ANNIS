@@ -35,7 +35,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.io.File;
 import java.io.IOException;
@@ -88,7 +87,7 @@ public class DocBrowserController implements Serializable {
 
 
     public DocVisualizerFetcher(String corpus, List<String> docPath, String canonicalTitle,
-        String type, Panel visHolder, VisualizerRule config, Button btn, final UI ui) {
+        String type, Panel visHolder, VisualizerRule config, Button btn) {
       this.corpus = corpus;
       this.docPath = docPath;
       this.btn = btn;
@@ -289,6 +288,6 @@ public class DocBrowserController implements Serializable {
     this.visibleVisHolder.put(canonicalTitle, visHolder);
 
     Background.run(new DocVisualizerFetcher(corpus, path, canonicalTitle, visConfig.getVisType(),
-        visHolder, visConfig, btn, ui));
+        visHolder, visConfig, btn));
   }
 }
