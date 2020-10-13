@@ -362,7 +362,7 @@ public class PagingComponent extends Panel implements Button.ClickListener {
       String prefix = "Result for: <span class=\"" + Helper.CORPUS_FONT_FORCE + "\">";
       lblInfo.setDescription(prefix + text.replaceAll("\n", " ") + "</span>");
       lblInfo.setValue(text.length() < 50
-          ? prefix + StringEscapeUtils.escapeHtml4(text.substring(0, text.length()))
+          ? prefix + StringEscapeUtils.escapeHtml4(text)
           : prefix + StringEscapeUtils.escapeHtml4(text.substring(0, 50)) + " ... </span>");
     }
   }
