@@ -313,4 +313,5 @@ class IntegrationTest {
     assertTrue(rawTextLabel.getValue().endsWith("Die glänzten diesmal noch mit Abwesenheit ."));
 
   }
+
 }
