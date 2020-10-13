@@ -12,12 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.components.codemirror.AqlCodeEditor;
+import annis.gui.components.medialement.MediaElementPlayer;
 import annis.gui.docbrowser.DocBrowserPanel;
 import annis.gui.docbrowser.DocBrowserTable;
 import annis.gui.resultview.SingleResultPanel;
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.Row;
+import annis.visualizers.component.grid.GridComponent;
 import annis.visualizers.component.kwic.KWICComponent;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.vaadin.spring.internal.UIScopeImpl;
@@ -73,22 +75,22 @@ class IntegrationTest {
     MockVaadin.tearDown();
   }
 
-  private void selectCorpus() {
+  private void selectCorpus(String corpusName) {
     UI.getCurrent().getNavigator().navigateTo("");
 
     // Filter for the corpus name in case the corpus list has too many entries and does not show
     // the pcc2 corpus yet
-    _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), "pcc2");
+    _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), corpusName);
 
     // Explicitly select the corpus
     @SuppressWarnings("unchecked")
     Grid<String> grid = _get(Grid.class,
         spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
-    grid.getSelectionModel().select("pcc2");
+    grid.getSelectionModel().select(corpusName);
   }
 
-  private void executeTokenSearch() {
-    selectCorpus();
+  private void executeTokenSearch(String corpusName) {
+    selectCorpus(corpusName);
 
     // Set the query and submit query
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
@@ -100,7 +102,7 @@ class IntegrationTest {
   @Test
   void tokenSearchPcc2() throws InterruptedException, IOException {
 
-    executeTokenSearch();
+    executeTokenSearch("pcc2");
 
     // Test that the cell values have the correct token value
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
@@ -130,8 +132,45 @@ class IntegrationTest {
   }
 
   @Test
+  void tokenSearchDialog() throws InterruptedException, IOException {
+
+    executeTokenSearch("dialog.demo");
+
+    // Test that there is a grid visualizer
+    SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
+    GridComponent gridVis = _get(resultPanel, GridComponent.class,
+        spec -> spec.withPredicate(g -> !(g instanceof KWICComponent)));
+    AnnotationGrid annoGrid = _get(gridVis, AnnotationGrid.class);
+    ArrayList<Row> tokens = annoGrid.getRowsByAnnotation().get("default_ns::norm0");
+    assertEquals(1, tokens.size());
+    assertEquals(5, tokens.get(0).getEvents().size());
+    assertEquals("äh", tokens.get(0).getEvents().get(0).getValue());
+    assertEquals("fang", tokens.get(0).getEvents().get(1).getValue());
+    assertEquals("einfach", tokens.get(0).getEvents().get(2).getValue());
+    assertEquals("mal", tokens.get(0).getEvents().get(3).getValue());
+    assertEquals("an", tokens.get(0).getEvents().get(4).getValue());
+
+    // Open the video visualizer and check that media component is loaded
+    Button btOpenVisualizer =
+        _get(resultPanel, Button.class, spec -> spec.withCaption("video"));
+    _click(btOpenVisualizer);
+    awaitCondition(120, () -> !_find(resultPanel, MediaElementPlayer.class).isEmpty());
+    MediaElementPlayer player =
+        _get(resultPanel, MediaElementPlayer.class, spec -> spec.withCount(1));
+    assertEquals("video/webm", player.getState().getMimeType());
+    assertEquals(
+        "/Binary?file=dialog.demo%2Fdialog.demo%2Fdialog.demo.webm&toplevelCorpusName=dialog.demo",
+        player.getState().getResourceURL());
+
+    // Close the visualizer again
+    _click(btOpenVisualizer);
+    awaitCondition(120, () -> _find(resultPanel, MediaElementPlayer.class).isEmpty());
+  }
+
+
+  @Test
   void shareSingleResult() {
-    executeTokenSearch();
+    executeTokenSearch("pcc2");
 
     // Activate the share window
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
