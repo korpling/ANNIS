@@ -321,7 +321,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                 sentenceQuery.append("\n& #").append(count).append("_i_#").append(i.toString());
             }
         } catch (Exception ex) {
-            ex = null;
+          // Ignore this exception
         }
         StringBuilder metaQuery = new StringBuilder();
         Iterator<MetaBox> itMetaBoxes = mboxes.iterator();
