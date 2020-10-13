@@ -15,7 +15,6 @@ package annis.visualizers.component.tree;
 
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.tree.GraphicsBackend.Alignment;
-import com.google.common.base.Preconditions;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.util.Pair;
 import java.awt.geom.CubicCurve2D;
@@ -226,21 +225,23 @@ public class ConstituentLayouter<T extends GraphicsItem> {
       Rectangle2D targetRect = treeLayout.getRect(e.getTarget());
 
       CubicCurve2D curveData = secedgeCurve(treeLayout.getOrientation(), sourceRect, targetRect);
-      T secedgeElem =
-          backend.cubicCurve(curveData, styler.getStroke(e, input), styler.getEdgeColor(e, input));
-      secedgeElem.setZValue(-2);
+      if (curveData != null) {
+        T secedgeElem = backend.cubicCurve(curveData, styler.getStroke(e, input),
+            styler.getEdgeColor(e, input));
+        secedgeElem.setZValue(-2);
 
-      T arrowElem = backend.arrow(curveData.getP1(), curveData.getCtrlP1(),
-          new Rectangle2D.Double(0, 0, 8, 8), styler.getEdgeColor(e, input));
-      arrowElem.setZValue(-1);
-      arrowElem.setParentItem(secedgeElem);
+        T arrowElem = backend.arrow(curveData.getP1(), curveData.getCtrlP1(),
+            new Rectangle2D.Double(0, 0, 8, 8), styler.getEdgeColor(e, input));
+        arrowElem.setZValue(-1);
+        arrowElem.setParentItem(secedgeElem);
 
-      Point2D labelPos = evaluate(curveData, 0.8);
+        Point2D labelPos = evaluate(curveData, 0.8);
 
-      T label = backend.makeLabel(labeler.getLabel(e, input), labelPos, styler.getFont(e),
-          styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e, input));
-      label.setParentItem(secedgeElem);
-      secedgeElem.setParentItem(treeLayout.getParentItem());
+        T label = backend.makeLabel(labeler.getLabel(e, input), labelPos, styler.getFont(e),
+            styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e, input));
+        label.setParentItem(secedgeElem);
+        secedgeElem.setParentItem(treeLayout.getParentItem());
+      }
     }
   }
 
@@ -498,13 +499,19 @@ public class ConstituentLayouter<T extends GraphicsItem> {
       Rectangle2D targetRect) {
     Pair<RectangleSide> sidePair = findBestConnection(sourceRect, targetRect);
 
-    Point2D startPoint = sideMidPoint(sourceRect, sidePair.getFirst());
-    Point2D endPoint = sideMidPoint(targetRect, sidePair.getSecond());
+    if (sidePair != null) {
 
-    double middleX = (startPoint.getX() + endPoint.getX()) / 2.0;
-    double middleY = 50 * -verticalOrientation.value + (startPoint.getY() + endPoint.getY()) / 2;
-    return new CubicCurve2D.Double(startPoint.getX(), startPoint.getY(), middleX, middleY, middleX,
-        middleY, endPoint.getX(), endPoint.getY());
+      Point2D startPoint = sideMidPoint(sourceRect, sidePair.getFirst());
+      Point2D endPoint = sideMidPoint(targetRect, sidePair.getSecond());
+
+      double middleX = (startPoint.getX() + endPoint.getX()) / 2.0;
+      double middleY = 50 * -verticalOrientation.value + (startPoint.getY() + endPoint.getY()) / 2;
+      return new CubicCurve2D.Double(startPoint.getX(), startPoint.getY(), middleX, middleY,
+          middleX, middleY, endPoint.getX(), endPoint.getY());
+    } else {
+      // No connection found
+      return null;
+    }
   }
 
   private Point2D sideMidPoint(Rectangle2D rect, RectangleSide side) {
