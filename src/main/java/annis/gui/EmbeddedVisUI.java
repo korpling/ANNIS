@@ -338,55 +338,55 @@ public class EmbeddedVisUI extends CommonUI {
       Map<String, String[]> args) {
     try {
       // find the matching visualizer
-      final Optional<VisualizerPlugin> visPlugin =
+      final Optional<VisualizerPlugin> visPluginOpt =
           visualizers.stream().filter(vis -> Objects.equal(vis.getShortName(), visName)).findAny();
-      if (!visPlugin.isPresent()) {
+
+      if (visPluginOpt.isPresent()) {
+        VisualizerPlugin visPlugin = visPluginOpt.get();
+        URI uri = new URI(rawUri);
+        // fetch content of the URI
+        ApiClient client = Helper.getClient(this);
+
+        displayLoadingIndicator();
+
+        // copy the arguments for using them later in the callback
+        final Map<String, String[]> argsCopy = new LinkedHashMap<>(args);
+        Request request = new okhttp3.Request.Builder().url(uri.toASCIIString()).build();
+
+        Background.runWithCallback(() -> client.getHttpClient().newCall(request).execute(),
+            new FutureCallback<Response>() {
+              @Override
+              public void onFailure(Throwable t) {
+                log.error("Could not query Salt graph for embedded visualization.", t);
+                displayMessage("Could not query the result.", t.getMessage());
+              }
+
+              @Override
+              public void onSuccess(Response response) {
+                try {
+                  File tmpFile = File.createTempFile("embeddded-vis-fetched-result-", ".salt");
+                  try (FileOutputStream out = new FileOutputStream(tmpFile)) {
+                    IOUtils.copy(response.body().byteStream(), out);
+                  } catch (IOException ex) {
+                    log.error("Could not copy fetched GraphML file:", ex);
+                  }
+
+                  SDocument doc = SaltFactory.createSDocument();
+                  doc.loadDocumentGraph(
+                      org.eclipse.emf.common.util.URI.createFileURI(tmpFile.getAbsolutePath()));
+                  generateVisualizerFromDocument(doc, argsCopy, visPlugin);
+
+                } catch (IOException ex) {
+                  log.error("Could not parse Salt XML", ex);
+                  displayMessage("Could not parse Salt XML", ex.toString());
+                }
+              }
+
+            });
+      } else {
         displayMessage("Unknown visualizer \"" + visName + "\"",
             "This ANNIS instance does not know the given visualizer.");
-        return;
       }
-
-      URI uri = new URI(rawUri);
-      // fetch content of the URI
-      ApiClient client = Helper.getClient(this);
-
-      displayLoadingIndicator();
-
-      // copy the arguments for using them later in the callback
-      final Map<String, String[]> argsCopy = new LinkedHashMap<>(args);
-      Request request = new okhttp3.Request.Builder().url(uri.toASCIIString()).build();
-
-      Background.runWithCallback(() -> client.getHttpClient().newCall(request).execute(),
-          new FutureCallback<Response>() {
-            @Override
-            public void onFailure(Throwable t) {
-              log.error("Could not query Salt graph for embedded visualization.", t);
-              displayMessage("Could not query the result.", t.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Response response) {
-              try {
-                File tmpFile = File.createTempFile("embeddded-vis-fetched-result-", ".salt");
-                try (FileOutputStream out = new FileOutputStream(tmpFile)) {
-                  IOUtils.copy(response.body().byteStream(), out);
-                } catch (IOException ex) {
-                  log.error("Could not copy fetched GraphML file:", ex);
-                }
-
-                SDocument doc = SaltFactory.createSDocument();
-                doc.loadDocumentGraph(
-                    org.eclipse.emf.common.util.URI.createFileURI(tmpFile.getAbsolutePath()));
-                generateVisualizerFromDocument(doc, argsCopy, visPlugin.get());
-
-              } catch (IOException ex) {
-                log.error("Could not parse Salt XML", ex);
-                displayMessage("Could not parse Salt XML", ex.toString());
-              }
-            }
-
-          });
-
     } catch (URISyntaxException ex) {
       displayMessage("Invalid URL", "The provided URL is malformed:<br />" + ex.getMessage());
     } catch (Throwable ex) {
