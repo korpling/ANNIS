@@ -13,8 +13,9 @@
  */
 package annis.gui.flatquerybuilder;
 
+import annis.gui.components.ExceptionDialog;
 import com.vaadin.server.ClassResource;
-import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import java.io.IOException;
 import java.text.Normalizer;
 import java.util.HashMap;
@@ -147,15 +148,8 @@ public class ReducingStringComparator {
                 ALLOGRAPHS.put(mappingName, mappingMap);
             }
 
-        } catch (SAXException e) {
-            e = null;
-            Notification.show(READING_ERROR_MESSAGE);
-        } catch (IOException e) {
-            e = null;
-            Notification.show(READING_ERROR_MESSAGE);
-        } catch (ParserConfigurationException e) {
-            e = null;
-            Notification.show(READING_ERROR_MESSAGE);
+          } catch (SAXException | IOException | ParserConfigurationException ex) {
+            ExceptionDialog.show(ex, READING_ERROR_MESSAGE, UI.getCurrent());
         }
 
     }
