@@ -457,7 +457,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
      */
     public void showMatchSearchInProgress(String segmentationName) {
         resultLayout.removeAllComponents();
-        segmentationName = segmentationName;
+        this.segmentationName = segmentationName;
     }
 
     public void showNoResult() {
