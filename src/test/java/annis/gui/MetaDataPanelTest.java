@@ -21,7 +21,6 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Window;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.api.model.Annotation;
@@ -94,18 +93,19 @@ class MetaDataPanelTest {
           (ListDataProvider<Annotation>) metaGrid.getDataProvider();
       Set<String> displayedNames = dataProvider.getItems().stream()
           .map(i -> nameColumn.getValueProvider().apply(i)).collect(Collectors.toSet());
-      List<String> displayedValues = dataProvider.getItems().stream()
+      Set<String> displayedValues = dataProvider.getItems().stream()
           .map(i -> valueColumn.getValueProvider().apply(i).getValue())
-          .collect(Collectors.toList());
+          .collect(Collectors.toSet());
 
       assertEquals(new HashSet<>(Arrays.asList("URL", "annotation_description", "annotation_levels",
           "full_name", "language", "source", "version")), displayedNames);
 
       assertEquals(7, displayedValues.size());
-      assertEquals("<a href=\"https://www.aclweb.org/anthology/W04-0213.pdf\">link</a>",
-          displayedValues.get(0));
-      assertEquals("German", displayedValues.get(4));
-      assertEquals("6.0", displayedValues.get(5));
+      assertTrue(displayedValues
+          .contains(
+              "<a href=\"http://www.aclweb.org/anthology/W/W04/W04-0213.pdf\" target=\"_new\">link</a>"));
+      assertTrue(displayedValues.contains("German"));
+      assertTrue(displayedValues.contains("6.0"));
     }
   }
 
