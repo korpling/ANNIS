@@ -26,10 +26,6 @@ import org.corpus_tools.salt.common.STextualDS;
  */
 public class RawTextWrapper implements Serializable {
 
-  public RawTextWrapper() {
-
-  }
-
   public RawTextWrapper(SDocumentGraph docGraph) {
     if (docGraph != null) {
       this.texts = new ArrayList<>();
