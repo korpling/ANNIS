@@ -15,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.vaadin.hene.popupbutton.PopupButton;
@@ -24,7 +22,6 @@ import org.vaadin.hene.popupbutton.PopupButton;
 @SpringBootTest
 @ActiveProfiles({"desktop", "test"})
 @WebAppConfiguration
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class ExportPanelTest {
 
   @Autowired

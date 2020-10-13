@@ -20,7 +20,9 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Window;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.junit.jupiter.api.AfterEach;
@@ -29,15 +31,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 @SpringBootTest
 @ActiveProfiles({"desktop", "test"})
 @WebAppConfiguration
-@DirtiesContext(classMode = ClassMode.AFTER_CLASS)
 class MetaDataPanelTest {
 
   @Autowired
@@ -93,16 +92,16 @@ class MetaDataPanelTest {
       @SuppressWarnings("unchecked")
       ListDataProvider<Annotation> dataProvider =
           (ListDataProvider<Annotation>) metaGrid.getDataProvider();
-      List<String> displayedNames = dataProvider.getItems().stream()
-          .map(i -> nameColumn.getValueProvider().apply(i)).collect(Collectors.toList());
+      Set<String> displayedNames = dataProvider.getItems().stream()
+          .map(i -> nameColumn.getValueProvider().apply(i)).collect(Collectors.toSet());
       List<String> displayedValues = dataProvider.getItems().stream()
           .map(i -> valueColumn.getValueProvider().apply(i).getValue())
           .collect(Collectors.toList());
 
-      assertEquals(Arrays.asList("URL", "annotation_description", "annotation_levels", "full_name",
-          "language", "source", "version"), displayedNames);
+      assertEquals(new HashSet<>(Arrays.asList("URL", "annotation_description", "annotation_levels",
+          "full_name", "language", "source", "version")), displayedNames);
 
-      assertEquals(6, displayedValues.size());
+      assertEquals(7, displayedValues.size());
       assertEquals("<a href=\"https://www.aclweb.org/anthology/W04-0213.pdf\">link</a>",
           displayedValues.get(0));
       assertEquals("German", displayedValues.get(4));
