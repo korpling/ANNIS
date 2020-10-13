@@ -5,8 +5,11 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
@@ -16,8 +19,11 @@ import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
+import com.vaadin.v7.event.FieldEvents.TextChangeEvent;
 import com.vaadin.v7.ui.CheckBox;
 import com.vaadin.v7.ui.ComboBox;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -202,5 +208,40 @@ class FlatQueryBuilderTest {
     // Add a valid, but unknown operator
     box.setValue(".30");
     assertEquals(".30", box.getValue());
+  }
+
+  @Test
+  void valueFieldTextChange() {
+    initQueryBuilder(0);
+
+    // Add a pos annotation
+    queryBuilder.addLinguisticSequenceBox("pos");
+
+    SearchBox searchBox = _get(queryBuilder, SearchBox.class);
+    ValueField valueField = _get(queryBuilder, ValueField.class);
+    SensitiveComboBox cb = _get(searchBox, SensitiveComboBox.class);
+    
+    @SuppressWarnings("unchecked")
+    List<String> oldItemIds = new ArrayList<>((Collection<String>) cb.getItemIds());
+    assertNotEquals("VAFIN", oldItemIds.get(0));
+    assertNotEquals("VMFIN", oldItemIds.get(1));
+    assertNotEquals("VVFIN", oldItemIds.get(2));
+
+    // Mock a text change event
+    TextChangeEvent event = mock(TextChangeEvent.class);
+    when(event.getText()).thenReturn("VFIN");
+    valueField.textChange(event);
+
+    MockVaadin.INSTANCE.clientRoundtrip();
+
+    // Check that the order has changed to include the nearest values first
+    @SuppressWarnings("unchecked")
+    List<String> newItemIds = new ArrayList<>((Collection<String>) cb.getItemIds());
+    assertEquals("VAFIN", newItemIds.get(0));
+    assertEquals("VMFIN", newItemIds.get(1));
+    assertEquals("VVFIN", newItemIds.get(2));
+
+
+
   }
 }
