@@ -223,11 +223,8 @@ public class VakyarthaDependencyTree extends WriterVisualizer {
             if (includeEdge) {
               SNode source = sRelation.getSource();
 
-              String label = "";
-              for (SAnnotation anno : sRelation.getAnnotations()) {
-                label = anno.getValue_STEXT();
-                break;
-              }
+              String label = sRelation.getAnnotations().stream().findFirst()
+                  .map(SAnnotation::getValue_STEXT).orElse("");
 
               if (sRelation.getSource() != null && node2Int.containsKey(source)) {
                 govs.put(String.valueOf(node2Int.get(source)), label);
