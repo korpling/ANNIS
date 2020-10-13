@@ -8,6 +8,7 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._setValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
@@ -36,8 +37,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.UUID;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -118,6 +121,33 @@ class IntegrationTest {
     assertEquals("Zossen", tokens.get(0).getEvents().get(4).getValue());
     assertEquals("wollen", tokens.get(0).getEvents().get(5).getValue());
 
+    // Check the annotation values are shown
+    ArrayList<Row> lemmaRows = kwicGrid.getRowsByAnnotation().get("tiger::lemma");
+    assertEquals(1, lemmaRows.size());
+    assertEquals(6, lemmaRows.get(0).getEvents().size());
+    assertEquals("Feigenblatt", lemmaRows.get(0).getEvents().get(0).getValue());
+    assertEquals("der", lemmaRows.get(0).getEvents().get(1).getValue());
+    assertEquals("jugendliche", lemmaRows.get(0).getEvents().get(2).getValue());
+    assertEquals("in", lemmaRows.get(0).getEvents().get(3).getValue());
+    assertEquals("Zossen", lemmaRows.get(0).getEvents().get(4).getValue());
+    assertEquals("wollen", lemmaRows.get(0).getEvents().get(5).getValue());
+
+    ArrayList<Row> posRows = kwicGrid.getRowsByAnnotation().get("tiger::pos");
+    assertEquals(1, posRows.size());
+    assertEquals(6, posRows.get(0).getEvents().size());
+    assertEquals("NN", posRows.get(0).getEvents().get(0).getValue());
+    assertEquals("ART", posRows.get(0).getEvents().get(1).getValue());
+    assertEquals("NN", posRows.get(0).getEvents().get(2).getValue());
+    assertEquals("APPR", posRows.get(0).getEvents().get(3).getValue());
+    assertEquals("NE", posRows.get(0).getEvents().get(4).getValue());
+    assertEquals("VMFIN", posRows.get(0).getEvents().get(5).getValue());
+    
+    // Disable the part-of-speech token annotation display
+    TreeSet<String> visibleAnnos = new TreeSet<>(Arrays.asList("tiger::lemma"));
+    resultPanel.setVisibleTokenAnnosVisible(visibleAnnos);
+    assertNull(kwicGrid.getRowsByAnnotation().get("tiger:pos"));
+    assertNotNull(kwicGrid.getRowsByAnnotation().get("tiger::lemma"));
+
     // Open the coreference visualizer and check that IFrame component is loaded
     Button btOpenVisualizer =
         _get(resultPanel, Button.class, spec -> spec.withCaption("coreference (discourse)"));
@@ -129,6 +159,8 @@ class IntegrationTest {
     // Close the visualizer again
     _click(btOpenVisualizer);
     awaitCondition(120, () -> _find(resultPanel, AutoHeightIFrame.class).isEmpty());
+    
+    
   }
 
   @Test
