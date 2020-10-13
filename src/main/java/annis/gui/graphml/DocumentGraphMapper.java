@@ -188,7 +188,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                   SNode n = mapNode(currentNodeId.get(), data);
                   graph.addNode(n);
                 }
-
               }
               currentNodeId = Optional.empty();
               data.clear();
@@ -207,6 +206,13 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               data.clear();
               break;
             case "data":
+              if (currentDataKey.isPresent()) {
+                String annoKey = keys.get(currentDataKey.get());
+                // Add an empty data entry if this element did not have any character child
+                if (annoKey != null && !data.containsKey(annoKey)) {
+                  data.put(annoKey, "");
+                }
+              }
               currentDataKey = Optional.empty();
               break;
           }
