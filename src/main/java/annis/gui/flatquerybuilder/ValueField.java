@@ -219,18 +219,22 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
         } else {
             String txt = event.getText();
             HashMap<Integer, Collection<String>> levdistvals = new HashMap<>();
-            if (txt.length() > 1) {
+            if (txt != null && txt.length() > 1) {
                 scb.removeAllItems();
                 for (String s : values.keySet()) {
-                    Integer d = StringUtils.getLevenshteinDistance(removeAccents(txt).toLowerCase(),
-                            removeAccents(s).toLowerCase());
+                  String txtWithoutAccents = removeAccents(txt);
+                  String valueWithoutAccents = removeAccents(s);
+                  if (txtWithoutAccents != null && valueWithoutAccents != null) {
+                    Integer d = StringUtils.getLevenshteinDistance(txtWithoutAccents.toLowerCase(),
+                        valueWithoutAccents.toLowerCase());
                     if (levdistvals.containsKey(d)) {
-                        levdistvals.get(d).add(s);
+                      levdistvals.get(d).add(s);
                     }
                     if (!levdistvals.containsKey(d)) {
-                        Set<String> newc = new TreeSet<>();
-                        newc.add(s);
-                        levdistvals.put(d, newc);
+                      Set<String> newc = new TreeSet<>();
+                      newc.add(s);
+                      levdistvals.put(d, newc);
+                    }
                     }
                 }
                 SortedSet<Integer> keys = new TreeSet<>(levdistvals.keySet());
