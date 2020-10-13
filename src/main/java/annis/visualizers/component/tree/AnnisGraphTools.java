@@ -16,6 +16,7 @@ package annis.visualizers.component.tree;
 import annis.gui.AnnisUI;
 import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
+import com.google.common.base.Objects;
 import com.vaadin.ui.UI;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
@@ -67,7 +68,8 @@ public class AnnisGraphTools implements Serializable {
             return a.getValue_STEXT();
           }
         } else {
-          if (a.getNamespace().equals(namespace) && a.getName().equals(featureName)) {
+          if (Objects.equal(a.getNamespace(), namespace)
+              && Objects.equal(a.getName(), featureName)) {
             return a.getValue_STEXT();
           }
         }
