@@ -440,7 +440,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
       for (RectangleSide target : RectangleSide.values()) {
         Point2D o = sideMidPoint(sourceRect, orig);
         Point2D t = sideMidPoint(targetRect, target);
-        double dist = Math.hypot(o.getX() - t.getX(), t.getY() - t.getY());
+        double dist = Math.hypot(o.getX() - t.getX(), o.getY() - t.getY());
         if (dist < minDist) {
           result = new Pair<RectangleSide>(orig, target);
           minDist = dist;
