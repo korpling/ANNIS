@@ -20,7 +20,6 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.ui.Notification;
@@ -507,7 +506,9 @@ public class HTMLVis extends AbstractVisualizer {
         Notification.show("Could not parse the HTML visualizer web-font configuration file",
             ex.getMessage(), Notification.Type.ERROR_MESSAGE);
       } finally {
-        f.delete();
+        if (f.exists() && !f.delete()) {
+          log.warn("Could not delete temporary file {}", f.getAbsolutePath());
+        }
       }
     } catch (ApiException ex) {
       if (ex.getCode() != 404) {

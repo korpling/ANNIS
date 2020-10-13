@@ -85,7 +85,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         log.info("Extracting the bundled graphANNIS service to {}",
                                 tmpExec.getAbsolutePath());
                         FileUtils.copyInputStreamToFile(resource.getInputStream(), tmpExec);
-                        tmpExec.setExecutable(true);
+                        if (!tmpExec.setExecutable(true)) {
+                          log.warn("Could not mark the bundled graphANNIS service as executable");
+                        }
 
                         // If the configuration does not exist, create an empty file
                         File serviceConfigFile = getServiceConfig();
@@ -171,9 +173,11 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         if (!result.exists()) {
             File parentDir = result.getParentFile();
             if (!parentDir.mkdirs()) {
-                log.error("Could not create directory", parentDir.getAbsolutePath());
+              log.error("Could not create directory {}", parentDir.getAbsolutePath());
             }
-            result.createNewFile();
+            if (!result.createNewFile()) {
+              log.error("Could not create new file {}", result.getAbsolutePath());
+            }
         }
         // Set to a default data folder and SQLite file
         Toml configToml = new Toml().read(result);
