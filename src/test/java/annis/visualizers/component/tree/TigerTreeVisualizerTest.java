@@ -95,12 +95,19 @@ class TigerTreeVisualizerTest {
     BufferedImage expectedImage = ImageIO.read(expectedRes.getInputStream());
 
     // Compare both images pixel by pixel
-    assertEquals(expectedImage.getWidth(), actualImage.getWidth());
-    assertEquals(expectedImage.getHeight(), actualImage.getHeight());
+    assertEquals(expectedImage.getWidth(), actualImage.getWidth(),
+        String.format("Width for image {} was {} but should have been {}",
+            tmpFile.getAbsolutePath(), actualImage.getWidth(), expectedImage.getWidth()));
+    assertEquals(expectedImage.getHeight(), actualImage.getHeight(),
+        String.format("Height for image {} was {} but should have been {}",
+            tmpFile.getAbsolutePath(), actualImage.getHeight(), expectedImage.getHeight()));
 
     for (int x = 0; x < expectedImage.getWidth(); x++) {
       for (int y = 0; y < expectedImage.getHeight(); y++) {
-        assertEquals(expectedImage.getRGB(x, y), actualImage.getRGB(x, y));
+        assertEquals(expectedImage.getRGB(x, y), actualImage.getRGB(x, y),
+            String.format("Pixel value at ({},{}) for image {} was {} but should have been {}", x,
+                y, tmpFile.getAbsolutePath(), actualImage.getRGB(x, y),
+                expectedImage.getRGB(x, y)));
       }
     }
 
