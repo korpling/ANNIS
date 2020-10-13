@@ -24,7 +24,6 @@ import annis.model.DisplayedResultQuery;
 import annis.model.PagedResultQuery;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.Match;
-import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
@@ -496,13 +495,16 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             // the new menu entry
             MenuItem miSingleSegLayer;
 
+            if (s == null) {
+              s = "";
+            }
             /**
              * TODO maybe it would be better, to mark the default text level corresponding to the
              * corpus.properties.
              *
              * There exists always a default text level.
              */
-            if (s == null || "".equals(s)) {
+            if ("".equals(s)) {
                 miSingleSegLayer =
                         miSegmentation.addItem(NULL_SEGMENTATION_VALUE, new MenuBaseTextCommand());
             } else {
@@ -519,6 +521,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             final String selectedSegmentationLayer =
                     sui.getQueryState().getVisibleBaseText().getValue();
             if ((selectedSegmentationLayer == null && "".equals(s))
+
                     || s.equals(selectedSegmentationLayer)) {
                 miSingleSegLayer.setChecked(true);
             } else {
