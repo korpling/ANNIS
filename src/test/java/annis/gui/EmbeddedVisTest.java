@@ -11,10 +11,12 @@ import com.github.mvysny.kaributesting.mockhttp.MockRequest;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.github.mvysny.kaributesting.v8.MockVaadinKt;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
+import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,6 +83,49 @@ class EmbeddedVisTest {
           .startsWith("Feigenblatt Die Jugendlichen in Zossen wollen ein Musikcafé ."));
       assertTrue(labelRawText.getValue().endsWith("Die glänzten diesmal noch mit Abwesenheit ."));
 
+    }
+
+    /**
+     * Make sure there is an error message when an unknown visualizer is requested.
+     */
+    @Test
+    void unknownRemoteSaltVisualizer() {
+      EmbeddedVisUI ui = (EmbeddedVisUI) UI.getCurrent();
+
+      MockRequest request = MockVaadinKt.getMock(VaadinRequest.getCurrent());
+      request.setParameter("embedded_salt", "http://example.com/does-not-exist.salt");
+      ui.attachToPath("/embeddedvis/notavisualizer", VaadinRequest.getCurrent());
+
+      
+      awaitCondition(60,
+          () -> !_find(Label.class,
+              spec -> spec.withPredicate(
+                  l -> l.getContentMode() == ContentMode.HTML && l.getValue().startsWith("<h1>")))
+                      .isEmpty());
+      Label labelMessage = _get(Label.class);
+      assertEquals(
+          "<h1>Unknown visualizer \"notavisualizer\"</h1><div>This ANNIS instance does not know the given visualizer.</div>",
+          labelMessage.getValue());
+    }
+
+    @Test
+    void invalidRemoteSaltUrlScheme() throws IOException {
+      EmbeddedVisUI ui = (EmbeddedVisUI) UI.getCurrent();
+
+      MockRequest request = MockVaadinKt.getMock(VaadinRequest.getCurrent());
+      request.setParameter("embedded_salt", "file://example.com/does-not-exist.salt");
+      ui.attachToPath("/embeddedvis/raw_text", VaadinRequest.getCurrent());
+
+
+      awaitCondition(60,
+          () -> !_find(Label.class,
+              spec -> spec.withPredicate(
+                  l -> l.getContentMode() == ContentMode.HTML && l.getValue().startsWith("<h1>")))
+                      .isEmpty());
+      Label labelMessage = _get(Label.class);
+      assertEquals(
+          "<h1>Could not generate the visualization.</h1><div>Expected URL scheme 'http' or 'https' but was 'file'</div>",
+          labelMessage.getValue());
     }
 
 }
