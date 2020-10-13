@@ -455,20 +455,19 @@ public class SingleResultPanel extends CssLayout
       ui.getQueryState().getSelectedMatches().getValue().clear();
       ui.getQueryState().getSelectedMatches().getValue().add(resultNumber);
       ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
+
+      Window window = new ShareSingleMatchGenerator(ui, resolverEntries, match, query,
+          segmentationName, ui.getVisualizerPlugins());
+      window.setWidth(790, Unit.PIXELS);
+      window.setHeight(680, Unit.PIXELS);
+      window.setResizable(true);
+      window.setModal(true);
+
+      window.addCloseListener(e -> btLink.setEnabled(true));
+      window.setCaption("Match reference link");
+
+      ui.addWindow(window);
     }
-
-    Window window = new ShareSingleMatchGenerator(ui, resolverEntries, match, query,
-        segmentationName,
-        ui.getVisualizerPlugins());
-    window.setWidth(790, Unit.PIXELS);
-    window.setHeight(680, Unit.PIXELS);
-    window.setResizable(true);
-    window.setModal(true);
-
-    window.addCloseListener(e -> btLink.setEnabled(true));
-    window.setCaption("Match reference link");
-
-    UI.getCurrent().addWindow(window);
   }
 
   @Override
