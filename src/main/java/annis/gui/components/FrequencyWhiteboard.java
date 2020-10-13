@@ -47,9 +47,9 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
         }
     }
 
-    public static final int PIXEL_PER_VALUE = 45;
+    public static final float PIXEL_PER_VALUE = 45.0f;
 
-    public static final int ADDTIONAL_PIXEL_WIDTH = 100;
+    public static final float ADDTIONAL_PIXEL_WIDTH = 100.0f;
 
     private List<String> labels;
     private List<Integer> values;
@@ -96,7 +96,7 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
           labels.add(StringUtils.join(e.getValues(), "/") + " (" + e.getCount() + ")");
             values.add(e.getCount());
         }
-        setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * values.size()), Unit.PIXELS);
+        setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * (float) values.size()), Unit.PIXELS);
         lastScale = scale;
         lastFont = font;
         lastFontSize = fontSize;

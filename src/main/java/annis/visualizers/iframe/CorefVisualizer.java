@@ -489,7 +489,7 @@ public class CorefVisualizer extends WriterVisualizer {
       String style = "";
       if (input.getMarkedAndCovered().containsKey(tok)) {
         MatchedNodeColors[] vals = MatchedNodeColors.values();
-        long match = Math.min(input.getMarkedAndCovered().get(tok) - 1, vals.length - 1);
+        long match = Math.min(input.getMarkedAndCovered().get(tok) - 1l, vals.length - 1l);
 
         style += ("color: " + vals[(int) match].getHTMLColor() + ";");
       }
