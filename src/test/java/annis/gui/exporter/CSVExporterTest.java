@@ -14,6 +14,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.util.collections.Sets;
@@ -44,6 +45,11 @@ class CSVExporterTest {
     UIScopeImpl.setBeanStoreRetrievalStrategy(new SingletonBeanStoreRetrievalStrategy());
     this.ui = beanFactory.getBean(AnnisUI.class);
     MockVaadin.setup(() -> ui);
+  }
+
+  @AfterEach
+  public void tearDown() {
+    MockVaadin.tearDown();
   }
 
   @Test
