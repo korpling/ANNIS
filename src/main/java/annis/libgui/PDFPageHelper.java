@@ -151,7 +151,7 @@ public class PDFPageHelper {
           if ((nodeNamespace == null || input.getNamespace() == null)
               && getPDFPageAnnotationName().equals(anno.getName())) {
             return anno.getValue_STEXT();
-          } else if (nodeNamespace.equals(input.getNamespace())
+          } else if (nodeNamespace != null && nodeNamespace.equals(input.getNamespace())
               && getPDFPageAnnotationName().equals(anno.getName())) {
             return anno.getValue_STEXT();
           }
