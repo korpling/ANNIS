@@ -343,7 +343,8 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
 
     BufferedImage image;
     if (width == 0 || maxheight == 0) {
-      Notification.show("Can't generate tree visualization.", Notification.Type.WARNING_MESSAGE);
+      input.getUI().access(() -> Notification.show("Can't generate tree visualization.",
+          Notification.Type.WARNING_MESSAGE));
       image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
     } else {
       image =
