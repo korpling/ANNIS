@@ -147,6 +147,15 @@ class IntegrationTest {
     resultPanel.setVisibleTokenAnnosVisible(visibleAnnos);
     assertNull(kwicGrid.getRowsByAnnotation().get("tiger:pos"));
     assertNotNull(kwicGrid.getRowsByAnnotation().get("tiger::lemma"));
+  }
+
+  @Test
+  void openVisualizerPcc2() throws InterruptedException, IOException {
+
+    executeTokenSearch("pcc2");
+
+    SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
+    KWICComponent kwicVis = _get(resultPanel, KWICComponent.class);
 
     // Open the coreference visualizer and check that IFrame component is loaded
     Button btOpenVisualizer =
