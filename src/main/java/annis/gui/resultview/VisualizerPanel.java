@@ -32,7 +32,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Resource;
-import com.vaadin.server.StreamResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -42,11 +41,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -169,29 +165,6 @@ public class VisualizerPanel extends CssLayout
       }
     }
 
-  }
-
-  public class ByteArrayOutputStreamSource implements StreamResource.StreamSource {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 814822953760083712L;
-
-    private transient ByteArrayOutputStream byteStream;
-
-    public ByteArrayOutputStreamSource(ByteArrayOutputStream byteStream) {
-      this.byteStream = byteStream;
-    }
-
-    @Override
-    public InputStream getStream() {
-      if (byteStream == null) {
-        log.error("byte stream was null");
-        return null;
-      }
-      return new ByteArrayInputStream(byteStream.toByteArray());
-    }
   }
 
   public static final long serialVersionUID = 2L;
