@@ -77,12 +77,16 @@ public class AnnisGraphTools implements Serializable {
   }
 
   public static boolean isTerminal(SNode n, VisualizerInput input) {
-    if (input == null) {
+    String terminalName = null;
+    String terminalNamespace = null;
+    if(input != null) {
+      terminalName = input.getMappings().get(TigerTreeVisualizer.TERMINAL_NAME_KEY);
+      terminalNamespace = input.getMappings().get(TigerTreeVisualizer.TERMINAL_NS_KEY);
+    }
+
+    if (terminalName == null) {
       return n instanceof SToken;
     } else {
-      String terminalName = input.getMappings().get(TigerTreeVisualizer.TERMINAL_NAME_KEY);
-      String terminalNamespace = input.getMappings().get(TigerTreeVisualizer.TERMINAL_NS_KEY);
-
       SAnnotation anno = n.getAnnotation(terminalNamespace, terminalName);
 
       return anno != null;
