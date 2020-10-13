@@ -19,6 +19,7 @@ import annis.gui.docbrowser.DocBrowserTable;
 import annis.gui.resultview.SingleResultPanel;
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.gui.widgets.grid.AnnotationGrid;
+import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.visualizers.component.grid.GridComponent;
 import annis.visualizers.component.kwic.KWICComponent;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -113,35 +115,23 @@ class IntegrationTest {
     AnnotationGrid kwicGrid = _get(kwicVis, AnnotationGrid.class);
     ArrayList<Row> tokens = kwicGrid.getRowsByAnnotation().get("tok");
     assertEquals(1, tokens.size());
-    assertEquals(6, tokens.get(0).getEvents().size());
-    assertEquals("Feigenblatt", tokens.get(0).getEvents().get(0).getValue());
-    assertEquals("Die", tokens.get(0).getEvents().get(1).getValue());
-    assertEquals("Jugendlichen", tokens.get(0).getEvents().get(2).getValue());
-    assertEquals("in", tokens.get(0).getEvents().get(3).getValue());
-    assertEquals("Zossen", tokens.get(0).getEvents().get(4).getValue());
-    assertEquals("wollen", tokens.get(0).getEvents().get(5).getValue());
+    assertEquals(Arrays.asList("Feigenblatt", "Die", "Jugendlichen", "in", "Zossen", "wollen"),
+        tokens.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
+
 
     // Check the annotation values are shown
     ArrayList<Row> lemmaRows = kwicGrid.getRowsByAnnotation().get("tiger::lemma");
     assertEquals(1, lemmaRows.size());
-    assertEquals(6, lemmaRows.get(0).getEvents().size());
-    assertEquals("Feigenblatt", lemmaRows.get(0).getEvents().get(0).getValue());
-    assertEquals("der", lemmaRows.get(0).getEvents().get(1).getValue());
-    assertEquals("jugendliche", lemmaRows.get(0).getEvents().get(2).getValue());
-    assertEquals("in", lemmaRows.get(0).getEvents().get(3).getValue());
-    assertEquals("Zossen", lemmaRows.get(0).getEvents().get(4).getValue());
-    assertEquals("wollen", lemmaRows.get(0).getEvents().get(5).getValue());
+    assertEquals(Arrays.asList("Feigenblatt", "der", "jugendliche", "in", "Zossen", "wollen"),
+        lemmaRows.get(0).getEvents().stream().map(GridEvent::getValue)
+            .collect(Collectors.toList()));
 
     ArrayList<Row> posRows = kwicGrid.getRowsByAnnotation().get("tiger::pos");
     assertEquals(1, posRows.size());
-    assertEquals(6, posRows.get(0).getEvents().size());
-    assertEquals("NN", posRows.get(0).getEvents().get(0).getValue());
-    assertEquals("ART", posRows.get(0).getEvents().get(1).getValue());
-    assertEquals("NN", posRows.get(0).getEvents().get(2).getValue());
-    assertEquals("APPR", posRows.get(0).getEvents().get(3).getValue());
-    assertEquals("NE", posRows.get(0).getEvents().get(4).getValue());
-    assertEquals("VMFIN", posRows.get(0).getEvents().get(5).getValue());
-    
+    assertEquals(Arrays.asList("NN", "ART", "NN", "APPR", "NE", "VMFIN"),
+        posRows.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
+
+
     // Disable the part-of-speech token annotation display
     TreeSet<String> visibleAnnos = new TreeSet<>(Arrays.asList("tiger::lemma"));
     resultPanel.setVisibleTokenAnnosVisible(visibleAnnos);
@@ -168,8 +158,8 @@ class IntegrationTest {
     // Close the visualizer again
     _click(btOpenVisualizer);
     awaitCondition(120, () -> _find(resultPanel, AutoHeightIFrame.class).isEmpty());
-    
-    
+
+
   }
 
   @Test
@@ -184,16 +174,12 @@ class IntegrationTest {
     AnnotationGrid annoGrid = _get(gridVis, AnnotationGrid.class);
     ArrayList<Row> tokens = annoGrid.getRowsByAnnotation().get("default_ns::norm0");
     assertEquals(1, tokens.size());
-    assertEquals(5, tokens.get(0).getEvents().size());
-    assertEquals("äh", tokens.get(0).getEvents().get(0).getValue());
-    assertEquals("fang", tokens.get(0).getEvents().get(1).getValue());
-    assertEquals("einfach", tokens.get(0).getEvents().get(2).getValue());
-    assertEquals("mal", tokens.get(0).getEvents().get(3).getValue());
-    assertEquals("an", tokens.get(0).getEvents().get(4).getValue());
+
+    assertEquals(Arrays.asList("äh", "fang", "einfach", "mal", "an"),
+        tokens.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
 
     // Open the video visualizer and check that media component is loaded
-    Button btOpenVisualizer =
-        _get(resultPanel, Button.class, spec -> spec.withCaption("video"));
+    Button btOpenVisualizer = _get(resultPanel, Button.class, spec -> spec.withCaption("video"));
     _click(btOpenVisualizer);
     awaitCondition(120, () -> !_find(resultPanel, MediaElementPlayer.class).isEmpty());
     MediaElementPlayer player =
