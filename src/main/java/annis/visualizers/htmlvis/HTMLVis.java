@@ -34,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -506,10 +507,10 @@ public class HTMLVis extends AbstractVisualizer {
         Notification.show("Could not parse the HTML visualizer web-font configuration file",
             ex.getMessage(), Notification.Type.ERROR_MESSAGE);
       } finally {
-        if (f.exists() && !f.delete()) {
-          log.warn("Could not delete temporary file {}", f.getAbsolutePath());
-        }
+        Files.deleteIfExists(f.toPath());
       }
+    } catch (IOException ex) {
+      log.error("Unexpected input/output exception", ex);
     } catch (ApiException ex) {
       if (ex.getCode() != 404) {
         log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
