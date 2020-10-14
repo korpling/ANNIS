@@ -5,7 +5,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.LoggerFactory;
 
-// NOSONAR We want the awaitCondition code to be as near as possible to the Karibu async example
+
 public class TestHelper {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(TestHelper.class);
@@ -30,7 +30,7 @@ public class TestHelper {
       if (!condition) {
         // Wait until invoking the condition again
         log.debug("Waiting 250ms before checking condition again");
-        Thread.sleep(250);
+        Thread.sleep(250); // NOSONAR The code should similar to the Karibu async example
       }
     }
 
