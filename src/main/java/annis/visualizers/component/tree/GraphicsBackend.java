@@ -78,12 +78,12 @@ public interface GraphicsBackend<T extends GraphicsItem> {
   /**
    * Returns a backend font object.
    * 
-   * @param family The font family
+   * @param original The original base font
    * @param pointSize The point size
    * @param style The style constant, as given by the constants in {@link java.awt.Font}.
    * @return a backend font object.
    */
-  Font getFont(String family, int pointSize, int style);
+  Font getFont(java.awt.Font original, int pointSize, int style);
 
   /**
    * Creates a new grouping item. Grouping items do not have any content and are just used to bundle

@@ -34,8 +34,8 @@ public class Java2dBackend implements GraphicsBackend<AbstractImageGraphicsItem>
 
     private final java.awt.Font awtFont;
 
-    public Java2dFont(String family, int pointSize, int style) {
-      awtFont = new java.awt.Font(family, style, pointSize);
+    public Java2dFont(java.awt.Font original, int pointSize, int style) {
+      awtFont = original.deriveFont(style, (float) pointSize);
     }
 
     @Override
@@ -119,8 +119,8 @@ public class Java2dBackend implements GraphicsBackend<AbstractImageGraphicsItem>
   }
 
   @Override
-  public Font getFont(String family, int pointSize, int style) {
-    return new Java2dFont(family, pointSize, style);
+  public Font getFont(java.awt.Font original, int pointSize, int style) {
+    return new Java2dFont(original, pointSize, style);
   }
 
   private double getRotationAngle(Point2D origin, Point2D target) {
