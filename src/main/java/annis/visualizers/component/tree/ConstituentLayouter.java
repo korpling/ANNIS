@@ -499,19 +499,13 @@ public class ConstituentLayouter<T extends GraphicsItem> {
       Rectangle2D targetRect) {
     Pair<RectangleSide> sidePair = findBestConnection(sourceRect, targetRect);
 
-    if (sidePair != null) {
+    Point2D startPoint = sideMidPoint(sourceRect, sidePair.getFirst());
+    Point2D endPoint = sideMidPoint(targetRect, sidePair.getSecond());
 
-      Point2D startPoint = sideMidPoint(sourceRect, sidePair.getFirst());
-      Point2D endPoint = sideMidPoint(targetRect, sidePair.getSecond());
-
-      double middleX = (startPoint.getX() + endPoint.getX()) / 2.0;
-      double middleY = 50 * -verticalOrientation.value + (startPoint.getY() + endPoint.getY()) / 2;
-      return new CubicCurve2D.Double(startPoint.getX(), startPoint.getY(), middleX, middleY,
-          middleX, middleY, endPoint.getX(), endPoint.getY());
-    } else {
-      // No connection found
-      return null;
-    }
+    double middleX = (startPoint.getX() + endPoint.getX()) / 2.0;
+    double middleY = 50 * -verticalOrientation.value + (startPoint.getY() + endPoint.getY()) / 2;
+    return new CubicCurve2D.Double(startPoint.getX(), startPoint.getY(), middleX, middleY, middleX,
+        middleY, endPoint.getX(), endPoint.getY());
   }
 
   private Point2D sideMidPoint(Rectangle2D rect, RectangleSide side) {
