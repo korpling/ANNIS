@@ -484,50 +484,48 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     private void updateSegmentationLayer(Set<String> segLayers) {
 
-        // clear the menu base text
-        miSegmentation.removeChildren();
+      // clear the menu base text
+      miSegmentation.removeChildren();
 
-        // add the default token layer
-        segLayers.add("");
+      // add the default token layer
+      segLayers.add("");
 
-        // iterate of all segmentation layers and add them to the menu
-        for (String s : segLayers) {
-            // the new menu entry
-            MenuItem miSingleSegLayer;
+      // iterate of all segmentation layers and add them to the menu
+      for (String s : segLayers) {
+        if (s != null) {
+          // the new menu entry
+          MenuItem miSingleSegLayer;
+          /**
+           * TODO maybe it would be better, to mark the default text level corresponding to the
+           * corpus.properties.
+           *
+           * There exists always a default text level.
+           */
+          if ("".equals(s)) {
+            miSingleSegLayer =
+                miSegmentation.addItem(NULL_SEGMENTATION_VALUE, new MenuBaseTextCommand());
+          } else {
+            miSingleSegLayer = miSegmentation.addItem(s, new MenuBaseTextCommand());
+          }
 
-            if (s == null) {
-              s = "";
-            }
-            /**
-             * TODO maybe it would be better, to mark the default text level corresponding to the
-             * corpus.properties.
-             *
-             * There exists always a default text level.
-             */
-            if ("".equals(s)) {
-                miSingleSegLayer =
-                        miSegmentation.addItem(NULL_SEGMENTATION_VALUE, new MenuBaseTextCommand());
-            } else {
-                miSingleSegLayer = miSegmentation.addItem(s, new MenuBaseTextCommand());
-            }
+          // mark as selectable
+          miSingleSegLayer.setCheckable(true);
 
-            // mark as selectable
-            miSingleSegLayer.setCheckable(true);
+          /**
+           * Check if a segmentation item must set checked. If no segmentation layer is selected,
+           * set the default layer as selected.
+           */
+          final String selectedSegmentationLayer =
+              sui.getQueryState().getVisibleBaseText().getValue();
+          if ((selectedSegmentationLayer == null && "".equals(s))
 
-            /**
-             * Check if a segmentation item must set checked. If no segmentation layer is selected,
-             * set the default layer as selected.
-             */
-            final String selectedSegmentationLayer =
-                    sui.getQueryState().getVisibleBaseText().getValue();
-            if ((selectedSegmentationLayer == null && "".equals(s))
-
-                    || s.equals(selectedSegmentationLayer)) {
-                miSingleSegLayer.setChecked(true);
-            } else {
-                miSingleSegLayer.setChecked(false);
-            }
-        } // end iterate for segmentation layer
+              || s.equals(selectedSegmentationLayer)) {
+            miSingleSegLayer.setChecked(true);
+          } else {
+            miSingleSegLayer.setChecked(false);
+          }
+        }
+      } // end iterate for segmentation layer
     }
 
     private void updateVariables(SaltProject p) {
