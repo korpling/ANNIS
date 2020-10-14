@@ -25,10 +25,10 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import org.corpus_tools.salt.SALT_TYPE;
+import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SaltProject;
-import org.corpus_tools.salt.samples.SampleGenerator;
+import org.eclipse.emf.common.util.URI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
@@ -68,9 +68,11 @@ class TigerTreeVisualizerTest {
   @Test
   void compareSampleImage() throws IOException {
 
-    // Use the example document from Salt
-    SaltProject project = SampleGenerator.createSaltProject();
-    SDocument doc = project.getCorpusGraphs().get(0).getDocuments().get(0);
+    // Load the example tree
+    ClassPathResource docFile = new ClassPathResource(
+        "example_constituent_tree/rootCorpus/subCorpus1/doc1.salt", TigerTreeVisualizerTest.class);
+    SDocument doc = SaltFactory.createSDocument();
+    doc.loadDocumentGraph(URI.createURI(docFile.getURI().toASCIIString()));
     SDocumentGraph graph = doc.getDocumentGraph();
 
     // Mark the root node as match
@@ -82,7 +84,10 @@ class TigerTreeVisualizerTest {
     Map<String, String> mappings = new LinkedHashMap<>();
     mappings.put("node_ns", "syntax");
     mappings.put("node_key", "const");
-    mappings.put("edge_type", "null");
+    mappings.put("edge_type", "edge");
+    mappings.put("secedge_type", "secedge");
+    mappings.put("edge_key", "func");
+
     when(visInput.getMappings()).thenReturn(mappings);
 
     // Create the resource as byte array
