@@ -142,7 +142,7 @@ class IntegrationTest {
     executeTokenSearch("pcc2");
 
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
-    KWICComponent kwicVis = _get(resultPanel, KWICComponent.class);
+    _get(resultPanel, KWICComponent.class);
 
     // Open the coreference visualizer and check that IFrame component is loaded
     Button btOpenVisualizer =
