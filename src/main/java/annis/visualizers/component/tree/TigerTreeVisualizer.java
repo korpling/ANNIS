@@ -134,8 +134,8 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
     private final Font notoSansFontRegular;
     private final Font notoSansFontBold;
 
-    public DefaultStyler(Java2dBackend backend_) throws FontFormatException, IOException {
-      this.backend = backend_;
+    public DefaultStyler(Java2dBackend backend) throws FontFormatException, IOException {
+      this.backend = backend;
 
       // Loading fonts directly from the classpath fails, copy to temporary file first
       File regularFont = File.createTempFile("NotoSans-Regular", ".ttf");

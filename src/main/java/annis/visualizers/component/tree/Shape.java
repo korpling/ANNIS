@@ -74,7 +74,7 @@ public interface Shape {
 
     @Override
     public double getInternalYOffset(String label, Font font, Alignment alignment) {
-      double paddingRatio = getYPadding() / getXPadding();
+      double paddingRatio = super.getYPadding() / super.getXPadding();
       return font.extents(label).getHeight() * alignment.getYAlign() * (1.0 - paddingRatio);
     }
   }
