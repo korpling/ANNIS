@@ -225,23 +225,22 @@ public class ConstituentLayouter<T extends GraphicsItem> {
       Rectangle2D targetRect = treeLayout.getRect(e.getTarget());
 
       CubicCurve2D curveData = secedgeCurve(treeLayout.getOrientation(), sourceRect, targetRect);
-      if (curveData != null) {
-        T secedgeElem = backend.cubicCurve(curveData, styler.getStroke(e, input),
-            styler.getEdgeColor(e, input));
-        secedgeElem.setZValue(-2);
+      T secedgeElem =
+          backend.cubicCurve(curveData, styler.getStroke(e, input), styler.getEdgeColor(e, input));
+      secedgeElem.setZValue(-2);
 
-        T arrowElem = backend.arrow(curveData.getP1(), curveData.getCtrlP1(),
-            new Rectangle2D.Double(0, 0, 8, 8), styler.getEdgeColor(e, input));
-        arrowElem.setZValue(-1);
-        arrowElem.setParentItem(secedgeElem);
+      T arrowElem = backend.arrow(curveData.getP1(), curveData.getCtrlP1(),
+          new Rectangle2D.Double(0, 0, 8, 8), styler.getEdgeColor(e, input));
+      arrowElem.setZValue(-1);
+      arrowElem.setParentItem(secedgeElem);
 
-        Point2D labelPos = evaluate(curveData, 0.8);
+      Point2D labelPos = evaluate(curveData, 0.8);
 
-        T label = backend.makeLabel(labeler.getLabel(e, input), labelPos, styler.getFont(e),
-            styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e, input));
-        label.setParentItem(secedgeElem);
-        secedgeElem.setParentItem(treeLayout.getParentItem());
-      }
+      T label = backend.makeLabel(labeler.getLabel(e, input), labelPos, styler.getFont(e),
+          styler.getTextBrush(e), Alignment.CENTERED, styler.getShape(e, input));
+      label.setParentItem(secedgeElem);
+      secedgeElem.setParentItem(treeLayout.getParentItem());
+
     }
   }
 
@@ -434,7 +433,8 @@ public class ConstituentLayouter<T extends GraphicsItem> {
   }
 
   private Pair<RectangleSide> findBestConnection(Rectangle2D sourceRect, Rectangle2D targetRect) {
-    Pair<RectangleSide> result = null;
+    // Initialize with with "from bottom to top side" to never return null values
+    Pair<RectangleSide> result = new Pair<RectangleSide>(RectangleSide.BOTTOM, RectangleSide.TOP);
     double minDist = Float.MAX_VALUE;
     for (RectangleSide orig : RectangleSide.values()) {
       for (RectangleSide target : RectangleSide.values()) {
