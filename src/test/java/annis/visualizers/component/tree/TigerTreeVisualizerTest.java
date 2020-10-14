@@ -100,8 +100,10 @@ class TigerTreeVisualizerTest {
 
     // Compare image appearance with default thresholds
     ImageComparison imageComparison = new ImageComparison(expectedImage, actualImage);
+    imageComparison.setPixelToleranceLevel(0.2);
     ImageComparisonResult comparisonResult = imageComparison.compareImages();
-    assertEquals(ImageComparisonState.MATCH, comparisonResult.getImageComparisonState());
+    assertEquals(ImageComparisonState.MATCH, comparisonResult.getImageComparisonState(), String
+        .format("%f percent image difference detected", comparisonResult.getDifferencePercent()));
   }
 
 }
