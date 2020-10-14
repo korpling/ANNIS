@@ -17,7 +17,6 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SSpan;
@@ -136,27 +135,26 @@ public class PDFPageHelper {
    *
    */
   public String getPageFromAnnotation(SNode node) {
-    if (node != null && node.getAnnotations() != null) {
+    if (node != null) {
 
-      Set<SLayer> layers = node.getLayers();
-      String nodeNamespace = null;
+      String nodeNamespace =
+          node.getLayers().stream().findFirst().map(SLayer::getName).orElse(null);
 
-      if (layers != null) {
-        for (SLayer l : layers) {
-          nodeNamespace = l.getName();
-        }
+      for (SLayer l : node.getLayers()) {
+        nodeNamespace = l.getName();
+      }
 
-        for (SAnnotation anno : node.getAnnotations()) {
+      for (SAnnotation anno : node.getAnnotations()) {
 
-          if ((nodeNamespace == null || input.getNamespace() == null)
-              && getPDFPageAnnotationName().equals(anno.getName())) {
-            return anno.getValue_STEXT();
-          } else if (nodeNamespace != null && nodeNamespace.equals(input.getNamespace())
-              && getPDFPageAnnotationName().equals(anno.getName())) {
-            return anno.getValue_STEXT();
-          }
+        if ((nodeNamespace == null || input.getNamespace() == null)
+            && getPDFPageAnnotationName().equals(anno.getName())) {
+          return anno.getValue_STEXT();
+        } else if (nodeNamespace != null && nodeNamespace.equals(input.getNamespace())
+            && getPDFPageAnnotationName().equals(anno.getName())) {
+          return anno.getValue_STEXT();
         }
       }
+
     }
 
     return null;
