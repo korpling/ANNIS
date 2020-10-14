@@ -90,7 +90,7 @@ public class ResultFetchJob implements Runnable {
 
       // set the the progress bar, for given the user some information about the
       // loading process
-      ui.accessSynchronously(() -> resultPanel.showMatchSearchInProgress(query.getSegmentation()));
+      ui.access(() -> resultPanel.showMatchSearchInProgress(query.getSegmentation()));
 
       // get the matches
       FindQuery q = new FindQuery();
@@ -160,7 +160,7 @@ public class ResultFetchJob implements Runnable {
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
     } catch (final ApiException | IOException root) {
-      ui.accessSynchronously(() -> {
+      ui.access(() -> {
         if (resultPanel != null && resultPanel.getPaging() != null) {
           PagingComponent paging = resultPanel.getPaging();
           Throwable cause = root.getCause();

@@ -29,7 +29,6 @@ import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.server.JsonCodec;
-import com.vaadin.server.Page;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import elemental.json.JsonValue;
@@ -618,7 +617,7 @@ public class Helper {
     } catch (final ApiException ex) {
       if (!AnnisBaseUI.handleCommonError(ex, "get corpus configuration")) {
         new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER, ERROR_MESSAGE_CORPUS_PROPS,
-            Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+            Notification.Type.WARNING_MESSAGE, true).show(ui.getPage());
       }
     }
 

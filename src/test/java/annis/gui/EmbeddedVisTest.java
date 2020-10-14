@@ -16,7 +16,6 @@ import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
-import java.io.IOException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,7 @@ class EmbeddedVisTest {
     }
 
     @Test
-    void regression509() throws InterruptedException {
+    void regression509() throws Exception {
         EmbeddedVisUI ui = (EmbeddedVisUI) UI.getCurrent();
         MockRequest request = MockVaadinKt.getMock(VaadinRequest.getCurrent());
         request.setParameter("embedded_ns", "exmaralda");
@@ -67,7 +66,7 @@ class EmbeddedVisTest {
     }
 
     @Test
-    void showRawText() {
+    void showRawText() throws Exception {
       EmbeddedVisUI ui = (EmbeddedVisUI) UI.getCurrent();
 
       MockRequest request = MockVaadinKt.getMock(VaadinRequest.getCurrent());
@@ -87,9 +86,11 @@ class EmbeddedVisTest {
 
     /**
      * Make sure there is an error message when an unknown visualizer is requested.
+     * 
+     * @throws Exception
      */
     @Test
-    void unknownRemoteSaltVisualizer() {
+    void unknownRemoteSaltVisualizer() throws Exception {
       EmbeddedVisUI ui = (EmbeddedVisUI) UI.getCurrent();
 
       MockRequest request = MockVaadinKt.getMock(VaadinRequest.getCurrent());
@@ -109,7 +110,7 @@ class EmbeddedVisTest {
     }
 
     @Test
-    void invalidRemoteSaltUrlScheme() throws IOException {
+    void invalidRemoteSaltUrlScheme() throws Exception {
       EmbeddedVisUI ui = (EmbeddedVisUI) UI.getCurrent();
 
       MockRequest request = MockVaadinKt.getMock(VaadinRequest.getCurrent());

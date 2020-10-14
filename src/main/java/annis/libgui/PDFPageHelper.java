@@ -25,8 +25,6 @@ import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.util.DataSourceSequence;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Helps to extract page number annotations from {@link SSpan} of a salt document.
@@ -45,8 +43,6 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class PDFPageHelper {
-
-  private static final Logger log = LoggerFactory.getLogger(PDFPageHelper.class);
 
   public static final String MAPPING_PAGE_KEY = "pdf_page_key";
   public static final String DEFAULT_PAGE_NUMBER_ANNOTATION_NAME = "page";

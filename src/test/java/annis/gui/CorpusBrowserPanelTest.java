@@ -46,7 +46,7 @@ class CorpusBrowserPanelTest {
   private Accordion accordion;
 
   @BeforeEach
-  public void setup() {
+  public void setup() throws Exception {
     UIScopeImpl.setBeanStoreRetrievalStrategy(new SingletonBeanStoreRetrievalStrategy());
     ui = beanFactory.getBean(AnnisUI.class);
 
