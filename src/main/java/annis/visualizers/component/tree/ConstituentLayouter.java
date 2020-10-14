@@ -434,7 +434,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 
   private Pair<RectangleSide> findBestConnection(Rectangle2D sourceRect, Rectangle2D targetRect) {
     // Initialize with with "from bottom to top side" to never return null values
-    Pair<RectangleSide> result = new Pair<RectangleSide>(RectangleSide.BOTTOM, RectangleSide.TOP);
+    Pair<RectangleSide> result = new Pair<>(RectangleSide.BOTTOM, RectangleSide.TOP);
     double minDist = Float.MAX_VALUE;
     for (RectangleSide orig : RectangleSide.values()) {
       for (RectangleSide target : RectangleSide.values()) {

@@ -98,7 +98,7 @@ public class VisualizerPanel extends CssLayout
       try {
         final Component createdComponent = future.get(60, TimeUnit.SECONDS);
 
-        ui.accessSynchronously(() -> {
+        ui.access(() -> {
           vis = createdComponent;
           updateGUIAfterLoadingVisualizer(callback);
         });
@@ -119,7 +119,7 @@ public class VisualizerPanel extends CssLayout
 
       if (exception != null) {
         final Throwable finalException = exception;
-        ui.accessSynchronously(() -> Notification.show(
+        ui.access(() -> Notification.show(
             "Error when creating visualizer "
                 + (visPlugin == null ? UNKNOWN : visPlugin.getShortName()),
             finalException.toString(), Notification.Type.WARNING_MESSAGE));

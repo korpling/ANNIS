@@ -56,7 +56,7 @@ class MetaDataPanelTest {
   }
 
   @Test
-  void showPcc2CorpusBrowser() {
+  void showPcc2CorpusBrowser() throws Exception {
     // Open a corpus browser for pcc2
     Button button = mock(Button.class);
     CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();

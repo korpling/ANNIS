@@ -34,7 +34,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.v7.ui.TextArea;
-import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -84,25 +83,30 @@ class IntegrationTest {
     // the pcc2 corpus yet
     _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), corpusName);
 
+    MockVaadin.INSTANCE.clientRoundtrip();
+
     // Explicitly select the corpus
     @SuppressWarnings("unchecked")
     Grid<String> grid = _get(Grid.class,
         spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
     grid.getSelectionModel().select(corpusName);
+
+    MockVaadin.INSTANCE.clientRoundtrip();
   }
 
-  private void executeTokenSearch(String corpusName) {
+  private void executeTokenSearch(String corpusName) throws Exception {
     selectCorpus(corpusName);
 
     // Set the query and submit query
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
+    MockVaadin.INSTANCE.clientRoundtrip();
     _click(_get(Button.class, spec -> spec.withCaption("Search")));
 
-    awaitCondition(240, () -> !_find(SingleResultPanel.class).isEmpty());
+    awaitCondition(120, () -> !_find(SingleResultPanel.class).isEmpty());
   }
 
   @Test
-  void tokenSearchPcc2() throws InterruptedException, IOException {
+  void tokenSearchPcc2() throws Exception {
 
     executeTokenSearch("pcc2");
 
@@ -137,7 +141,7 @@ class IntegrationTest {
   }
 
   @Test
-  void openVisualizerPcc2() throws InterruptedException, IOException {
+  void openVisualizerPcc2() throws Exception {
 
     executeTokenSearch("pcc2");
 
@@ -154,13 +158,11 @@ class IntegrationTest {
 
     // Close the visualizer again
     _click(btOpenVisualizer);
-    awaitCondition(120, () -> _find(resultPanel, AutoHeightIFrame.class).isEmpty());
-
-
+    awaitCondition(60, () -> _find(resultPanel, AutoHeightIFrame.class).isEmpty());
   }
 
   @Test
-  void tokenSearchDialog() throws InterruptedException, IOException {
+  void tokenSearchDialog() throws Exception {
 
     executeTokenSearch("dialog.demo");
 
@@ -193,7 +195,7 @@ class IntegrationTest {
 
 
   @Test
-  void shareSingleResult() {
+  void shareSingleResult() throws Exception {
     executeTokenSearch("pcc2");
 
     // Activate the share window
@@ -272,7 +274,7 @@ class IntegrationTest {
   }
 
   @Test
-  void showDocumentRawText() {
+  void showDocumentRawText() throws Exception {
     UI.getCurrent().getNavigator().navigateTo("");
 
     ui.getSearchView().getDocBrowserController().openDocBrowser("pcc2");

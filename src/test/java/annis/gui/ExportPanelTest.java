@@ -42,7 +42,7 @@ class ExportPanelTest {
   }
 
   @Test
-  void testCSVExport() {
+  void testCSVExport() throws Exception {
     // Prepare query
     ui.getQueryState().setSelectedCorpora(Sets.newHashSet("pcc2"));
     ui.getQueryState().getAql().setValue("tok=\"Feigenblatt\"");
