@@ -11,6 +11,7 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.Match;
 import com.vaadin.server.VaadinSession;
+import java.awt.Color;
 import java.awt.FontFormatException;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -103,7 +104,9 @@ class TigerTreeVisualizerTest {
 
     for (int x = 0; x < expectedImage.getWidth(); x++) {
       for (int y = 0; y < expectedImage.getHeight(); y++) {
-        assertEquals(expectedImage.getRGB(x, y), actualImage.getRGB(x, y), String.format(
+        Color colorExpected = new Color(expectedImage.getRGB(x, y), true);
+        Color colorActual = new Color(actualImage.getRGB(x, y), true);
+        assertEquals(colorExpected, colorActual, String.format(
             "Pixel value at (%d,%d) for image %s was wrong", x, y, tmpFile.getAbsolutePath()));
       }
     }
