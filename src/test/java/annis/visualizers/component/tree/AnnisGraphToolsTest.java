@@ -51,17 +51,22 @@ class AnnisGraphToolsTest {
   @Test
   void hasEdgeSubtypeForEmptyType() {
 
-    SDominanceRelation rel = mock(SDominanceRelation.class);
+    SDominanceRelation rel1 = mock(SDominanceRelation.class);
     VisualizerInput input = mock(VisualizerInput.class);
 
     // When the type is empty, this should be treated like having no type (null) at all
-    when(rel.getType()).thenReturn("");
+    when(rel1.getType()).thenReturn("");
     Map<String, String> mappings = new LinkedHashMap<>();
     when(input.getMappings()).thenReturn(mappings);
     mappings.put("edge_type", "null");
 
     AnnisGraphTools tools = new AnnisGraphTools(input);
-    assertTrue(tools.hasEdgeSubtype(rel, "null"));
+    assertTrue(tools.hasEdgeSubtype(rel1, "null"));
+
+    SDominanceRelation rel2 = mock(SDominanceRelation.class);
+    when(rel1.getType()).thenReturn(null);
+    assertTrue(tools.hasEdgeSubtype(rel2, "null"));
+
   }
 
 }
