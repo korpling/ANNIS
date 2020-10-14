@@ -228,9 +228,9 @@ class FlatQueryBuilderTest {
     assertNotEquals("VVFIN", oldItemIds.get(2));
 
     // Mock a text change event
-    TextChangeEvent event = mock(TextChangeEvent.class);
-    when(event.getText()).thenReturn("VFIN");
-    valueField.textChange(event);
+    TextChangeEvent eventVFIN = mock(TextChangeEvent.class);
+    when(eventVFIN.getText()).thenReturn("VFIN");
+    valueField.textChange(eventVFIN);
 
     MockVaadin.INSTANCE.clientRoundtrip();
 
@@ -241,7 +241,26 @@ class FlatQueryBuilderTest {
     assertEquals("VMFIN", newItemIds.get(1));
     assertEquals("VVFIN", newItemIds.get(2));
 
+    // Test with an empty and null value, the suggestions should stay the same
+    TextChangeEvent eventEmpty = mock(TextChangeEvent.class);
+    when(eventEmpty.getText()).thenReturn("");
+    valueField.textChange(eventEmpty);
 
+    MockVaadin.INSTANCE.clientRoundtrip();
+    newItemIds = new ArrayList<>((Collection<String>) cb.getItemIds());
+    assertEquals("VAFIN", newItemIds.get(0));
+    assertEquals("VMFIN", newItemIds.get(1));
+    assertEquals("VVFIN", newItemIds.get(2));
+
+    TextChangeEvent eventNull = mock(TextChangeEvent.class);
+    when(eventNull.getText()).thenReturn(null);
+    valueField.textChange(eventNull);
+
+    MockVaadin.INSTANCE.clientRoundtrip();
+    newItemIds = new ArrayList<>((Collection<String>) cb.getItemIds());
+    assertEquals("VAFIN", newItemIds.get(0));
+    assertEquals("VMFIN", newItemIds.get(1));
+    assertEquals("VVFIN", newItemIds.get(2));
 
   }
 }
