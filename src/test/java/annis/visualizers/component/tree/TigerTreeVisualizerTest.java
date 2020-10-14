@@ -10,8 +10,10 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.Match;
+import com.github.romankh3.image.comparison.ImageComparison;
+import com.github.romankh3.image.comparison.model.ImageComparisonResult;
+import com.github.romankh3.image.comparison.model.ImageComparisonState;
 import com.vaadin.server.VaadinSession;
-import java.awt.Color;
 import java.awt.FontFormatException;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -96,21 +98,10 @@ class TigerTreeVisualizerTest {
         new ClassPathResource("example_constituent_tree.png", this.getClass());
     BufferedImage expectedImage = ImageIO.read(expectedRes.getInputStream());
 
-    // Compare both images pixel by pixel
-    assertEquals(expectedImage.getWidth(), actualImage.getWidth(),
-        String.format("Width for image %s is wrong", tmpFile.getAbsolutePath()));
-    assertEquals(expectedImage.getHeight(), actualImage.getHeight(),
-        String.format("Height for image %s is wrong", tmpFile.getAbsolutePath()));
-
-    for (int x = 0; x < expectedImage.getWidth(); x++) {
-      for (int y = 0; y < expectedImage.getHeight(); y++) {
-        Color colorExpected = new Color(expectedImage.getRGB(x, y), true);
-        Color colorActual = new Color(actualImage.getRGB(x, y), true);
-        assertEquals(colorExpected, colorActual, String.format(
-            "Pixel value at (%d,%d) for image %s was wrong", x, y, tmpFile.getAbsolutePath()));
-      }
-    }
-
+    // Compare image appearance with default thresholds
+    ImageComparison imageComparison = new ImageComparison(expectedImage, actualImage);
+    ImageComparisonResult comparisonResult = imageComparison.compareImages();
+    assertEquals(ImageComparisonState.MATCH, comparisonResult.getImageComparisonState());
   }
 
 }
