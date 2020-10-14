@@ -36,7 +36,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 @SpringBootTest
-@ActiveProfiles({"desktop", "test"})
+@ActiveProfiles({"desktop", "test", "headless"})
 @WebAppConfiguration
 class FlatQueryBuilderTest {
 

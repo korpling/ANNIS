@@ -25,7 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@ActiveProfiles({"desktop", "test"})
+@ActiveProfiles({"desktop", "test", "headless"})
 class CitationRedirectionServletTest {
 
   @LocalServerPort

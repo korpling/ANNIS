@@ -84,10 +84,6 @@
 			<resource>
 				<directory>${project.build.directory}/native/</directory>
 			</resource>
-			<resource>
-				<directory>${basedir}/target/extra-resources</directory>
-				<filtering>true</filtering>
-			</resource>
 		</resources>
 
 		<pluginManagement>

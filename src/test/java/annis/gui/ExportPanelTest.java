@@ -20,7 +20,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.vaadin.hene.popupbutton.PopupButton;
 
 @SpringBootTest
-@ActiveProfiles({"desktop", "test"})
+@ActiveProfiles({"desktop", "test", "headless"})
 @WebAppConfiguration
 class ExportPanelTest {
 
