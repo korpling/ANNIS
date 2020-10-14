@@ -16,9 +16,15 @@ public class TestHelper {
       Awaitility.pollInSameThread();
       MockVaadin.INSTANCE.clientRoundtrip();
       await().atMost(seconds, TimeUnit.SECONDS).until(() -> {
+        Thread.yield();
         MockVaadin.INSTANCE.clientRoundtrip();
+
+        Thread.yield();
         Boolean result = conditionEvaluator.call();
+
+        Thread.yield();
         MockVaadin.INSTANCE.clientRoundtrip();
+        Thread.yield();
         return result;
       });
       MockVaadin.INSTANCE.clientRoundtrip();
