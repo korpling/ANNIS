@@ -72,7 +72,7 @@ class TigerTreeVisualizerTest {
 
     // Mark the root node as match
     Match m = new Match(
-            Arrays.asList(graph.getRootsByRelation(SALT_TYPE.SDOMINANCE_RELATION).get(0).getId()));
+        Arrays.asList(graph.getRootsByRelation(SALT_TYPE.SDOMINANCE_RELATION).get(0).getId()));
     Helper.addMatchToDocumentGraph(m, graph);
 
     when(visInput.getDocument()).thenReturn(doc);
@@ -98,18 +98,14 @@ class TigerTreeVisualizerTest {
 
     // Compare both images pixel by pixel
     assertEquals(expectedImage.getWidth(), actualImage.getWidth(),
-        String.format("Width for image {} was {} but should have been {}",
-            tmpFile.getAbsolutePath(), actualImage.getWidth(), expectedImage.getWidth()));
+        String.format("Width for image %s is wrong", tmpFile.getAbsolutePath()));
     assertEquals(expectedImage.getHeight(), actualImage.getHeight(),
-        String.format("Height for image {} was {} but should have been {}",
-            tmpFile.getAbsolutePath(), actualImage.getHeight(), expectedImage.getHeight()));
+        String.format("Height for image %s is wrong", tmpFile.getAbsolutePath()));
 
     for (int x = 0; x < expectedImage.getWidth(); x++) {
       for (int y = 0; y < expectedImage.getHeight(); y++) {
-        assertEquals(expectedImage.getRGB(x, y), actualImage.getRGB(x, y),
-            String.format("Pixel value at ({},{}) for image {} was {} but should have been {}", x,
-                y, tmpFile.getAbsolutePath(), actualImage.getRGB(x, y),
-                expectedImage.getRGB(x, y)));
+        assertEquals(expectedImage.getRGB(x, y), actualImage.getRGB(x, y), String.format(
+            "Pixel value at (%d,%d) for image %s was wrong", x, y, tmpFile.getAbsolutePath()));
       }
     }
 
