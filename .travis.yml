@@ -27,13 +27,15 @@ before_script:
   - export PATH=$HOME/.cargo/bin:$TRAVIS_BUILD_DIR/node_modules/.bin/:$PATH
   - misc/download-mdbook.sh 0.4.2
   - misc/download-annis-cli.sh 0.30.0
-  # download pcc2 corpus and import it using the CLI
+  # download demo corpora and import them using the CLI
   - wget http://corpus-tools.org/corpora/pcc2_relANNIS.zip
   - wget https://corpus-tools.org/corpora/dialog.demo_relANNIS.zip
+  - wget https://corpus-tools.org/corpora/Aeschylus.Persae.L1-18_relAnnis.zip
   - mkdir -p  $HOME/.annis/v4/
   - annis -c "import pcc2_relANNIS.zip"  $HOME/.annis/v4/
   - annis -c "import dialog.demo_relANNIS.zip"  $HOME/.annis/v4/
-
+  - annis -c "import Aeschylus.Persae.L1-18_relAnnis.zip"  $HOME/.annis/v4/
+  
 jobs:
   include:
     - language: java

@@ -52,24 +52,28 @@ class CorpusBrowserPanelTest {
 
     MockVaadin.setup(() -> ui);
 
-    // Open a corpus browser for pcc2
+
+  }
+
+  @AfterEach
+  public void tearDown() {
+    MockVaadin.tearDown();
+  }
+
+  private void openCorpusBrowser(String corpus) throws Exception {
+    // Open a corpus browser for the given corpus
     Button button = mock(Button.class);
     CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
-    corpusList.initCorpusBrowser("pcc2", button);
+    corpusList.initCorpusBrowser(corpus, button);
 
     // Get window by its title
-    Window w = _get(Window.class, spec -> spec.withCaption("Corpus information for pcc2"));
+    Window w = _get(Window.class, spec -> spec.withCaption("Corpus information for " + corpus));
 
     // Wait for corpus browser content to load
     awaitCondition(30, () -> _find(w, ProgressBar.class).isEmpty());
 
     panel = _get(w, CorpusBrowserPanel.class);
     accordion = _get(panel, Accordion.class);
-  }
-
-  @AfterEach
-  public void tearDown() {
-    MockVaadin.tearDown();
   }
 
   private Map<String, CorpusBrowserEntry> getItems(ExampleTable tbl) {
@@ -81,7 +85,9 @@ class CorpusBrowserPanelTest {
   }
 
   @Test
-  void generateNodeExampleQuery() {
+  void generateNodeExampleQuery() throws Exception {
+    openCorpusBrowser("pcc2");
+
     Tab tab = accordion.getTab(0);
     assertEquals("Node Annotations", tab.getCaption());
 
@@ -95,7 +101,9 @@ class CorpusBrowserPanelTest {
   }
 
   @Test
-  void generateEdgeAnnoExampleQuery() {
+  void generateEdgeAnnoExampleQuery() throws Exception {
+    openCorpusBrowser("pcc2");
+
     Tab tab = accordion.getTab(1);
     assertEquals("Edge Annotations", tab.getCaption());
 
@@ -110,7 +118,9 @@ class CorpusBrowserPanelTest {
 
 
   @Test
-  void generateEdgeTypesExampleQuery() {
+  void generateEdgeTypesExampleQuery() throws Exception {
+    openCorpusBrowser("pcc2");
+
     Tab tab = accordion.getTab(2);
     assertEquals("Edge Types", tab.getCaption());
 
@@ -139,7 +149,9 @@ class CorpusBrowserPanelTest {
   }
 
   @Test
-  void generateMetaAnntoationsExampleQuery() {
+  void generateMetaAnntoationsExampleQuery() throws Exception {
+    openCorpusBrowser("pcc2");
+
     Tab tab = accordion.getTab(3);
     assertEquals("Meta Annotations", tab.getCaption());
 
@@ -149,6 +161,30 @@ class CorpusBrowserPanelTest {
     assertNotNull(genreEntry);
     assertEquals("Genre=\"Sport\"", genreEntry.getQuery());
     assertEquals(new HashSet<>(Arrays.asList("pcc2")), genreEntry.getCorpora());
+  }
+
+  @Test
+  void generateEdgeTypesExampleQueryAeschylus() throws Exception {
+    openCorpusBrowser("Aeschylus.Persae.L1-18");
+
+    Tab tab = accordion.getTab(2);
+    assertEquals("Edge Types", tab.getCaption());
+
+    Map<String, CorpusBrowserEntry> items = getItems(_get(tab.getComponent(), ExampleTable.class));
+
+    CorpusBrowserEntry emptyDominanceEntry = items.get("(dominance)");
+    assertNotNull(emptyDominanceEntry);
+    assertEquals("node & node & #1 > #2", emptyDominanceEntry.getQuery());
+    assertEquals(new HashSet<>(Arrays.asList("Aeschylus.Persae.L1-18")),
+        emptyDominanceEntry.getCorpora());
+
+
+    CorpusBrowserEntry typedDominanceEntry = items.get("edge");
+    assertNotNull(typedDominanceEntry);
+    assertEquals("node & node & #1 >edge #2", typedDominanceEntry.getQuery());
+    assertEquals(new HashSet<>(Arrays.asList("Aeschylus.Persae.L1-18")),
+        typedDominanceEntry.getCorpora());
+
 
   }
 
