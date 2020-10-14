@@ -197,6 +197,10 @@ public class AnnisGraphTools implements Serializable {
   public boolean hasEdgeSubtype(SRelation rel, String edgeSubtype) {
     String type = rel.getType();
 
+    if (type != null && type.isEmpty()) {
+      type = null;
+    }
+
     if (getPrimEdgeSubType().equals(edgeSubtype)) {
       edgeSubtype =
           input.getMappings().get("edge") != null ? input.getMappings().get("edge")

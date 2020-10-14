@@ -50,7 +50,7 @@ public interface GraphicsBackend<T extends GraphicsItem> {
 
     public double getAscent();
 
-    double getLineHeight();
+    public double getLineHeight();
   }
 
   /**

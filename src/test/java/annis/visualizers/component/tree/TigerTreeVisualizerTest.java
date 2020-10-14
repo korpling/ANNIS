@@ -79,6 +79,7 @@ class TigerTreeVisualizerTest {
     Map<String, String> mappings = new LinkedHashMap<>();
     mappings.put("node_ns", "syntax");
     mappings.put("node_key", "const");
+    mappings.put("node_anno_ns", "default_ns");
     mappings.put("edge_type", "null");
     when(visInput.getMappings()).thenReturn(mappings);
 

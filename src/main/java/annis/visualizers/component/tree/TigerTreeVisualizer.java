@@ -169,7 +169,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
       if (AnnisGraphTools.isTerminal(n, input)) {
         return backend.getFont(this.notoSansFontRegular, 12, java.awt.Font.PLAIN);
       } else {
-        return backend.getFont(this.notoSansFontBold, 15, java.awt.Font.PLAIN);
+        return backend.getFont(this.notoSansFontBold, 15, java.awt.Font.BOLD);
       }
 
     }
