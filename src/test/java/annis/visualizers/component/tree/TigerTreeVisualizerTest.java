@@ -100,7 +100,8 @@ class TigerTreeVisualizerTest {
 
     // Compare image appearance with default thresholds
     ImageComparison imageComparison = new ImageComparison(expectedImage, actualImage);
-    imageComparison.setPixelToleranceLevel(0.2);
+    // Anti-aliasing difference can lead to different pixels, allow some variation
+    imageComparison.setAllowingPercentOfDifferentPixels(0.5);
     ImageComparisonResult comparisonResult = imageComparison.compareImages();
     assertEquals(ImageComparisonState.MATCH, comparisonResult.getImageComparisonState(), String
         .format("%f percent image difference detected", comparisonResult.getDifferencePercent()));
