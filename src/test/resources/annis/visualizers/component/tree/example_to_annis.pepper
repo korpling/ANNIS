@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pepper-job id="5nlbc0mg" version="1.0">
+	<importer name="SaltXMLImporter" path="./example_constituent_tree/">
+	</importer>
+	<exporter name="ANNISExporter" path="./example_constituent_tree_annis/">
+	</exporter>
+</pepper-job>
