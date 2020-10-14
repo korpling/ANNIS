@@ -1,11 +1,19 @@
 package annis.visualizers.component.tree;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import annis.libgui.visualizers.VisualizerInput;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.junit.jupiter.api.Test;
 
@@ -31,6 +39,29 @@ class AnnisGraphToolsTest {
     assertNull(AnnisGraphTools.extractAnnotation(annos, null, "anno"));
 
 
+  }
+
+  @Test
+  void isTerminalNullCheck() {
+    assertFalse(AnnisGraphTools.isTerminal(null, null));
+    VisualizerInput mockedVisInput = mock(VisualizerInput.class);
+    assertFalse(AnnisGraphTools.isTerminal(null, mockedVisInput));
+  }
+
+  @Test
+  void hasEdgeSubtypeForEmptyType() {
+
+    SDominanceRelation rel = mock(SDominanceRelation.class);
+    VisualizerInput input = mock(VisualizerInput.class);
+
+    // When the type is empty, this should be treated like having no type (null) at all
+    when(rel.getType()).thenReturn("");
+    Map<String, String> mappings = new LinkedHashMap<>();
+    when(input.getMappings()).thenReturn(mappings);
+    mappings.put("edge_type", "null");
+
+    AnnisGraphTools tools = new AnnisGraphTools(input);
+    assertTrue(tools.hasEdgeSubtype(rel, "null"));
   }
 
 }
