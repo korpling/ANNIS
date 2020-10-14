@@ -11,6 +11,7 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.Match;
 import com.vaadin.server.VaadinSession;
+import java.awt.FontFormatException;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,7 +43,7 @@ class TigerTreeVisualizerTest {
   private TigerTreeVisualizer vis;
 
   @BeforeEach
-  void setup() {
+  void setup() throws FontFormatException, IOException {
 
     vis = new TigerTreeVisualizer();
 

@@ -24,12 +24,14 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontFormatException;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -39,11 +41,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import javax.imageio.ImageIO;
+import org.apache.commons.io.FileUtils;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -127,8 +131,28 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
 
     private final Java2dBackend backend;
 
-    public DefaultStyler(Java2dBackend backend_) {
+    private final Font notoSansFontRegular;
+    private final Font notoSansFontBold;
+
+    public DefaultStyler(Java2dBackend backend_) throws FontFormatException, IOException {
       this.backend = backend_;
+
+      // Loading fonts directly from the classpath fails, copy to temporary file first
+      File regularFont = File.createTempFile("NotoSans-Regular", ".ttf");
+      File boldFont = File.createTempFile("NotoSans-Bold", ".ttf");
+
+      regularFont.deleteOnExit();
+      boldFont.deleteOnExit();
+
+      FileUtils.copyToFile(
+          new ClassPathResource("NotoSans-Regular.ttf", TigerTreeVisualizer.class).getInputStream(),
+          regularFont);
+      FileUtils.copyToFile(
+          new ClassPathResource("NotoSans-Bold.ttf", TigerTreeVisualizer.class).getInputStream(),
+          boldFont);
+
+      this.notoSansFontRegular = Font.createFont(Font.TRUETYPE_FONT, regularFont.getAbsoluteFile());
+      this.notoSansFontBold = Font.createFont(Font.TRUETYPE_FONT, boldFont.getAbsoluteFile());
     }
 
     @Override
@@ -143,16 +167,16 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
     @Override
     public GraphicsBackend.Font getFont(SNode n, VisualizerInput input) {
       if (AnnisGraphTools.isTerminal(n, input)) {
-        return backend.getFont(Font.SANS_SERIF, 12, java.awt.Font.PLAIN);
+        return backend.getFont(this.notoSansFontRegular, 12, java.awt.Font.PLAIN);
       } else {
-        return backend.getFont(Font.SANS_SERIF, 15, java.awt.Font.BOLD);
+        return backend.getFont(this.notoSansFontBold, 15, java.awt.Font.PLAIN);
       }
 
     }
 
     @Override
     public GraphicsBackend.Font getFont(SRelation e) {
-      return backend.getFont(Font.SANS_SERIF, 10, java.awt.Font.PLAIN);
+      return backend.getFont(this.notoSansFontRegular, 10, java.awt.Font.PLAIN);
     }
 
     @Override
@@ -262,7 +286,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
 
   private AnnisGraphTools graphtools;
 
-  public TigerTreeVisualizer() {
+  public TigerTreeVisualizer() throws FontFormatException, IOException {
     labeler = new DefaultLabeler();
     initTransients();
   }
@@ -294,11 +318,12 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer {
     return "tree";
   }
 
-  private void initTransients() {
+  private void initTransients() throws FontFormatException, IOException {
     styler = new DefaultStyler(getBackend());
   }
 
-  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+  private void readObject(java.io.ObjectInputStream in)
+      throws IOException, ClassNotFoundException, FontFormatException {
     in.defaultReadObject();
     initTransients();
   }
