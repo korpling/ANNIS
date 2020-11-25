@@ -1,0 +1,61 @@
+name: Automated tests
+on: push
+
+jobs:
+  test_jdk8:
+    name: Execute all automated tests JDK 8
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Cache test corpora
+        uses: actions/cache@v2
+        with:
+          path: "*.zip"
+          key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
+      - name: Set JAVA_HOME to included JDK 8
+        run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
+      - run: misc/download-annis-cli.sh 0.30.0
+      - run: misc/import-test-corpora.sh
+      - name: Run Maven install (includes tests)
+        run: mvn install
+  test_jdk11:
+    name: Execute all automated tests on JDK 11
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Cache test corpora
+        uses: actions/cache@v2
+        with:
+          path: "*.zip"
+          key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
+      - name: Set JAVA_HOME to included JDK 11
+        run: echo JAVA_HOME=$JAVA_HOME_11_X64 >> $GITHUB_ENV
+      - run: misc/download-annis-cli.sh 0.30.0
+      - run: misc/import-test-corpora.sh
+      - name: Run Maven install (includes tests)
+        run: mvn install
+
+  test_docs:
+    name: Test documentation
+    runs-on: ubuntu-20.04
+    steps:
+      - run: misc/download-mdbook.sh 0.4.2
+      - run: mdbook build docs/user-guide/
+      - run: mdbook build docs/developer-guide/
+      - run: mdbook build docs/online-help/
