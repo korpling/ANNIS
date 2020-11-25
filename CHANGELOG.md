@@ -5,6 +5,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade to graphANNIS 0.30.0 which brings its own REST service
+- User interface now uses Spring Boot to create a runnable jar file which can be executed easily without explicit installation.
+
+### Removed
+
+- REST service has been removed 
+- Kickstarter has no user interface for importing and deleting corpora, use the web administration instead
+
 ## [4.0.0-beta.4] - 2020-03-26
 
 ### Changed
