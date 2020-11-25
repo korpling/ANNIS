@@ -29,8 +29,8 @@ public class TestHelper {
 
       if (!condition) {
         // Wait until invoking the condition again
-        log.debug("Waiting 250ms before checking condition again");
-        Thread.sleep(250); // NOSONAR The code should similar to the Karibu async example
+        log.debug("Waiting 1 second before checking condition again");
+        Thread.sleep(1000); // NOSONAR The code should similar to the Karibu async example
       }
     }
 
