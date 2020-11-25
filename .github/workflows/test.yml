@@ -59,7 +59,7 @@ jobs:
     name: Test documentation
     runs-on: ubuntu-20.04
     steps:
-      - run: misc/download-mdbook.sh 0.4.2
+      - run: "misc/download-mdbook.sh 0.4.2"
         env:
           OS_NAME: linux
       - run: mdbook build docs/user-guide/
