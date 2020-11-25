@@ -101,8 +101,9 @@ class IntegrationTest {
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
     MockVaadin.INSTANCE.clientRoundtrip();
     _click(_get(Button.class, spec -> spec.withCaption("Search")));
+    MockVaadin.INSTANCE.clientRoundtrip();
 
-    awaitCondition(240, () -> !_find(SingleResultPanel.class).isEmpty());
+    awaitCondition(60, () -> !_find(SingleResultPanel.class).isEmpty());
   }
 
   @Test
