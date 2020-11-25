@@ -21,23 +21,23 @@ fi
 if [ "$install_mdbook" = true ] ; then
         echo "Installing mdBook version ${MDBOOK_VERSION}"
 
-        if [[ "$TRAVIS_OS_NAME" == "linux" ]];
+        if [[ "$OS_NAME" == "linux" ]];
         then
             rm -f mdbook.tar.gz
             curl -L -o mdbook.tar.gz https://github.com/rust-lang/mdBook/releases/download/v${MDBOOK_VERSION}/mdbook-v${MDBOOK_VERSION}-x86_64-unknown-linux-gnu.tar.gz
             tar -C $HOME/.cargo/bin/ -zxf mdbook.tar.gz
-        elif [[ "$TRAVIS_OS_NAME" == "osx" ]];
+        elif [[ "$OS_NAME" == "osx" ]];
         then
             rm -f mdbook.tar.gz
             curl -L -o mdbook.tar.gz https://github.com/rust-lang/mdBook/releases/download/v${MDBOOK_VERSION}/mdbook-v${MDBOOK_VERSION}-x86_64-apple-darwin.tar.gz
             tar -C $HOME/.cargo/bin/ -zxf mdbook.tar.gz
-        elif [[ "$TRAVIS_OS_NAME" == "windows" ]];
+        elif [[ "$OS_NAME" == "windows" ]];
         then
             del /s /q mdbook.tar.gz
             curl -L -o mdbook.zip https://github.com/rust-lang/mdBook/releases/download/v${MDBOOK_VERSION}/mdBook-v${MDBOOK_VERSION}-x86_64-pc-windows-msvc.zip
             unzip -o -d $HOME/.cargo/bin/ mdbook.zip
         else
-            >&2 echo "Unknown value \"${TRAVIS_OS_NAME}\" for environment variable TRAVIS_OS_NAME"
+            >&2 echo "Unknown value \"${OS_NAME}\" for environment variable OS_NAME"
         	exit 1
         fi
 fi
