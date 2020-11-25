@@ -101,9 +101,11 @@ class IntegrationTest {
     // Set the query and submit query
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
     MockVaadin.INSTANCE.clientRoundtrip();
+    awaitCondition(60, () -> "tok".equals(ui.getQueryState().getAql().getValue()));
     Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
     _click(searchButton);
     awaitCondition(60, () -> searchButton.isEnabled());
+    awaitCondition(60, () -> !_find(ResultViewPanel.class).isEmpty());
     ResultViewPanel resultView = _get(ResultViewPanel.class);
    
     awaitCondition(60, () -> !_find(resultView, SingleResultPanel.class).isEmpty());
