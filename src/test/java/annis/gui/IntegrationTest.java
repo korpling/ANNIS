@@ -16,6 +16,7 @@ import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.components.medialement.MediaElementPlayer;
 import annis.gui.docbrowser.DocBrowserPanel;
 import annis.gui.docbrowser.DocBrowserTable;
+import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.SingleResultPanel;
 import annis.gui.widgets.AutoHeightIFrame;
 import annis.gui.widgets.grid.AnnotationGrid;
@@ -103,8 +104,9 @@ class IntegrationTest {
     Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
     _click(searchButton);
     awaitCondition(60, () -> searchButton.isEnabled());
-
-    awaitCondition(60, () -> !_find(SingleResultPanel.class).isEmpty());
+    ResultViewPanel resultView = _get(ResultViewPanel.class);
+   
+    awaitCondition(60, () -> !_find(resultView, SingleResultPanel.class).isEmpty());
   }
 
   @Test
