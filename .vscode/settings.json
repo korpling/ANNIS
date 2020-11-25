@@ -9,13 +9,5 @@
     "java.import.gradle.enabled": false,
     "java.format.settings.url": "https://raw.githubusercontent.com/hexatomic/hexatomic/develop/releng/ide/eclipse-java-hexatomic-style.xml",
     "java.import.gradle.wrapper.enabled": false,
-    "ltex.workspaceFolderDictionary": {
-        "en-US": [
-            "graphANNIS",
-            "GraphANNIS",
-            "GraphML",
-            "Keycloak",
-            "relANNIS"
-        ]
-    }
+    "yaml.schemaStore.enable": false
 }
