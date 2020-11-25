@@ -1,5 +1,5 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.1212548.svg)](https://doi.org/10.5281/zenodo.1212548)
-[![Build Status](https://travis-ci.org/korpling/ANNIS.svg?branch=develop)](https://travis-ci.org/korpling/ANNIS)
+![Automated tests](https://github.com/korpling/ANNIS/workflows/Automated%20tests/badge.svg)
 
 ANNIS is an open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.
 

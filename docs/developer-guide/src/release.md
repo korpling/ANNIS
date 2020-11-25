@@ -44,7 +44,7 @@ mvn license:add-third-party license:download-licenses
 3. **Release** the staging repository to Maven Central with the Nexus interface: [https://oss.sonatype.org/](https://oss.sonatype.org/)
 4. Create a new **release on GitHub** including the changelog. Upload the binaries from Maven repository to GitHub release as well.
 
-A new version of the User and Developer Guide will be deployed by Travis CI.
+A new version of the User and Developer Guide will be deployed by the GitHub Actions CI.
 
 
 
