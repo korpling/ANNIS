@@ -52,9 +52,7 @@ jobs:
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
-      - name: Run Maven install (includes tests)
-        run: mvn install
-      - name: Run Maven Tests (including integration tests) with enabled code coverage and upload results to SonarCloud
+      - name: Run Maven Tests with enabled code coverage and upload results to SonarCloud
         run: mvn -B -Pcoverage verify sonar:sonar -Dsonar.projectKey=korpling_ANNIS -Dsonar.organization=korpling -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
