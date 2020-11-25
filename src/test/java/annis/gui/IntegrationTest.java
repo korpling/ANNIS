@@ -95,7 +95,8 @@ class IntegrationTest {
     MockVaadin.INSTANCE.clientRoundtrip();
   }
 
-  private void executeTokenSearch(String corpusName) throws Exception {
+  private void executeTokenSearch(String corpusName, int matchCount, int documentCount)
+      throws Exception {
     selectCorpus(corpusName);
 
     // Set the query and submit query
@@ -104,17 +105,25 @@ class IntegrationTest {
     awaitCondition(60, () -> "tok".equals(ui.getQueryState().getAql().getValue()));
     Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
     _click(searchButton);
-    awaitCondition(60, () -> searchButton.isEnabled());
-    awaitCondition(60, () -> !_find(ResultViewPanel.class).isEmpty());
+
+    // Wait until the count is displayed
+    String expectedStatus = "" + matchCount + " matches\nin " + documentCount
+        + (documentCount == 1 ? " document" : " documents");
+    awaitCondition(60,
+        () -> expectedStatus
+            .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
+        () -> "Waited for status \"" + expectedStatus + "\" but was \""
+            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+
     ResultViewPanel resultView = _get(ResultViewPanel.class);
    
-    awaitCondition(60, () -> !_find(resultView, SingleResultPanel.class).isEmpty());
+    awaitCondition(30, () -> !_find(resultView, SingleResultPanel.class).isEmpty());
   }
 
   @Test
   void tokenSearchPcc2() throws Exception {
 
-    executeTokenSearch("pcc2");
+    executeTokenSearch("pcc2", 399, 2);
 
     // Test that the cell values have the correct token value
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
@@ -149,7 +158,7 @@ class IntegrationTest {
   @Test
   void openVisualizerPcc2() throws Exception {
 
-    executeTokenSearch("pcc2");
+    executeTokenSearch("pcc2", 399, 2);
 
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
     _get(resultPanel, KWICComponent.class);
@@ -170,7 +179,7 @@ class IntegrationTest {
   @Test
   void tokenSearchDialog() throws Exception {
 
-    executeTokenSearch("dialog.demo");
+    executeTokenSearch("dialog.demo", 102, 1);
 
     // Test that there is a grid visualizer
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
@@ -202,7 +211,7 @@ class IntegrationTest {
 
   @Test
   void shareSingleResult() throws Exception {
-    executeTokenSearch("pcc2");
+    executeTokenSearch("pcc2", 399, 2);
 
     // Activate the share window
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
