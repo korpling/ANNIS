@@ -14,7 +14,8 @@ public class TestHelper {
     // Static helper class
   }
 
-  public static void awaitCondition(int seconds, Callable<Boolean> conditionEvaluator)
+  public static void awaitCondition(int seconds, Callable<Boolean> conditionEvaluator,
+      Callable<String> message)
       throws Exception {
     long startTime = System.currentTimeMillis();
     long maxExecutionTime = ((long) seconds) * 1000l;
@@ -37,7 +38,13 @@ public class TestHelper {
     MockVaadin.INSTANCE.clientRoundtrip();
 
     if (!condition) {
-      throw new TimeoutException("Condition did not become true in " + seconds + " seconds.");
+      throw new TimeoutException(message.call());
     }
+  }
+
+  public static void awaitCondition(int seconds, Callable<Boolean> conditionEvaluator)
+      throws Exception {
+    awaitCondition(seconds, conditionEvaluator,
+        () -> "Condition did not become true in " + seconds + " seconds.");
   }
 }

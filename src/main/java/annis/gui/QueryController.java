@@ -183,7 +183,7 @@ public class QueryController implements Serializable {
    * Cancel queries from the client side.
    *
    * Important: This does not magically cancel the query on the server side, so don't use this to
-   * implement a "real" query cancelation.
+   * implement a "real" query cancellation.
    */
   private void cancelSearch() {
     // don't spin forever when canceled
