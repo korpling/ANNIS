@@ -366,10 +366,14 @@ public class QueryController implements Serializable {
     searchView.updateFragment(displayedQuery);
 
     if (displayedQuery.getCorpora() == null || displayedQuery.getCorpora().isEmpty()) {
+      searchView.getControlPanel().getQueryPanel().setStatus("No corpus selected");
+      searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
       Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
       return;
     }
     if ("".equals(displayedQuery.getQuery())) {
+      searchView.getControlPanel().getQueryPanel().setStatus("Empty query");
+      searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
       return;
     }
