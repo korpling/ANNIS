@@ -25,6 +25,8 @@ import annis.gui.widgets.grid.Row;
 import annis.visualizers.component.grid.GridComponent;
 import annis.visualizers.component.kwic.KWICComponent;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
+import com.vaadin.data.provider.DataProvider;
+import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -77,8 +79,22 @@ class IntegrationTest {
     MockVaadin.tearDown();
   }
 
-  private void selectCorpus(String corpusName) {
-    UI.getCurrent().getNavigator().navigateTo("");
+  private void selectCorpus(String corpusName) throws Exception {
+
+    @SuppressWarnings("unchecked")
+    Grid<String> grid = _get(Grid.class,
+        spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
+
+    // Wait until corpus list is shown
+    awaitCondition(30, () -> {
+      DataProvider<String, ?> provider = grid.getDataProvider();
+      if (provider instanceof ListDataProvider<?>) {
+        ListDataProvider<?> listDataProvider = (ListDataProvider<?>) provider;
+        return !listDataProvider.getItems().isEmpty();
+      } else {
+        return false;
+      }
+    }, () -> "Corpus list did not appear");
 
     // Filter for the corpus name in case the corpus list has too many entries and does not show
     // the pcc2 corpus yet
@@ -87,12 +103,11 @@ class IntegrationTest {
     MockVaadin.INSTANCE.clientRoundtrip();
 
     // Explicitly select the corpus
-    @SuppressWarnings("unchecked")
-    Grid<String> grid = _get(Grid.class,
-        spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
     grid.getSelectionModel().select(corpusName);
 
-    MockVaadin.INSTANCE.clientRoundtrip();
+    awaitCondition(30, () -> ui.getQueryState().getSelectedCorpora().contains(corpusName),
+            () -> "Could not select corpus " + corpusName + ", "
+                    + ui.getQueryState().getSelectedCorpora() + " was the current selection.");
   }
 
   private void executeTokenSearch(String corpusName, int matchCount, int documentCount)
@@ -102,7 +117,10 @@ class IntegrationTest {
     // Set the query and submit query
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
     MockVaadin.INSTANCE.clientRoundtrip();
-    awaitCondition(60, () -> "tok".equals(ui.getQueryState().getAql().getValue()));
+    awaitCondition(5, () -> "tok".equals(ui.getQueryState().getAql().getValue()));
+    awaitCondition(5, () -> "Valid query, click on \"Search\" to start searching."
+        .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
+
     Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
     _click(searchButton);
 
