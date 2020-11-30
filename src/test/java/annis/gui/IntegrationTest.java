@@ -367,6 +367,8 @@ class IntegrationTest {
         () -> expectedStatus.equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
         () -> "Waited for status \"" + expectedStatus + "\" but was \""
             + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+    assertEquals(1,
+        _find(com.vaadin.ui.TextArea.class, spec -> spec.withValue(expectedStatus)).size());
   }
 
   @Test
@@ -396,6 +398,8 @@ class IntegrationTest {
             .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
         () -> "Waited for status \"" + expectedStatus + "\" but was \""
             + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+    assertEquals(1,
+        _find(com.vaadin.ui.TextArea.class, spec -> spec.withValue(expectedStatus)).size());
   }
 
 }
