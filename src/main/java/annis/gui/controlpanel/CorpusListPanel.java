@@ -13,12 +13,16 @@
  */
 package annis.gui.controlpanel;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
+import annis.gui.AnnisUI;
+import annis.gui.CorpusBrowserPanel;
+import annis.gui.ExampleQueriesPanel;
+import annis.gui.MetaDataPanel;
+import annis.gui.components.ExceptionDialog;
+import annis.gui.objects.QueryUIState;
+import annis.libgui.Background;
+import annis.libgui.CorpusSet;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
@@ -42,21 +46,14 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.slf4j.LoggerFactory;
-
-import annis.gui.AnnisUI;
-import annis.gui.CorpusBrowserPanel;
-import annis.gui.ExampleQueriesPanel;
-import annis.gui.MetaDataPanel;
-import annis.gui.components.ExceptionDialog;
-import annis.gui.objects.QueryUIState;
-import annis.libgui.Background;
-import annis.libgui.CorpusSet;
-import annis.libgui.Helper;
-import annis.libgui.IDGenerator;
 
 /**
  *
@@ -88,7 +85,10 @@ public class CorpusListPanel extends VerticalLayout {
         ui.access(() -> {
           ListDataProvider<String> availableCorpora = new ListDataProvider<>(corpora);
           availableCorpora.setFilter(filter);
+          HashSet<String> oldSelectedItems = new HashSet<>(tblCorpora.getSelectedItems());
           tblCorpora.setDataProvider(availableCorpora);
+          // reset the selected items
+          tblCorpora.asMultiSelect().setValue(oldSelectedItems);
           List<CorpusSet> corpusSets = new LinkedList<>();
           if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
             corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());

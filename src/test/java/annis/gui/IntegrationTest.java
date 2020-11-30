@@ -46,6 +46,7 @@ import java.util.Optional;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import net.jcip.annotations.NotThreadSafe;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -60,6 +61,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @ActiveProfiles({"desktop", "test", "headless"})
 @WebAppConfiguration
+@NotThreadSafe
 class IntegrationTest {
 
   @Autowired
@@ -81,26 +83,27 @@ class IntegrationTest {
 
   private void selectCorpus(String corpusName) throws Exception {
 
-    @SuppressWarnings("unchecked")
-    Grid<String> grid = _get(Grid.class,
-        spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
-
-    // Wait until corpus list is shown
-    awaitCondition(30, () -> {
-      DataProvider<String, ?> provider = grid.getDataProvider();
-      if (provider instanceof ListDataProvider<?>) {
-        ListDataProvider<?> listDataProvider = (ListDataProvider<?>) provider;
-        return !listDataProvider.getItems().isEmpty();
-      } else {
-        return false;
-      }
-    }, () -> "Corpus list did not appear");
 
     // Filter for the corpus name in case the corpus list has too many entries and does not show
     // the pcc2 corpus yet
     _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), corpusName);
 
-    MockVaadin.INSTANCE.clientRoundtrip();
+    @SuppressWarnings("unchecked")
+    Grid<String> grid = _get(Grid.class,
+        spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
+    grid.getSelectionModel().deselectAll();
+
+    // Wait until the (refreshed) corpus list is shown
+    awaitCondition(30, () -> {
+      DataProvider<String, ?> provider = grid.getDataProvider();
+      if (provider instanceof ListDataProvider<?>) {
+        ListDataProvider<?> listDataProvider = (ListDataProvider<?>) provider;
+        return listDataProvider.getItems().contains(corpusName)
+            && ui.getQueryState().getSelectedCorpora().isEmpty();
+      } else {
+        return false;
+      }
+    }, () -> "Corpus list did not appear");
 
     // Explicitly select the corpus
     grid.getSelectionModel().select(corpusName);
