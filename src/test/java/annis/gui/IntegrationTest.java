@@ -349,4 +349,53 @@ class IntegrationTest {
 
   }
 
+  @Test
+  void emptyQueryStatus() throws Exception {
+    selectCorpus("pcc2");
+
+    // Set and emppty query and submit query
+    _get(AqlCodeEditor.class).getPropertyDataSource().setValue("");
+    MockVaadin.INSTANCE.clientRoundtrip();
+    awaitCondition(5, () -> "".equals(ui.getQueryState().getAql().getValue()));
+
+    Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
+    _click(searchButton);
+
+    // Wait until the status is displayed
+    String expectedStatus = "Empty query";
+    awaitCondition(60,
+        () -> expectedStatus.equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
+        () -> "Waited for status \"" + expectedStatus + "\" but was \""
+            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+  }
+
+  @Test
+  void emptyCorpusStatus() throws Exception {
+
+    @SuppressWarnings("unchecked")
+    Grid<String> grid = _get(Grid.class,
+        spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
+    grid.getSelectionModel().deselectAll();
+
+    // Wait until the (refreshed) corpus list is shown
+    awaitCondition(30, () -> ui.getQueryState().getSelectedCorpora().isEmpty(),
+        () -> "Selecting no corpus failed");
+
+    // Set and emppty query and submit query
+    _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
+    MockVaadin.INSTANCE.clientRoundtrip();
+    awaitCondition(5, () -> "tok".equals(ui.getQueryState().getAql().getValue()));
+
+    Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
+    _click(searchButton);
+
+    // Wait until the status is displayed
+    String expectedStatus = "No corpus selected";
+    awaitCondition(60,
+        () -> expectedStatus
+            .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
+        () -> "Waited for status \"" + expectedStatus + "\" but was \""
+            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+  }
+
 }
