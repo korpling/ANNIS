@@ -99,12 +99,11 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     List<String> corpusPath =
         Helper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
-    String corpusName = corpusPath.get(corpusPath.size() - 1);
-    String documentName = corpusPath.get(0);
+    Collections.reverse(corpusPath);
+    String corpusName = corpusPath.get(0);
 
     CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
     try {
-      Collections.reverse(corpusPath);
       List<String> files = api.listFiles(corpusName, Joiner.on('/').join(corpusPath));
       for (String f : files) {
         if (f.endsWith(".pdf")) {
