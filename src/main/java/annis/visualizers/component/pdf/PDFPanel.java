@@ -25,6 +25,8 @@ import com.google.common.net.UrlEscapers;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.UI;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.corpus_tools.annis.ApiException;
@@ -102,13 +104,13 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
     CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
     try {
+      Collections.reverse(corpusPath);
       List<String> files = api.listFiles(corpusName, Joiner.on('/').join(corpusPath));
       for (String f : files) {
         if (f.endsWith(".pdf")) {
           // Create an URL how to featch the PDF file
-          return input.getContextPath() + "/Binary?" + "documentName="
-              + urlParamEscape.escape(documentName) + "&toplevelCorpusName="
-              + urlParamEscape.escape(corpusName) + "&mime=" + "application/pdf";
+          return input.getContextPath() + "/Binary?" + "toplevelCorpusName="
+              + urlParamEscape.escape(corpusName) + "&file=" + urlParamEscape.escape(f);
         }
       }
     } catch (ApiException e) {
