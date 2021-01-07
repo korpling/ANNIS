@@ -238,10 +238,7 @@ public class DocBrowserController implements Serializable {
 
   public void openDocBrowser(String corpus) {
     // if not already init, do it now
-    if (!initedDocBrowsers.containsKey(corpus)) {
-      DocBrowserPanel docBrowser = DocBrowserPanel.initDocBrowserPanel(ui, corpus);
-      initedDocBrowsers.put(corpus, docBrowser);
-    }
+    initedDocBrowsers.computeIfAbsent(corpus, k -> DocBrowserPanel.initDocBrowserPanel(ui, k));
 
     // init tab and put to front
     TabSheet.Tab tab =
