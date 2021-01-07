@@ -88,21 +88,22 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     super.attach();
     setSizeUndefined();
 
+    CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
+
     // set the state
-    getState().binaryURL = getBinaryPath();
+    getState().binaryURL = getBinaryPath(api);
     getState().pdfID = getPDF_ID();
     getState().firstPage = firstPage;
     getState().lastPage = lastPage;
   }
 
-  private String getBinaryPath() {
+  protected String getBinaryPath(CorporaApi api) {
     List<String> corpusPath =
         Helper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
     Collections.reverse(corpusPath);
     String corpusName = corpusPath.get(0);
 
-    CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
     try {
       List<String> files = api.listFiles(corpusName, Joiner.on('/').join(corpusPath));
       for (String f : files) {
