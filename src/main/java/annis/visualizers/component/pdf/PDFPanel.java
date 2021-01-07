@@ -86,10 +86,8 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     super.attach();
     setSizeUndefined();
 
-    CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
-
     // set the state
-    getState().binaryURL = getBinaryPath(api);
+    getState().binaryURL = getBinaryPath(new CorporaApi(Helper.getClient(input.getUI())));
     getState().pdfID = getPDF_ID();
     getState().firstPage = firstPage;
     getState().lastPage = lastPage;
