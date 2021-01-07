@@ -183,6 +183,7 @@ public class DocBrowserController implements Serializable {
     input.setMappings(config.getMappings());
     input.setNamespace(config.getLayer());
     input.setUI(ui);
+    input.setContextPath(ui.getServletContext().getContextPath());
 
 
     // get the whole document wrapped in a salt project
