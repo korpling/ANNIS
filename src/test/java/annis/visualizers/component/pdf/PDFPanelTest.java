@@ -50,7 +50,7 @@ class PDFPanelTest {
     // Make sure the document has an assigned PDF file
     CorporaApi api = mock(CorporaApi.class);
     when(api.listFiles(anyString(), anyString()))
-        .thenReturn(Arrays.asList("test.pdf"));
+        .thenReturn(Arrays.asList("notapdf.webm", "test.pdf"));
 
     assertEquals("/context/Binary?toplevelCorpusName=rootCorpus&file=test.pdf",
         fixture.getBinaryPath(api));
@@ -90,4 +90,6 @@ class PDFPanelTest {
     assertEquals("", fixture.getBinaryPath(api));
     verify(ui).addWindow(any(ExceptionDialog.class));
   }
+
+
 }
