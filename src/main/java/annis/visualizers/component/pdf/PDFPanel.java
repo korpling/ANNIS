@@ -24,8 +24,6 @@ import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.vaadin.ui.UI;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -114,7 +112,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
         }
       }
     } catch (ApiException e) {
-      ExceptionDialog.show(e, UI.getCurrent());
+      ExceptionDialog.show(e, input.getUI());
     }
 
     return "";
