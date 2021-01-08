@@ -41,5 +41,5 @@ You can permanently enable this service by calling
 $ systemctl enable annis.service
 ```
 
-Since ANNIS is a Spring Boot application, the other methods of running a Spring Boot application as service (described in their [documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/deployment.html#deployment-service)) are also possible.
+Since ANNIS is a Spring Boot application, the other methods of running a Spring Boot application as service (described in their [documentation](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/deployment.html#deployment-service)) are also possible.
 
