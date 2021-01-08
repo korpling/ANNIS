@@ -1,6 +1,7 @@
 package annis.gui.admin.reflinks;
 
 import annis.gui.AnnisUI;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.query_references.UrlShortener;
 import annis.libgui.Helper;
 import au.com.bytecode.opencsv.CSVReader;
@@ -13,11 +14,16 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Upload;
+import com.vaadin.ui.Upload.FailedEvent;
+import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.VerticalLayout;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashSet;
@@ -36,7 +42,8 @@ import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 
-public class MigrationPanel extends Panel {
+public class MigrationPanel extends Panel
+    implements Upload.Receiver, Upload.FinishedListener, Upload.FailedListener {
 
   /**
    * 
@@ -44,12 +51,22 @@ public class MigrationPanel extends Panel {
   private static final long serialVersionUID = -6893786947746535332L;
 
   private final TextArea txtMessages = new TextArea();
+  private final Upload exportedFileUpload = new Upload();
+  private final Button btMigrate = new Button("Start migration");
 
+  private File urlShortenerExport;
 
 
   @Override
   public void attach() {
     super.attach();
+
+    btMigrate.setEnabled(false);
+
+    exportedFileUpload.setCaption("Exported URL shortener entries as CSV file");
+    exportedFileUpload.setReceiver(this);
+    exportedFileUpload.addFinishedListener(this);
+    exportedFileUpload.addFailedListener(this);
 
     TextField serviceUrl = new TextField("ANNIS service URL");
     TextField serviceUsername = new TextField("Username for ANNIS service");
@@ -57,10 +74,8 @@ public class MigrationPanel extends Panel {
     CheckBox skipExisting = new CheckBox("Skip existing UUIDs");
 
 
-    FormLayout formLayout =
-        new FormLayout(serviceUrl, serviceUsername, servicePassword, skipExisting);
-
-    Button btMigrate = new Button("Start migration");
+    FormLayout formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername,
+        servicePassword, skipExisting);
 
     txtMessages.setSizeFull();
     txtMessages.setValue("");
@@ -70,19 +85,23 @@ public class MigrationPanel extends Panel {
     setContent(layout);
   }
 
-  private void appendMessage(String message) {
+  private void appendMessage(String message, UI ui) {
 
-    txtMessages.setReadOnly(false);
-    String oldVal = txtMessages.getValue();
-    if (oldVal == null || oldVal.isEmpty()) {
-      txtMessages.setValue(message);
-    } else {
-      txtMessages.setValue(oldVal + "\n" + message);
-    }
+    ui.access(() -> {
+      txtMessages.setReadOnly(false);
+      String oldVal = txtMessages.getValue();
+      if (oldVal == null || oldVal.isEmpty()) {
+        txtMessages.setValue(message);
+      } else {
+        txtMessages.setValue(oldVal + "\n" + message);
+      }
 
-    txtMessages.setCursorPosition(txtMessages.getValue().length() - 1);
-    txtMessages.setReadOnly(true);
+      txtMessages.setCursorPosition(txtMessages.getValue().length() - 1);
+      txtMessages.setReadOnly(true);
+    });
+
   }
+
 
   private int migrateUrlShortener(List<String> paths, String serviceURL, String username,
       String password, boolean skipExisting,
@@ -116,7 +135,7 @@ public class MigrationPanel extends Panel {
       try {
         result = client.build().newCall(testRequest).execute().body().string();
       } catch (IOException ex) {
-        appendMessage(ex.toString());
+        appendMessage(ex.toString(), ui);
       }
       Preconditions.checkArgument("true".equalsIgnoreCase(result), "Authentication failed");
     }
@@ -169,7 +188,8 @@ public class MigrationPanel extends Panel {
                     // check the query
                     try {
                       appendMessage(String.format("UUID {}, testing query {} on corpus {}",
-                          q.getUuid(), q.getQuery().getQuery().trim(), q.getQuery().getCorpora()));
+                          q.getUuid(), q.getQuery().getQuery().trim(), q.getQuery().getCorpora()),
+                          ui);
                       QueryStatus status = q.test(searchApi, client.build(), searchServiceBaseUrl);
 
                       // insert URLs into new database
@@ -192,7 +212,7 @@ public class MigrationPanel extends Panel {
                         sb.append(q.getQuery().getQuery().trim() + lineSeparator);
                         sb.append("Error Message: " + q.getErrorMsg());
 
-                        appendMessage(sb.toString());
+                        appendMessage(sb.toString(), ui);
                       }
                       urlShortener.migrate(q.getUri(), temporary, "anonymous", q.getUuid(),
                           q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
@@ -213,7 +233,7 @@ public class MigrationPanel extends Panel {
 
                       q.setErrorMsg(ex.getMessage());
 
-                      appendMessage(sb.toString());
+                      appendMessage(sb.toString(), ui);
                       failedQueries.put(QueryStatus.Failed, q);
                     }
                   }
@@ -239,20 +259,45 @@ public class MigrationPanel extends Panel {
                 q.setErrorMsg(errorMsg);
                 failedQueries.put(QueryStatus.Failed, q);
 
-                appendMessage(sb.toString());
+                appendMessage(sb.toString(), ui);
               }
             }
           }
 
         } catch (FileNotFoundException ex) {
-          appendMessage("File with URL shortener table not found");
+          appendMessage("File with URL shortener table not found", ui);
         } catch (IOException ex) {
-          appendMessage("Migrating URL shortener table failed\n\n" + ex.toString());
+          appendMessage("Migrating URL shortener table failed\n\n" + ex.toString(), ui);
         }
       }
     }
 
     return successfulQueries;
+  }
+
+  @Override
+  public OutputStream receiveUpload(String filename, String mimeType) {
+    try {
+      urlShortenerExport = File.createTempFile(filename, "");
+      urlShortenerExport.deleteOnExit();
+      exportedFileUpload.setButtonCaption(filename + " (Click to change)");
+      return new FileOutputStream(urlShortenerExport);
+    } catch (IOException ex) {
+      ExceptionDialog.show(ex, getUI());
+    }
+    return null;
+  }
+
+  @Override
+  public void uploadFinished(FinishedEvent event) {
+    btMigrate.setEnabled(true);
+
+    appendMessage("Finished CSV file upload", getUI());
+  }
+
+  @Override
+  public void uploadFailed(FailedEvent event) {
+    appendMessage("Could not upload file: " + event.toString(), getUI());
   }
 
 }
