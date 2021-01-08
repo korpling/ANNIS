@@ -2,6 +2,7 @@ package annis.gui.query_references;
 
 import annis.gui.CommonUI;
 import annis.libgui.Helper;
+import com.google.common.base.Preconditions;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -60,6 +61,24 @@ public class UrlShortener {
     }
     return UriComponentsBuilder.fromUri(original).replacePath(appContext + "/").replaceQuery("")
         .queryParam("id", shortID.toString()).build().toUriString();
+  }
+
+  @Transactional
+  public void migrate(URI url, URI temporary, String userName, UUID uuid, Date creationTime) {
+
+
+    Optional<UrlShortenerEntry> existing = repo.findById(uuid);
+    
+    Preconditions.checkState(!existing.isPresent(),
+        "Attempted to migrate UUID {} which already exists in the database.", uuid);
+
+    UrlShortenerEntry entry = new UrlShortenerEntry();
+    entry.setId(uuid);
+    entry.setOwner(userName);
+    entry.setCreated(creationTime);
+    entry.setUrl(url);
+    entry.setTemporaryUrl(temporary);
+    repo.save(entry);
   }
 
   public Optional<URI> unshorten(UUID id) {
