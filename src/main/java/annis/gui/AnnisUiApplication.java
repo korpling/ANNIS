@@ -1,8 +1,9 @@
 package annis.gui;
 
-import org.springframework.boot.SpringApplication;
+import java.awt.Desktop;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,7 +29,11 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class AnnisUiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(AnnisUiApplication.class, args);
+      SpringApplicationBuilder builder = new SpringApplicationBuilder(AnnisUiApplication.class);
+      if (Desktop.isDesktopSupported()) {
+        builder.headless(false);
+      }
+      builder.run(args);
     }
 
 }
