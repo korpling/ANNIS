@@ -15,11 +15,20 @@
  */
 package annis.gui;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.Callable;
-
+import annis.gui.admin.CorpusAdminPanel;
+import annis.gui.admin.GroupManagementPanel;
+import annis.gui.admin.ImportPanel;
+import annis.gui.admin.controller.CorpusController;
+import annis.gui.admin.controller.GroupController;
+import annis.gui.admin.model.ApiClientProvider;
+import annis.gui.admin.model.CorpusManagement;
+import annis.gui.admin.model.GroupManagement;
+import annis.gui.admin.reflinks.MigrationPanel;
+import annis.gui.admin.view.UIView;
+import annis.libgui.Background;
+import annis.libgui.Helper;
 import com.google.common.util.concurrent.FutureCallback;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -29,22 +38,12 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
 import org.corpus_tools.annis.ApiClient;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
-import annis.gui.admin.CorpusAdminPanel;
-import annis.gui.admin.GroupManagementPanel;
-import annis.gui.admin.ImportPanel;
-import annis.gui.admin.controller.CorpusController;
-import annis.gui.admin.controller.GroupController;
-import annis.gui.admin.model.ApiClientProvider;
-import annis.gui.admin.model.CorpusManagement;
-import annis.gui.admin.model.GroupManagement;
-import annis.gui.admin.view.UIView;
-import annis.libgui.Background;
-import annis.libgui.Helper;
 
 /**
  *
@@ -73,6 +72,8 @@ public class AdminView extends VerticalLayout
 
     private final SecurityContext securityContext;
 
+    private MigrationPanel migrationPanel;
+
     public AdminView(AnnisUI ui) {
         this.ui = ui;
         securityContext = SecurityContextHolder.getContext();
@@ -93,10 +94,13 @@ public class AdminView extends VerticalLayout
 
         importPanel = new ImportPanel();
 
+        migrationPanel = new MigrationPanel();
+
         tabSheet = new TabSheet();
         tabSheet.addTab(importPanel, "Import Corpus", FontAwesome.UPLOAD);
         tabSheet.addTab(corpusAdminPanel, "Corpus management", FontAwesome.LIST_ALT);
         tabSheet.addTab(groupManagementPanel, "Group management", FontAwesome.USERS);
+        tabSheet.addTab(migrationPanel, "Reference link migration", VaadinIcons.CLOUD_DOWNLOAD_O);
 
         tabSheet.setSizeFull();
 
@@ -164,6 +168,8 @@ public class AdminView extends VerticalLayout
                 return corpusAdminPanel;
             case "groups":
                 return groupManagementPanel;
+              case "reference-link-migration":
+                return migrationPanel;
             default:
                 break;
             }
@@ -178,6 +184,8 @@ public class AdminView extends VerticalLayout
             return "corpora";
         } else if (c == groupManagementPanel) {
             return "groups";
+          } else if (c == migrationPanel) {
+            return "reference-link-migration";
         }
         return "";
     }
