@@ -15,10 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - REST service has been removed 
 - Kickstarter has no user interface for importing and deleting corpora, use the web administration instead
 
-## Fixed
-
-- PDF visualizer did not produce correct URLs to binary request handler
-
 ## [4.0.0-beta.4] - 2020-03-26
 
 ### Changed
