@@ -14,7 +14,6 @@
 package annis.libgui;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.base.Charsets;
 import com.google.common.eventbus.EventBus;
@@ -151,9 +150,6 @@ public class AnnisBaseUI extends UI implements Serializable {
     }
     return false;
   }
-
-
-  private transient ObjectMapper jsonMapper;
 
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
 
