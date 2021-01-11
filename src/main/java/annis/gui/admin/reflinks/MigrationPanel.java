@@ -68,7 +68,7 @@ public class MigrationPanel extends Panel
 
     @Override
     public void onSuccess(Integer successfulQueries) {
-      appendMessage("Finished to import " + successfulQueries + " queries.", ui);
+      appendMessage("\nFinished to import " + successfulQueries + " queries.\n", ui);
 
       // output summary and detailed list of failed queries
       final Collection<URLShortenerDefinition> unknownCorpusQueries =
@@ -126,7 +126,7 @@ public class MigrationPanel extends Panel
 
     @Override
     public void onFailure(Throwable t) {
-      appendMessage("Failed!\n\n" + t.toString(), ui);
+      appendMessage("\nFailed!\n\n" + t.toString(), ui);
     }
 
     private void printProblematicQueries(final String statusCaption,
@@ -190,17 +190,22 @@ public class MigrationPanel extends Panel
     exportedFileUpload.addFailedListener(this);
 
     TextField serviceUrl = new TextField("ANNIS service URL");
+    serviceUrl.setWidth(30, Unit.EM);
     TextField serviceUsername = new TextField("Username for ANNIS service");
+    serviceUsername.setWidth(30, Unit.EM);
     PasswordField servicePassword = new PasswordField("Password for ANNIS service");
+    servicePassword.setWidth(30, Unit.EM);
     CheckBox skipExisting = new CheckBox("Skip existing UUIDs");
 
 
     FormLayout formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername,
         servicePassword, skipExisting);
 
+
     txtMessages.setSizeFull();
     txtMessages.setValue("");
     txtMessages.setReadOnly(true);
+    txtMessages.addStyleName("message-output");
 
     VerticalLayout layout = new VerticalLayout(formLayout, btMigrate, txtMessages);
     layout.setSizeFull();
@@ -325,7 +330,7 @@ public class MigrationPanel extends Panel
                 } else {
                   // check the query
                   try {
-                    appendMessage(String.format("UUID {}, testing query {} on corpus {}",
+                    appendMessage(String.format("UUID %s, testing query %s on corpus %s",
                         q.getUuid(), q.getQuery().getQuery().trim(), q.getQuery().getCorpora()),
                         ui);
                     QueryStatus status = q.test(searchApi, client.build(), searchServiceBaseUrl);

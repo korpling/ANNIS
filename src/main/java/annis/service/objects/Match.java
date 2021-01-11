@@ -19,8 +19,6 @@ import com.google.common.base.Splitter;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -80,7 +78,7 @@ public class Match implements Serializable {
       } else {
         Preconditions.checkArgument(componentsSize == 3 || componentsSize == 2,
             "A match containing " + "annotation information always has to have the form "
-                + "ns::name::salt:/....  or name::salt:/....");
+                + "ns::name::id  or name::id");
 
         String ns = "";
         String name = "";
@@ -99,6 +97,11 @@ public class Match implements Serializable {
         }
         // undo any escaping for the annotation part
         anno = anno.replace("%20", " ").replace("%25", "%").replace("%2C", ",");
+      }
+
+      // Remove a possible legacy id prefix
+      if (id.startsWith("salt:/")) {
+        id = id.substring("salt:/".length());
       }
 
       match.addSaltId(id, anno);
