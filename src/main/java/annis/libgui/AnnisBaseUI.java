@@ -13,6 +13,9 @@
  */
 package annis.libgui;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.base.Charsets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
@@ -37,11 +40,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
-import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.corpus_tools.annis.ApiException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -170,19 +168,6 @@ public class AnnisBaseUI extends UI implements Serializable {
   }
 
 
-  public ObjectMapper getJsonMapper() {
-    if (jsonMapper == null) {
-      jsonMapper = new ObjectMapper();
-      // configure json object mapper
-      AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
-      jsonMapper.setAnnotationIntrospector(introspector);
-      // the json should be human readable
-      jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
-      jsonMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
-    return jsonMapper;
-  }
-
   public EventBus getLoginDataLostBus() {
     if (loginDataLostBus == null) {
       loginDataLostBus = new EventBus();
@@ -233,6 +218,8 @@ public class AnnisBaseUI extends UI implements Serializable {
   protected Map<String, InstanceConfig> loadInstanceConfig() {
     TreeMap<String, InstanceConfig> result = new TreeMap<>();
 
+    JsonMapper mapper = new JsonMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     // get a list of all directories that contain instance informations
     List<File> locations = getAllConfigLocations("instances");
@@ -244,7 +231,7 @@ public class AnnisBaseUI extends UI implements Serializable {
           for (File i : instanceFiles) {
             if (i.isFile() && i.canRead()) {
               try {
-                InstanceConfig config = getJsonMapper().readValue(i, InstanceConfig.class);
+                InstanceConfig config = mapper.readValue(i, InstanceConfig.class);
                 String name = StringUtils.removeEnd(i.getName(), ".json");
                 config.setInstanceName(name);
                 result.put(name, config);

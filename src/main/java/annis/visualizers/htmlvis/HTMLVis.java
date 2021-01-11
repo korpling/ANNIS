@@ -19,6 +19,10 @@ import annis.libgui.MatchedNodeColors;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -48,11 +52,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -373,14 +372,11 @@ public class HTMLVis extends AbstractVisualizer {
     return sb.toString();
   }
 
-  private ObjectMapper createJsonMapper() {
-    ObjectMapper jsonMapper = new ObjectMapper();
-    // configure json object mapper
-    AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
-    jsonMapper.setAnnotationIntrospector(introspector);
+  private JsonMapper createJsonMapper() {
+    JsonMapper jsonMapper = new JsonMapper();
     // the json should be human readable
-    jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
-    jsonMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    jsonMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+    jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     return jsonMapper;
   }
 
