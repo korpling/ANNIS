@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import javax.ws.rs.core.UriBuilder;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -44,6 +43,7 @@ import org.joda.time.format.DateTimeFormatterBuilder;
 import org.joda.time.format.DateTimeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public class URLShortenerDefinition {
 
@@ -129,17 +129,17 @@ public class URLShortenerDefinition {
     DisplayedResultQuery rewrittenQuery = new DisplayedResultQuery(this.query);
     rewrittenQuery.setQueryLanguage(QueryLanguage.AQL_QUIRKS_V3);
 
-    UriBuilder rewrittenUri = UriBuilder.fromUri(this.uri);
+    UriComponentsBuilder rewrittenUri = UriComponentsBuilder.fromUri(this.uri);
     if (this.uri.getPath().startsWith("/embeddedvis")) {
       // we need to keep query parameters arguments, except for the one with the
       // linked query
-      rewrittenUri.replaceQueryParam("embedded_interface", rewrittenQuery.toCitationFragment());
+      rewrittenUri.queryParam("embedded_interface", rewrittenQuery.toCitationFragment());
     } else {
       // just update the fragment, but leave everything else the same
       rewrittenUri.fragment(rewrittenQuery.toCitationFragment());
     }
 
-    return new URLShortenerDefinition(rewrittenUri.build(), this.uuid, this.creationTime,
+    return new URLShortenerDefinition(rewrittenUri.build().toUri(), this.uuid, this.creationTime,
         rewrittenQuery);
   }
 
@@ -178,19 +178,19 @@ public class URLShortenerDefinition {
   public static int MAX_RETRY = 5;
 
   private QueryStatus testFind(SearchApi searchApi, OkHttpClient client,
-      HttpUrl annisSearchServiceBaseUrl)
-      throws IOException, ApiException {
+      HttpUrl annisSearchServiceBaseUrl) throws IOException, ApiException {
 
     // Create a file with the matches according to the new graphANNIS based implementation
-    File matchesGraphANNISFile = searchApi.find(new FindQuery().query(query.getQuery()));
+    File matchesGraphANNISFile = searchApi.find(
+        new FindQuery().query(query.getQuery()).corpora(new LinkedList<>(query.getCorpora())));
 
 
-    HttpUrl findUrl =
-        annisSearchServiceBaseUrl.newBuilder().addPathSegment("find")
-            .addQueryParameter("q", query.getQuery())
-            .addQueryParameter("corpora", Joiner.on(",").join(query.getCorpora())).build();
+    HttpUrl findUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("find")
+        .addQueryParameter("q", query.getQuery())
+        .addQueryParameter("corpora", Joiner.on(",").join(query.getCorpora())).build();
 
-    Request legacyFindRequest = new Request.Builder().url(findUrl).build();
+    Request legacyFindRequest =
+        new Request.Builder().url(findUrl).addHeader("Accept", "text/plain").build();
 
     // read in the file again line by line and compare it with the legacy ANNIS
     // version
@@ -252,7 +252,7 @@ public class URLShortenerDefinition {
 
     XmlMapper mapper = new XmlMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    
+
     try {
 
       QueryStatus status = QueryStatus.Ok;

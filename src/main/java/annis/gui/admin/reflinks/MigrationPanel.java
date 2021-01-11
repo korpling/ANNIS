@@ -50,6 +50,7 @@ import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public class MigrationPanel extends Panel
     implements Upload.Receiver, Upload.FinishedListener, Upload.FailedListener {
@@ -68,52 +69,57 @@ public class MigrationPanel extends Panel
     @Override
     public void onSuccess(Integer successfulQueries) {
       appendMessage("Finished to import " + successfulQueries + " queries.", ui);
-      
+
       // output summary and detailed list of failed queries
-      final Collection<URLShortenerDefinition> unknownCorpusQueries = failedQueries
-              .get(QueryStatus.UnknownCorpus);
+      final Collection<URLShortenerDefinition> unknownCorpusQueries =
+          failedQueries.get(QueryStatus.UnknownCorpus);
 
       StringBuilder detailedStatus = new StringBuilder();
 
 
       if (!unknownCorpusQueries.isEmpty()) {
-          final Map<String, Integer> unknownCorpusCount = new TreeMap<>();
-          for (final URLShortenerDefinition q : unknownCorpusQueries) {
-              for (final String c : q.getUnknownCorpora()) {
-                  final int oldCount = unknownCorpusCount.getOrDefault(c, 0);
-                  unknownCorpusCount.put(c, oldCount + 1);
-              }
+        final Map<String, Integer> unknownCorpusCount = new TreeMap<>();
+        for (final URLShortenerDefinition q : unknownCorpusQueries) {
+          for (final String c : q.getUnknownCorpora()) {
+            final int oldCount = unknownCorpusCount.getOrDefault(c, 0);
+            unknownCorpusCount.put(c, oldCount + 1);
           }
-          final String unknownCorpusCaption = "Unknown corpus (" + unknownCorpusCount.size()
-                  + " unknown corpora and " + unknownCorpusQueries.size() + " queries)";
-          detailedStatus.append(unknownCorpusCaption);
+        }
+        final String unknownCorpusCaption = "Unknown corpus (" + unknownCorpusCount.size()
+            + " unknown corpora and " + unknownCorpusQueries.size() + " queries)";
+        detailedStatus.append(unknownCorpusCaption);
+        detailedStatus.append("\n");
+        detailedStatus.append(Strings.repeat("=", unknownCorpusCaption.length()));
+        detailedStatus.append("\n");
+
+        for (final Map.Entry<String, Integer> e : unknownCorpusCount.entrySet()) {
+          detailedStatus.append("Corpus \"" + e.getKey() + "\": " + e.getValue() + " queries");
           detailedStatus.append("\n");
-          detailedStatus.append(Strings.repeat("=", unknownCorpusCaption.length()));
-          detailedStatus.append("\n");
-          
-          for (final Map.Entry<String, Integer> e : unknownCorpusCount.entrySet()) {
-            detailedStatus.append("Corpus \"" + e.getKey() + "\": " + e.getValue() + " queries");
-            detailedStatus.append("\n");
-          }
-          detailedStatus.append("\n");  
+        }
+        detailedStatus.append("\n");
       }
 
-      printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists), detailedStatus);
-      printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers), detailedStatus);
-      printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer), detailedStatus);
+      printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists),
+          detailedStatus);
+      printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers),
+          detailedStatus);
+      printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer),
+          detailedStatus);
       printProblematicQueries("Timeout", failedQueries.get(QueryStatus.Timeout), detailedStatus);
-      printProblematicQueries("Other server error", failedQueries.get(QueryStatus.ServerError), detailedStatus);
-      printProblematicQueries("Empty corpus list", failedQueries.get(QueryStatus.EmptyCorpusList), detailedStatus);
+      printProblematicQueries("Other server error", failedQueries.get(QueryStatus.ServerError),
+          detailedStatus);
+      printProblematicQueries("Empty corpus list", failedQueries.get(QueryStatus.EmptyCorpusList),
+          detailedStatus);
       printProblematicQueries("Failed", failedQueries.get(QueryStatus.Failed), detailedStatus);
 
       final String summaryString = "+ Successful: " + successfulQueries + " from "
-              + (successfulQueries + failedQueries.size()) + " +";
+          + (successfulQueries + failedQueries.size()) + " +";
       detailedStatus.append(Strings.repeat("+", summaryString.length()));
-      detailedStatus.append("\n");  
+      detailedStatus.append("\n");
       detailedStatus.append(summaryString);
-      detailedStatus.append("\n");  
+      detailedStatus.append("\n");
       detailedStatus.append(Strings.repeat("+", summaryString.length()));
-      detailedStatus.append("\n");  
+      detailedStatus.append("\n");
 
       appendMessage(detailedStatus.toString(), ui);
     }
@@ -201,11 +207,11 @@ public class MigrationPanel extends Panel
     layout.setMargin(true);
     setContent(layout);
     layout.setExpandRatio(txtMessages, 1.0f);
-    
+
 
     btMigrate.setEnabled(false);
     btMigrate.addClickListener(new Button.ClickListener() {
-      
+
 
       @Override
       public void buttonClick(ClickEvent event) {
@@ -244,8 +250,7 @@ public class MigrationPanel extends Panel
 
 
   private int migrateUrlShortener(String serviceURL, String username, String password,
-      boolean skipExisting, AnnisUI ui,
-      Multimap<QueryStatus, URLShortenerDefinition> failedQueries)
+      boolean skipExisting, AnnisUI ui, Multimap<QueryStatus, URLShortenerDefinition> failedQueries)
       throws ApiException {
 
 
@@ -333,8 +338,9 @@ public class MigrationPanel extends Panel
                       // Link the UUID to an error page temporarily, until the issue is fixed.
                       // Remember the original URL, so the temporary URL can just be set
                       // to null to resolve to the original URL when the issue is fixed in ANNIS.
-                      temporary = new HttpUrl.Builder().addPathSegment("unsupported-query")
-                          .addQueryParameter("url", q.getUri().toASCIIString()).build().uri();
+                      temporary =
+                          UriComponentsBuilder.newInstance().pathSegment("unsupported-query")
+                              .queryParam("url", q.getUri().toASCIIString()).build().toUri();
                       String lineSeparator = System.getProperty("line.separator");
 
                       StringBuilder sb = new StringBuilder();
