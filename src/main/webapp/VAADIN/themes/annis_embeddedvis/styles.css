@@ -16173,6 +16173,10 @@ div.v-layout.v-horizontal.v-widget {
 	font-family: monospace;
 }
 
+.annis_embeddedvis textarea.message-output {
+	font-family: monospace;
+}
+
 .annis_embeddedvis .tigerquery-builder-canvas {
 	z-index: 0;
 }

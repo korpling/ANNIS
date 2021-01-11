@@ -141,6 +141,10 @@ $font-size: 10pt;
   textarea.query {
     font-family: monospace;
   }
+  
+  textarea.message-output {
+    font-family: monospace;
+  }
 
   .tigerquery-builder-canvas {
     z-index: 0;
