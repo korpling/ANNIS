@@ -44,6 +44,7 @@ public class UrlShortener {
     if (existingEntry.isEmpty()) {
 
       UrlShortenerEntry entry = new UrlShortenerEntry();
+      entry.setId(UUID.randomUUID());
       entry.setUrl(localURL);
       Optional<OidcUser> user = Helper.getUser(ui);
       if (user.isPresent()) {
@@ -54,7 +55,6 @@ public class UrlShortener {
       entry.setCreated(new Date());
 
       UrlShortenerEntry savedEntry = repo.save(entry);
-      // The UUID should be generated when the entry is save
       shortID = savedEntry.getId();
     } else {
       shortID = existingEntry.get(0).getId();
@@ -65,8 +65,6 @@ public class UrlShortener {
 
   @Transactional
   public void migrate(URI url, URI temporary, String userName, UUID uuid, Date creationTime) {
-
-
     Optional<UrlShortenerEntry> existing = repo.findById(uuid);
     
     Preconditions.checkState(!existing.isPresent(),
