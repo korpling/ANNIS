@@ -65,14 +65,11 @@ public class MigrationPanel extends Panel
   private static final String CORPUS_PREFIX = "Corpus: \"";
 
   private final class MigrationCallback implements FutureCallback<Integer> {
-    private final AnnisUI ui;
     private final Multimap<QueryStatus, URLShortenerDefinition> failedQueries;
 
 
-    private MigrationCallback(Multimap<QueryStatus, URLShortenerDefinition> failedQueries,
-        AnnisUI ui) {
+    private MigrationCallback(Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
       this.failedQueries = failedQueries;
-      this.ui = ui;
     }
 
     @Override
@@ -181,12 +178,14 @@ public class MigrationPanel extends Panel
   private final Button btMigrate = new Button("Start migration");
 
   private File urlShortenerFile;
+  private AnnisUI ui;
 
 
   @Override
   public void attach() {
     super.attach();
 
+    this.ui = (AnnisUI) getUI();
     setSizeFull();
 
 
@@ -223,19 +222,17 @@ public class MigrationPanel extends Panel
     btMigrate.setEnabled(false);
     btMigrate.addClickListener(event -> {
       txtMessages.setValue("");
-      if (getUI() instanceof AnnisUI) {
-        AnnisUI ui = (AnnisUI) getUI();
-        Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
-        Background.runWithCallback(() -> {
-          try {
-            return migrateUrlShortener(serviceUrl.getValue(), serviceUsername.getValue(),
-                servicePassword.getValue(), skipExisting.getValue(), ui, failedQueries);
-          } catch (ApiException ex) {
-            ExceptionDialog.show(ex, ui);
-            return 0;
-          }
-        }, new MigrationCallback(failedQueries, ui));
-      }
+      Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
+      Background.runWithCallback(() -> {
+        try {
+          return migrateUrlShortener(serviceUrl.getValue(), serviceUsername.getValue(),
+              servicePassword.getValue(), skipExisting.getValue(), failedQueries);
+        } catch (ApiException ex) {
+          ExceptionDialog.show(ex, ui);
+          return 0;
+        }
+      }, new MigrationCallback(failedQueries));
+
     });
   }
 
@@ -254,9 +251,121 @@ public class MigrationPanel extends Panel
 
   }
 
+  private void reportSingleQueryFailureStatus(QueryStatus status, URLShortenerDefinition q) {
+    String lineSeparator = "\n";
+
+    StringBuilder sb = new StringBuilder();
+    sb.append(QUERY_ERROR_PREFIX + status + lineSeparator);
+    sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"" + lineSeparator);
+    sb.append(UUID_PREFIX + q.getUuid() + "\"" + lineSeparator);
+    sb.append(QUERY_PREFIX + lineSeparator);
+    sb.append(q.getQuery().getQuery().trim() + lineSeparator);
+    sb.append(ERROR_MESSAGE_PREFIX + q.getErrorMsg());
+
+    appendMessage(sb.toString(), ui);
+  }
+
+  private boolean checkSingleQuery(URLShortenerDefinition q, SearchApi searchApi,
+      UrlShortener urlShortener, OkHttpClient client, HttpUrl searchServiceBaseUrl,
+      Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
+    // check the query
+    try {
+      appendMessage(String.format("UUID %s, testing query %s on corpus %s", q.getUuid(),
+          q.getQuery().getQuery().trim(), q.getQuery().getCorpora()), ui);
+      QueryStatus status = q.test(searchApi, client, searchServiceBaseUrl);
+
+      // insert URLs into new database
+      URI temporary = null;
+
+      if (status != QueryStatus.OK) {
+        failedQueries.put(status, q);
+        // Link the UUID to an error page temporarily, until the issue is fixed.
+        // Remember the original URL, so the temporary URL can just be set
+        // to null to resolve to the original URL when the issue is fixed in ANNIS.
+        temporary = UriComponentsBuilder.newInstance().pathSegment("unsupported-query")
+            .queryParam("url", q.getUri().toASCIIString()).build().toUri();
+
+        reportSingleQueryFailureStatus(status, q);
+      }
+      urlShortener.migrate(q.getUri(), temporary, "anonymous", q.getUuid(),
+          q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
+
+      if (status == QueryStatus.OK) {
+        return true;
+      }
+
+    } catch (Throwable ex) {
+      q.setErrorMsg(ex.getMessage());
+      failedQueries.put(QueryStatus.FAILED, q);
+
+      reportSingleQueryFailureStatus(QueryStatus.FAILED, q);
+    }
+
+    return false;
+  }
+
+  private boolean readUrlShortenerLine(String[] line, boolean skipExisting,
+      UrlShortener urlShortener, Set<String> knownCorpora, SearchApi searchApi, OkHttpClient client,
+      HttpUrl searchServiceBaseUrl, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
+    if (line.length == 4) {
+
+      // parse URL
+      try {
+        URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
+        if (q != null) {
+          // check if all corpora exist in the new instance
+          List<String> corpusNames =
+              q.getQuery() == null || q.getQuery().getCorpora() == null ? new LinkedList<>()
+                  : new LinkedList<>(q.getQuery().getCorpora());
+          for (String c : corpusNames) {
+            if (!knownCorpora.contains(c)) {
+              q.addUnknownCorpus(c);
+            }
+          }
+
+          if (!q.getUnknownCorpora().isEmpty()) {
+            failedQueries.put(QueryStatus.UNKNOWN_CORPUS, q);
+          } else if (corpusNames.isEmpty()) {
+            q.setErrorMsg("Corpus name is empty");
+            failedQueries.put(QueryStatus.FAILED, q);
+          } else if (urlShortener.unshorten(q.getUuid()).isPresent()) {
+            if (skipExisting) {
+              return false;
+            } else {
+              failedQueries.put(QueryStatus.UUID_EXISTS, q);
+            }
+          } else {
+            return checkSingleQuery(q, searchApi, urlShortener, client, searchServiceBaseUrl,
+                failedQueries);
+          }
+        }
+      } catch (Throwable ex) {
+
+        String lineSeparator = System.getProperty("line.separator");
+
+        String errorMsg = ex.getMessage();
+        if (errorMsg == null) {
+          errorMsg = ex.getClass().toString();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(QUERY_ERROR_PREFIX + QueryStatus.FAILED + lineSeparator);
+        sb.append(UUID_PREFIX + line[0] + "\"" + lineSeparator);
+        sb.append(ERROR_MESSAGE_PREFIX + errorMsg);
+
+        URLShortenerDefinition q =
+            new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
+        q.setErrorMsg(errorMsg);
+        failedQueries.put(QueryStatus.FAILED, q);
+
+        appendMessage(sb.toString(), ui);
+      }
+    }
+    return false;
+  }
 
   private int migrateUrlShortener(String serviceURL, String username, String password,
-      boolean skipExisting, AnnisUI ui, Multimap<QueryStatus, URLShortenerDefinition> failedQueries)
+      boolean skipExisting, Multimap<QueryStatus, URLShortenerDefinition> failedQueries)
       throws ApiException {
 
 
@@ -294,119 +403,17 @@ public class MigrationPanel extends Panel
     CorporaApi corporaApi = new CorporaApi(apiClient);
     SearchApi searchApi = new SearchApi(apiClient);
     Set<String> knownCorpora = new HashSet<>(corporaApi.listCorpora());
-    UrlShortener urlShortener = ui.getUrlShortener();
 
 
     if (urlShortenerFile != null && urlShortenerFile.isFile()) {
       try (CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
         String[] line;
         while ((line = csvReader.readNext()) != null) {
-          if (line.length == 4) {
-
-            // parse URL
-            try {
-              URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
-              if (q != null) {
-                // check if all corpora exist in the new instance
-                List<String> corpusNames =
-                    q.getQuery() == null || q.getQuery().getCorpora() == null ? new LinkedList<>()
-                        : new LinkedList<>(q.getQuery().getCorpora());
-                for (String c : corpusNames) {
-                  if (!knownCorpora.contains(c)) {
-                    q.addUnknownCorpus(c);
-                  }
-                }
-
-                if (!q.getUnknownCorpora().isEmpty()) {
-                  failedQueries.put(QueryStatus.UNKNOWN_CORPUS, q);
-                } else if (corpusNames.isEmpty()) {
-                  q.setErrorMsg("Corpus name is empty");
-                  failedQueries.put(QueryStatus.FAILED, q);
-                } else if (urlShortener.unshorten(q.getUuid()).isPresent()) {
-                  if (skipExisting) {
-                    continue;
-                  } else {
-                    failedQueries.put(QueryStatus.UUID_EXISTS, q);
-                  }
-                } else {
-                  // check the query
-                  try {
-                    appendMessage(String.format("UUID %s, testing query %s on corpus %s",
-                        q.getUuid(), q.getQuery().getQuery().trim(), q.getQuery().getCorpora()),
-                        ui);
-                    QueryStatus status = q.test(searchApi, client.build(), searchServiceBaseUrl);
-
-                    // insert URLs into new database
-                    URI temporary = null;
-
-                    if (status != QueryStatus.OK) {
-                      failedQueries.put(status, q);
-                      // Link the UUID to an error page temporarily, until the issue is fixed.
-                      // Remember the original URL, so the temporary URL can just be set
-                      // to null to resolve to the original URL when the issue is fixed in ANNIS.
-                      temporary =
-                          UriComponentsBuilder.newInstance().pathSegment("unsupported-query")
-                              .queryParam("url", q.getUri().toASCIIString()).build().toUri();
-                      String lineSeparator = System.getProperty("line.separator");
-
-                      StringBuilder sb = new StringBuilder();
-                      sb.append(QUERY_ERROR_PREFIX + status + lineSeparator);
-                      sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"" + lineSeparator);
-                      sb.append(UUID_PREFIX + q.getUuid() + "\"" + lineSeparator);
-                      sb.append(QUERY_PREFIX + lineSeparator);
-                      sb.append(q.getQuery().getQuery().trim() + lineSeparator);
-                      sb.append(ERROR_MESSAGE_PREFIX + q.getErrorMsg());
-
-                      appendMessage(sb.toString(), ui);
-                    }
-                    urlShortener.migrate(q.getUri(), temporary, "anonymous", q.getUuid(),
-                        q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
-
-                    if (status == QueryStatus.OK) {
-                      successfulQueries++;
-                    }
-
-                  } catch (Throwable ex) {
-                    String lineSeparator = System.getProperty("line.separator");
-                    StringBuilder sb = new StringBuilder();
-                    sb.append(QUERY_ERROR_PREFIX + QueryStatus.FAILED + lineSeparator);
-                    sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"" + lineSeparator);
-                    sb.append(UUID_PREFIX + q.getUuid() + "\"" + lineSeparator);
-                    sb.append(QUERY_PREFIX + lineSeparator);
-                    sb.append(q.getQuery().getQuery().trim() + lineSeparator);
-                    sb.append(ERROR_MESSAGE_PREFIX + ex.getMessage());
-
-                    q.setErrorMsg(ex.getMessage());
-
-                    appendMessage(sb.toString(), ui);
-                    failedQueries.put(QueryStatus.FAILED, q);
-                  }
-                }
-              }
-            } catch (Throwable ex) {
-
-              String lineSeparator = System.getProperty("line.separator");
-
-              String errorMsg = ex.getMessage();
-              if (errorMsg == null) {
-                errorMsg = ex.getClass().toString();
-              }
-
-              StringBuilder sb = new StringBuilder();
-              sb.append(QUERY_ERROR_PREFIX + QueryStatus.FAILED + lineSeparator);
-              sb.append(UUID_PREFIX + line[0] + "\"" + lineSeparator);
-              sb.append(ERROR_MESSAGE_PREFIX + errorMsg);
-
-              URLShortenerDefinition q =
-                  new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
-              q.setErrorMsg(errorMsg);
-              failedQueries.put(QueryStatus.FAILED, q);
-
-              appendMessage(sb.toString(), ui);
-            }
+          if (readUrlShortenerLine(line, skipExisting, ui.getUrlShortener(), knownCorpora,
+              searchApi, client.build(), searchServiceBaseUrl, failedQueries)) {
+            successfulQueries++;
           }
         }
-
       } catch (FileNotFoundException ex) {
         appendMessage("File with URL shortener table not found", ui);
       } catch (IOException ex) {
