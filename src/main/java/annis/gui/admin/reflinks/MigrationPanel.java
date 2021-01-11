@@ -55,6 +55,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class MigrationPanel extends Panel
     implements Upload.Receiver, Upload.FinishedListener, Upload.FailedListener {
 
+  private static final String ERROR_MESSAGE_PREFIX = "Error Message: ";
+
+  private static final String QUERY_PREFIX = "Query:";
+
+  private static final String UUID_PREFIX = "UUID: \"";
+
+  private static final String QUERY_ERROR_PREFIX = "Query Error: ";
+
+  private static final String CORPUS_PREFIX = "Corpus: \"";
+
   private final class MigrationCallback implements FutureCallback<Integer> {
     private final AnnisUI ui;
     private final Multimap<QueryStatus, URLShortenerDefinition> failedQueries;
@@ -140,13 +150,13 @@ public class MigrationPanel extends Panel
 
         for (final URLShortenerDefinition q : queries) {
           if (q.getQuery() != null && q.getQuery().getCorpora() != null) {
-            sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\"");
+            sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"");
             sb.append("\n");
           }
-          sb.append("UUID: \"" + q.getUuid() + "\"");
+          sb.append(UUID_PREFIX + q.getUuid() + "\"");
           sb.append("\n");
           if (q.getQuery() != null && q.getQuery().getQuery() != null) {
-            sb.append("Query:");
+            sb.append(QUERY_PREFIX);
             sb.append("\n");
             sb.append(q.getQuery().getQuery().trim());
             sb.append("\n");
@@ -165,9 +175,6 @@ public class MigrationPanel extends Panel
 
   }
 
-  /**
-   * 
-   */
   private static final long serialVersionUID = -6893786947746535332L;
 
   private final TextArea txtMessages = new TextArea();
@@ -217,6 +224,7 @@ public class MigrationPanel extends Panel
     btMigrate.setEnabled(false);
     btMigrate.addClickListener(new Button.ClickListener() {
 
+      private static final long serialVersionUID = 5971461476376302617L;
 
       @Override
       public void buttonClick(ClickEvent event) {
@@ -349,12 +357,12 @@ public class MigrationPanel extends Panel
                       String lineSeparator = System.getProperty("line.separator");
 
                       StringBuilder sb = new StringBuilder();
-                      sb.append("Query Error: " + status + lineSeparator);
-                      sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\"" + lineSeparator);
-                      sb.append("UUID: \"" + q.getUuid() + "\"" + lineSeparator);
-                      sb.append("Query:" + lineSeparator);
+                      sb.append(QUERY_ERROR_PREFIX + status + lineSeparator);
+                      sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"" + lineSeparator);
+                      sb.append(UUID_PREFIX + q.getUuid() + "\"" + lineSeparator);
+                      sb.append(QUERY_PREFIX + lineSeparator);
                       sb.append(q.getQuery().getQuery().trim() + lineSeparator);
-                      sb.append("Error Message: " + q.getErrorMsg());
+                      sb.append(ERROR_MESSAGE_PREFIX + q.getErrorMsg());
 
                       appendMessage(sb.toString(), ui);
                     }
@@ -368,12 +376,12 @@ public class MigrationPanel extends Panel
                   } catch (Throwable ex) {
                     String lineSeparator = System.getProperty("line.separator");
                     StringBuilder sb = new StringBuilder();
-                    sb.append("Query Error: " + QueryStatus.Failed + lineSeparator);
-                    sb.append("Corpus: \"" + q.getQuery().getCorpora() + "\"" + lineSeparator);
-                    sb.append("UUID: \"" + q.getUuid() + "\"" + lineSeparator);
-                    sb.append("Query:" + lineSeparator);
+                    sb.append(QUERY_ERROR_PREFIX + QueryStatus.Failed + lineSeparator);
+                    sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"" + lineSeparator);
+                    sb.append(UUID_PREFIX + q.getUuid() + "\"" + lineSeparator);
+                    sb.append(QUERY_PREFIX + lineSeparator);
                     sb.append(q.getQuery().getQuery().trim() + lineSeparator);
-                    sb.append("Error Message: " + ex.getMessage());
+                    sb.append(ERROR_MESSAGE_PREFIX + ex.getMessage());
 
                     q.setErrorMsg(ex.getMessage());
 
@@ -389,14 +397,12 @@ public class MigrationPanel extends Panel
               String errorMsg = ex.getMessage();
               if (errorMsg == null) {
                 errorMsg = ex.getClass().toString();
-                ex.printStackTrace();
-
               }
 
               StringBuilder sb = new StringBuilder();
-              sb.append("Query Error: " + QueryStatus.Failed + lineSeparator);
-              sb.append("UUID: \"" + line[0] + "\"" + lineSeparator);
-              sb.append("Error Message: " + errorMsg);
+              sb.append(QUERY_ERROR_PREFIX + QueryStatus.Failed + lineSeparator);
+              sb.append(UUID_PREFIX + line[0] + "\"" + lineSeparator);
+              sb.append(ERROR_MESSAGE_PREFIX + errorMsg);
 
               URLShortenerDefinition q =
                   new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
