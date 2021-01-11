@@ -51,6 +51,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class MigrationPanel extends Panel
     implements Upload.Receiver, Upload.FinishedListener, Upload.FailedListener {
 
+  private static final int TEXTFIELD_WIDTH = 30;
+
   private static final String ERROR_MESSAGE_PREFIX = "Error Message: ";
 
   static final String QUERY_PREFIX = "Query:";
@@ -84,18 +86,18 @@ public class MigrationPanel extends Panel
     exportedFileUpload.addFinishedListener(this);
     exportedFileUpload.addFailedListener(this);
 
-    TextField serviceUrl = new TextField("ANNIS service URL");
-    serviceUrl.setWidth(30, Unit.EM);
-    TextField serviceUsername = new TextField("Username for ANNIS service");
-    serviceUsername.setWidth(30, Unit.EM);
-    PasswordField servicePassword = new PasswordField("Password for ANNIS service");
+    TextField serviceUrl = new TextField("Legacy ANNIS service URL");
+    serviceUrl.setWidth(TEXTFIELD_WIDTH, Unit.EM);
+    serviceUrl.setPlaceholder("https://example.com/annis3-service");
+    TextField serviceUsername = new TextField("Username for legacy ANNIS service");
+    serviceUsername.setWidth(TEXTFIELD_WIDTH, Unit.EM);
+    PasswordField servicePassword = new PasswordField("Password for legacy ANNIS service");
     servicePassword.setWidth(30, Unit.EM);
     CheckBox skipExisting = new CheckBox("Skip existing UUIDs");
 
 
     FormLayout formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername,
         servicePassword, skipExisting);
-
 
     txtMessages.setSizeFull();
     txtMessages.setValue("");
@@ -195,62 +197,57 @@ public class MigrationPanel extends Panel
   }
 
   private boolean readUrlShortenerLine(String[] line, boolean skipExisting,
-      UrlShortener urlShortener, Set<String> knownCorpora, SearchApi searchApi, OkHttpClient client,
+      Set<String> knownCorpora, SearchApi searchApi, OkHttpClient client,
       HttpUrl searchServiceBaseUrl, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
-    if (line.length == 4) {
 
-      // parse URL
-      try {
-        URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
-        if (q != null) {
-          // check if all corpora exist in the new instance
-          List<String> corpusNames =
-              q.getQuery() == null || q.getQuery().getCorpora() == null ? new LinkedList<>()
-                  : new LinkedList<>(q.getQuery().getCorpora());
-          for (String c : corpusNames) {
-            if (!knownCorpora.contains(c)) {
-              q.addUnknownCorpus(c);
-            }
-          }
-
-          if (!q.getUnknownCorpora().isEmpty()) {
-            failedQueries.put(QueryStatus.UNKNOWN_CORPUS, q);
-          } else if (corpusNames.isEmpty()) {
-            q.setErrorMsg("Corpus name is empty");
-            failedQueries.put(QueryStatus.FAILED, q);
-          } else if (urlShortener.unshorten(q.getUuid()).isPresent()) {
-            if (skipExisting) {
-              return false;
-            } else {
-              failedQueries.put(QueryStatus.UUID_EXISTS, q);
-            }
-          } else {
-            return checkSingleQuery(q, searchApi, urlShortener, client, searchServiceBaseUrl,
-                failedQueries);
-          }
-        }
-      } catch (RuntimeException | UnsupportedEncodingException | URISyntaxException ex) {
-
-        String lineSeparator = System.getProperty("line.separator");
-
-        String errorMsg = ex.getMessage();
-        if (errorMsg == null) {
-          errorMsg = ex.getClass().toString();
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(QUERY_ERROR_PREFIX + QueryStatus.FAILED + lineSeparator);
-        sb.append(UUID_PREFIX + line[0] + "\"" + lineSeparator);
-        sb.append(ERROR_MESSAGE_PREFIX + errorMsg);
-
-        URLShortenerDefinition q =
-            new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
-        q.setErrorMsg(errorMsg);
-        failedQueries.put(QueryStatus.FAILED, q);
-
-        appendMessage(sb.toString(), ui);
-      }
+    if (line.length != 4) {
+      return false;
     }
+
+    // parse URL
+    try {
+      URLShortenerDefinition q = URLShortenerDefinition.parse(line[3], line[0], line[2]);
+      if (q != null) {
+        // check if all corpora exist in the new instance
+        List<String> corpusNames =
+            q.getQuery() == null || q.getQuery().getCorpora() == null ? new LinkedList<>()
+                : new LinkedList<>(q.getQuery().getCorpora());
+        corpusNames.stream().filter(c -> !knownCorpora.contains(c))
+            .forEach(c -> q.addUnknownCorpus(c));
+
+        if (!q.getUnknownCorpora().isEmpty()) {
+          failedQueries.put(QueryStatus.UNKNOWN_CORPUS, q);
+        } else if (corpusNames.isEmpty()) {
+          q.setErrorMsg("Corpus name is empty");
+          failedQueries.put(QueryStatus.FAILED, q);
+        } else if (ui.getUrlShortener().unshorten(q.getUuid()).isPresent()) {
+          if (skipExisting) {
+            return false;
+          } else {
+            failedQueries.put(QueryStatus.UUID_EXISTS, q);
+          }
+        } else {
+          return checkSingleQuery(q, searchApi, ui.getUrlShortener(), client, searchServiceBaseUrl,
+              failedQueries);
+        }
+      }
+    } catch (RuntimeException | UnsupportedEncodingException | URISyntaxException ex) {
+
+      String errorMsg = ex.getMessage();
+      if (errorMsg == null) {
+        errorMsg = ex.getClass().toString();
+      }
+
+
+      URLShortenerDefinition q =
+          new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
+      q.setErrorMsg(errorMsg);
+      reportSingleQueryFailureStatus(QueryStatus.FAILED, q);
+
+      failedQueries.put(QueryStatus.FAILED, q);
+
+    }
+
     return false;
   }
 
@@ -299,7 +296,7 @@ public class MigrationPanel extends Panel
       try (CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
         String[] line;
         while ((line = csvReader.readNext()) != null) {
-          if (readUrlShortenerLine(line, skipExisting, ui.getUrlShortener(), knownCorpora,
+          if (readUrlShortenerLine(line, skipExisting, knownCorpora,
               searchApi, client.build(), searchServiceBaseUrl, failedQueries)) {
             successfulQueries++;
           }
