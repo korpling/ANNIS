@@ -7,10 +7,8 @@ import annis.libgui.Background;
 import annis.libgui.Helper;
 import au.com.bytecode.opencsv.CSVReader;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
@@ -30,14 +28,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
@@ -56,120 +51,13 @@ public class MigrationPanel extends Panel
 
   private static final String ERROR_MESSAGE_PREFIX = "Error Message: ";
 
-  private static final String QUERY_PREFIX = "Query:";
+  static final String QUERY_PREFIX = "Query:";
 
-  private static final String UUID_PREFIX = "UUID: \"";
+  static final String UUID_PREFIX = "UUID: \"";
 
   private static final String QUERY_ERROR_PREFIX = "Query Error: ";
 
-  private static final String CORPUS_PREFIX = "Corpus: \"";
-
-  private final class MigrationCallback implements FutureCallback<Integer> {
-    private final Multimap<QueryStatus, URLShortenerDefinition> failedQueries;
-
-
-    private MigrationCallback(Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
-      this.failedQueries = failedQueries;
-    }
-
-    @Override
-    public void onSuccess(Integer successfulQueries) {
-      appendMessage("\nFinished to import " + successfulQueries + " queries.\n", ui);
-
-      // output summary and detailed list of failed queries
-      final Collection<URLShortenerDefinition> unknownCorpusQueries =
-          failedQueries.get(QueryStatus.UNKNOWN_CORPUS);
-
-      StringBuilder detailedStatus = new StringBuilder();
-
-
-      if (!unknownCorpusQueries.isEmpty()) {
-        final Map<String, Integer> unknownCorpusCount = new TreeMap<>();
-        for (final URLShortenerDefinition q : unknownCorpusQueries) {
-          for (final String c : q.getUnknownCorpora()) {
-            final int oldCount = unknownCorpusCount.getOrDefault(c, 0);
-            unknownCorpusCount.put(c, oldCount + 1);
-          }
-        }
-        final String unknownCorpusCaption = "Unknown corpus (" + unknownCorpusCount.size()
-            + " unknown corpora and " + unknownCorpusQueries.size() + " queries)";
-        detailedStatus.append(unknownCorpusCaption);
-        detailedStatus.append("\n");
-        detailedStatus.append(Strings.repeat("=", unknownCorpusCaption.length()));
-        detailedStatus.append("\n");
-
-        for (final Map.Entry<String, Integer> e : unknownCorpusCount.entrySet()) {
-          detailedStatus.append("Corpus \"" + e.getKey() + "\": " + e.getValue() + " queries");
-          detailedStatus.append("\n");
-        }
-        detailedStatus.append("\n");
-      }
-
-      printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUID_EXISTS),
-          detailedStatus);
-      printProblematicQueries("Count different", failedQueries.get(QueryStatus.COUNT_DIFFERS),
-          detailedStatus);
-      printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MATCHES_DIFFER),
-          detailedStatus);
-      printProblematicQueries("Timeout", failedQueries.get(QueryStatus.TIMEOUT), detailedStatus);
-      printProblematicQueries("Other server error", failedQueries.get(QueryStatus.SERVER_ERROR),
-          detailedStatus);
-      printProblematicQueries("Empty corpus list", failedQueries.get(QueryStatus.EMPTY_CORPUS_LIST),
-          detailedStatus);
-      printProblematicQueries("FAILED", failedQueries.get(QueryStatus.FAILED), detailedStatus);
-
-      final String summaryString = "+ Successful: " + successfulQueries + " from "
-          + (successfulQueries + failedQueries.size()) + " +";
-      detailedStatus.append(Strings.repeat("+", summaryString.length()));
-      detailedStatus.append("\n");
-      detailedStatus.append(summaryString);
-      detailedStatus.append("\n");
-      detailedStatus.append(Strings.repeat("+", summaryString.length()));
-      detailedStatus.append("\n");
-
-      appendMessage(detailedStatus.toString(), ui);
-    }
-
-    @Override
-    public void onFailure(Throwable t) {
-      appendMessage("\nFailed!\n\n" + t.toString(), ui);
-    }
-
-    private void printProblematicQueries(final String statusCaption,
-        final Collection<URLShortenerDefinition> queries, StringBuilder sb) {
-      if (queries != null && !queries.isEmpty()) {
-        final String captionWithCount = statusCaption + " (sum: " + queries.size() + ")";
-        sb.append(captionWithCount);
-        sb.append("\n");
-        sb.append(Strings.repeat("=", captionWithCount.length()));
-        sb.append("\n\n");
-
-        for (final URLShortenerDefinition q : queries) {
-          if (q.getQuery() != null && q.getQuery().getCorpora() != null) {
-            sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"");
-            sb.append("\n");
-          }
-          sb.append(UUID_PREFIX + q.getUuid() + "\"");
-          sb.append("\n");
-          if (q.getQuery() != null && q.getQuery().getQuery() != null) {
-            sb.append(QUERY_PREFIX);
-            sb.append("\n");
-            sb.append(q.getQuery().getQuery().trim());
-            sb.append("\n");
-          }
-          if (q.getErrorMsg() != null) {
-            sb.append("Error: " + q.getErrorMsg());
-            sb.append("\n");
-          }
-
-          sb.append("-------");
-          sb.append("\n");
-        }
-        sb.append("\n");
-      }
-    }
-
-  }
+  static final String CORPUS_PREFIX = "Corpus: \"";
 
   private static final long serialVersionUID = -6893786947746535332L;
 
@@ -178,7 +66,7 @@ public class MigrationPanel extends Panel
   private final Button btMigrate = new Button("Start migration");
 
   private File urlShortenerFile;
-  private AnnisUI ui;
+  AnnisUI ui;
 
 
   @Override
@@ -231,12 +119,12 @@ public class MigrationPanel extends Panel
           ExceptionDialog.show(ex, ui);
           return 0;
         }
-      }, new MigrationCallback(failedQueries));
+      }, new MigrationCallback(this, failedQueries));
 
     });
   }
 
-  private void appendMessage(String message, UI ui) {
+  void appendMessage(String message, UI ui) {
 
     ui.access(() -> {
       String oldVal = txtMessages.getValue();
