@@ -554,11 +554,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-xc</artifactId>
-			<version>1.9.13</version>
-			<scope>compile</scope>
-		</dependency>
+		    <groupId>com.fasterxml.jackson.dataformat</groupId>
+		    <artifactId>jackson-dataformat-xml</artifactId>
+		    </dependency>
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
@@ -571,7 +569,7 @@
 			<artifactId>jsr305</artifactId>
 			<version>3.0.2</version>
 		</dependency>
-
+		
 		<dependency>
 			<groupId>com.github.mvysny.kaributesting</groupId>
 			<artifactId>karibu-testing-v8</artifactId>

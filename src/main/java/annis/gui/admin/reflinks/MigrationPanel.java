@@ -175,6 +175,8 @@ public class MigrationPanel extends Panel
   public void attach() {
     super.attach();
 
+    setSizeFull();
+
 
     exportedFileUpload.setCaption("Exported URL shortener entries as CSV file");
     exportedFileUpload.setReceiver(this);
@@ -298,7 +300,6 @@ public class MigrationPanel extends Panel
                 List<String> corpusNames =
                     q.getQuery() == null || q.getQuery().getCorpora() == null ? new LinkedList<>()
                         : new LinkedList<>(q.getQuery().getCorpora());
-                corporaApi.listCorpora();
                 for (String c : corpusNames) {
                   if (!knownCorpora.contains(c)) {
                     q.addUnknownCorpus(c);
@@ -310,7 +311,7 @@ public class MigrationPanel extends Panel
                 } else if (corpusNames.isEmpty()) {
                   q.setErrorMsg("Corpus name is empty");
                   failedQueries.put(QueryStatus.Failed, q);
-                } else if (urlShortener.unshorten(q.getUuid()) != null) {
+                } else if (urlShortener.unshorten(q.getUuid()).isPresent()) {
                   if (skipExisting) {
                     continue;
                   } else {

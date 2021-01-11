@@ -6,8 +6,9 @@ import annis.model.DisplayedResultQuery;
 import annis.model.Query;
 import annis.service.objects.Match;
 import annis.service.objects.QueryLanguage;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.google.common.base.Joiner;
-import com.google.gson.Gson;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -249,8 +250,9 @@ public class URLShortenerDefinition {
       }
     }
 
-    Gson gson = new Gson();
-
+    XmlMapper mapper = new XmlMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    
     try {
 
       QueryStatus status = QueryStatus.Ok;
@@ -263,8 +265,8 @@ public class URLShortenerDefinition {
               .addQueryParameter("corpora", Joiner.on(",").join(query.getCorpora())).build();
           ResponseBody body =
               client.newCall(new Request.Builder().url(countLegacyUrl).build()).execute().body();
-
-          CountExtra result = gson.fromJson(body.string(), CountExtra.class);
+          String bodyString = body.string();
+          CountExtra result = mapper.readValue(bodyString, CountExtra.class);
           countLegacy = Optional.of(result.getMatchCount());
           break;
         } catch (IOException ex) {
