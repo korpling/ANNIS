@@ -27,7 +27,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -182,7 +184,7 @@ public class MigrationPanel extends Panel
         return true;
       }
 
-    } catch (Throwable ex) {
+    } catch (RuntimeException ex) {
       q.setErrorMsg(ex.getMessage());
       failedQueries.put(QueryStatus.FAILED, q);
 
@@ -227,7 +229,7 @@ public class MigrationPanel extends Panel
                 failedQueries);
           }
         }
-      } catch (Throwable ex) {
+      } catch (RuntimeException | UnsupportedEncodingException | URISyntaxException ex) {
 
         String lineSeparator = System.getProperty("line.separator");
 
