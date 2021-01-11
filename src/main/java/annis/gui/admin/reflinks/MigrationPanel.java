@@ -12,7 +12,6 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Panel;
@@ -222,26 +221,20 @@ public class MigrationPanel extends Panel
 
 
     btMigrate.setEnabled(false);
-    btMigrate.addClickListener(new Button.ClickListener() {
-
-      private static final long serialVersionUID = 5971461476376302617L;
-
-      @Override
-      public void buttonClick(ClickEvent event) {
-        txtMessages.setValue("");
-        if (getUI() instanceof AnnisUI) {
-          AnnisUI ui = (AnnisUI) getUI();
-          Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
-          Background.runWithCallback(() -> {
-            try {
-              return migrateUrlShortener(serviceUrl.getValue(), serviceUsername.getValue(),
-                  servicePassword.getValue(), skipExisting.getValue(), ui, failedQueries);
-            } catch (ApiException ex) {
-              ExceptionDialog.show(ex, ui);
-              return 0;
-            }
-          }, new MigrationCallback(failedQueries, ui));
-        }
+    btMigrate.addClickListener(event -> {
+      txtMessages.setValue("");
+      if (getUI() instanceof AnnisUI) {
+        AnnisUI ui = (AnnisUI) getUI();
+        Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
+        Background.runWithCallback(() -> {
+          try {
+            return migrateUrlShortener(serviceUrl.getValue(), serviceUsername.getValue(),
+                servicePassword.getValue(), skipExisting.getValue(), ui, failedQueries);
+          } catch (ApiException ex) {
+            ExceptionDialog.show(ex, ui);
+            return 0;
+          }
+        }, new MigrationCallback(failedQueries, ui));
       }
     });
   }
