@@ -142,7 +142,7 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
         }
         if (job != null) {
           if (job.getStatus() == StatusEnum.FAILED) {
-            appendFromBackground("Failed.");
+            appendFromBackground("FAILED.");
           } else {
             appendFromBackground("Unknown status.");
           }

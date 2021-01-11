@@ -81,7 +81,7 @@ public class MigrationPanel extends Panel
 
       // output summary and detailed list of failed queries
       final Collection<URLShortenerDefinition> unknownCorpusQueries =
-          failedQueries.get(QueryStatus.UnknownCorpus);
+          failedQueries.get(QueryStatus.UNKNOWN_CORPUS);
 
       StringBuilder detailedStatus = new StringBuilder();
 
@@ -108,18 +108,18 @@ public class MigrationPanel extends Panel
         detailedStatus.append("\n");
       }
 
-      printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUIDExists),
+      printProblematicQueries("UUID already exists", failedQueries.get(QueryStatus.UUID_EXISTS),
           detailedStatus);
-      printProblematicQueries("Count different", failedQueries.get(QueryStatus.CountDiffers),
+      printProblematicQueries("Count different", failedQueries.get(QueryStatus.COUNT_DIFFERS),
           detailedStatus);
-      printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MatchesDiffer),
+      printProblematicQueries("Match list different", failedQueries.get(QueryStatus.MATCHES_DIFFER),
           detailedStatus);
-      printProblematicQueries("Timeout", failedQueries.get(QueryStatus.Timeout), detailedStatus);
-      printProblematicQueries("Other server error", failedQueries.get(QueryStatus.ServerError),
+      printProblematicQueries("Timeout", failedQueries.get(QueryStatus.TIMEOUT), detailedStatus);
+      printProblematicQueries("Other server error", failedQueries.get(QueryStatus.SERVER_ERROR),
           detailedStatus);
-      printProblematicQueries("Empty corpus list", failedQueries.get(QueryStatus.EmptyCorpusList),
+      printProblematicQueries("Empty corpus list", failedQueries.get(QueryStatus.EMPTY_CORPUS_LIST),
           detailedStatus);
-      printProblematicQueries("Failed", failedQueries.get(QueryStatus.Failed), detailedStatus);
+      printProblematicQueries("FAILED", failedQueries.get(QueryStatus.FAILED), detailedStatus);
 
       final String summaryString = "+ Successful: " + successfulQueries + " from "
           + (successfulQueries + failedQueries.size()) + " +";
@@ -318,15 +318,15 @@ public class MigrationPanel extends Panel
                 }
 
                 if (!q.getUnknownCorpora().isEmpty()) {
-                  failedQueries.put(QueryStatus.UnknownCorpus, q);
+                  failedQueries.put(QueryStatus.UNKNOWN_CORPUS, q);
                 } else if (corpusNames.isEmpty()) {
                   q.setErrorMsg("Corpus name is empty");
-                  failedQueries.put(QueryStatus.Failed, q);
+                  failedQueries.put(QueryStatus.FAILED, q);
                 } else if (urlShortener.unshorten(q.getUuid()).isPresent()) {
                   if (skipExisting) {
                     continue;
                   } else {
-                    failedQueries.put(QueryStatus.UUIDExists, q);
+                    failedQueries.put(QueryStatus.UUID_EXISTS, q);
                   }
                 } else {
                   // check the query
@@ -339,7 +339,7 @@ public class MigrationPanel extends Panel
                     // insert URLs into new database
                     URI temporary = null;
 
-                    if (status != QueryStatus.Ok) {
+                    if (status != QueryStatus.OK) {
                       failedQueries.put(status, q);
                       // Link the UUID to an error page temporarily, until the issue is fixed.
                       // Remember the original URL, so the temporary URL can just be set
@@ -362,14 +362,14 @@ public class MigrationPanel extends Panel
                     urlShortener.migrate(q.getUri(), temporary, "anonymous", q.getUuid(),
                         q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
 
-                    if (status == QueryStatus.Ok) {
+                    if (status == QueryStatus.OK) {
                       successfulQueries++;
                     }
 
                   } catch (Throwable ex) {
                     String lineSeparator = System.getProperty("line.separator");
                     StringBuilder sb = new StringBuilder();
-                    sb.append(QUERY_ERROR_PREFIX + QueryStatus.Failed + lineSeparator);
+                    sb.append(QUERY_ERROR_PREFIX + QueryStatus.FAILED + lineSeparator);
                     sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"" + lineSeparator);
                     sb.append(UUID_PREFIX + q.getUuid() + "\"" + lineSeparator);
                     sb.append(QUERY_PREFIX + lineSeparator);
@@ -379,7 +379,7 @@ public class MigrationPanel extends Panel
                     q.setErrorMsg(ex.getMessage());
 
                     appendMessage(sb.toString(), ui);
-                    failedQueries.put(QueryStatus.Failed, q);
+                    failedQueries.put(QueryStatus.FAILED, q);
                   }
                 }
               }
@@ -393,14 +393,14 @@ public class MigrationPanel extends Panel
               }
 
               StringBuilder sb = new StringBuilder();
-              sb.append(QUERY_ERROR_PREFIX + QueryStatus.Failed + lineSeparator);
+              sb.append(QUERY_ERROR_PREFIX + QueryStatus.FAILED + lineSeparator);
               sb.append(UUID_PREFIX + line[0] + "\"" + lineSeparator);
               sb.append(ERROR_MESSAGE_PREFIX + errorMsg);
 
               URLShortenerDefinition q =
                   new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
               q.setErrorMsg(errorMsg);
-              failedQueries.put(QueryStatus.Failed, q);
+              failedQueries.put(QueryStatus.FAILED, q);
 
               appendMessage(sb.toString(), ui);
             }

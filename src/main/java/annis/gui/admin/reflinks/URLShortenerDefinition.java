@@ -212,7 +212,7 @@ public class URLShortenerDefinition {
         if (!Objects.equals(parsed_m1, parsed_m2)) {
           this.errorMsg = "Match " + matchNr + " (should be)" + System.lineSeparator() + m2
               + System.lineSeparator() + "(but was)" + System.lineSeparator() + m1;
-          return QueryStatus.MatchesDiffer;
+          return QueryStatus.MATCHES_DIFFER;
         }
       }
     } finally {
@@ -221,7 +221,7 @@ public class URLShortenerDefinition {
       }
     }
 
-    return QueryStatus.Ok;
+    return QueryStatus.OK;
   }
 
   public QueryStatus test(SearchApi searchApi, OkHttpClient client,
@@ -229,7 +229,7 @@ public class URLShortenerDefinition {
 
     if (this.query.getCorpora().isEmpty()) {
       this.errorMsg = "Empty corpus list";
-      return QueryStatus.EmptyCorpusList;
+      return QueryStatus.EMPTY_CORPUS_LIST;
     }
 
     // check count first (also warmup for the corpus)
@@ -243,7 +243,7 @@ public class URLShortenerDefinition {
     } catch (ApiException ex) {
       if (ex.getCode() == 408 || ex.getCode() == 504) {
         this.errorMsg = "Timeout in graphANNIS";
-        return QueryStatus.Timeout;
+        return QueryStatus.TIMEOUT;
       } else {
         countGraphANNIS = 0;
       }
@@ -254,7 +254,7 @@ public class URLShortenerDefinition {
 
     try {
 
-      QueryStatus status = QueryStatus.Ok;
+      QueryStatus status = QueryStatus.OK;
 
       int countLegacy = 0;
       for (int tries = 0; tries < MAX_RETRY; tries++) {
@@ -271,7 +271,7 @@ public class URLShortenerDefinition {
         } catch (IOException ex) {
           if (tries >= MAX_RETRY - 1) {
             this.errorMsg = ex.getMessage();
-            return QueryStatus.ServerError;
+            return QueryStatus.SERVER_ERROR;
           } else {
             log.warn("Server error when executing query {}", query.getQuery(), ex);
           }
@@ -281,26 +281,26 @@ public class URLShortenerDefinition {
       if (countGraphANNIS != countLegacy) {
 
         this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
-        status = QueryStatus.CountDiffers;
+        status = QueryStatus.COUNT_DIFFERS;
 
       } else if (countGraphANNIS == 0) {
-        status = QueryStatus.Ok;
+        status = QueryStatus.OK;
       } else {
         status = testFind(searchApi, client, annisSearchServiceBaseUrl);
       }
 
-      if (status != QueryStatus.Ok && this.query.getQueryLanguage() == QueryLanguage.AQL) {
+      if (status != QueryStatus.OK && this.query.getQueryLanguage() == QueryLanguage.AQL) {
         // check in quirks mode and rewrite if necessary
         log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery().trim(),
             this.query.getCorpora());
 
         URLShortenerDefinition quirksQuery = this.rewriteInQuirksMode();
         QueryStatus quirksStatus = quirksQuery.test(searchApi, client, annisSearchServiceBaseUrl);
-        if (quirksStatus == QueryStatus.Ok) {
+        if (quirksStatus == QueryStatus.OK) {
           this.query = quirksQuery.query;
           this.uri = quirksQuery.uri;
           this.errorMsg = "Rewrite in quirks mode necessary";
-          status = QueryStatus.Ok;
+          status = QueryStatus.OK;
         } else {
           status = quirksStatus;
           this.errorMsg = quirksQuery.getErrorMsg();
@@ -311,12 +311,12 @@ public class URLShortenerDefinition {
     } catch (ApiException ex) {
       this.errorMsg = ex.toString();
       if (ex.getCode() == 408 || ex.getCode() == 504) {
-        return QueryStatus.Timeout;
+        return QueryStatus.TIMEOUT;
       }
-      return QueryStatus.ServerError;
+      return QueryStatus.SERVER_ERROR;
     } catch (IOException ex) {
       this.errorMsg = ex.toString();
-      return QueryStatus.ServerError;
+      return QueryStatus.SERVER_ERROR;
     }
   }
 }
