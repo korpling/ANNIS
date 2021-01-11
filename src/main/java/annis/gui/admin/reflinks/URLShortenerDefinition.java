@@ -22,7 +22,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import okhttp3.HttpUrl;
@@ -257,7 +256,7 @@ public class URLShortenerDefinition {
 
       QueryStatus status = QueryStatus.Ok;
 
-      Optional<Integer> countLegacy = Optional.empty();
+      int countLegacy = 0;
       for (int tries = 0; tries < MAX_RETRY; tries++) {
         try {
           HttpUrl countLegacyUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("count")
@@ -267,7 +266,7 @@ public class URLShortenerDefinition {
               client.newCall(new Request.Builder().url(countLegacyUrl).build()).execute().body();
           String bodyString = body.string();
           CountExtra result = mapper.readValue(bodyString, CountExtra.class);
-          countLegacy = Optional.of(result.getMatchCount());
+          countLegacy = result.getMatchCount();
           break;
         } catch (IOException ex) {
           if (tries >= MAX_RETRY - 1) {
@@ -279,9 +278,9 @@ public class URLShortenerDefinition {
         }
       }
 
-      if (countGraphANNIS != countLegacy.get()) {
+      if (countGraphANNIS != countLegacy) {
 
-        this.errorMsg = "should have been " + countLegacy.get() + " but was " + countGraphANNIS;
+        this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
         status = QueryStatus.CountDiffers;
 
       } else if (countGraphANNIS == 0) {
