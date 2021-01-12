@@ -41,7 +41,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
-import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -67,7 +66,7 @@ public class MigrationPanel extends Panel
 
   private final TextArea txtMessages = new TextArea();
   private final Upload exportedFileUpload = new Upload();
-  private final Button btMigrate = new Button("Start migration");
+  final Button migrateButton = new Button("Start migration");
 
   private File urlShortenerFile;
   AnnisUI ui;
@@ -104,15 +103,16 @@ public class MigrationPanel extends Panel
     txtMessages.setReadOnly(true);
     txtMessages.addStyleName("message-output");
 
-    VerticalLayout layout = new VerticalLayout(formLayout, btMigrate, txtMessages);
+    VerticalLayout layout = new VerticalLayout(formLayout, migrateButton, txtMessages);
     layout.setSizeFull();
     layout.setMargin(true);
     setContent(layout);
     layout.setExpandRatio(txtMessages, 1.0f);
 
 
-    btMigrate.setEnabled(false);
-    btMigrate.addClickListener(event -> {
+    migrateButton.setEnabled(false);
+    migrateButton.setDisableOnClick(true);
+    migrateButton.addClickListener(event -> {
       txtMessages.setValue("");
       Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
       Background.runWithCallback(() -> {
@@ -329,7 +329,7 @@ public class MigrationPanel extends Panel
 
   @Override
   public void uploadFinished(FinishedEvent event) {
-    btMigrate.setEnabled(true);
+    migrateButton.setEnabled(true);
 
     appendMessage("Finished CSV file upload", getUI());
   }
@@ -339,35 +339,15 @@ public class MigrationPanel extends Panel
     appendMessage("Could not upload file: " + event.toString(), getUI());
   }
 
+
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + btMigrate.hashCode();
-    result = prime * result + exportedFileUpload.hashCode();
-    result = prime * result + txtMessages.hashCode();
-    result = prime * result + ((ui == null) ? 0 : ui.hashCode());
-    result = prime * result + ((urlShortenerFile == null) ? 0 : urlShortenerFile.hashCode());
-    return result;
+    return super.hashCode();
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (obj == this) {
-      return true;
-    }
-    if (obj.getClass() != getClass()) {
-      return false;
-    }
-    MigrationPanel other = (MigrationPanel) obj;
-    return new EqualsBuilder().appendSuper(super.equals(obj)).append(btMigrate, other.btMigrate)
-        .append(exportedFileUpload, other.exportedFileUpload)
-        .append(txtMessages, other.txtMessages)
-        .append(urlShortenerFile, other.urlShortenerFile).append(ui, other.ui)
-        .isEquals();
+    return super.equals(obj);
   }
 
 }
