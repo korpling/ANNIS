@@ -180,8 +180,6 @@ public class MigrationPanel extends Panel
         // to null to resolve to the original URL when the issue is fixed in ANNIS.
         temporary = UriComponentsBuilder.newInstance().pathSegment("unsupported-query")
             .queryParam("url", q.getUri().toASCIIString()).build().toUri();
-
-        reportSingleQueryFailureStatus(status, q);
       }
       urlShortener.migrate(q.getUri(), temporary, "anonymous", q.getUuid(),
           q.getCreationTime() == null ? new Date() : q.getCreationTime().toDate());
@@ -193,8 +191,6 @@ public class MigrationPanel extends Panel
     } catch (RuntimeException ex) {
       q.setErrorMsg(getErrorMessage(ex));
       failedQueries.put(QueryStatus.FAILED, q);
-
-      reportSingleQueryFailureStatus(QueryStatus.FAILED, q);
     }
 
     return false;
