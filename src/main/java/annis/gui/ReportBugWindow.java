@@ -46,6 +46,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -301,14 +302,12 @@ public class ReportBugWindow extends Window {
     }
 
     private boolean sendBugReport(String bugEMailAddress, byte[] screenImage, String imageMimeType) {
-        MultiPartEmail mail = new MultiPartEmail();
         try {
-            // server setup
-            mail.setHostName("localhost");
+          MultiPartEmail mail =
+              Helper.createEMailFromConfiguration(((AnnisUI) getUI()).getConfig());
 
             // content of the mail
             mail.addReplyTo(form.getField("email").getValue().toString(), form.getField("name").getValue().toString());
-            mail.setFrom(bugEMailAddress);
             mail.addTo(bugEMailAddress);
 
             mail.setSubject("[ANNIS BUG] " + form.getField("summary").getValue().toString());
@@ -350,7 +349,7 @@ public class ReportBugWindow extends Window {
             mail.send();
             return true;
 
-        } catch (EmailException ex) {
+          } catch (EmailException | UnknownHostException ex) {
             Notification.show("E-Mail not configured on server",
                     "If this is no Kickstarter version please ask the administrator (" + bugEMailAddress
                             + ") of this ANNIS-instance for assistance. "
