@@ -243,9 +243,38 @@ class MigrationPanelTest {
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
 
-    // This CSV line is missing a column
+    // This URI in the line has invalid characters
     simulateUpload(
         "899e9bef-3a16-4d03-8ed3-70aa1abd125d\tanonymous\t2015-11-16 13:19:58.471+00\thttp:/invalid<host>\n");
+    fillOutForm();
+
+    // Mock the required responses
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+
+    // Start the migration process
+    _click(start);
+
+    // Check that the invalid character was detected and logged
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals("Finished to import 0 queries.\n\n" + "FAILED (sum: 1)\n"
+        + "===============\n" + "\n" + "Corpus: \"[]\"\n"
+        + "UUID: \"899e9bef-3a16-4d03-8ed3-70aa1abd125d\"\n"
+        + "Error: Illegal character in path at index 13: http:/invalid<host>\n"
+        + "-------\n\n" + "" + "++++++++++++++++++++++++\n"
+        + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
+  }
+
+  @Test
+  void testEmptyCorpusName() throws Exception {
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    // This linked URL is missing the corpus parameter
+    simulateUpload(
+        "a3cbc7da-1511-473d-abc2-fe531ff5db9a\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&cl=5&cr=5&s=0&l=10\n");
     fillOutForm();
 
     // Mock the required responses
@@ -258,12 +287,12 @@ class MigrationPanelTest {
     TextArea messages = _get(panel, TextArea.class);
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
-    assertEquals("Finished to import 0 queries.\n\n" + "FAILED (sum: 1)\n"
-        + "===============\n" + "\n" + "Corpus: \"[]\"\n"
-        + "UUID: \"899e9bef-3a16-4d03-8ed3-70aa1abd125d\"\n"
-        + "Error: Illegal character in path at index 13: http:/invalid<host>\n"
-        + "-------\n\n" + "" + "++++++++++++++++++++++++\n"
-        + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
+    assertEquals("Finished to import 0 queries.\n\n" + "FAILED (sum: 1)\n" + "===============\n"
+        + "\n" + "UUID: \"a3cbc7da-1511-473d-abc2-fe531ff5db9a\"\n"
+        + "Error: Corpus name is empty\n" + "-------\n\n" + ""
+        + "++++++++++++++++++++++++\n" + "+ Successful: 0 from 1 +\n"
+        + "++++++++++++++++++++++++\n", messages.getValue());
   }
+
 
 }
