@@ -338,4 +338,54 @@ public class MigrationPanel extends Panel
     appendMessage("Could not upload file: " + event.toString(), getUI());
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((btMigrate == null) ? 0 : btMigrate.hashCode());
+    result = prime * result + ((exportedFileUpload == null) ? 0 : exportedFileUpload.hashCode());
+    result = prime * result + ((txtMessages == null) ? 0 : txtMessages.hashCode());
+    result = prime * result + ((ui == null) ? 0 : ui.hashCode());
+    result = prime * result + ((urlShortenerFile == null) ? 0 : urlShortenerFile.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    MigrationPanel other = (MigrationPanel) obj;
+    if (btMigrate == null) {
+      if (other.btMigrate != null)
+        return false;
+    } else if (!btMigrate.equals(other.btMigrate))
+      return false;
+    if (exportedFileUpload == null) {
+      if (other.exportedFileUpload != null)
+        return false;
+    } else if (!exportedFileUpload.equals(other.exportedFileUpload))
+      return false;
+    if (txtMessages == null) {
+      if (other.txtMessages != null)
+        return false;
+    } else if (!txtMessages.equals(other.txtMessages))
+      return false;
+    if (ui == null) {
+      if (other.ui != null)
+        return false;
+    } else if (!ui.equals(other.ui))
+      return false;
+    if (urlShortenerFile == null) {
+      if (other.urlShortenerFile != null)
+        return false;
+    } else if (!urlShortenerFile.equals(other.urlShortenerFile))
+      return false;
+    return true;
+  }
+
+
 }
