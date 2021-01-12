@@ -52,14 +52,8 @@ public class MigrationPanel extends Panel
 
   private static final int TEXTFIELD_WIDTH = 30;
 
-  private static final String ERROR_MESSAGE_PREFIX = "Error Message: ";
-
   static final String QUERY_PREFIX = "Query:";
-
   static final String UUID_PREFIX = "UUID: \"";
-
-  private static final String QUERY_ERROR_PREFIX = "Query Error: ";
-
   static final String CORPUS_PREFIX = "Corpus: \"";
 
   private static final long serialVersionUID = -6893786947746535332L;

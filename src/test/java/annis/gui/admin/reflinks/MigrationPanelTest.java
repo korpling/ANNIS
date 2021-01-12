@@ -208,7 +208,62 @@ class MigrationPanelTest {
             + "Error: should have been 0 but was 1\n" + "-------\n\n" + "++++++++++++++++++++++++\n"
             + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n",
         messages.getValue());
+  }
 
+  @Test
+  void testInvalidLine() throws Exception {
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    // This CSV line is missing a column
+    simulateUpload(
+        "98b5e738-2b24-4bbc-90b4-f6d5fe57416c\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n");
+    fillOutForm();
+
+    // Mock the required responses
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+
+    // Start the migration process
+    _click(start);
+
+    // Check that the missing column was not counted in the total number of queries
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals(
+        "Finished to import 0 queries.\n\n" + "++++++++++++++++++++++++\n"
+            + "+ Successful: 0 from 0 +\n" + "++++++++++++++++++++++++\n",
+        messages.getValue());
+  }
+
+  @Test
+  void testInvalidUri() throws Exception {
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    // This CSV line is missing a column
+    simulateUpload(
+        "899e9bef-3a16-4d03-8ed3-70aa1abd125d\tanonymous\t2015-11-16 13:19:58.471+00\thttp:/invalid<host>\n");
+    fillOutForm();
+
+    // Mock the required responses
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+
+    // Start the migration process
+    _click(start);
+
+    // Check that the missing column was not counted in the total number of queries
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals("Finished to import 0 queries.\n\n" + "FAILED (sum: 1)\n"
+        + "===============\n" + "\n" + "Corpus: \"[]\"\n"
+        + "UUID: \"899e9bef-3a16-4d03-8ed3-70aa1abd125d\"\n"
+        + "Error: Illegal character in path at index 13: http:/invalid<host>\n"
+        + "-------\n\n" + "" + "++++++++++++++++++++++++\n"
+        + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
   }
 
 }
