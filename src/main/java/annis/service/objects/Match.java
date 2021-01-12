@@ -28,8 +28,6 @@ import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents a single match of an AQL query.
@@ -44,8 +42,6 @@ public class Match implements Serializable {
    * 
    */
   private static final long serialVersionUID = 4550139902283358825L;
-
-  private final static Logger log = LoggerFactory.getLogger(Match.class);
 
   private final static Splitter matchSplitter = Splitter.on(" ").trimResults().omitEmptyStrings();
   private final static Splitter annoIDSplitter = Splitter.on("::").trimResults().limit(3);
@@ -66,48 +62,51 @@ public class Match implements Serializable {
     }
 
     for (String singleMatch : splitter.split(raw)) {
-      
-      String id = "";
-      String anno = null;
-      // split into the annotation namespace/name and the salt URI
-      List<String> components = annoIDSplitter.splitToList(singleMatch);
-
-      int componentsSize = components.size();
-      if (components.size() == 1) {
-        id = singleMatch;
-      } else {
-        Preconditions.checkArgument(componentsSize == 3 || componentsSize == 2,
-            "A match containing " + "annotation information always has to have the form "
-                + "ns::name::id  or name::id");
-
-        String ns = "";
-        String name = "";
-        if (componentsSize == 3) {
-          id = components.get(2);
-          ns = components.get(0);
-          name = components.get(1);
-        } else if (componentsSize == 2) {
-          id = components.get(1);
-          name = components.get(0);
-        }
-        if (ns.isEmpty()) {
-          anno = name;
-        } else {
-          anno = ns + "::" + name;
-        }
-        // undo any escaping for the annotation part
-        anno = anno.replace("%20", " ").replace("%25", "%").replace("%2C", ",");
-      }
-
-      // Remove a possible legacy id prefix
-      if (id.startsWith("salt:/")) {
-        id = id.substring("salt:/".length());
-      }
-
-      match.addSaltId(id, anno);
+      parseSingleMatchComponent(singleMatch, match);
     }
 
     return match;
+  }
+
+  private static void parseSingleMatchComponent(String singleMatch, Match result) {
+
+    String id = "";
+    String anno = null;
+    // split into the annotation namespace/name and the salt URI
+    List<String> components = annoIDSplitter.splitToList(singleMatch);
+
+    int componentsSize = components.size();
+    if (components.size() == 1) {
+      id = singleMatch;
+    } else {
+      Preconditions.checkArgument(componentsSize == 3 || componentsSize == 2, "A match containing "
+          + "annotation information always has to have the form " + "ns::name::id  or name::id");
+
+      String ns = "";
+      String name = "";
+      if (componentsSize == 3) {
+        id = components.get(2);
+        ns = components.get(0);
+        name = components.get(1);
+      } else if (componentsSize == 2) {
+        id = components.get(1);
+        name = components.get(0);
+      }
+      if (ns.isEmpty()) {
+        anno = name;
+      } else {
+        anno = ns + "::" + name;
+      }
+      // undo any escaping for the annotation part
+      anno = anno.replace("%20", " ").replace("%25", "%").replace("%2C", ",");
+    }
+
+    // Remove a possible legacy id prefix
+    if (id.startsWith("salt:/")) {
+      id = id.substring("salt:/".length());
+    }
+
+    result.addSaltId(id, anno);
   }
 
   public static String singleMatchToString(String id, String anno) {
