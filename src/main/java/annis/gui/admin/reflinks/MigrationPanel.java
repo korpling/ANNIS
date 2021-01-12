@@ -41,6 +41,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.Route;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -342,9 +343,9 @@ public class MigrationPanel extends Panel
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((btMigrate == null) ? 0 : btMigrate.hashCode());
-    result = prime * result + ((exportedFileUpload == null) ? 0 : exportedFileUpload.hashCode());
-    result = prime * result + ((txtMessages == null) ? 0 : txtMessages.hashCode());
+    result = prime * result + btMigrate.hashCode();
+    result = prime * result + exportedFileUpload.hashCode();
+    result = prime * result + txtMessages.hashCode();
     result = prime * result + ((ui == null) ? 0 : ui.hashCode());
     result = prime * result + ((urlShortenerFile == null) ? 0 : urlShortenerFile.hashCode());
     return result;
@@ -352,40 +353,21 @@ public class MigrationPanel extends Panel
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (obj == null) {
+      return false;
+    }
+    if (obj == this) {
       return true;
-    if (!super.equals(obj))
+    }
+    if (obj.getClass() != getClass()) {
       return false;
-    if (getClass() != obj.getClass())
-      return false;
+    }
     MigrationPanel other = (MigrationPanel) obj;
-    if (btMigrate == null) {
-      if (other.btMigrate != null)
-        return false;
-    } else if (!btMigrate.equals(other.btMigrate))
-      return false;
-    if (exportedFileUpload == null) {
-      if (other.exportedFileUpload != null)
-        return false;
-    } else if (!exportedFileUpload.equals(other.exportedFileUpload))
-      return false;
-    if (txtMessages == null) {
-      if (other.txtMessages != null)
-        return false;
-    } else if (!txtMessages.equals(other.txtMessages))
-      return false;
-    if (ui == null) {
-      if (other.ui != null)
-        return false;
-    } else if (!ui.equals(other.ui))
-      return false;
-    if (urlShortenerFile == null) {
-      if (other.urlShortenerFile != null)
-        return false;
-    } else if (!urlShortenerFile.equals(other.urlShortenerFile))
-      return false;
-    return true;
+    return new EqualsBuilder().appendSuper(super.equals(obj)).append(btMigrate, other.btMigrate)
+        .append(exportedFileUpload, other.exportedFileUpload)
+        .append(txtMessages, other.txtMessages)
+        .append(urlShortenerFile, other.urlShortenerFile).append(ui, other.ui)
+        .isEquals();
   }
-
 
 }
