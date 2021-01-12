@@ -56,6 +56,8 @@ public class URLShortenerDefinition {
 
   private String errorMsg;
 
+  private final XmlMapper mapper;
+
   protected URLShortenerDefinition(URI uri, UUID uuid, DateTime creationTime) {
     this(uri, uuid, creationTime, new DisplayedResultQuery());
   }
@@ -67,6 +69,8 @@ public class URLShortenerDefinition {
     this.query = query;
     this.creationTime = creationTime;
     this.errorMsg = null;
+    this.mapper = new XmlMapper();
+    this.mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
   }
 
   public static UUID parseUUID(String uuid) {
@@ -224,6 +228,53 @@ public class URLShortenerDefinition {
     return QueryStatus.OK;
   }
 
+
+  private int getLegacyCount(OkHttpClient client, HttpUrl annisSearchServiceBaseUrl)
+      throws IOException {
+    int countLegacy = 0;
+    for (int tries = 0; tries < MAX_RETRY; tries++) {
+      try {
+        HttpUrl countLegacyUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("count")
+            .addQueryParameter("q", query.getQuery())
+            .addQueryParameter("corpora", Joiner.on(",").join(query.getCorpora())).build();
+        ResponseBody body =
+            client.newCall(new Request.Builder().url(countLegacyUrl).build()).execute().body();
+        String bodyString = body.string();
+        CountExtra result = mapper.readValue(bodyString, CountExtra.class);
+        countLegacy = result.getMatchCount();
+        break;
+      } catch (IOException ex) {
+        if (tries >= MAX_RETRY - 1) {
+          // Rethrow server error so it can be properly processed by the calling function
+          throw (ex);
+        } else {
+          log.warn("Server error when executing query {}", query.getQuery(), ex);
+        }
+      }
+    }
+    return countLegacy;
+  }
+
+  private QueryStatus testQuirksMode(SearchApi searchApi, OkHttpClient client,
+      HttpUrl annisSearchServiceBaseUrl) {
+    log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery().trim(),
+        this.query.getCorpora());
+
+    URLShortenerDefinition quirksQuery = this.rewriteInQuirksMode();
+    QueryStatus quirksStatus = quirksQuery.test(searchApi, client, annisSearchServiceBaseUrl);
+    if (quirksStatus == QueryStatus.OK) {
+      this.query = quirksQuery.query;
+      this.uri = quirksQuery.uri;
+      this.errorMsg = "Rewrite in quirks mode necessary";
+      return QueryStatus.OK;
+    } else {
+      this.errorMsg = quirksQuery.getErrorMsg();
+      return quirksStatus;
+    }
+
+
+  }
+
   public QueryStatus test(SearchApi searchApi, OkHttpClient client,
       HttpUrl annisSearchServiceBaseUrl) {
 
@@ -232,57 +283,18 @@ public class URLShortenerDefinition {
       return QueryStatus.EMPTY_CORPUS_LIST;
     }
 
-    // check count first (also warmup for the corpus)
-    int countGraphANNIS;
-
     try {
-      countGraphANNIS = searchApi
-          .count(new CountQuery().query(query.getQuery()).queryLanguage(query.getApiQueryLanguage())
-              .corpora(new LinkedList<>(query.getCorpora())))
-          .getMatchCount();
-    } catch (ApiException ex) {
-      if (ex.getCode() == 408 || ex.getCode() == 504) {
-        this.errorMsg = "Timeout in graphANNIS";
-        return QueryStatus.TIMEOUT;
-      } else {
-        countGraphANNIS = 0;
-      }
-    }
-
-    XmlMapper mapper = new XmlMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
-    try {
-
       QueryStatus status = QueryStatus.OK;
 
-      int countLegacy = 0;
-      for (int tries = 0; tries < MAX_RETRY; tries++) {
-        try {
-          HttpUrl countLegacyUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("count")
-              .addQueryParameter("q", query.getQuery())
-              .addQueryParameter("corpora", Joiner.on(",").join(query.getCorpora())).build();
-          ResponseBody body =
-              client.newCall(new Request.Builder().url(countLegacyUrl).build()).execute().body();
-          String bodyString = body.string();
-          CountExtra result = mapper.readValue(bodyString, CountExtra.class);
-          countLegacy = result.getMatchCount();
-          break;
-        } catch (IOException ex) {
-          if (tries >= MAX_RETRY - 1) {
-            this.errorMsg = ex.getMessage();
-            return QueryStatus.SERVER_ERROR;
-          } else {
-            log.warn("Server error when executing query {}", query.getQuery(), ex);
-          }
-        }
-      }
+      // check count first (also warmup for the corpus)
+      int countGraphANNIS = searchApi.count(new CountQuery().query(query.getQuery())
+          .queryLanguage(query.getApiQueryLanguage()).corpora(new LinkedList<>(query.getCorpora())))
+          .getMatchCount();
+      int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
 
       if (countGraphANNIS != countLegacy) {
-
         this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
         status = QueryStatus.COUNT_DIFFERS;
-
       } else if (countGraphANNIS == 0) {
         status = QueryStatus.OK;
       } else {
@@ -291,29 +303,18 @@ public class URLShortenerDefinition {
 
       if (status != QueryStatus.OK && this.query.getQueryLanguage() == QueryLanguage.AQL) {
         // check in quirks mode and rewrite if necessary
-        log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery().trim(),
-            this.query.getCorpora());
-
-        URLShortenerDefinition quirksQuery = this.rewriteInQuirksMode();
-        QueryStatus quirksStatus = quirksQuery.test(searchApi, client, annisSearchServiceBaseUrl);
-        if (quirksStatus == QueryStatus.OK) {
-          this.query = quirksQuery.query;
-          this.uri = quirksQuery.uri;
-          this.errorMsg = "Rewrite in quirks mode necessary";
-          status = QueryStatus.OK;
-        } else {
-          status = quirksStatus;
-          this.errorMsg = quirksQuery.getErrorMsg();
-        }
+        status = testQuirksMode(searchApi, client, annisSearchServiceBaseUrl);
       }
 
       return status;
     } catch (ApiException ex) {
-      this.errorMsg = ex.toString();
       if (ex.getCode() == 408 || ex.getCode() == 504) {
+        this.errorMsg = "Timeout in graphANNIS";
         return QueryStatus.TIMEOUT;
+      } else {
+        this.errorMsg = ex.toString();
+        return QueryStatus.SERVER_ERROR;
       }
-      return QueryStatus.SERVER_ERROR;
     } catch (IOException ex) {
       this.errorMsg = ex.toString();
       return QueryStatus.SERVER_ERROR;
