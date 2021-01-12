@@ -143,7 +143,6 @@ public class MigrationPanel extends Panel
 
       txtMessages.setCursorPosition(txtMessages.getValue().length() - 1);
     });
-
   }
 
   private void reportSingleQueryFailureStatus(QueryStatus status, URLShortenerDefinition q) {
@@ -154,7 +153,9 @@ public class MigrationPanel extends Panel
     sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"" + lineSeparator);
     sb.append(UUID_PREFIX + q.getUuid() + "\"" + lineSeparator);
     sb.append(QUERY_PREFIX + lineSeparator);
-    sb.append(q.getQuery().getQuery().trim() + lineSeparator);
+    if (q.getQuery().getQuery() != null) {
+      sb.append(q.getQuery().getQuery().trim() + lineSeparator);
+    }
     sb.append(ERROR_MESSAGE_PREFIX + q.getErrorMsg());
 
     appendMessage(sb.toString(), ui);
@@ -295,7 +296,6 @@ public class MigrationPanel extends Panel
     CorporaApi corporaApi = new CorporaApi(apiClient);
     SearchApi searchApi = new SearchApi(apiClient);
     Set<String> knownCorpora = new HashSet<>(corporaApi.listCorpora());
-
 
     if (urlShortenerFile != null && urlShortenerFile.isFile()) {
       try (CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {

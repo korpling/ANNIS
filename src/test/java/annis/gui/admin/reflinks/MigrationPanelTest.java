@@ -20,6 +20,8 @@ import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FinishedEvent;
 import java.io.IOException;
 import java.io.OutputStream;
+import net.jcip.annotations.NotThreadSafe;
+import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -34,6 +36,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @SpringBootTest
 @ActiveProfiles({"desktop", "test", "headless"})
 @WebAppConfiguration
+@NotThreadSafe
 class MigrationPanelTest {
 
   @Autowired
@@ -78,11 +81,14 @@ class MigrationPanelTest {
         _get(Upload.class, spec -> spec.withCaption("Exported URL shortener entries as CSV file"));
     OutputStream exampleFile = panel.receiveUpload("url_shortener.csv", "text/plain");
     IOUtils.write(
-        "d84ef680-adfb-4923-b2d7-481351d81e95\tanonymous\t2015-11-16 13:19:58.471+00\t/#q=tok&c=pcc2&cl=5&cr=5&s=0&l=10\n",
+        "d84ef680-adfb-4923-b2d7-481351d81e95\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n",
         exampleFile, StandardCharset.UTF_8);
     exampleFile.close();
     panel.uploadFinished(
         new FinishedEvent(upload, "url_shortener.csv", "text/plain", -1));
+
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(10, () -> "Finished CSV file upload".equals(messages.getValue()));
     assertTrue(start.isEnabled());
 
     // Fill out the form
@@ -93,14 +99,26 @@ class MigrationPanelTest {
     _get(TextField.class, spec -> spec.withCaption("Password for legacy ANNIS service"))
         .setValue("test");
 
+    // Mock the required responses
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+    legacyServer.enqueue(new MockResponse()
+        .setBody("<matchAndDocumentCount><documentCount>1</documentCount>"
+            + "  <matchCount>1</matchCount></matchAndDocumentCount>"));
+    legacyServer.enqueue(
+        new MockResponse().setBody("salt:/pcc2/11299#tok_5"));
+
     // Start the migration process
     _click(start);
-    TestHelper.awaitCondition(10, start::isEnabled);
 
     // Check that migration was successful
-    TextArea messages = _get(panel, TextArea.class);
-    assertEquals("\n" + "+++++++++++++++++++++++++\n" + "+ Successful: 1 from 1 +\n"
-        + "+++++++++++++++++++++++++", messages.getValue());
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals(
+        "UUID d84ef680-adfb-4923-b2d7-481351d81e95, testing query \"Zossen\" on corpus [pcc2]\n\n"
+            + "Finished to import 1 queries.\n\n" + "++++++++++++++++++++++++\n"
+            + "+ Successful: 1 from 1 +\n"
+            + "++++++++++++++++++++++++\n",
+        messages.getValue());
 
   }
 

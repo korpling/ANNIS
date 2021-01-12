@@ -75,7 +75,6 @@ final class MigrationCallback implements FutureCallback<Integer> {
     detailedStatus.append("\n");
 
     this.migrationPanel.appendMessage(detailedStatus.toString(), this.migrationPanel.ui);
-
     this.migrationPanel.migrateButton.setEnabled(true);
   }
 
