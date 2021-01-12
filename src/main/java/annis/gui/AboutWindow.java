@@ -16,10 +16,10 @@
 package annis.gui;
 
 import annis.VersionInfo;
+import annis.gui.components.ExceptionDialog;
 import annis.libgui.IDGenerator;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinService;
 import com.vaadin.shared.Version;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
@@ -34,12 +34,11 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -69,6 +68,8 @@ public class AboutWindow extends Window {
     private VerticalLayout layout;
 
     private Button btClose;
+
+    private TextArea txtThirdParty;
 
     public AboutWindow() {
         setSizeFull();
@@ -109,30 +110,8 @@ public class AboutWindow extends Window {
         layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
         layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
 
-        TextArea txtThirdParty = new TextArea();
+        txtThirdParty = new TextArea();
         txtThirdParty.setSizeFull();
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("The ANNIS team wants to thank these third party software that " + "made the ANNIS GUI possible:\n");
-
-        File thirdPartyFolder = new File(VaadinService.getCurrent().getBaseDirectory(), "THIRD-PARTY");
-        if (thirdPartyFolder.isDirectory()) {
-            File[] thirdPartyFolderFiles = thirdPartyFolder.listFiles((FileFilter) new WildcardFileFilter("*.txt"));
-            if (thirdPartyFolderFiles != null) {
-                for (File c : thirdPartyFolderFiles) {
-                    if (c.isFile()) {
-                        try {
-                            sb.append(FileUtils.readFileToString(c)).append("\n");
-                        } catch (IOException ex) {
-                            log.error("Could not read file", ex);
-                        }
-                    }
-                }
-            }
-        }
-
-        txtThirdParty.setValue(sb.toString());
         txtThirdParty.setReadOnly(true);
         txtThirdParty.addStyleName("shared-text");
         txtThirdParty.setWordWrap(false);
@@ -148,11 +127,18 @@ public class AboutWindow extends Window {
         layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
         layout.setExpandRatio(txtThirdParty, 1.0f);
 
-    }
+      }
 
-    @Override
-    public void attach() {
+      @Override
+      public void attach() {
         super.attach();
         IDGenerator.assignIDForFields(AboutWindow.this, btClose);
+
+        try {
+          File citationFile = new ClassPathResource("CITATION.cff").getFile();
+          txtThirdParty.setValue(FileUtils.readFileToString(citationFile));
+        } catch (IOException ex) {
+          ExceptionDialog.show(ex, getUI());
+        }
     }
 }

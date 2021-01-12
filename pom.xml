@@ -82,6 +82,13 @@
 			<resource>
 				<directory>${project.build.directory}/native/</directory>
 			</resource>
+			<resource>
+				<directory>.</directory>
+				<filtering>false</filtering>
+				<includes>
+					<include>CITATION.cff</include>
+				</includes>
+			</resource>
 		</resources>
 
 		<pluginManagement>
