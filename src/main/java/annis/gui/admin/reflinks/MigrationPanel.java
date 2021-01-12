@@ -187,13 +187,23 @@ public class MigrationPanel extends Panel
       }
 
     } catch (RuntimeException ex) {
-      q.setErrorMsg(ex.getMessage());
+      q.setErrorMsg(getErrorMessage(ex));
       failedQueries.put(QueryStatus.FAILED, q);
 
       reportSingleQueryFailureStatus(QueryStatus.FAILED, q);
     }
 
     return false;
+  }
+
+  private String getErrorMessage(Exception ex) {
+    if (ex == null) {
+      return "";
+    } else if (ex.getMessage() == null) {
+      return ex.getClass().toString();
+    } else {
+      return ex.getMessage();
+    }
   }
 
   private boolean readUrlShortenerLine(String[] line, boolean skipExisting,
@@ -233,15 +243,9 @@ public class MigrationPanel extends Panel
       }
     } catch (RuntimeException | UnsupportedEncodingException | URISyntaxException ex) {
 
-      String errorMsg = ex.getMessage();
-      if (errorMsg == null) {
-        errorMsg = ex.getClass().toString();
-      }
-
-
       URLShortenerDefinition q =
           new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
-      q.setErrorMsg(errorMsg);
+      q.setErrorMsg(getErrorMessage(ex));
       reportSingleQueryFailureStatus(QueryStatus.FAILED, q);
 
       failedQueries.put(QueryStatus.FAILED, q);
