@@ -13,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -47,7 +46,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 public class URLShortenerDefinition {
 
-  private final static Logger log = LoggerFactory.getLogger(URLShortenerDefinition.class);
+  private static final Logger log = LoggerFactory.getLogger(URLShortenerDefinition.class);
+  private static final int MAX_RETRY = 5;
+
 
   private URI uri;
   private DisplayedResultQuery query;
@@ -90,7 +91,7 @@ public class URLShortenerDefinition {
   }
 
   public static URLShortenerDefinition parse(String url, String uuid, String creationTime)
-      throws URISyntaxException, UnsupportedEncodingException {
+      throws URISyntaxException {
 
     URI parsedURI = new URI(url);
 
@@ -179,8 +180,6 @@ public class URLShortenerDefinition {
     unknownCorpora.add(corpus);
   }
 
-  public static int MAX_RETRY = 5;
-
   private QueryStatus testFind(SearchApi searchApi, OkHttpClient client,
       HttpUrl annisSearchServiceBaseUrl) throws IOException, ApiException {
 
@@ -211,10 +210,10 @@ public class URLShortenerDefinition {
           && (m2 = matchesLegacy.readLine()) != null) {
         matchNr++;
 
-        Match parsed_m1 = Match.parseFromString(m1);
-        Match parsed_m2 = Match.parseFromString(m2);
+        Match m1Parsed = Match.parseFromString(m1);
+        Match m2Parsed = Match.parseFromString(m2);
 
-        if (!Objects.equals(parsed_m1, parsed_m2)) {
+        if (!Objects.equals(m1Parsed, m2Parsed)) {
           this.errorMsg = "Match " + matchNr + " (should be)" + System.lineSeparator() + m2
               + System.lineSeparator() + "(but was)" + System.lineSeparator() + m1;
           return QueryStatus.MATCHES_DIFFER;
