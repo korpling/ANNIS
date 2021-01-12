@@ -19,9 +19,9 @@
 	<scm>
 		<connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
 		<developerConnection>scm:git:git@github.com:korpling/ANNIS.git</developerConnection>
+		<url>https://github.com/korpling/ANNIS</url>
 	</scm>
-
-
+	
 	<organization>
 		<name>Corpuslinguistic working group Humboldt University Berlin</name>
 		<url>http://www.linguistik.hu-berlin.de/institut/professuren/korpuslinguistik/</url>
@@ -133,6 +133,15 @@
 						</execution>
 					</executions>
 				</plugin>
+                <plugin>
+                    <groupId>org.corpus-tools</groupId>
+                    <artifactId>cff-maven-plugin</artifactId>
+                    <version>0.4.0</version>
+                    <configuration>
+                        <input>${project.basedir}/misc/cff-templates/CITATION_input.yml</input>
+                        <includeEmail>false</includeEmail>
+                    </configuration>
+                </plugin>
 			</plugins>
 		</pluginManagement>
 

@@ -1,8 +1,6 @@
-# YAML 1.2
-# Metadata for citation of this software according to the CFF format (https://citation-file-format.github.io/)
 cff-version: 1.0.3
 message: If you use this software, please cite it using these metadata.
-title: 'ANNIS'
+title: ANNIS
 doi: 10.5281/zenodo.1212548
 authors:
 - given-names: Thomas
@@ -37,25 +35,1679 @@ authors:
 - given-names: Florian
   family-names: Petran
   affiliation: Ruhr-Universitaet Bochum
-version: annis-3.6.0
-date-released: 2019-02-12
 repository-code: https://github.com/korpling/ANNIS
-license:  Apache-2.0
+license: Apache-2.0
+version: 4.0.1-beta.4-SNAPSHOT
+date-released: 2021-01-12
 references:
-  - type: article
-    title: "ANNIS3: A new architecture for generic corpus query and visualization"
-    year: 2016
-#    doi: 10.1093/llc/fqu057
-    url: http://doi.org/10.1093/llc/fqu057
-    authors:
-      - family-names: Krause
-        given-names: Thomas
-        orcid: https://orcid.org/0000-0003-3731-2422
-        affiliation: Humboldt-Universität zu Berlin
-      - family-names: Zeldes
-        given-names: Amir
-        affiliation: Georgetown University
-    journal: Digital Scholarship in the Humanities
-    volume: 31
-    issue: "1"
-    issn: 2055-7671
+- type: article
+  title: 'ANNIS3: A new architecture for generic corpus query and visualization'
+  year: 2016
+  url: http://doi.org/10.1093/llc/fqu057
+  authors:
+  - family-names: Krause
+    given-names: Thomas
+    orcid: https://orcid.org/0000-0003-3731-2422
+    affiliation: Humboldt-Universität zu Berlin
+  - family-names: Zeldes
+    given-names: Amir
+    affiliation: Georgetown University
+  journal: Digital Scholarship in the Humanities
+  volume: 31
+  issue: '1'
+  issn: 2055-7671
+- type: software
+  title: ANTLR 3 Runtime
+  version: 3.5.2
+  abbreviation: org.antlr:antlr-runtime
+  license: BSD-3-Clause
+  notes: More license information can be found in the THIRD-PARTY/ANTLR_3_Runtime
+    directory.
+  authors:
+  - name: Terence Parr
+  - name: Jim Idle
+  repository-code: https://github.com/antlr/antlr3/tree/master/antlr-runtime
+- type: software
+  title: ANTLR 4 Runtime
+  version: 4.7.2
+  abbreviation: org.antlr:antlr4-runtime
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/ANTLR_4_Runtime
+    directory.
+  authors:
+  - name: Terence Parr
+  - name: Sam Harwell
+  - name: Eric Vergnaud
+  - name: Peter Boyer
+  - name: Jim Idle
+  - name: Mike Lischke
+  - name: Tom Everett
+  repository-code: https://github.com/antlr/antlr4/tree/master/antlr4-runtime
+- type: software
+  title: ANTLR 4 Tool
+  version: 4.7.2
+  abbreviation: org.antlr:antlr4
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/ANTLR_4_Tool directory.
+  authors:
+  - name: Terence Parr
+  - name: Sam Harwell
+  - name: Eric Vergnaud
+  - name: Peter Boyer
+  - name: Jim Idle
+  - name: Mike Lischke
+  - name: Tom Everett
+  repository-code: https://github.com/antlr/antlr4/tree/master/antlr4
+- type: software
+  title: ASM Core
+  version: 5.0.4
+  abbreviation: org.ow2.asm:asm
+  license: BSD-3-Clause
+  notes: More license information can be found in the THIRD-PARTY/ASM_Core directory.
+  authors:
+  - name: Eric Bruneton
+  - name: Eugene Kuleshov
+  - name: Remi Forax
+  repository-code: http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/asm/trunk/asm/
+- type: software
+  title: ASM based accessors helper used by json-smart
+  version: '1.2'
+  abbreviation: net.minidev:accessors-smart
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/ASM_based_accessors_helper_used_by_json_smart
+    directory.
+  authors:
+  - name: Uriel Chemouni
+  repository-code: https://github.com/netplex/json-smart-v2
+- type: software
+  title: AntLR Parser Generator
+  version: 2.7.7
+  abbreviation: antlr:antlr
+  license: BSD-3-Clause
+  notes: More license information can be found in the THIRD-PARTY/AntLR_Parser_Generator
+    directory.
+  authors: []
+- type: software
+  title: Apache Commons Codec
+  version: '1.9'
+  abbreviation: commons-codec:commons-codec
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Codec
+    directory.
+  authors:
+  - name: Henri Yandell
+  - name: Tim OBrien
+  - name: Scott Sanders
+  - name: Rodney Waldhoff
+  - name: Daniel Rall
+  - name: Jon S. Stevens
+  - name: Gary Gregory
+  - name: David Graham
+  - name: Julius Davies
+  - name: Thomas Neidhart
+  repository-code: http://svn.apache.org/viewvc/commons/proper/codec/trunk
+- type: software
+  title: Apache Commons IO
+  version: '2.7'
+  abbreviation: commons-io:commons-io
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_Commons_IO
+    directory.
+  authors:
+  - name: Scott Sanders
+  - name: dIon Gillard
+  - name: Nicola Ken Barozzi
+  - name: Henri Yandell
+  - name: Stephen Colebourne
+  - name: Jeremias Maerki
+  - name: Matthew Hawthorne
+  - name: Martin Cooper
+  - name: Rob Oxspring
+  - name: Jochen Wiedmann
+  - name: Niall Pemberton
+  - name: Jukka Zitting
+  - name: Gary Gregory
+  - name: Kristian Rosenvold
+  repository-code: https://gitbox.apache.org/repos/asf?p=commons-io.git
+- type: software
+  title: Apache Commons Lang
+  version: '3.10'
+  abbreviation: org.apache.commons:commons-lang3
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Lang
+    directory.
+  authors:
+  - name: Daniel Rall
+  - name: Stephen Colebourne
+  - name: Henri Yandell
+  - name: Steven Caswell
+  - name: Robert Burrell Donkin
+  - name: Gary D. Gregory
+  - name: Fredrik Westermarck
+  - name: James Carman
+  - name: Niall Pemberton
+  - name: Matt Benson
+  - name: Joerg Schaible
+  - name: Oliver Heger
+  - name: Paul Benedict
+  - name: Benedikt Ritter
+  - name: Duncan Jones
+  - name: Loic Guibert
+  - name: Rob Tompkins
+  repository-code: https://gitbox.apache.org/repos/asf?p=commons-lang.git
+- type: software
+  title: Apache HttpClient
+  version: 4.5.12
+  abbreviation: org.apache.httpcomponents:httpclient
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_HttpClient
+    directory.
+  authors:
+  - name: Ortwin Glueck
+  - name: Oleg Kalnichevski
+  - name: Asankha C. Perera
+  - name: Sebastian Bazley
+  - name: Erik Abele
+  - name: Ant Elder
+  - name: Paul Fremantle
+  - name: Roland Weber
+  - name: Sam Berlin
+  - name: Sean C. Sullivan
+  - name: Jonathan Moore
+  - name: Gary Gregory
+  - name: William Speirs
+  - name: Karl Wright
+  - name: Francois-Xavier Bonnet
+  repository-code: https://github.com/apache/httpcomponents-client/tree/4.5.12/httpclient
+- type: software
+  title: Apache HttpCore
+  version: 4.4.13
+  abbreviation: org.apache.httpcomponents:httpcore
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_HttpCore
+    directory.
+  authors:
+  - name: Ortwin Glueck
+  - name: Oleg Kalnichevski
+  - name: Asankha C. Perera
+  - name: Sebastian Bazley
+  - name: Erik Abele
+  - name: Ant Elder
+  - name: Paul Fremantle
+  - name: Roland Weber
+  - name: Sam Berlin
+  - name: Sean C. Sullivan
+  - name: Jonathan Moore
+  - name: Gary Gregory
+  - name: William Speirs
+  - name: Karl Wright
+  - name: Francois-Xavier Bonnet
+  repository-code: https://github.com/apache/httpcomponents-core/tree/4.4.13/httpcore
+- type: software
+  title: Apache Log4j API
+  version: 2.13.3
+  abbreviation: org.apache.logging.log4j:log4j-api
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_Log4j_API
+    directory.
+  authors:
+  - name: Ralph Goers
+  - name: Gary Gregory
+  - name: Scott Deboy
+  - name: Remko Popma
+  - name: Nick Williams
+  - name: Matt Sicker
+  - name: Bruce Brouwer
+  - name: Mikael Ståldal
+  - name: Carter Kozak
+  repository-code: https://git-wip-us.apache.org/repos/asf?p=logging-log4j2.git;a=summary/log4j-api
+- type: software
+  title: Apache Log4j to SLF4J Adapter
+  version: 2.13.3
+  abbreviation: org.apache.logging.log4j:log4j-to-slf4j
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_Log4j_to_SLF4J_Adapter
+    directory.
+  authors:
+  - name: Ralph Goers
+  - name: Gary Gregory
+  - name: Scott Deboy
+  - name: Remko Popma
+  - name: Nick Williams
+  - name: Matt Sicker
+  - name: Bruce Brouwer
+  - name: Mikael Ståldal
+  - name: Carter Kozak
+  repository-code: https://git-wip-us.apache.org/repos/asf?p=logging-log4j2.git;a=summary/log4j-to-slf4j
+- type: software
+  title: Apache Tika core
+  version: 1.24.1
+  abbreviation: org.apache.tika:tika-core
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_Tika_core
+    directory.
+  authors:
+  - name: Rida Benjelloun
+  - name: Keith Bennett
+  - name: Mark Harwood
+  - name: Ken Krugler
+  - name: Chris A. Mattmann
+  - name: Michael McCandless
+  - name: Dave Meikle
+  - name: Sami Siren
+  - name: Jukka Zitting
+  - name: Nick Burch
+  - name: Maxim Valyanskiy
+  - name: Oleg Tikhonov
+  - name: Ray Gauss II
+  - name: Tyler Palsulich
+  - name: Tim Allison
+  - name: Konstantin Gribov
+  repository-code: https://github.com/apache/tika/tika-core
+- type: software
+  title: AspectJ weaver
+  version: 1.9.6
+  abbreviation: org.aspectj:aspectjweaver
+  license: EPL-1.0
+  notes: More license information can be found in the THIRD-PARTY/AspectJ_weaver directory.
+  authors:
+  - name: Andy Clement
+  repository-code: https://github.com/eclipse/org.aspectj
+- type: software
+  title: Bean Validation API
+  version: 2.0.1.Final
+  abbreviation: javax.validation:validation-api
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Bean_Validation_API
+    directory.
+  authors:
+  - name: Emmanuel Bernard
+  - name: Emmanuel Bernard
+  - name: Hardy Ferentschik
+  - name: Gunnar Morling
+  - name: Guillaume Smet
+  repository-code: https://github.com/beanvalidation/beanvalidation-api
+- type: software
+  title: Byte Buddy (without dependencies)
+  version: 1.10.14
+  abbreviation: net.bytebuddy:byte-buddy
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Byte_Buddy_without_dependencies_
+    directory.
+  authors:
+  - name: Rafael Winterhalter
+- type: software
+  title: ClassMate
+  version: 1.5.1
+  abbreviation: com.fasterxml:classmate
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/ClassMate directory.
+  authors:
+  - name: Tatu Saloranta
+  - name: Brian Langel
+  repository-code: https://github.com/FasterXML/java-classmate
+- type: software
+  title: Commons Email
+  version: 1.3.2
+  abbreviation: org.apache.commons:commons-email
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Commons_Email directory.
+  authors:
+  - name: dIon Gillard
+  - name: John McNally
+  - name: Quinton McCombs
+  - name: Eric Pugh
+  - name: Daniel Rall
+  - name: Jon Scott Stevens
+  - name: Jason van Zyl
+  - name: Joe Germuska
+  - name: Robert Burrell Donkin
+  - name: Henning P. Schmiedehausen
+  - name: Stephen Colebourne
+  - name: Ben Speakmon
+  - name: Siegfried Goeschl
+  - name: Thomas Neidhart
+  repository-code: http://svn.apache.org/viewvc/commons/proper/email/trunk
+- type: software
+  title: FindBugs-jsr305
+  version: 3.0.2
+  abbreviation: com.google.code.findbugs:jsr305
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/FindBugs_jsr305
+    directory.
+  authors: []
+  repository-code: https://code.google.com/p/jsr-305/
+- type: software
+  title: Flute
+  version: 1.3.0.gg2
+  abbreviation: com.vaadin.external.flute:flute
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/Flute directory.
+  authors:
+  - name: Flute Dev
+  repository-code: http://www.w3.org/
+- type: software
+  title: GAGAWA
+  version: 1.0.1
+  abbreviation: com.hp.gagawa:gagawa
+  license: MIT
+  notes: More license information can be found in the THIRD-PARTY/GAGAWA directory.
+  authors:
+  - name: Mark S. Kolich
+  repository-code: http://gagawa.googlecode.com/svn/trunk/
+- type: software
+  title: GenTyRef
+  version: 1.2.0.vaadin1
+  abbreviation: com.vaadin.external:gentyref
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/GenTyRef directory.
+  authors:
+  - name: Wouter Coekaerts
+  repository-code: https://github.com/vaadin/gentyref
+- type: software
+  title: Gson
+  version: 2.8.6
+  abbreviation: com.google.code.gson:gson
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Gson directory.
+  authors: []
+  repository-code: https://github.com/google/gson/gson/
+- type: software
+  title: Gson on Fire!
+  version: 1.8.4
+  abbreviation: io.gsonfire:gson-fire
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Gson_on_Fire_ directory.
+  authors:
+  - name: Julio Viera
+- type: software
+  title: Guava GWT compatible libs
+  version: '20.0'
+  abbreviation: com.google.guava:guava-gwt
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Guava_GWT_compatible_libs
+    directory.
+  authors:
+  - name: Kevin Bourrillion
+  repository-code: https://github.com/google/guava/guava-gwt
+- type: software
+  title: 'Guava: Google Core Libraries for Java'
+  version: '20.0'
+  abbreviation: com.google.guava:guava
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Guava_Google_Core_Libraries_for_Java
+    directory.
+  authors:
+  - name: Kevin Bourrillion
+  repository-code: https://github.com/google/guava/guava
+- type: software
+  title: H2 Database Engine
+  version: 1.4.200
+  abbreviation: com.h2database:h2
+  license: MPL-2.0 OR EPL-1.0
+  notes: More license information can be found in the THIRD-PARTY/H2_Database_Engine
+    directory.
+  authors:
+  - name: Thomas Mueller
+  repository-code: https://github.com/h2database/h2database
+- type: software
+  title: Hibernate Commons Annotations
+  version: 5.1.0.Final
+  abbreviation: org.hibernate.common:hibernate-commons-annotations
+  license: LGPL-2.1
+  notes: More license information can be found in the THIRD-PARTY/Hibernate_Commons_Annotations
+    directory.
+  authors:
+  - name: The Hibernate Development Team
+  repository-code: http://github.com/hibernate/hibernate-commons-annotations
+- type: software
+  title: Hibernate ORM - hibernate-core
+  version: 5.4.21.Final
+  abbreviation: org.hibernate:hibernate-core
+  license: LGPL-2.1
+  notes: More license information can be found in the THIRD-PARTY/Hibernate_ORM_hibernate_core
+    directory.
+  authors:
+  - name: The Hibernate Development Team
+  repository-code: http://github.com/hibernate/hibernate-orm
+- type: software
+  title: HikariCP
+  version: 3.4.5
+  abbreviation: com.zaxxer:HikariCP
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/HikariCP directory.
+  authors:
+  - name: Brett Wooldridge
+- type: software
+  title: ICU4J
+  version: '61.1'
+  abbreviation: com.ibm.icu:icu4j
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/ICU4J directory.
+  authors:
+  - name: Mark Davis
+  - name: John Emmons
+  - name: Doug Felt
+  - name: Deborah Goldsmith
+  - name: Steven Loomis
+  - name: Markus Scherer
+  - name: Peter Edberg
+  - name: Yoshito Umaoka
+  repository-code: http://source.icu-project.org/repos/icu/trunk/icu4j
+- type: software
+  title: J2ObjC Annotations
+  version: '1.1'
+  abbreviation: com.google.j2objc:j2objc-annotations
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/J2ObjC_Annotations
+    directory.
+  authors: []
+  repository-code: http://svn.sonatype.org/spice/tags/oss-parent-7/j2objc-annotations
+- type: software
+  title: JAXB Runtime
+  version: 2.3.3
+  abbreviation: org.glassfish.jaxb:jaxb-runtime
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/JAXB_Runtime directory.
+  authors:
+  - name: Roman Grigoriadi
+  repository-code: https://github.com/eclipse-ee4j/jaxb-ri.git/jaxb-runtime-parent/jaxb-runtime
+- type: software
+  title: JBoss Logging 3
+  version: 3.4.1.Final
+  abbreviation: org.jboss.logging:jboss-logging
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/JBoss_Logging_3
+    directory.
+  authors:
+  - name: JBoss.org Community
+  repository-code: https://github.com/jboss-logging/jboss-logging
+- type: software
+  title: JCIP Annotations under Apache License
+  version: 1.0-1
+  abbreviation: com.github.stephenc.jcip:jcip-annotations
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/JCIP_Annotations_under_Apache_License
+    directory.
+  authors:
+  - name: Stephen Connolly
+  repository-code: http://github.com/stephenc/jcip-annotations/tree/master/
+- type: software
+  title: JSClipboard Add-on
+  version: 1.0.12
+  abbreviation: com.github.vaadin4qbanos:jsclipboard
+  license-url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  notes: More license information can be found in the THIRD-PARTY/JSClipboard_Add_on
+    directory.
+  authors:
+  - name: Rubén Bresler
+  - name: Geanny Hernández
+  repository-code: https://github.com/vaadin4qbanos/vaadin-jsclipboard-addon.git/jsclipboard
+- type: software
+  title: JSON Small and Fast Parser
+  version: '2.3'
+  abbreviation: net.minidev:json-smart
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/JSON_Small_and_Fast_Parser
+    directory.
+  authors:
+  - name: Uriel Chemouni
+  - name: Eitan Raviv
+  repository-code: https://github.com/netplex/json-smart-v2
+- type: software
+  title: JSON in Java
+  version: '20160810'
+  abbreviation: org.json:json
+  license: JSON
+  notes: More license information can be found in the THIRD-PARTY/JSON_in_Java directory.
+  authors:
+  - name: Douglas Crockford
+  repository-code: https://github.com/douglascrockford/JSON-java.git
+- type: software
+  title: JSR 353 (JSON Processing) Default Provider
+  version: 1.0.4
+  abbreviation: org.glassfish:javax.json
+  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
+  notes: More license information can be found in the THIRD-PARTY/JSR_353_JSON_Processing_Default_Provider
+    directory.
+  authors:
+  - name: Jitendra Kotamraju
+  repository-code: http://java.net/projects/jsonp/sources/git/show/javax.json
+- type: software
+  title: JUL to SLF4J bridge
+  version: 1.7.30
+  abbreviation: org.slf4j:jul-to-slf4j
+  license: MIT
+  notes: More license information can be found in the THIRD-PARTY/JUL_to_SLF4J_bridge
+    directory.
+  authors:
+  - name: Ceki Gulcu
+  repository-code: https://github.com/qos-ch/slf4j/jul-to-slf4j
+- type: software
+  title: 'Jackson datatype: JSR310'
+  version: 2.11.2
+  abbreviation: com.fasterxml.jackson.datatype:jackson-datatype-jsr310
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jackson_datatype_JSR310
+    directory.
+  authors:
+  - name: Nick Williams
+  repository-code: http://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310
+- type: software
+  title: 'Jackson datatype: jdk8'
+  version: 2.11.2
+  abbreviation: com.fasterxml.jackson.datatype:jackson-datatype-jdk8
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jackson_datatype_jdk8
+    directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: http://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jdk8
+- type: software
+  title: 'Jackson module: JAXB Annotations'
+  version: 2.11.2
+  abbreviation: com.fasterxml.jackson.module:jackson-module-jaxb-annotations
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jackson_module_JAXB_Annotations
+    directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: http://github.com/FasterXML/jackson-modules-base/jackson-module-jaxb-annotations
+- type: software
+  title: Jackson-annotations
+  version: 2.11.2
+  abbreviation: com.fasterxml.jackson.core:jackson-annotations
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jackson_annotations
+    directory.
+  authors:
+  - name: Tatu Saloranta
+  - name: Christopher Currie
+  - name: Paul Brown
+  repository-code: http://github.com/FasterXML/jackson-annotations
+- type: software
+  title: Jackson-core
+  version: 2.11.2
+  abbreviation: com.fasterxml.jackson.core:jackson-core
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jackson_core directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: http://github.com/FasterXML/jackson-core
+- type: software
+  title: Jackson-dataformat-XML
+  version: 2.11.2
+  abbreviation: com.fasterxml.jackson.dataformat:jackson-dataformat-xml
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jackson_dataformat_XML
+    directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: http://github.com/FasterXML/jackson-dataformat-xml
+- type: software
+  title: Jackson-module-parameter-names
+  version: 2.11.2
+  abbreviation: com.fasterxml.jackson.module:jackson-module-parameter-names
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jackson_module_parameter_names
+    directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: http://github.com/FasterXML/jackson-modules-java8/jackson-module-parameter-names
+- type: software
+  title: Jakarta Activation
+  version: 1.2.2
+  abbreviation: com.sun.activation:jakarta.activation
+  license: BSD-3-Clause
+  notes: More license information can be found in the THIRD-PARTY/Jakarta_Activation
+    directory.
+  authors:
+  - name: Bill Shannon
+  repository-code: https://github.com/eclipse-ee4j/jaf/jakarta.activation
+- type: software
+  title: Jakarta Activation API jar
+  version: 1.2.2
+  abbreviation: jakarta.activation:jakarta.activation-api
+  license: BSD-3-Clause
+  notes: More license information can be found in the THIRD-PARTY/Jakarta_Activation_API_jar
+    directory.
+  authors:
+  - name: Bill Shannon
+  repository-code: https://github.com/eclipse-ee4j/jaf/jakarta.activation-api
+- type: software
+  title: Jakarta Annotations API
+  version: 1.3.5
+  abbreviation: jakarta.annotation:jakarta.annotation-api
+  license: EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jakarta_Annotations_API
+    directory.
+  authors:
+  - name: Linda De Michiel
+  repository-code: https://github.com/eclipse-ee4j/common-annotations-api
+- type: software
+  title: Jakarta Expression Language 3.0
+  version: 3.0.3
+  abbreviation: org.glassfish:jakarta.el
+  license: EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jakarta_Expression_Language_3.0
+    directory.
+  authors:
+  - name: Yamini K B
+  repository-code: https://github.com/eclipse-ee4j/el-ri
+- type: software
+  title: Jakarta Mail API
+  version: 1.6.5
+  abbreviation: com.sun.mail:jakarta.mail
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/Jakarta_Mail_API
+    directory.
+  authors:
+  - name: Bill Shannon
+  repository-code: https://github.com/eclipse-ee4j/mail/jakarta.mail
+- type: software
+  title: Jakarta Persistence API
+  version: 2.2.3
+  abbreviation: jakarta.persistence:jakarta.persistence-api
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/Jakarta_Persistence_API
+    directory.
+  authors:
+  - name: Lukas Jungmann
+  repository-code: https://github.com/eclipse-ee4j/jpa-api.git
+- type: software
+  title: Jakarta XML Binding API
+  version: 2.3.3
+  abbreviation: jakarta.xml.bind:jakarta.xml.bind-api
+  license: BSD-3-Clause
+  notes: More license information can be found in the THIRD-PARTY/Jakarta_XML_Binding_API
+    directory.
+  authors:
+  - name: Roman Grigoriadi
+  repository-code: https://github.com/eclipse-ee4j/jaxb-api.git/jakarta.xml.bind-api
+- type: software
+  title: Java Annotation Indexer
+  version: 2.1.3.Final
+  abbreviation: org.jboss:jandex
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Java_Annotation_Indexer
+    directory.
+  authors:
+  - name: JBoss.org Community
+  repository-code: http://github.com/jboss/jboss-parent-pom/jandex
+- type: software
+  title: Java Servlet API
+  version: 4.0.1
+  abbreviation: javax.servlet:javax.servlet-api
+  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
+  notes: More license information can be found in the THIRD-PARTY/Java_Servlet_API
+    directory.
+  authors:
+  - name: Ed Burns
+  - name: Shing Wai Chan
+  repository-code: https://github.com/javaee/servlet-spec
+- type: software
+  title: Java Text Categorizing Library
+  version: 1.0.1
+  abbreviation: org.knallgrau.utils:textcat
+  license: LGPL-3.0
+  notes: More license information can be found in the THIRD-PARTY/Java_Text_Categorizing_Library
+    directory.
+  authors:
+  - name: Thomas Hammerl
+  repository-code: http://textcat.cvs.sourceforge.net/textcat/
+- type: software
+  title: JavaBeans(TM) Activation Framework
+  version: 1.1.1
+  abbreviation: javax.activation:activation
+  license: CDDL-1.0
+  notes: More license information can be found in the THIRD-PARTY/JavaBeans_TM_Activation_Framework
+    directory.
+  authors: []
+- type: software
+  title: JavaMail API (compat)
+  version: 1.4.5
+  abbreviation: javax.mail:mail
+  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
+  notes: More license information can be found in the THIRD-PARTY/JavaMail_API_compat_
+    directory.
+  authors:
+  - name: Bill Shannon
+  repository-code: http://kenai.com/hg/javamail~mercurial/mail
+- type: software
+  title: Javassist
+  version: 3.24.0-GA
+  abbreviation: org.javassist:javassist
+  license: LGPL-2.1
+  notes: More license information can be found in the THIRD-PARTY/Javassist directory.
+  authors:
+  - name: Shigeru Chiba
+  - name: Andrew Dinn
+  - name: Kabir Khan
+  - name: Scott Marlow
+- type: software
+  title: Joda-Time
+  version: 2.10.6
+  abbreviation: joda-time:joda-time
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Joda_Time directory.
+  authors:
+  - name: Stephen Colebourne
+  - name: Brian S O'Neill
+  repository-code: https://github.com/JodaOrg/joda-time
+- type: software
+  title: Logback Classic Module
+  version: 1.2.3
+  abbreviation: ch.qos.logback:logback-classic
+  license: EPL-1.0 OR LGPL-2.1-only
+  notes: More license information can be found in the THIRD-PARTY/Logback_Classic_Module
+    directory.
+  authors:
+  - name: Ceki Gulcu
+  - name: Joern Huxhorn
+  repository-code: https://github.com/ceki/logback/logback-classic
+- type: software
+  title: Logback Core Module
+  version: 1.2.3
+  abbreviation: ch.qos.logback:logback-core
+  license: EPL-1.0 OR LGPL-2.1-only
+  notes: More license information can be found in the THIRD-PARTY/Logback_Core_Module
+    directory.
+  authors:
+  - name: Ceki Gulcu
+  - name: Joern Huxhorn
+  repository-code: https://github.com/ceki/logback/logback-core
+- type: software
+  title: Neo Visionaries Internationalization Package
+  version: '1.1'
+  abbreviation: com.neovisionaries:nv-i18n
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Neo_Visionaries_Internationalization_Package
+    directory.
+  authors:
+  - name: Takahiko Kawasaki
+- type: software
+  title: Nimbus Content Type
+  version: '2.0'
+  abbreviation: com.nimbusds:content-type
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Nimbus_Content_Type
+    directory.
+  authors:
+  - name: Vladimir Dzhuvinov
+  repository-code: https://bitbucket.org/connect2id/nimbus-content-type
+- type: software
+  title: Nimbus JOSE+JWT
+  version: '8.19'
+  abbreviation: com.nimbusds:nimbus-jose-jwt
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Nimbus_JOSE_JWT
+    directory.
+  authors:
+  - name: Vladimir Dzhuvinov
+  repository-code: https://bitbucket.org/connect2id/nimbus-jose-jwt
+- type: software
+  title: Nimbus LangTag
+  version: 1.4.4
+  abbreviation: com.nimbusds:lang-tag
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Nimbus_LangTag directory.
+  authors:
+  - name: Vladimir Dzhuvinov
+  repository-code: https://bitbucket.org/connect2id/nimbus-language-tags.git
+- type: software
+  title: OAuth 2.0 SDK with OpenID Connect extensions
+  version: 7.1.1
+  abbreviation: com.nimbusds:oauth2-oidc-sdk
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/OAuth_2.0_SDK_with_OpenID_Connect_extensions
+    directory.
+  authors:
+  - name: Vladimir Dzhuvinov
+  repository-code: https://bitbucket.org/connect2id/oauth-2.0-sdk-with-openid-connect-extensions
+- type: software
+  title: 'OWNER :: Core'
+  version: 1.0.10
+  abbreviation: org.aeonbits.owner:owner
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/OWNER_Core directory.
+  authors:
+  - name: Luigi R. Viggiano
+  repository-code: https://github.com/lviggiano/owner/tree/master/owner
+- type: software
+  title: OkHttp
+  version: 3.14.9
+  abbreviation: com.squareup.okhttp3:okhttp
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/OkHttp directory.
+  authors: []
+  repository-code: https://github.com/square/okhttp/okhttp/
+- type: software
+  title: OkHttp Logging Interceptor
+  version: 3.14.9
+  abbreviation: com.squareup.okhttp3:logging-interceptor
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/OkHttp_Logging_Interceptor
+    directory.
+  authors: []
+  repository-code: https://github.com/square/okhttp/logging-interceptor/
+- type: software
+  title: Okio
+  version: 1.17.2
+  abbreviation: com.squareup.okio:okio
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Okio directory.
+  authors: []
+  repository-code: https://github.com/square/okio/okio/
+- type: software
+  title: SLF4J API Module
+  version: 1.7.30
+  abbreviation: org.slf4j:slf4j-api
+  license: MIT
+  notes: More license information can be found in the THIRD-PARTY/SLF4J_API_Module
+    directory.
+  authors:
+  - name: Ceki Gulcu
+  repository-code: https://github.com/qos-ch/slf4j/slf4j-api
+- type: software
+  title: Simple API for CSS
+  version: '1.3'
+  abbreviation: org.w3c.css:sac
+  license: W3C
+  notes: More license information can be found in the THIRD-PARTY/Simple_API_for_CSS
+    directory.
+  authors: []
+- type: software
+  title: SnakeYAML
+  version: '1.26'
+  abbreviation: org.yaml:snakeyaml
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/SnakeYAML directory.
+  authors:
+  - name: Andrey Somov
+  - name: Alexander Maslov
+  - name: Jordan Angold
+  repository-code: https://bitbucket.org/asomov/snakeyaml/src
+- type: software
+  title: Spring AOP
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-aop
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_AOP directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Aspects
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-aspects
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Aspects directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Beans
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-beans
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Beans directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Commons Logging Bridge
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-jcl
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Commons_Logging_Bridge
+    directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Context
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-context
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Context directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Core
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-core
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Core directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Data Core
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.data:spring-data-commons
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Data_Core
+    directory.
+  authors:
+  - name: Oliver Drotbohm
+  - name: Mark Paluch
+  repository-code: https://github.com/spring-projects/spring-data-build/spring-data-parent/spring-data-commons
+- type: software
+  title: Spring Data JPA
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.data:spring-data-jpa
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Data_JPA
+    directory.
+  authors:
+  - name: Oliver Drotbohm
+  - name: Mark Paluch
+  repository-code: https://github.com/spring-projects/spring-data-build/spring-data-parent/spring-data-jpa
+- type: software
+  title: Spring Expression Language (SpEL)
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-expression
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Expression_Language_SpEL_
+    directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring JDBC
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-jdbc
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_JDBC directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Object/Relational Mapping
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-orm
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Object_Relational_Mapping
+    directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Transaction
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-tx
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Transaction
+    directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Web
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-web
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Web directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring Web MVC
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-webmvc
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_Web_MVC directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Spring WebSocket
+  version: 5.2.9.RELEASE
+  abbreviation: org.springframework:spring-websocket
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Spring_WebSocket
+    directory.
+  authors:
+  - name: Juergen Hoeller
+  repository-code: https://github.com/spring-projects/spring-framework
+- type: software
+  title: Stax2 API
+  version: 4.2.1
+  abbreviation: org.codehaus.woodstox:stax2-api
+  license: BSD-2-Clause
+  notes: More license information can be found in the THIRD-PARTY/Stax2_API directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: http://github.com/FasterXML/stax2-api
+- type: software
+  title: StringTemplate 4
+  version: '4.1'
+  abbreviation: org.antlr:ST4
+  authors: []
+  repository-code: https://github.com/antlr/stringtemplate4/tree/master
+- type: software
+  title: TXW2 Runtime
+  version: 2.3.3
+  abbreviation: org.glassfish.jaxb:txw2
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/TXW2_Runtime directory.
+  authors:
+  - name: Roman Grigoriadi
+  repository-code: https://github.com/eclipse-ee4j/jaxb-ri.git/jaxb-txw-parent/txw2
+- type: software
+  title: Vaadin Sass Compiler
+  version: 0.9.13
+  abbreviation: com.vaadin:vaadin-sass-compiler
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Vaadin_Sass_Compiler
+    directory.
+  authors:
+  - name: Artur Signell
+  repository-code: http://github.com/vaadin/sass-compiler
+- type: software
+  title: Woodstox
+  version: 5.0.3
+  abbreviation: com.fasterxml.woodstox:woodstox-core
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Woodstox directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: https://github.com/FasterXML/woodstox
+- type: software
+  title: abego TreeLayout Core
+  version: 1.0.3
+  abbreviation: org.abego.treelayout:org.abego.treelayout.core
+  license: BSD-3-Clause
+  notes: More license information can be found in the THIRD-PARTY/abego_TreeLayout_Core
+    directory.
+  authors:
+  - name: Udo Borkowski
+  repository-code: https://github.com/abego/treelayout
+- type: software
+  title: atmosphere-runtime
+  version: 2.4.30.vaadin1
+  abbreviation: com.vaadin.external.atmosphere:atmosphere-runtime
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/atmosphere_runtime
+    directory.
+  authors:
+  - name: Jeanfrancois Arcand
+  - name: Paul Sandoz
+  - name: Hubert Iwaniuk
+  - name: Sebastian Lövdahl
+  repository-code: http://github.com/Atmosphere/atmosphere/atmosphere-runtime
+- type: software
+  title: dom4j
+  version: 2.1.3
+  abbreviation: org.dom4j:dom4j
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/dom4j directory.
+  authors:
+  - name: Filip Jirsák
+- type: software
+  title: error-prone annotations
+  version: 2.0.12
+  abbreviation: com.google.errorprone:error_prone_annotations
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/error_prone_annotations
+    directory.
+  authors: []
+  repository-code: https://github.com/google/error-prone/error_prone_annotations
+- type: software
+  title: gwt-elemental
+  version: 2.8.2
+  abbreviation: com.google.gwt:gwt-elemental
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/gwt_elemental directory.
+  authors: []
+  repository-code: http://svn.sonatype.org/spice/tags/oss-parent-4/gwt/gwt-elemental
+- type: software
+  title: gwt-user
+  version: 2.8.2
+  abbreviation: com.google.gwt:gwt-user
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/gwt_user directory.
+  authors: []
+  repository-code: http://svn.sonatype.org/spice/tags/oss-parent-4/gwt/gwt-user
+- type: software
+  title: istack common utility code runtime
+  version: 3.0.11
+  abbreviation: com.sun.istack:istack-commons-runtime
+  license: BSD-3-Clause
+  notes: More license information can be found in the THIRD-PARTY/istack_common_utility_code_runtime
+    directory.
+  authors:
+  - name: Lukas Jungmann
+  repository-code: https://github.com/eclipse-ee4j/jaxb-istack-commons/istack-commons-runtime
+- type: software
+  title: jackson-databind
+  version: 2.11.2
+  abbreviation: com.fasterxml.jackson.core:jackson-databind
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/jackson_databind
+    directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: http://github.com/FasterXML/jackson-databind
+- type: software
+  title: java jwt
+  version: 3.10.3
+  abbreviation: com.auth0:java-jwt
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/java_jwt directory.
+  authors:
+  - name: Auth0
+  - name: Hernan Zalazar
+  - name: Luciano Balmaceda
+  repository-code: https://github.com/auth0/java-jwt
+- type: software
+  title: javax.transaction API
+  version: 1.3.3
+  abbreviation: jakarta.transaction:jakarta.transaction-api
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/javax.transaction_API
+    directory.
+  authors:
+  - name: Stephen Felts
+  repository-code: https://github.com/eclipse-ee4j/jta-api
+- type: software
+  title: jsinterop-annotations
+  version: 1.0.2
+  abbreviation: com.google.jsinterop:jsinterop-annotations
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/jsinterop_annotations
+    directory.
+  authors: []
+  repository-code: http://svn.sonatype.org/spice/tags/oss-parent-4/jsinterop/jsinterop-annotations
+- type: software
+  title: jsoup Java HTML Parser
+  version: 1.11.2
+  abbreviation: org.jsoup:jsoup
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/jsoup_Java_HTML_Parser
+    directory.
+  authors:
+  - name: Jonathan Hedley
+  repository-code: https://github.com/jhy/jsoup
+- type: software
+  title: jsr311-api
+  version: 1.1.1
+  abbreviation: javax.ws.rs:jsr311-api
+  license: CDDL-1.0
+  notes: More license information can be found in the THIRD-PARTY/jsr311_api directory.
+  authors: []
+- type: software
+  title: jung-api
+  version: 2.0.1
+  abbreviation: net.sf.jung:jung-api
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/jung_api directory.
+  authors:
+  - name: Joshua
+  - name: Danyel
+  - name: Tom
+  repository-code: http://jung.cvs.sourceforge.net/jung/jung2/jung-api
+- type: software
+  title: jung-graph-impl
+  version: 2.0.1
+  abbreviation: net.sf.jung:jung-graph-impl
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/jung_graph_impl
+    directory.
+  authors:
+  - name: Joshua
+  - name: Danyel
+  - name: Tom
+  repository-code: http://jung.cvs.sourceforge.net/jung/jung2/jung-graph-impl
+- type: software
+  title: larvalabs collections
+  version: '4.01'
+  abbreviation: net.sourceforge.collections:collections-generic
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/larvalabs_collections
+    directory.
+  authors: []
+  repository-code: http://collections.svn.sourceforge.net/viewvc/collections/
+- type: software
+  title: opencsv
+  version: '2.3'
+  abbreviation: net.sf.opencsv:opencsv
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/opencsv directory.
+  authors:
+  - name: Glen Smith
+  - name: Sean Sullivan
+  - name: Scott Conway
+  repository-code: http://opencsv.svn.sourceforge.net/viewvc/opencsv/
+- type: software
+  title: org.eclipse.emf
+  version: 2.9.1-v20130827-0309
+  abbreviation: org.eclipse.emf:org.eclipse.emf.common
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/org.eclipse.emf
+    directory.
+  authors:
+  - name: Eclipse.org
+  repository-code: http://git.eclipse.org/c/emf/org.eclipse.emf.git/
+- type: software
+  title: org.eclipse.emf.ecore
+  version: 2.9.1-v20130827-0309
+  abbreviation: org.eclipse.emf:org.eclipse.emf.ecore
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/org.eclipse.emf.ecore
+    directory.
+  authors:
+  - name: Eclipse.org
+  repository-code: http://git.eclipse.org/c/emf/org.eclipse.emf.git/
+- type: software
+  title: org.eclipse.emf.ecore.xmi
+  version: 2.9.1-v20130827-0309
+  abbreviation: org.eclipse.emf:org.eclipse.emf.ecore.xmi
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/org.eclipse.emf.ecore.xmi
+    directory.
+  authors:
+  - name: Eclipse.org
+  repository-code: http://git.eclipse.org/c/emf/org.eclipse.emf.git/
+- type: software
+  title: popupbutton
+  version: 3.0.0
+  abbreviation: org.vaadin.addons:popupbutton
+  authors: []
+- type: software
+  title: salt-api
+  version: 3.4.2
+  abbreviation: org.corpus-tools:salt-api
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/salt_api directory.
+  authors:
+  - name: Florian Zipser
+  - name: Thomas Krause
+  repository-code: https://github.com/korpling/salt/salt-api
+- type: software
+  title: spring-boot
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-autoconfigure
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-autoconfigure
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_autoconfigure
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter-aop
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter-aop
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter_aop
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter-data-jpa
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter-data-jpa
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter_data_jpa
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter-jdbc
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter-jdbc
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter_jdbc
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter-json
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter-json
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter_json
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter-logging
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter-logging
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter_logging
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter-oauth2-client
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter-oauth2-client
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter_oauth2_client
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter-tomcat
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter-tomcat
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter_tomcat
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-boot-starter-web
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-starter-web
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_starter_web
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
+  title: spring-security-config
+  version: 5.3.4.RELEASE
+  abbreviation: org.springframework.security:spring-security-config
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_security_config
+    directory.
+  authors:
+  - name: Rob Winch
+  - name: Joe Grandja
+  repository-code: https://github.com/spring-projects/spring-security
+- type: software
+  title: spring-security-core
+  version: 5.3.4.RELEASE
+  abbreviation: org.springframework.security:spring-security-core
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_security_core
+    directory.
+  authors:
+  - name: Rob Winch
+  - name: Joe Grandja
+  repository-code: https://github.com/spring-projects/spring-security
+- type: software
+  title: spring-security-crypto
+  version: 5.3.4.RELEASE
+  abbreviation: org.springframework.security:spring-security-crypto
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_security_crypto
+    directory.
+  authors:
+  - name: Rob Winch
+  - name: Joe Grandja
+  repository-code: https://github.com/spring-projects/spring-security
+- type: software
+  title: spring-security-oauth2-client
+  version: 5.3.4.RELEASE
+  abbreviation: org.springframework.security:spring-security-oauth2-client
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_security_oauth2_client
+    directory.
+  authors:
+  - name: Rob Winch
+  - name: Joe Grandja
+  repository-code: https://github.com/spring-projects/spring-security
+- type: software
+  title: spring-security-oauth2-core
+  version: 5.3.4.RELEASE
+  abbreviation: org.springframework.security:spring-security-oauth2-core
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_security_oauth2_core
+    directory.
+  authors:
+  - name: Rob Winch
+  - name: Joe Grandja
+  repository-code: https://github.com/spring-projects/spring-security
+- type: software
+  title: spring-security-oauth2-jose
+  version: 5.3.4.RELEASE
+  abbreviation: org.springframework.security:spring-security-oauth2-jose
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_security_oauth2_jose
+    directory.
+  authors:
+  - name: Rob Winch
+  - name: Joe Grandja
+  repository-code: https://github.com/spring-projects/spring-security
+- type: software
+  title: spring-security-web
+  version: 5.3.4.RELEASE
+  abbreviation: org.springframework.security:spring-security-web
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_security_web
+    directory.
+  authors:
+  - name: Rob Winch
+  - name: Joe Grandja
+  repository-code: https://github.com/spring-projects/spring-security
+- type: software
+  title: swagger-annotations
+  version: 1.5.24
+  abbreviation: io.swagger:swagger-annotations
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/swagger_annotations
+    directory.
+  authors:
+  - name: Tony Tam
+  repository-code: https://github.com/swagger-api/swagger-core/modules/swagger-annotations
+- type: software
+  title: tomcat-embed-core
+  version: 9.0.38
+  abbreviation: org.apache.tomcat.embed:tomcat-embed-core
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/tomcat_embed_core
+    directory.
+  authors: []
+- type: software
+  title: tomcat-embed-websocket
+  version: 9.0.38
+  abbreviation: org.apache.tomcat.embed:tomcat-embed-websocket
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/tomcat_embed_websocket
+    directory.
+  authors: []
+- type: software
+  title: toml4j
+  version: 0.7.2
+  abbreviation: com.moandjiezana.toml:toml4j
+  license: MIT
+  notes: More license information can be found in the THIRD-PARTY/toml4j directory.
+  authors:
+  - name: Moandji Ezana
+  repository-code: https://github.com/mwanji/toml4j
+- type: software
+  title: vaadin-client
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-client
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_client directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-client
+- type: software
+  title: vaadin-client-compiled
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-client-compiled
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_client_compiled
+    directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-client-compiled
+- type: software
+  title: vaadin-compatibility-client
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-compatibility-client
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_client
+    directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-compatibility-client
+- type: software
+  title: vaadin-compatibility-client-compiled
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-compatibility-client-compiled
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_client_compiled
+    directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-compatibility-client-compiled
+- type: software
+  title: vaadin-compatibility-server
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-compatibility-server
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_server
+    directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-compatibility-server
+- type: software
+  title: vaadin-compatibility-shared
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-compatibility-shared
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_shared
+    directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-compatibility-shared
+- type: software
+  title: vaadin-compatibility-themes
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-compatibility-themes
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_themes
+    directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-compatibility-themes
+- type: software
+  title: vaadin-push
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-push
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_push directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-push
+- type: software
+  title: vaadin-server
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-server
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_server directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-server
+- type: software
+  title: vaadin-shared
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-shared
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_shared directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-shared
+- type: software
+  title: vaadin-slf4j-jdk14
+  version: 1.6.1
+  abbreviation: com.vaadin.external.slf4j:vaadin-slf4j-jdk14
+  license: MIT
+  notes: More license information can be found in the THIRD-PARTY/vaadin_slf4j_jdk14
+    directory.
+  authors:
+  - name: SLF4J developer
+  repository-code: https://github.com/qos-ch/slf4j
+- type: software
+  title: vaadin-spring
+  version: 3.2.1
+  abbreviation: com.vaadin:vaadin-spring
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_spring directory.
+  authors:
+  - name: AMahdy AbdElAziz
+  - name: Chris Phillipson
+  - name: Henri Sara
+  - name: Josh Long
+  - name: Matti Tahvonen
+  - name: Nicolas Frankel
+  - name: Peter Lehto
+  - name: Petter Holmström
+  repository-code: https://github.com/vaadin/spring/vaadin-spring
+- type: software
+  title: vaadin-spring-boot
+  version: 3.2.1
+  abbreviation: com.vaadin:vaadin-spring-boot
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_spring_boot
+    directory.
+  authors:
+  - name: AMahdy AbdElAziz
+  - name: Chris Phillipson
+  - name: Henri Sara
+  - name: Josh Long
+  - name: Matti Tahvonen
+  - name: Nicolas Frankel
+  - name: Peter Lehto
+  - name: Petter Holmström
+  repository-code: https://github.com/vaadin/spring/vaadin-spring-boot
+- type: software
+  title: vaadin-spring-boot-starter
+  version: 3.2.1
+  abbreviation: com.vaadin:vaadin-spring-boot-starter
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_spring_boot_starter
+    directory.
+  authors:
+  - name: AMahdy AbdElAziz
+  - name: Chris Phillipson
+  - name: Henri Sara
+  - name: Josh Long
+  - name: Matti Tahvonen
+  - name: Nicolas Frankel
+  - name: Peter Lehto
+  - name: Petter Holmström
+  repository-code: https://github.com/vaadin/spring/vaadin-spring-boot-starter
+- type: software
+  title: vaadin-themes
+  version: 8.12.0
+  abbreviation: com.vaadin:vaadin-themes
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  notes: More license information can be found in the THIRD-PARTY/vaadin_themes directory.
+  authors:
+  - name: Henri Sara
+  repository-code: https://github.com/vaadin/framework/vaadin-themes
