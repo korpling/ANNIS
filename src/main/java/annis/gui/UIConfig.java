@@ -80,14 +80,6 @@ public class UIConfig {
     this.webserviceConfig = webserviceConfig;
   }
 
-  public String getBugEMail() {
-    return bugEMail;
-  }
-
-  public void setBugEMail(String bugEMail) {
-    this.bugEMail = bugEMail;
-  }
-
   public String getMailHost() {
     return mailHost;
   }
