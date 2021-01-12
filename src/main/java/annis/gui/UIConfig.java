@@ -6,6 +6,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class UIConfig {
 
   private String bugEMail;
+  private String mailHost;
+  private String mailUser;
+  private String mailPassword;
+  private int mailPort;
+  private boolean mailTLS;
+  private String mailFrom;
 
   private boolean disableRTL;
 
@@ -72,5 +78,61 @@ public class UIConfig {
 
   public void setWebserviceConfig(String webserviceConfig) {
     this.webserviceConfig = webserviceConfig;
+  }
+
+  public String getBugEMail() {
+    return bugEMail;
+  }
+
+  public void setBugEMail(String bugEMail) {
+    this.bugEMail = bugEMail;
+  }
+
+  public String getMailHost() {
+    return mailHost;
+  }
+
+  public void setMailHost(String mailHost) {
+    this.mailHost = mailHost;
+  }
+
+  public String getMailUser() {
+    return mailUser;
+  }
+
+  public void setMailUser(String mailUser) {
+    this.mailUser = mailUser;
+  }
+
+  public String getMailPassword() {
+    return mailPassword;
+  }
+
+  public void setMailPassword(String mailPassword) {
+    this.mailPassword = mailPassword;
+  }
+
+  public int getMailPort() {
+    return mailPort;
+  }
+
+  public void setMailPort(int mailPort) {
+    this.mailPort = mailPort;
+  }
+
+  public boolean isMailTLS() {
+    return mailTLS;
+  }
+
+  public void setMailTLS(boolean mailTLS) {
+    this.mailTLS = mailTLS;
+  }
+
+  public String getMailFrom() {
+    return mailFrom;
+  }
+
+  public void setMailFrom(String mailFrom) {
+    this.mailFrom = mailFrom;
   }  
 }
