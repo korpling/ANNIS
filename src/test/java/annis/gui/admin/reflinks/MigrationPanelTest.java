@@ -13,6 +13,7 @@ import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.nimbusds.jose.util.StandardCharset;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
@@ -56,7 +57,6 @@ class MigrationPanelTest {
     this.legacyServer.start();
 
     MockVaadin.setup(() -> ui);
-
 
     _click(_get(Button.class, spec -> spec.withCaption("Administration")));
     TabSheet tab = _get(TabSheet.class);
@@ -105,11 +105,10 @@ class MigrationPanelTest {
 
     // Mock the required responses
     legacyServer.enqueue(new MockResponse().setBody("true"));
-    legacyServer.enqueue(new MockResponse()
-        .setBody("<matchAndDocumentCount><documentCount>1</documentCount>"
-            + "  <matchCount>1</matchCount></matchAndDocumentCount>"));
     legacyServer.enqueue(
-        new MockResponse().setBody("salt:/pcc2/11299#tok_5"));
+        new MockResponse().setBody("<matchAndDocumentCount><documentCount>1</documentCount>"
+            + "  <matchCount>1</matchCount></matchAndDocumentCount>"));
+    legacyServer.enqueue(new MockResponse().setBody("salt:/pcc2/11299#tok_5"));
 
     // Start the migration process
     _click(start);
@@ -121,10 +120,28 @@ class MigrationPanelTest {
     assertEquals(
         "UUID 1763431c-79b2-4576-b532-67e241ce8396, testing query \"Zossen\" on corpus [pcc2]\n"
             + "Finished to import 1 queries.\n\n" + "++++++++++++++++++++++++\n"
-            + "+ Successful: 1 from 1 +\n"
-            + "++++++++++++++++++++++++\n",
+            + "+ Successful: 1 from 1 +\n" + "++++++++++++++++++++++++\n",
         messages.getValue());
 
+    // Importing the UUID again should return an error
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+    _click(start);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals("Finished to import 0 queries.\n\n" + "UUID already exists (sum: 1)\n"
+        + "============================\n" + "\n" + "Corpus: \"[pcc2]\"\n"
+        + "UUID: \"1763431c-79b2-4576-b532-67e241ce8396\"\n" + "Query:\n" + "\"Zossen\"\n"
+        + "-------\n\n" + "++++++++++++++++++++++++\n"
+        + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
+
+    // Try again but explicitly skip existing UUIDs
+    _get(panel, CheckBox.class).setValue(true);
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+    _click(start);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals("Finished to import 0 queries.\n\n" + "++++++++++++++++++++++++\n"
+        + "+ Successful: 0 from 0 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
   }
 
   @Test
@@ -188,8 +205,7 @@ class MigrationPanelTest {
             + "Finished to import 0 queries.\n\n" + "Count different (sum: 1)\n"
             + "========================\n" + "\n" + "Corpus: \"[pcc2]\"\n"
             + "UUID: \"98b5e738-2b24-4bbc-90b4-f6d5fe57416c\"\n" + "Query:\n" + "\"Zossen\"\n"
-            + "Error: should have been 0 but was 1\n" + "-------\n\n"
-            + "++++++++++++++++++++++++\n"
+            + "Error: should have been 0 but was 1\n" + "-------\n\n" + "++++++++++++++++++++++++\n"
             + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n",
         messages.getValue());
 

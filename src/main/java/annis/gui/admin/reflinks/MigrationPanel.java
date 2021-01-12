@@ -145,22 +145,6 @@ public class MigrationPanel extends Panel
     });
   }
 
-  private void reportSingleQueryFailureStatus(QueryStatus status, URLShortenerDefinition q) {
-    String lineSeparator = "\n";
-
-    StringBuilder sb = new StringBuilder();
-    sb.append(QUERY_ERROR_PREFIX + status + lineSeparator);
-    sb.append(CORPUS_PREFIX + q.getQuery().getCorpora() + "\"" + lineSeparator);
-    sb.append(UUID_PREFIX + q.getUuid() + "\"" + lineSeparator);
-    sb.append(QUERY_PREFIX + lineSeparator);
-    if (q.getQuery().getQuery() != null) {
-      sb.append(q.getQuery().getQuery().trim() + lineSeparator);
-    }
-    sb.append(ERROR_MESSAGE_PREFIX + q.getErrorMsg());
-
-    appendMessage(sb.toString(), ui);
-  }
-
   private boolean checkSingleQuery(URLShortenerDefinition q, SearchApi searchApi,
       UrlShortener urlShortener, OkHttpClient client, HttpUrl searchServiceBaseUrl,
       Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
@@ -244,10 +228,7 @@ public class MigrationPanel extends Panel
       URLShortenerDefinition q =
           new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
       q.setErrorMsg(getErrorMessage(ex));
-      reportSingleQueryFailureStatus(QueryStatus.FAILED, q);
-
       failedQueries.put(QueryStatus.FAILED, q);
-
     }
 
     return false;
