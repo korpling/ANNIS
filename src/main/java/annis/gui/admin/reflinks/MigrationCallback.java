@@ -34,7 +34,6 @@ final class MigrationCallback implements FutureCallback<Integer> {
 
     StringBuilder detailedStatus = new StringBuilder();
 
-
     if (!unknownCorpusQueries.isEmpty()) {
       final Map<String, Integer> unknownCorpusCount = new TreeMap<>();
       for (final URLShortenerDefinition q : unknownCorpusQueries) {

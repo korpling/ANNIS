@@ -93,7 +93,10 @@ public class MigrationPanel extends Panel
     emailText.setWidth(TEXTFIELD_WIDTH, Unit.EM);
 
     FormLayout formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername,
-        servicePassword, skipExisting, emailText);
+        servicePassword, skipExisting);
+    if (ui.getConfig().getMailHost() != null) {
+      formLayout.addComponent(emailText);
+    }
 
     txtMessages.setSizeFull();
     txtMessages.setValue("");
