@@ -60,11 +60,11 @@ public class MigrationPanel extends Panel
 
   private final TextArea txtMessages = new TextArea();
   private final Upload exportedFileUpload = new Upload();
+  final TextField emailText = new TextField();
   final Button migrateButton = new Button("Start migration");
 
   private File urlShortenerFile;
   AnnisUI ui;
-
 
   @Override
   public void attach() {
@@ -88,9 +88,12 @@ public class MigrationPanel extends Panel
     servicePassword.setWidth(30, Unit.EM);
     CheckBox skipExisting = new CheckBox("Skip existing UUIDs");
 
+    emailText.setCaption("E-Mail for status reports (optional)");
+    emailText.setPlaceholder("you@example.com");
+    emailText.setWidth(TEXTFIELD_WIDTH, Unit.EM);
 
     FormLayout formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername,
-        servicePassword, skipExisting);
+        servicePassword, skipExisting, emailText);
 
     txtMessages.setSizeFull();
     txtMessages.setValue("");
@@ -313,6 +316,9 @@ public class MigrationPanel extends Panel
     appendMessage("Could not upload file: " + event.toString(), getUI());
   }
 
+  public String getMessages() {
+    return txtMessages.getValue();
+  }
 
   @Override
   public int hashCode() {

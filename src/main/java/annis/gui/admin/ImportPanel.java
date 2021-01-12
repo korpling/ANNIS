@@ -54,24 +54,6 @@ import org.springframework.http.HttpStatus;
 public class ImportPanel extends Panel implements Upload.ProgressListener, Upload.FinishedListener,
     Upload.StartedListener, Upload.Receiver, LoginListener {
 
-  public static class ImportRequest {
-    String email;
-
-    /**
-     * @return the email
-     */
-    public String getEmail() {
-      return email;
-    }
-
-    /**
-     * @param email the email to set
-     */
-    public void setEmail(String email) {
-      this.email = email;
-    }
-  }
-
   private class WaitForFinishRunner implements Runnable {
     private final UI ui;
     private final String uuid;
@@ -103,7 +85,6 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
         currentMessageIndex = allMessages.size();
 
         appendFromBackground(newMessages);
-
       }
     }
 

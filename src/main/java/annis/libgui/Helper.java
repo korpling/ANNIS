@@ -35,9 +35,11 @@ import elemental.json.JsonValue;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -63,6 +65,8 @@ import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.MultiPartEmail;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.Configuration;
@@ -1150,5 +1154,36 @@ public class Helper {
       aql.append("/ & #a @* #doc");
     }
     return aql.toString();
+  }
+
+  /**
+   * Creates a pre-configured email object from the configuration.
+   * 
+   * @param config
+   * @return An email with server and from information set.
+   * @throws EmailException
+   * @throws UnknownHostException Thrown when the "mailFrom" property is not set and the localhost
+   *         host name can't be determined.
+   */
+  public static MultiPartEmail createEMailFromConfiguration(UIConfig config)
+      throws EmailException, UnknownHostException {
+    MultiPartEmail result = new MultiPartEmail();
+
+    if (config.getMailHost() == null) {
+      result.setHostName("localhost");
+    } else {
+      result.setHostName(config.getMailHost());
+    }
+    if (config.getMailUser() != null && config.getMailPassword() != null) {
+      result.setAuthentication(config.getMailUser(), config.getMailPassword());
+    }
+    result.setStartTLSRequired(config.isMailTLS());
+    if (config.getMailFrom() == null) {
+      result.setFrom("annis@" + InetAddress.getLocalHost().getHostName(), "ANNIS");
+    } else {
+      result.setFrom(config.getMailFrom());
+    }
+
+    return result;
   }
 }

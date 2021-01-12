@@ -1,20 +1,24 @@
 package annis.gui.admin.reflinks;
 
+import annis.gui.components.ExceptionDialog;
+import annis.libgui.Helper;
 import com.google.common.base.Strings;
 import com.google.common.collect.Multimap;
 import com.google.common.util.concurrent.FutureCallback;
+import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+import org.apache.commons.mail.EmailException;
+import org.apache.commons.mail.MultiPartEmail;
 
 final class MigrationCallback implements FutureCallback<Integer> {
-  /**
-   * 
-   */
+
   private final MigrationPanel migrationPanel;
   private final Multimap<QueryStatus, URLShortenerDefinition> failedQueries;
 
-  MigrationCallback(MigrationPanel migrationPanel, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
+  MigrationCallback(MigrationPanel migrationPanel,
+      Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
     this.migrationPanel = migrationPanel;
     this.failedQueries = failedQueries;
   }
@@ -77,12 +81,36 @@ final class MigrationCallback implements FutureCallback<Integer> {
 
     this.migrationPanel.appendMessage(detailedStatus.toString(), this.migrationPanel.ui);
     this.migrationPanel.migrateButton.setEnabled(true);
+    
+    sendMail();
+  }
+
+  private void sendMail() {
+    String mailAddress = this.migrationPanel.emailText.getValue();
+    if (mailAddress != null && !mailAddress.isEmpty()) {
+      try {
+        // Send the whole content of the message text area as mail
+        MultiPartEmail mail = Helper.createEMailFromConfiguration(migrationPanel.ui.getConfig());
+        mail.addTo(mailAddress);
+        mail.setSubject("ANNIS reference link migration finished");
+        String message = this.migrationPanel.getMessages();
+        if (message == null || message.isEmpty()) {
+          message = "No further information provided";
+        }
+        mail.setMsg(message);
+        mail.send();
+      } catch (EmailException | UnknownHostException ex) {
+        ExceptionDialog.show(ex, this.migrationPanel.ui);
+      }
+    }
   }
 
   @Override
   public void onFailure(Throwable t) {
     this.migrationPanel.appendMessage("\nFailed!\n\n" + t.toString(), this.migrationPanel.ui);
     this.migrationPanel.migrateButton.setEnabled(true);
+
+    sendMail();
   }
 
   private void printProblematicQueries(final String statusCaption,
