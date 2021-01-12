@@ -21,7 +21,8 @@ final class MigrationCallback implements FutureCallback<Integer> {
 
   @Override
   public void onSuccess(Integer successfulQueries) {
-    this.migrationPanel.appendMessage("\nFinished to import " + successfulQueries + " queries.\n", this.migrationPanel.ui);
+    this.migrationPanel.appendMessage("Finished to import " + successfulQueries + " queries.\n",
+        this.migrationPanel.ui);
 
     // output summary and detailed list of failed queries
     final Collection<URLShortenerDefinition> unknownCorpusQueries =
