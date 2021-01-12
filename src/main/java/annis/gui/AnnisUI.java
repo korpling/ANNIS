@@ -317,6 +317,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     return urlShortener;
   }
 
+  public void setUrlShortener(UrlShortener urlShortener) {
+    this.urlShortener = urlShortener;
+  }
+
   public SecurityContext getSecurityContext() {
     if (this.securityContext == null) {
       this.securityContext = SecurityContextHolder.getContext();

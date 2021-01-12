@@ -75,11 +75,14 @@ final class MigrationCallback implements FutureCallback<Integer> {
     detailedStatus.append("\n");
 
     this.migrationPanel.appendMessage(detailedStatus.toString(), this.migrationPanel.ui);
+
+    this.migrationPanel.migrateButton.setEnabled(true);
   }
 
   @Override
   public void onFailure(Throwable t) {
     this.migrationPanel.appendMessage("\nFailed!\n\n" + t.toString(), this.migrationPanel.ui);
+    this.migrationPanel.migrateButton.setEnabled(true);
   }
 
   private void printProblematicQueries(final String statusCaption,
