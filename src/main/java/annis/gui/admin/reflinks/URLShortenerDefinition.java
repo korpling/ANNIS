@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -220,9 +221,7 @@ public class URLShortenerDefinition {
         }
       }
     } finally {
-      if (!matchesGraphANNISFile.delete()) {
-        log.warn("Could not delete temporary file {}", matchesGraphANNISFile.getAbsolutePath());
-      }
+      Files.delete(matchesGraphANNISFile.toPath());
     }
 
     return QueryStatus.OK;
@@ -257,8 +256,10 @@ public class URLShortenerDefinition {
 
   private QueryStatus testQuirksMode(SearchApi searchApi, OkHttpClient client,
       HttpUrl annisSearchServiceBaseUrl) {
-    log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery().trim(),
-        this.query.getCorpora());
+    if (log.isInfoEnabled()) {
+      log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery().trim(),
+          this.query.getCorpora());
+    }
 
     URLShortenerDefinition quirksQuery = this.rewriteInQuirksMode();
     QueryStatus quirksStatus = quirksQuery.test(searchApi, client, annisSearchServiceBaseUrl);
@@ -271,8 +272,6 @@ public class URLShortenerDefinition {
       this.errorMsg = quirksQuery.getErrorMsg();
       return quirksStatus;
     }
-
-
   }
 
   public QueryStatus test(SearchApi searchApi, OkHttpClient client,
@@ -284,7 +283,6 @@ public class URLShortenerDefinition {
     }
 
     try {
-      QueryStatus status = QueryStatus.OK;
 
       // check count first (also warmup for the corpus)
       int countGraphANNIS = searchApi.count(new CountQuery().query(query.getQuery())
@@ -292,6 +290,7 @@ public class URLShortenerDefinition {
           .getMatchCount();
       int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
 
+      QueryStatus status;
       if (countGraphANNIS != countLegacy) {
         this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
         status = QueryStatus.COUNT_DIFFERS;
