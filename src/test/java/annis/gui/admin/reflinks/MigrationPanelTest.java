@@ -100,7 +100,7 @@ class MigrationPanelTest {
     assertFalse(start.isEnabled());
 
     simulateUpload(
-        "d84ef680-adfb-4923-b2d7-481351d81e95\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n");
+        "1763431c-79b2-4576-b532-67e241ce8396\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n");
     fillOutForm();
 
     // Mock the required responses
@@ -119,7 +119,7 @@ class MigrationPanelTest {
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
     assertEquals(
-        "UUID d84ef680-adfb-4923-b2d7-481351d81e95, testing query \"Zossen\" on corpus [pcc2]\n"
+        "UUID 1763431c-79b2-4576-b532-67e241ce8396, testing query \"Zossen\" on corpus [pcc2]\n"
             + "Finished to import 1 queries.\n\n" + "++++++++++++++++++++++++\n"
             + "+ Successful: 1 from 1 +\n"
             + "++++++++++++++++++++++++\n",
@@ -134,7 +134,7 @@ class MigrationPanelTest {
     assertFalse(start.isEnabled());
 
     simulateUpload(
-        "d84ef680-adfb-4923-b2d7-481351d81e95\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=ThisCorpusShouldNeverExist&cl=5&cr=5&s=0&l=10\n");
+        "00c086a9-bd99-4661-8d47-3f05431baf62\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=ThisCorpusShouldNeverExist&cl=5&cr=5&s=0&l=10\n");
     fillOutForm();
 
     // Mock the required responses
@@ -151,6 +151,45 @@ class MigrationPanelTest {
         "Finished to import 0 queries.\n\n" + "Unknown corpus (1 unknown corpora and 1 queries)\n"
             + "================================================\n"
             + "Corpus \"ThisCorpusShouldNeverExist\": 1 queries\n\n" + "++++++++++++++++++++++++\n"
+            + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n",
+        messages.getValue());
+
+  }
+
+  @Test
+  void testFailingQuery() throws Exception {
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    simulateUpload(
+        "98b5e738-2b24-4bbc-90b4-f6d5fe57416c\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n");
+    fillOutForm();
+
+    // Mock the required responses
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+    // Send a different count twice, one for the new AQL version and one for the quirks mode
+    legacyServer.enqueue(
+        new MockResponse().setBody("<matchAndDocumentCount><documentCount>0</documentCount>"
+            + "  <matchCount>0</matchCount></matchAndDocumentCount>"));
+    legacyServer.enqueue(
+        new MockResponse().setBody("<matchAndDocumentCount><documentCount>0</documentCount>"
+            + "  <matchCount>0</matchCount></matchAndDocumentCount>"));
+
+    // Start the migration process
+    _click(start);
+
+    // Check that the missing corpus was detected
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals(
+        "UUID 98b5e738-2b24-4bbc-90b4-f6d5fe57416c, testing query \"Zossen\" on corpus [pcc2]\n"
+            + "Finished to import 0 queries.\n\n" + "Count different (sum: 1)\n"
+            + "========================\n" + "\n" + "Corpus: \"[pcc2]\"\n"
+            + "UUID: \"98b5e738-2b24-4bbc-90b4-f6d5fe57416c\"\n" + "Query:\n" + "\"Zossen\"\n"
+            + "Error: should have been 0 but was 1\n" + "-------\n\n"
+            + "++++++++++++++++++++++++\n"
             + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n",
         messages.getValue());
 
