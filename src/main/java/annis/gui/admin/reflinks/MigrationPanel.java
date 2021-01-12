@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -222,8 +221,7 @@ public class MigrationPanel extends Panel
         List<String> corpusNames =
             q.getQuery() == null || q.getQuery().getCorpora() == null ? new LinkedList<>()
                 : new LinkedList<>(q.getQuery().getCorpora());
-        corpusNames.stream().filter(c -> !knownCorpora.contains(c))
-            .forEach(c -> q.addUnknownCorpus(c));
+        corpusNames.stream().filter(c -> !knownCorpora.contains(c)).forEach(q::addUnknownCorpus);
 
         if (!q.getUnknownCorpora().isEmpty()) {
           failedQueries.put(QueryStatus.UNKNOWN_CORPUS, q);
@@ -241,8 +239,7 @@ public class MigrationPanel extends Panel
               failedQueries);
         }
       }
-    } catch (RuntimeException | UnsupportedEncodingException | URISyntaxException ex) {
-
+    } catch (RuntimeException | URISyntaxException ex) {
       URLShortenerDefinition q =
           new URLShortenerDefinition(null, URLShortenerDefinition.parseUUID(line[0]), null);
       q.setErrorMsg(getErrorMessage(ex));
