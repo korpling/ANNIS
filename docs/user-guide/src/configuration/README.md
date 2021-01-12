@@ -42,10 +42,6 @@ annis.bug-e-mail=user@example.com
 
 # If "true", the user can create reference links with shortened URLs
 annis.shorten-reference-links=true
-
-# for some custom login pages a maximized window is more suitable, set this value
-# to "true" in this case
-annis.login-window-maximized=false
 ```
 
 Being a Spring Boot application, ANNIS configuration properties also be given as [command line argument](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-command-line-args) or using [various other means](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files).

@@ -15,9 +15,6 @@ public class UIConfig {
 
   private boolean disableRTL;
 
-  private boolean loginWindowMaxmized;
-
-  private String loginURL;
 
   private String webserviceUrl;
   private String webserviceConfig;
@@ -30,22 +27,6 @@ public class UIConfig {
 
   public void setBugEmail(String bugEmail) {
     this.bugEMail = bugEmail;
-  }
-
-  public boolean isLoginWindowMaxmized() {
-    return loginWindowMaxmized;
-  }
-
-  public void setLoginWindowMaxmized(boolean loginWindowMaxmized) {
-    this.loginWindowMaxmized = loginWindowMaxmized;
-  }
-
-  public String getLoginURL() {
-    return loginURL;
-  }
-
-  public void setLoginURL(String loginURL) {
-    this.loginURL = loginURL;
   }
 
   public String getWebserviceUrl() {
