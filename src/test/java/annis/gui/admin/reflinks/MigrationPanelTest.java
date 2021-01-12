@@ -70,34 +70,38 @@ class MigrationPanelTest {
     this.legacyServer.shutdown();
   }
 
-  @Test
-  void testSuccessfulMigration() throws Exception {
-    // Button should be disabled until we upload a file
-    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
-    assertFalse(start.isEnabled());
-
-    // Simulate a manual upload
+  private void simulateUpload(String fileContent) throws Exception {
     Upload upload =
         _get(Upload.class, spec -> spec.withCaption("Exported URL shortener entries as CSV file"));
     OutputStream exampleFile = panel.receiveUpload("url_shortener.csv", "text/plain");
-    IOUtils.write(
-        "d84ef680-adfb-4923-b2d7-481351d81e95\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n",
-        exampleFile, StandardCharset.UTF_8);
+    IOUtils.write(fileContent, exampleFile, StandardCharset.UTF_8);
     exampleFile.close();
-    panel.uploadFinished(
-        new FinishedEvent(upload, "url_shortener.csv", "text/plain", -1));
+    panel.uploadFinished(new FinishedEvent(upload, "url_shortener.csv", "text/plain", -1));
 
     TextArea messages = _get(panel, TextArea.class);
     TestHelper.awaitCondition(10, () -> "Finished CSV file upload".equals(messages.getValue()));
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertTrue(start.isEnabled());
+  }
 
-    // Fill out the form
+  private void fillOutForm() {
     _get(TextField.class, spec -> spec.withCaption("Legacy ANNIS service URL"))
         .setValue("http://localhost:" + legacyServer.getPort());
     _get(TextField.class, spec -> spec.withCaption("Username for legacy ANNIS service"))
         .setValue("admin");
     _get(TextField.class, spec -> spec.withCaption("Password for legacy ANNIS service"))
         .setValue("test");
+  }
+
+  @Test
+  void testSuccessfulMigration() throws Exception {
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    simulateUpload(
+        "d84ef680-adfb-4923-b2d7-481351d81e95\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n");
+    fillOutForm();
 
     // Mock the required responses
     legacyServer.enqueue(new MockResponse().setBody("true"));
@@ -111,13 +115,43 @@ class MigrationPanelTest {
     _click(start);
 
     // Check that migration was successful
+    TextArea messages = _get(panel, TextArea.class);
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
     assertEquals(
-        "UUID d84ef680-adfb-4923-b2d7-481351d81e95, testing query \"Zossen\" on corpus [pcc2]\n\n"
+        "UUID d84ef680-adfb-4923-b2d7-481351d81e95, testing query \"Zossen\" on corpus [pcc2]\n"
             + "Finished to import 1 queries.\n\n" + "++++++++++++++++++++++++\n"
             + "+ Successful: 1 from 1 +\n"
             + "++++++++++++++++++++++++\n",
+        messages.getValue());
+
+  }
+
+  @Test
+  void testUnknownCorpus() throws Exception {
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    simulateUpload(
+        "d84ef680-adfb-4923-b2d7-481351d81e95\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=ThisCorpusShouldNeverExist&cl=5&cr=5&s=0&l=10\n");
+    fillOutForm();
+
+    // Mock the required responses
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+
+    // Start the migration process
+    _click(start);
+
+    // Check that the missing corpus was detected
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals(
+        "Finished to import 0 queries.\n\n" + "Unknown corpus (1 unknown corpora and 1 queries)\n"
+            + "================================================\n"
+            + "Corpus \"ThisCorpusShouldNeverExist\": 1 queries\n\n" + "++++++++++++++++++++++++\n"
+            + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n",
         messages.getValue());
 
   }
