@@ -115,10 +115,13 @@ public class MigrationPanel extends Panel
     migrateButton.addClickListener(event -> {
       txtMessages.setValue("");
       Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
+      String url = serviceUrl.getValue();
+      String username = serviceUsername.getValue();
+      String password = servicePassword.getValue();
+      boolean skip = skipExisting.getValue();
       Background.runWithCallback(() -> {
         try {
-          return migrateUrlShortener(serviceUrl.getValue(), serviceUsername.getValue(),
-              servicePassword.getValue(), skipExisting.getValue(), failedQueries);
+          return migrateUrlShortener(url, username, password, skip, failedQueries);
         } catch (ApiException ex) {
           ExceptionDialog.show(ex, ui);
           return 0;
