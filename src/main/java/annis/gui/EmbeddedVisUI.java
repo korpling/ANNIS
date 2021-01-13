@@ -77,7 +77,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 
 /**
  *
@@ -167,7 +167,7 @@ public class EmbeddedVisUI extends CommonUI {
   private transient ServletContext servletContext;
 
   @Autowired
-  private OAuth2AuthorizedClientRepository oauth2ClientRepo;
+  private OAuth2AuthorizedClientService oauth2ClientService;
 
   @Autowired
   private UIConfig config;
@@ -501,8 +501,8 @@ public class EmbeddedVisUI extends CommonUI {
   }
 
   @Override
-  public OAuth2AuthorizedClientRepository getOauth2ClientRepo() {
-    return this.oauth2ClientRepo;
+  public OAuth2AuthorizedClientService getOauth2ClientService() {
+    return this.oauth2ClientService;
   }
 
   @Override

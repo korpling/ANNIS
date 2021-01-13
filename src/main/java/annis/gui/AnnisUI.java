@@ -52,7 +52,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 
 /**
  * GUI for searching in corpora.
@@ -107,8 +107,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   private OAuth2ClientProperties oauth2Clients;
 
   @Autowired
-  private OAuth2AuthorizedClientRepository oauth2ClientRepo;
-
+  private OAuth2AuthorizedClientService oauth2ClientService;
 
   @Autowired
   private transient ServletContext servletContext;
@@ -270,7 +269,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     }
 
   }
-
   public UIConfig getConfig() {
     return config;
   }
@@ -321,8 +319,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   }
 
 
-  public OAuth2AuthorizedClientRepository getOauth2ClientRepo() {
-    return oauth2ClientRepo;
+  @Override
+  public OAuth2AuthorizedClientService getOauth2ClientService() {
+    return oauth2ClientService;
   }
 
   @Override

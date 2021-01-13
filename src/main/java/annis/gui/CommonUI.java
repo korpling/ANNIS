@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 
 /**
  *
@@ -164,7 +164,6 @@ public abstract class CommonUI extends AnnisBaseUI {
         return urlPrefix;
     }
 
-
     public ApiClient getClient() {
       final ApiClient client = Configuration.getDefaultApiClient();
       // Use the configuration to allow changing the path to the web-service
@@ -172,7 +171,7 @@ public abstract class CommonUI extends AnnisBaseUI {
 
       OkHttpClient httpClient = client.getHttpClient().newBuilder()
           .authenticator(
-              new JwtTokenRefreshAuthenticator(getSecurityContext(), getOauth2ClientRepo()))
+              new JwtTokenRefreshAuthenticator(getSecurityContext(), getOauth2ClientService()))
           .addInterceptor(new JwtTokenInterceptor(getSecurityContext())).build();
       client.setHttpClient(httpClient);
       return client;
@@ -187,7 +186,7 @@ public abstract class CommonUI extends AnnisBaseUI {
       return securityContext;
     }
 
-    public abstract OAuth2AuthorizedClientRepository getOauth2ClientRepo();
+    public abstract OAuth2AuthorizedClientService getOauth2ClientService();
 
     public abstract UIConfig getConfig();
 
