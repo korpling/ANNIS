@@ -17,9 +17,9 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 
 import annis.gui.AnnisUI;
+import annis.gui.CommonUI;
 import annis.gui.UIConfig;
 import annis.gui.graphml.CorpusGraphMapper;
-import annis.gui.security.JwtTokenInterceptor;
 import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
@@ -64,14 +64,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
-import okhttp3.OkHttpClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.Configuration;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -415,24 +413,11 @@ public class Helper {
   }
 
   public static ApiClient getClient(final UI ui) {
-    if(ui instanceof AnnisUI) { 
-      AnnisUI annisUI = (AnnisUI) ui;
-      return getClient(annisUI.getConfig(), annisUI.getSecurityContext());
-    } else {
-      return getClient(null, SecurityContextHolder.getContext());
+    if (ui instanceof CommonUI) {
+      CommonUI annisUI = (CommonUI) ui;
+      return annisUI.getClient();
     }
-  }
-
-  public static ApiClient getClient(final UIConfig config, SecurityContext context) {
-    final ApiClient client = Configuration.getDefaultApiClient();
-    if (config != null) {
-      // Use the configuration to allow changing the path to the web-service
-      client.setBasePath(config.getWebserviceUrl());
-    }
-    OkHttpClient httpClient = client.getHttpClient().newBuilder()
-        .addInterceptor(new JwtTokenInterceptor(context)).build();
-    client.setHttpClient(httpClient);
-    return client;
+    return null;
   }
 
   public static Set<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui)

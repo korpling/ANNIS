@@ -77,6 +77,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 
 /**
  *
@@ -165,6 +166,12 @@ public class EmbeddedVisUI extends CommonUI {
   @Autowired
   private transient ServletContext servletContext;
 
+  @Autowired
+  private OAuth2AuthorizedClientRepository oauth2ClientRepo;
+
+  @Autowired
+  private UIConfig config;
+
 
   public EmbeddedVisUI() {
     super(URL_PREFIX);
@@ -207,7 +214,7 @@ public class EmbeddedVisUI extends CommonUI {
       return;
     }
 
-    ApiClient client = Helper.getClient(null, SecurityContextHolder.getContext());
+    ApiClient client = getClient();
 
     displayLoadingIndicator();
 
@@ -491,6 +498,16 @@ public class EmbeddedVisUI extends CommonUI {
   @Override
   public ServletContext getServletContext() {
     return servletContext;
+  }
+
+  @Override
+  public OAuth2AuthorizedClientRepository getOauth2ClientRepo() {
+    return this.oauth2ClientRepo;
+  }
+
+  @Override
+  public UIConfig getConfig() {
+    return this.config;
   }
 
 }

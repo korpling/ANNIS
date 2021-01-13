@@ -15,14 +15,22 @@ package annis.gui;
 
 import annis.gui.components.SettingsStorage;
 import annis.gui.requesthandler.ResourceRequestHandler;
+import annis.gui.security.JwtTokenInterceptor;
+import annis.gui.security.JwtTokenRefreshAuthenticator;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import com.vaadin.server.VaadinRequest;
 import java.util.Map;
 import javax.servlet.ServletContext;
+import okhttp3.OkHttpClient;
+import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 
 /**
  *
@@ -38,6 +46,8 @@ public abstract class CommonUI extends AnnisBaseUI {
     private final String urlPrefix;
 
     private InstanceConfig instanceConfig;
+
+    private SecurityContext securityContext;
 
     protected CommonUI(String urlPrefix) {
         this.urlPrefix = urlPrefix;
@@ -154,6 +164,31 @@ public abstract class CommonUI extends AnnisBaseUI {
         return urlPrefix;
     }
 
+
+    public ApiClient getClient() {
+      final ApiClient client = Configuration.getDefaultApiClient();
+      // Use the configuration to allow changing the path to the web-service
+      client.setBasePath(getConfig().getWebserviceUrl());
+
+      OkHttpClient httpClient = client.getHttpClient().newBuilder()
+          .authenticator(
+              new JwtTokenRefreshAuthenticator(getSecurityContext(), getOauth2ClientRepo()))
+          .addInterceptor(new JwtTokenInterceptor(getSecurityContext())).build();
+      client.setHttpClient(httpClient);
+      return client;
+    }
+
     public abstract ServletContext getServletContext();
+
+    public SecurityContext getSecurityContext() {
+      if (this.securityContext == null) {
+        this.securityContext = SecurityContextHolder.getContext();
+      }
+      return securityContext;
+    }
+
+    public abstract OAuth2AuthorizedClientRepository getOauth2ClientRepo();
+
+    public abstract UIConfig getConfig();
 
 }

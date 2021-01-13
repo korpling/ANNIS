@@ -52,8 +52,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 
 /**
  * GUI for searching in corpora.
@@ -107,11 +106,12 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired(required = false)
   private OAuth2ClientProperties oauth2Clients;
 
+  @Autowired
+  private OAuth2AuthorizedClientRepository oauth2ClientRepo;
+
 
   @Autowired
   private transient ServletContext servletContext;
-
-  private SecurityContext securityContext;
 
   /**
    * A re-usable toolbar for different views.
@@ -217,8 +217,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     super.init(request);
 
-
-    getSession().addRequestHandler(new BinaryRequestHandler(getUrlPrefix(), getConfig(), getSecurityContext()));
+    getSession().addRequestHandler(new BinaryRequestHandler(getUrlPrefix(), this));
 
     String id = request.getParameter("id");
     if (id != null) {
@@ -321,16 +320,15 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     this.urlShortener = urlShortener;
   }
 
-  public SecurityContext getSecurityContext() {
-    if (this.securityContext == null) {
-      this.securityContext = SecurityContextHolder.getContext();
-    }
-    return securityContext;
+
+  public OAuth2AuthorizedClientRepository getOauth2ClientRepo() {
+    return oauth2ClientRepo;
   }
 
   @Override
   public ServletContext getServletContext() {
     return servletContext;
   }
+
 
 }
