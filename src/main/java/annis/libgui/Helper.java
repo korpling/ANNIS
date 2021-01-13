@@ -19,6 +19,7 @@ import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import annis.gui.AnnisUI;
 import annis.gui.UIConfig;
 import annis.gui.graphml.CorpusGraphMapper;
+import annis.gui.security.JwtTokenInterceptor;
 import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import com.google.common.base.Joiner;
@@ -63,6 +64,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
+import okhttp3.OkHttpClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
@@ -81,7 +83,6 @@ import org.corpus_tools.annis.api.model.CorpusConfigurationView;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
-import org.corpus_tools.annis.auth.HttpBearerAuth;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
@@ -428,17 +429,9 @@ public class Helper {
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(config.getWebserviceUrl());
     }
-    final Optional<OidcUser> user = Helper.getUser(context);
-    String bearerToken = null;
-    if (user.isPresent()) {
-      bearerToken = user.get().getIdToken().getTokenValue();
-    }
-    final org.corpus_tools.annis.auth.Authentication auth =
-          client.getAuthentication("bearerAuth");
-      if (auth instanceof HttpBearerAuth) {
-        final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
-        bearerAuth.setBearerToken(bearerToken);
-      }
+    OkHttpClient httpClient = client.getHttpClient().newBuilder()
+        .addInterceptor(new JwtTokenInterceptor(context)).build();
+    client.setHttpClient(httpClient);
     return client;
   }
 

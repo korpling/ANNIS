@@ -13,10 +13,13 @@
  */
 package annis.gui;
 
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Optional;
-
+import annis.gui.components.ScreenshotMaker;
+import annis.gui.components.SettingsStorage;
+import annis.gui.security.SecurityConfiguration;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
+import annis.libgui.IDGenerator;
+import annis.libgui.LoginDataLostException;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
@@ -35,18 +38,12 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
-
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Optional;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-
-import annis.gui.components.ScreenshotMaker;
-import annis.gui.components.SettingsStorage;
-import annis.gui.security.SecurityConfiguration;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.Helper;
-import annis.libgui.IDGenerator;
-import annis.libgui.LoginDataLostException;
 
 /**
  * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists), the screenshot making
