@@ -24,10 +24,4 @@
     <inherits name="com.vaadin.v7.Vaadin7WidgetSet" />
 
     <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
-
-    <inherits name="target.classes.annis.gui.widgets.gwt.AnnisWidgetSet" />
-
-    <inherits name="annis.gui.widgets.gwt.AnnisWidgetSet" />
-
-    <inherits name="src.main.java.annis.gui.widgets.gwt.AnnisWidgetSet" />
 </module>
