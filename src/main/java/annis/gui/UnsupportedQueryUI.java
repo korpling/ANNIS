@@ -22,6 +22,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.declarative.Design;
 import javax.servlet.ServletContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 
 @SpringUI(path = "/unsupported-query")
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
@@ -66,6 +67,13 @@ public class UnsupportedQueryUI extends CommonUI {
   @Autowired
   private transient ServletContext servletContext;
 
+  @Autowired
+  private OAuth2AuthorizedClientRepository oauth2ClientRepo;
+
+  @Autowired
+  private UIConfig config;
+
+
   private UnsupportedQueryPanel panel;
 
   protected Page overwrittenPage;
@@ -87,6 +95,17 @@ public class UnsupportedQueryUI extends CommonUI {
   public ServletContext getServletContext() {
     return servletContext;
   }
+
+  @Override
+  public OAuth2AuthorizedClientRepository getOauth2ClientRepo() {
+    return this.oauth2ClientRepo;
+  }
+
+  @Override
+  public UIConfig getConfig() {
+    return this.config;
+  }
+
 
   public UnsupportedQueryPanel getPanel() {
     return panel;

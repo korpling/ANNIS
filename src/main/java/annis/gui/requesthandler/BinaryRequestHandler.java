@@ -14,20 +14,21 @@
 
 package annis.gui.requesthandler;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import annis.gui.CommonUI;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServletResponse;
 import com.vaadin.server.VaadinSession;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import okhttp3.Call;
+import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
@@ -35,12 +36,6 @@ import org.corpus_tools.annis.Pair;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContext;
-
-import annis.gui.UIConfig;
-import annis.libgui.Helper;
-import okhttp3.Call;
-import okhttp3.Response;
 
 /**
  * This request handler provides binary-files. It will proxy all requests to the REST service. Since
@@ -62,13 +57,11 @@ public class BinaryRequestHandler implements RequestHandler {
 
 
   private final String prefix;
-  private final UIConfig config;
-  private final SecurityContext securityContext;
+  private final CommonUI ui;
 
-  public BinaryRequestHandler(String urlPrefix, UIConfig config, SecurityContext securityContext) {
+  public BinaryRequestHandler(String urlPrefix, CommonUI ui) {
     this.prefix = urlPrefix + "/Binary";
-    this.config = config;
-    this.securityContext = securityContext;
+    this.ui = ui;
   }
 
   @Override
@@ -105,7 +98,7 @@ public class BinaryRequestHandler implements RequestHandler {
     // Proxy the whole request, including any HTTP headers (e.g. used for range requests) to the
     // REST endpoint.
 
-    CorporaApi api = new CorporaApi(Helper.getClient(config, securityContext));
+    CorporaApi api = new CorporaApi(ui.getClient());
     ApiClient client = api.getApiClient();
     // create path and map variables
     String localVarPath = "/corpora/{corpus}/files/{name}"

@@ -277,7 +277,7 @@ public class AdminView extends VerticalLayout
 
     @Override
     public ApiClient getClient() {
-      return Helper.getClient(ui.getConfig(), ui.getSecurityContext());
+      return ui.getClient();
     }
 
 }
