@@ -82,13 +82,6 @@
 			<resource>
 				<directory>${project.build.directory}/native/</directory>
 			</resource>
-			<resource>
-				<directory>.</directory>
-				<filtering>false</filtering>
-				<includes>
-					<include>CITATION.cff</include>
-				</includes>
-			</resource>
 		</resources>
 
 		<pluginManagement>
@@ -267,6 +260,30 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-resources-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>copy-citation-cff</id>
+			            <phase>validate</phase>
+			            <goals>
+			                <goal>copy-resources</goal>
+			            </goals>
+			            <configuration>
+			                <outputDirectory>${project.build.directory}/classes</outputDirectory>
+			                <resources>
+			                    <resource>
+			                        <directory>${basedir}</directory>
+			                        <includes>
+			                            <include>CITATION.cff</include>
+			                        </includes>
+			                    </resource>
+			                </resources>
+			            </configuration>
+			        </execution>
+			    </executions>
 			</plugin>
 			<plugin>
 				<groupId>org.openapitools</groupId>

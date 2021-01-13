@@ -17,10 +17,10 @@ Otherwise the documentation can't be created.
 When the changelog is up-to-date, execute
 
 ~~~bash
-mvn -N keepachangelog:release
+mvn -N keepachangelog:release cff:create cff:third-party-folder
 ~~~
 and commit your changes.
-
+This will also update the citation file (`CITATION.cff`) and the contents of the `THIRD-PARTY` folder.
 
 ### Testing cycle
 
