@@ -1,9 +1,12 @@
 package annis.gui;
 
+import java.io.Serializable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "annis")
-public class UIConfig {
+public class UIConfig implements Serializable {
+
+  private static final long serialVersionUID = 8667972535616579418L;
 
   private String bugEMail;
   private String mailHost;

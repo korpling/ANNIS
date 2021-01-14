@@ -69,7 +69,7 @@ public class UnsupportedQueryUI extends CommonUI {
 
 
   @Autowired(required = false)
-  private OAuth2ClientProperties oauth2Clients;
+  private transient OAuth2ClientProperties oauth2Clients;
 
   @Autowired
   private UIConfig config;
