@@ -21,16 +21,12 @@ import java.util.Map;
 import org.corpus_tools.annis.ApiCallback;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.model.CountExtra;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class CountCallback implements ApiCallback<CountExtra> {
-    private static final Logger log = LoggerFactory.getLogger(CountCallback.class);
-
     private final ResultViewPanel panel;
 
     private final int pageSize;
