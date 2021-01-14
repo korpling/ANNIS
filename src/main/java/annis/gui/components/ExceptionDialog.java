@@ -16,6 +16,7 @@
 package annis.gui.components;
 
 import annis.gui.AnnisUI;
+import annis.gui.CommonUI;
 import annis.libgui.Helper;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Alignment;
@@ -39,6 +40,9 @@ public class ExceptionDialog extends Window implements Button.ClickListener {
     private static final long serialVersionUID = -9195384309481177718L;
 
     public static void show(Throwable ex, String caption, UI ui) {
+
+      // Check if we can handle this error without showing an explicit dialog
+      if (!(ui instanceof CommonUI) || !((CommonUI) ui).handleCommonError(ex, null)) {
         ExceptionDialog dlg = new ExceptionDialog(ex);
         dlg.setClosable(true);
         dlg.setModal(true);
@@ -48,10 +52,11 @@ public class ExceptionDialog extends Window implements Button.ClickListener {
 
         ui.addWindow(dlg);
         dlg.center();
+      }
     }
 
     public static void show(Throwable ex, UI ui) {
-        show(ex, null, ui);
+      show(ex, null, ui);
     }
 
     private Panel detailsPanel;

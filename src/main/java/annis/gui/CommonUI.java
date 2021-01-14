@@ -22,11 +22,13 @@ import annis.libgui.InstanceConfig;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.ServletContext;
 import org.corpus_tools.annis.ApiClient;
+import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.Configuration;
 import org.corpus_tools.annis.auth.HttpBearerAuth;
 import org.slf4j.Logger;
@@ -185,6 +187,52 @@ public abstract class CommonUI extends AnnisBaseUI {
         bearerAuth.setBearerToken(bearerToken);
       }
       return client;
+    }
+
+    /**
+     * Handle common errors like database/service connection problems and display a unified error
+     * message.
+     * 
+     * This will not log the exception, only display information to the user.
+     * 
+     * @param ex exception to handle
+     * @return True if error was handled, false otherwise.
+     */
+    public boolean handleCommonError(Throwable ex, String action) {
+
+      if (ex != null) {
+        Throwable rootCause = ex;
+        while (rootCause.getCause() != null) {
+          rootCause = rootCause.getCause();
+        }
+
+        if (rootCause instanceof ApiException) {
+          ApiException apiEx = (ApiException) rootCause;
+
+          if (apiEx.getCode() == 503) {
+            // database connection error
+            Notification n = new Notification(
+                "Can't execute " + (action == null ? "" : "\"" + action + "\"")
+                    + " action because database server is not responding.<br/>"
+                    + "There might be too many users using this service right now.",
+                Notification.Type.WARNING_MESSAGE);
+            n.setDescription(
+                "<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
+                    + "<p>Click on this message to close it.</p>"
+                    + "<p style=\"font-size:9pt;color:gray;\">Pinguin picture by Polar Cruises [CC BY 2.0 (http://creativecommons.org/licenses/by/2.0)], via Wikimedia Commons</p>");
+            n.setIcon(AnnisBaseUI.PINGUIN_IMAGE);
+            n.setHtmlContentAllowed(true);
+            n.setDelayMsec(15000);
+
+            n.show(this.getPage());
+            return true;
+          } else if (apiEx.getCode() == 401) {
+            redirectToLogin();
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
     public abstract ServletContext getServletContext();
