@@ -15,6 +15,8 @@ package annis.gui;
 
 import annis.gui.components.SettingsStorage;
 import annis.gui.requesthandler.ResourceRequestHandler;
+import annis.gui.security.JwtTokenInterceptor;
+import annis.gui.security.ReloginAuthenticator;
 import annis.gui.security.SecurityConfiguration;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
@@ -24,17 +26,15 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import javax.servlet.ServletContext;
+import okhttp3.OkHttpClient;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.Configuration;
-import org.corpus_tools.annis.auth.HttpBearerAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 /**
  *
@@ -173,17 +173,10 @@ public abstract class CommonUI extends AnnisBaseUI {
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(getConfig().getWebserviceUrl());
 
-      final Optional<OidcUser> user = Helper.getUser(getSecurityContext());
-      String bearerToken = null;
-      if (user.isPresent()) {
-        bearerToken = user.get().getIdToken().getTokenValue();
-      }
-      final org.corpus_tools.annis.auth.Authentication auth =
-          client.getAuthentication("bearerAuth");
-      if (auth instanceof HttpBearerAuth) {
-        final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
-        bearerAuth.setBearerToken(bearerToken);
-      }
+      OkHttpClient httpClient = client.getHttpClient().newBuilder()
+          .authenticator(new ReloginAuthenticator(this))
+          .addInterceptor(new JwtTokenInterceptor(getSecurityContext())).build();
+      client.setHttpClient(httpClient);
       return client;
     }
 
