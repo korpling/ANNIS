@@ -535,7 +535,7 @@ public class QueryController implements Serializable {
         default:
           log.error("Exception when communicating with service", ex);
           qp.setStatus("Unexpected exception:  " + ex.getMessage());
-          ExceptionDialog.show(ex, "Exception when communicating with service.", UI.getCurrent());
+          ExceptionDialog.show(ex, "Exception when communicating with service.", ui);
           break;
       }
 
