@@ -13,19 +13,23 @@
  */
 package annis.gui;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import annis.QueryGenerator;
+import annis.gui.components.ExceptionDialog;
+import annis.gui.controlpanel.ControlPanel;
+import annis.gui.docbrowser.DocBrowserController;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.media.MediaControllerImpl;
+import annis.gui.resultview.ResultViewPanel;
+import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.MimeTypeErrorListener;
+import annis.libgui.media.PDFController;
+import annis.libgui.media.PDFControllerImpl;
+import annis.model.DisplayedResultQuery;
+import annis.model.PagedResultQuery;
+import annis.model.Query;
+import annis.service.objects.QueryLanguage;
 import com.google.common.base.Splitter;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -47,29 +51,22 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
-
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.slf4j.LoggerFactory;
-
-import annis.QueryGenerator;
-import annis.gui.components.ExceptionDialog;
-import annis.gui.controlpanel.ControlPanel;
-import annis.gui.docbrowser.DocBrowserController;
-import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.media.MediaControllerImpl;
-import annis.gui.resultview.ResultViewPanel;
-import annis.libgui.Helper;
-import annis.libgui.InstanceConfig;
-import annis.libgui.media.MediaController;
-import annis.libgui.media.MimeTypeErrorListener;
-import annis.libgui.media.PDFController;
-import annis.libgui.media.PDFControllerImpl;
-import annis.model.DisplayedResultQuery;
-import annis.model.PagedResultQuery;
-import annis.model.Query;
-import annis.service.objects.QueryLanguage;
 
 /**
  * The view which shows the search interface.
@@ -77,7 +74,7 @@ import annis.service.objects.QueryLanguage;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class SearchView extends GridLayout
-        implements View, MimeTypeErrorListener, Page.UriFragmentChangedListener,
+    implements View, MimeTypeErrorListener, Page.UriFragmentChangedListener,
         TabSheet.CloseHandler, LoginListener, Sidebar, TabSheet.SelectedTabChangeListener {
 
     private class CitationRequestHandler implements RequestHandler {

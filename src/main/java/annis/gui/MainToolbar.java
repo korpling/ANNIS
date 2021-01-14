@@ -25,8 +25,6 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickListener;
@@ -38,7 +36,6 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import org.slf4j.LoggerFactory;
@@ -512,24 +509,9 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public void showLoginWindow() {
-    if (oauth2Clients != null) {
-
-      // Store the current fragment so it can be restored after login was successful
-      String oldFragment = Page.getCurrent().getUriFragment();
-      VaadinSession.getCurrent().setAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE, oldFragment);
-
-      final String contextPath = VaadinRequest.getCurrent().getContextPath();
-      
-      // Determine if there is only one or several clients
-      Collection<String> providers = oauth2Clients.getProvider().keySet();
-      if (providers.size() == 1) {
-        // Directly login with the single provider
-        Page.getCurrent()
-            .setLocation(contextPath + "/oauth2/authorization/" + providers.iterator().next());
-      } else {
-        // Show general login selection page
-        Page.getCurrent().setLocation(contextPath + "/login");
-      }
+    UI ui = UI.getCurrent();
+    if (ui instanceof CommonUI) {
+      ((CommonUI) ui).redirectToLogin();
     }
   }
 
