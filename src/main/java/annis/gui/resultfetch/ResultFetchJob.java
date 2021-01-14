@@ -159,43 +159,38 @@ public class ResultFetchJob implements Runnable {
 
     } catch (InterruptedException ex) {
       Thread.currentThread().interrupt();
-    } catch (final ApiException | IOException root) {
+    } catch (final ApiException ex) {
       ui.access(() -> {
         if (resultPanel != null && resultPanel.getPaging() != null) {
           PagingComponent paging = resultPanel.getPaging();
-          Throwable cause = root.getCause();
 
-          if (cause instanceof ApiException) {
-            ApiException ex = (ApiException) cause;
-            if (ex.getCode() == 400) {
-              JSON json = new JSON();
-              GraphAnnisError error = json.deserialize(ex.getResponseBody(), GraphAnnisError.class);
+          if (ex.getCode() == 400) {
+            JSON json = new JSON();
+            GraphAnnisError error = json.deserialize(ex.getResponseBody(), GraphAnnisError.class);
 
-              String errMsg = "";
-              if (error.getAqLSyntaxError() != null) {
-                errMsg = new ParseError(error.getAqLSyntaxError()).message;
-              }
-              if (error.getAqLSemanticError() != null) {
-                errMsg = new ParseError(error.getAqLSemanticError()).message;
-              }
-
-              paging.setInfo("parsing error: " + errMsg);
-            } else if (ex.getCode() == 504) {
-              paging.setInfo("Timeout: query execution took too long");
-            } else if (ex.getCode() == 403) {
-              paging.setInfo("Not authorized to query this corpus.");
-            } else {
-              paging.setInfo("unknown error: " + ex);
+            String errMsg = "";
+            if (error.getAqLSyntaxError() != null) {
+              errMsg = new ParseError(error.getAqLSyntaxError()).message;
             }
-          } else {
-            log.error("Unexcepted ExecutionException cause", root);
-          }
+            if (error.getAqLSemanticError() != null) {
+              errMsg = new ParseError(error.getAqLSemanticError()).message;
+            }
 
+            paging.setInfo("parsing error: " + errMsg);
+          } else if (ex.getCode() == 504) {
+            paging.setInfo("Timeout: query execution took too long");
+          } else if (ex.getCode() == 403) {
+            paging.setInfo("Not authorized to query this corpus.");
+          } else {
+            ExceptionDialog.show(ex, ui);
+          }
           resultPanel.showFinishedSubgraphSearch();
 
         }
       });
-    } // end catch
+    } catch(IOException ex) {
+      ui.access(() -> ExceptionDialog.show(ex, ui));
+    }
   }
 
   private void createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber,
