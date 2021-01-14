@@ -19,6 +19,7 @@ import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import annis.gui.AnnisUI;
 import annis.gui.CommonUI;
 import annis.gui.UIConfig;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.graphml.CorpusGraphMapper;
 import annis.model.AnnisConstants;
 import annis.service.objects.Match;
@@ -307,14 +308,6 @@ public class Helper {
   private static final String ERROR_MESSAGE_CORPUS_PROPS_HEADER =
       "Corpus properties does not exist";
 
-  private static final String ERROR_MESSAGE_CORPUS_PROPS =
-      "<div><p><strong>ANNIS can not access the corpus properties</strong></p>"
-          + "<h2>possible reasons are:</h2>" + "<ul>" + "<li>the ANNIS service is not running</li>"
-          + "<li>the corpus properties are not well defined</li></ul>"
-          + "<p>Please ask the responsible admin or consult the ANNIS "
-          + "<a href=\"http://korpling.github.io/ANNIS/doc/\">Documentation</a>.</p></div>";
-
-
   private static final Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   private static final Escaper jerseyExtraEscape =
@@ -597,10 +590,7 @@ public class Helper {
     try {
       corpusConfig = api.corpusConfiguration(corpus);
     } catch (final ApiException ex) {
-      if (!AnnisBaseUI.handleCommonError(ex, "get corpus configuration")) {
-        new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER, ERROR_MESSAGE_CORPUS_PROPS,
-            Notification.Type.WARNING_MESSAGE, true).show(ui.getPage());
-      }
+      ui.access(() -> ExceptionDialog.show(ex, ERROR_MESSAGE_CORPUS_PROPS_HEADER, ui));
     }
 
     return corpusConfig;
@@ -679,10 +669,7 @@ public class Helper {
       }
     } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);
-      if (!AnnisBaseUI.handleCommonError(ex, "retrieve metadata")) {
-        Notification.show("Remote exception: " + ex.getLocalizedMessage(),
-            Notification.Type.WARNING_MESSAGE);
-      }
+      ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
     }
 
     return result;
@@ -715,11 +702,7 @@ public class Helper {
       }
 
     } catch (ApiException | XMLStreamException | IOException ex) {
-      log.error(null, ex);
-      if (!AnnisBaseUI.handleCommonError(ex, "retrieve metadata")) {
-        Notification.show("Remote exception: " + ex.getLocalizedMessage(),
-            Notification.Type.WARNING_MESSAGE);
-      }
+      ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata for document", ui));
     }
 
     return result;

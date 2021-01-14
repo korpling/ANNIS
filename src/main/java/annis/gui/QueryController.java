@@ -13,42 +13,6 @@
  */
 package annis.gui;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TreeSet;
-import java.util.concurrent.Future;
-
-import com.google.common.eventbus.EventBus;
-import com.google.common.util.concurrent.FutureCallback;
-import com.vaadin.data.Binder;
-import com.vaadin.data.provider.ListDataProvider;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.UI;
-import com.vaadin.v7.data.Property;
-import com.vaadin.v7.data.util.BeanContainer;
-
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.JSON;
-import org.corpus_tools.annis.api.SearchApi;
-import org.corpus_tools.annis.api.model.CorpusConfiguration;
-import org.corpus_tools.annis.api.model.CountQuery;
-import org.corpus_tools.annis.api.model.GraphAnnisError;
-import org.corpus_tools.annis.api.model.QueryAttributeDescription;
-import org.corpus_tools.salt.common.SaltProject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import annis.QueryGenerator;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controller.CountCallback;
@@ -65,7 +29,6 @@ import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
-import annis.libgui.AnnisBaseUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
@@ -79,7 +42,40 @@ import annis.model.Query;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.QueryLanguage;
+import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.FutureCallback;
+import com.vaadin.data.Binder;
+import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.UI;
+import com.vaadin.v7.data.Property;
+import com.vaadin.v7.data.util.BeanContainer;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.TreeSet;
+import java.util.concurrent.Future;
 import okhttp3.Call;
+import org.corpus_tools.annis.ApiException;
+import org.corpus_tools.annis.JSON;
+import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.CountQuery;
+import org.corpus_tools.annis.api.model.GraphAnnisError;
+import org.corpus_tools.annis.api.model.QueryAttributeDescription;
+import org.corpus_tools.salt.common.SaltProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A controller to modifiy the query UI state. s
@@ -487,7 +483,7 @@ public class QueryController implements Serializable {
   }
 
   /**
-   * Show errors that occured during the execution of a query to the user.
+   * Show errors that occurred during the execution of a query to the user.
    *
    * @param ex The exception to report in the user interface
    * @param showNotification If true a notification is shown instead of only displaying the error in
@@ -499,7 +495,7 @@ public class QueryController implements Serializable {
     String caption = null;
     String description = null;
 
-    if (!AnnisBaseUI.handleCommonError(ex, "execute query")) {
+    if (!ui.handleCommonError(ex, "execute query")) {
       switch (ex.getCode()) {
         case 400:
           GraphAnnisError error =

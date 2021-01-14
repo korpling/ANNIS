@@ -21,7 +21,6 @@ import annis.gui.query_references.UrlShortener;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.security.SecurityConfiguration;
-import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
 import annis.libgui.visualizers.VisualizerPlugin;
@@ -164,12 +163,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
         event.getThrowable());
     // get the source throwable (thus the one that triggered the error)
     Throwable source = event.getThrowable();
-    if (!AnnisBaseUI.handleCommonError(source, null) && source != null) {
-      while (source.getCause() != null) {
-        source = source.getCause();
-      }
-      ExceptionDialog.show(source, this);
+    while (source.getCause() != null) {
+      source = source.getCause();
     }
+    ExceptionDialog.show(source, this);
   }
 
   /**

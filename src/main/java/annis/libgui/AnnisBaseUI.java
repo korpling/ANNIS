@@ -22,11 +22,9 @@ import com.google.common.io.Files;
 import com.vaadin.annotations.Theme;
 import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
-import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinService;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -39,7 +37,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.ApiException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -106,49 +103,6 @@ public class AnnisBaseUI extends UI implements Serializable {
     locations.add(new File(System.getProperty("user.home") + "/.annis/" + configFile));
 
     return locations;
-  }
-
-  /**
-   * Handle common errors like database/service connection problems and display a unified error
-   * message.
-   * 
-   * This will not log the exception, only display information to the user.
-   * 
-   * @param ex exception to handle
-   * @return True if error was handled, false otherwise.
-   */
-  public static boolean handleCommonError(Throwable ex, String action) {
-    if (ex != null) {
-      Throwable rootCause = ex;
-      while (rootCause.getCause() != null) {
-        rootCause = rootCause.getCause();
-      }
-
-      if (rootCause instanceof ApiException) {
-        ApiException apiEx = (ApiException) rootCause;
-
-        if (apiEx.getCode() == 503) {
-          // database connection error
-          Notification n = new Notification(
-              "Can't execute " + (action == null ? "" : "\"" + action + "\"")
-                  + " action because database server is not responding.<br/>"
-                  + "There might be too many users using this service right now.",
-              Notification.Type.WARNING_MESSAGE);
-          n.setDescription(
-              "<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
-                  + "<p>Click on this message to close it.</p>"
-                  + "<p style=\"font-size:9pt;color:gray;\">Pinguin picture by Polar Cruises [CC BY 2.0 (http://creativecommons.org/licenses/by/2.0)], via Wikimedia Commons</p>");
-          n.setIcon(PINGUIN_IMAGE);
-          n.setHtmlContentAllowed(true);
-          n.setDelayMsec(15000);
-
-          n.show(Page.getCurrent());
-
-          return true;
-        }
-      }
-    }
-    return false;
   }
 
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
