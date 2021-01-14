@@ -168,7 +168,7 @@ public class EmbeddedVisUI extends CommonUI {
 
 
   @Autowired(required = false)
-  private OAuth2ClientProperties oauth2Clients;
+  private transient OAuth2ClientProperties oauth2Clients;
 
   @Autowired
   private UIConfig config;
@@ -462,7 +462,7 @@ public class EmbeddedVisUI extends CommonUI {
     }
 
     if (args.get("config") != null && args.get("config").length > 0) {
-      String config = args.get("config")[0];
+      String configArg = args.get("config")[0];
 
       // get input parameters
       HTMLVis visualizer;
@@ -473,7 +473,7 @@ public class EmbeddedVisUI extends CommonUI {
       visConfig = new VisualizerRule();
       visConfig.setDisplayName(" ");
       Map<String, String> mappings = new HashMap<>();
-      mappings.put("config", config);
+      mappings.put("config", configArg);
       visConfig.setMappings(mappings);
       visConfig.setLayer(null);
       visConfig.setVisType("htmldoc");
