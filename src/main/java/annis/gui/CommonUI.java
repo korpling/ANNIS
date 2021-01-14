@@ -257,7 +257,8 @@ public abstract class CommonUI extends AnnisBaseUI {
         VaadinSession.getCurrent().setAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE,
             oldFragment);
 
-        final String contextPath = VaadinRequest.getCurrent().getContextPath();
+        VaadinRequest currentRequest = VaadinRequest.getCurrent();
+        final String contextPath = currentRequest == null ? "" : currentRequest.getContextPath();
 
         // Determine if there is only one or several clients
         Collection<String> providers = oauth2Clients.getProvider().keySet();
