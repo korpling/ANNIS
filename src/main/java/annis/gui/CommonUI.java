@@ -15,22 +15,26 @@ package annis.gui;
 
 import annis.gui.components.SettingsStorage;
 import annis.gui.requesthandler.ResourceRequestHandler;
-import annis.gui.security.JwtTokenInterceptor;
-import annis.gui.security.JwtTokenRefreshAuthenticator;
+import annis.gui.security.SecurityConfiguration;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinSession;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import javax.servlet.ServletContext;
-import okhttp3.OkHttpClient;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.Configuration;
+import org.corpus_tools.annis.auth.HttpBearerAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 /**
  *
@@ -169,11 +173,17 @@ public abstract class CommonUI extends AnnisBaseUI {
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(getConfig().getWebserviceUrl());
 
-      OkHttpClient httpClient = client.getHttpClient().newBuilder()
-          .authenticator(
-              new JwtTokenRefreshAuthenticator(getSecurityContext(), getOauth2ClientService()))
-          .addInterceptor(new JwtTokenInterceptor(getSecurityContext())).build();
-      client.setHttpClient(httpClient);
+      final Optional<OidcUser> user = Helper.getUser(getSecurityContext());
+      String bearerToken = null;
+      if (user.isPresent()) {
+        bearerToken = user.get().getIdToken().getTokenValue();
+      }
+      final org.corpus_tools.annis.auth.Authentication auth =
+          client.getAuthentication("bearerAuth");
+      if (auth instanceof HttpBearerAuth) {
+        final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
+        bearerAuth.setBearerToken(bearerToken);
+      }
       return client;
     }
 
@@ -186,8 +196,32 @@ public abstract class CommonUI extends AnnisBaseUI {
       return securityContext;
     }
 
-    public abstract OAuth2AuthorizedClientService getOauth2ClientService();
+    public abstract OAuth2ClientProperties getOauth2ClientProperties();
 
     public abstract UIConfig getConfig();
+
+    public void redirectToLogin() {
+      OAuth2ClientProperties oauth2Clients = getOauth2ClientProperties();
+      if (getOauth2ClientProperties() != null) {
+
+        // Store the current fragment so it can be restored after login was successful
+        String oldFragment = Page.getCurrent().getUriFragment();
+        VaadinSession.getCurrent().setAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE,
+            oldFragment);
+
+        final String contextPath = VaadinRequest.getCurrent().getContextPath();
+
+        // Determine if there is only one or several clients
+        Collection<String> providers = oauth2Clients.getProvider().keySet();
+        if (providers.size() == 1) {
+          // Directly login with the single provider
+          Page.getCurrent()
+              .setLocation(contextPath + "/oauth2/authorization/" + providers.iterator().next());
+        } else {
+          // Show general login selection page
+          Page.getCurrent().setLocation(contextPath + "/login");
+        }
+      }
+    }
 
 }

@@ -75,9 +75,9 @@ import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 
 /**
  *
@@ -166,8 +166,9 @@ public class EmbeddedVisUI extends CommonUI {
   @Autowired
   private transient ServletContext servletContext;
 
-  @Autowired
-  private OAuth2AuthorizedClientService oauth2ClientService;
+
+  @Autowired(required = false)
+  private OAuth2ClientProperties oauth2Clients;
 
   @Autowired
   private UIConfig config;
@@ -501,8 +502,8 @@ public class EmbeddedVisUI extends CommonUI {
   }
 
   @Override
-  public OAuth2AuthorizedClientService getOauth2ClientService() {
-    return this.oauth2ClientService;
+  public OAuth2ClientProperties getOauth2ClientProperties() {
+    return this.oauth2Clients;
   }
 
   @Override
