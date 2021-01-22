@@ -94,8 +94,8 @@ public class MigrationPanel extends Panel
       Background.runWithCallback(() -> {
         try {
           return migrateUrlShortener(url, username, password, skip, failedQueries);
-        } catch (ApiException ex) {
-          ExceptionDialog.show(ex, ui);
+        } catch (ApiException | IOException ex) {
+          ExceptionDialog.show(ex, "Migrating URL shortener table failed", ui);
           return 0;
         }
       }, new MigrationCallback(this, failedQueries));
@@ -288,7 +288,7 @@ public class MigrationPanel extends Panel
 
   private int migrateUrlShortener(String serviceURL, String username, String password,
       boolean skipExisting, Multimap<QueryStatus, URLShortenerDefinition> failedQueries)
-      throws ApiException {
+      throws ApiException, IOException {
 
 
     int successfulQueries = 0;
@@ -309,9 +309,6 @@ public class MigrationPanel extends Panel
       long numberOfQueries = 0;
       try (Stream<String> stream = Files.lines(urlShortenerFile.toPath(), StandardCharsets.UTF_8)) {
         numberOfQueries = stream.count();
-      } catch (IOException ex) {
-        ui.access(
-            () -> ExceptionDialog.show(ex, "Could not count number of queries to migrate", ui));
       }
       long processedQueries = 0;
       try (CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
@@ -322,16 +319,11 @@ public class MigrationPanel extends Panel
             successfulQueries++;
           }
           processedQueries++;
-          float progressValue;
-          if (numberOfQueries > 0 && processedQueries < numberOfQueries) {
-            progressValue = (float) processedQueries / (float) numberOfQueries;
-          } else {
-            progressValue = 1.0f;
-          }
+          float progressValue = numberOfQueries > 0 && processedQueries < numberOfQueries
+              ? ((float) processedQueries / (float) numberOfQueries)
+              : 1.0f;
           ui.access(() -> progress.setValue(progressValue));
         }
-      } catch (IOException ex) {
-        ui.access(() -> ExceptionDialog.show(ex, "Migrating URL shortener table failed", ui));
       }
     }
 
