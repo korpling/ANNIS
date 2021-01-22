@@ -62,7 +62,7 @@ public class MigrationPanel extends Panel
 
   private final TextArea txtMessages = new TextArea();
   private final Upload exportedFileUpload = new Upload();
-  private final ProgressBar progress = new ProgressBar();
+  final ProgressBar progress = new ProgressBar();
   final TextField emailText = new TextField();
   final Button migrateButton = new Button("Start migration");
 
@@ -83,6 +83,8 @@ public class MigrationPanel extends Panel
 
     migrateButton.addClickListener(event -> {
       txtMessages.setValue("");
+      progress.setValue(0.0f);
+      progress.setCaption("");
       Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
       String url = serviceUrl.getValue();
       String username = serviceUsername.getValue();
@@ -155,8 +157,10 @@ public class MigrationPanel extends Panel
       Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
     // check the query
     try {
-      progress.setCaption(String.format("testing query %s on corpus %s (UUID %s)", q.getUuid(),
-          q.getQuery().getQuery().trim(), q.getQuery().getCorpora()));
+      ui.access(() -> progress.setCaption(String.format("testing query %s on corpus %s (UUID %s)",
+          q.getUuid(),
+          q.getQuery().getQuery().trim(), q.getQuery().getCorpora())));
+
       QueryStatus status = q.test(searchApi, client, searchServiceBaseUrl);
 
       // insert URLs into new database
@@ -245,9 +249,8 @@ public class MigrationPanel extends Panel
 
 
     int successfulQueries = 0;
-    progress.setValue(0.0f);
-
     OkHttpClient.Builder client = new OkHttpClient.Builder();
+
     HttpUrl parsedServiceUrl = HttpUrl.parse(serviceURL);
     if (username != null && password != null) {
       client.authenticator(new Authenticator() {
@@ -310,18 +313,18 @@ public class MigrationPanel extends Panel
             successfulQueries++;
           }
           processedQueries++;
+          float progressValue;
           if (processedQueries < numberOfQueries) {
-            progress.setValue((float) processedQueries / (float) numberOfQueries);
+            progressValue = (float) processedQueries / (float) numberOfQueries;
           } else {
-            progress.setValue(1.0f);
+            progressValue = 1.0f;
           }
+          ui.access(() -> progress.setValue(progressValue));
         }
       } catch (IOException ex) {
         ui.access(() -> ExceptionDialog.show(ex, "Migrating URL shortener table failed", ui));
       }
     }
-
-    progress.setCaption("");
 
     return successfulQueries;
   }

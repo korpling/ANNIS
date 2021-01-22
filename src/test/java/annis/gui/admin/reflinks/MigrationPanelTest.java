@@ -2,9 +2,9 @@ package annis.gui.admin.reflinks;
 
 import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
@@ -78,10 +78,8 @@ class MigrationPanelTest {
     exampleFile.close();
     panel.uploadFinished(new FinishedEvent(upload, "url_shortener.csv", "text/plain", -1));
 
-    TextArea messages = _get(panel, TextArea.class);
-    TestHelper.awaitCondition(10, () -> "Finished CSV file upload".equals(messages.getValue()));
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
-    assertTrue(start.isEnabled());
+    TestHelper.awaitCondition(10, () -> start.isEnabled());
   }
 
   private void fillOutForm() {
@@ -111,6 +109,7 @@ class MigrationPanelTest {
     legacyServer.enqueue(new MockResponse().setBody("salt:/pcc2/11299#tok_5"));
 
     // Start the migration process
+    assertTrue(start.isEnabled());
     _click(start);
 
     // Check that migration was successful
@@ -118,9 +117,7 @@ class MigrationPanelTest {
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
     assertEquals(
-        "UUID 1763431c-79b2-4576-b532-67e241ce8396, testing query \"Zossen\" on corpus [pcc2]\n"
-            + "Finished to import 1 queries.\n\n" + "++++++++++++++++++++++++\n"
-            + "+ Successful: 1 from 1 +\n" + "++++++++++++++++++++++++\n",
+        "++++++++++++++++++++++++\n" + "+ Successful: 1 from 1 +\n" + "++++++++++++++++++++++++\n",
         messages.getValue());
 
     // Importing the UUID again should return an error
@@ -128,10 +125,9 @@ class MigrationPanelTest {
     _click(start);
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
-    assertEquals("Finished to import 0 queries.\n\n" + "UUID already exists (sum: 1)\n"
-        + "============================\n" + "\n" + "Corpus: \"[pcc2]\"\n"
-        + "UUID: \"1763431c-79b2-4576-b532-67e241ce8396\"\n" + "Query:\n" + "\"Zossen\"\n"
-        + "-------\n\n" + "++++++++++++++++++++++++\n"
+    assertEquals("UUID already exists (sum: 1)\n" + "============================\n" + "\n"
+        + "Corpus: \"[pcc2]\"\n" + "UUID: \"1763431c-79b2-4576-b532-67e241ce8396\"\n" + "Query:\n"
+        + "\"Zossen\"\n" + "-------\n\n" + "++++++++++++++++++++++++\n"
         + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
 
     // Try again but explicitly skip existing UUIDs
@@ -140,8 +136,9 @@ class MigrationPanelTest {
     _click(start);
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
-    assertEquals("Finished to import 0 queries.\n\n" + "++++++++++++++++++++++++\n"
-        + "+ Successful: 0 from 0 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
+    assertEquals(
+        "++++++++++++++++++++++++\n" + "+ Successful: 0 from 0 +\n" + "++++++++++++++++++++++++\n",
+        messages.getValue());
   }
 
   @Test
@@ -158,18 +155,17 @@ class MigrationPanelTest {
     legacyServer.enqueue(new MockResponse().setBody("true"));
 
     // Start the migration process
+    assertTrue(start.isEnabled());
     _click(start);
 
     // Check that the missing corpus was detected
     TextArea messages = _get(panel, TextArea.class);
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
-    assertEquals(
-        "Finished to import 0 queries.\n\n" + "Unknown corpus (1 unknown corpora and 1 queries)\n"
-            + "================================================\n"
-            + "Corpus \"ThisCorpusShouldNeverExist\": 1 queries\n\n" + "++++++++++++++++++++++++\n"
-            + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n",
-        messages.getValue());
+    assertEquals("Unknown corpus (1 unknown corpora and 1 queries)\n"
+        + "================================================\n"
+        + "Corpus \"ThisCorpusShouldNeverExist\": 1 queries\n\n" + "++++++++++++++++++++++++\n"
+        + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
 
   }
 
@@ -201,9 +197,7 @@ class MigrationPanelTest {
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
     assertEquals(
-        "UUID 98b5e738-2b24-4bbc-90b4-f6d5fe57416c, testing query \"Zossen\" on corpus [pcc2]\n"
-            + "Finished to import 0 queries.\n\n" + "Count different (sum: 1)\n"
-            + "========================\n" + "\n" + "Corpus: \"[pcc2]\"\n"
+        "Count different (sum: 1)\n" + "========================\n" + "\n" + "Corpus: \"[pcc2]\"\n"
             + "UUID: \"98b5e738-2b24-4bbc-90b4-f6d5fe57416c\"\n" + "Query:\n" + "\"Zossen\"\n"
             + "Error: should have been 0 but was 1\n" + "-------\n\n" + "++++++++++++++++++++++++\n"
             + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n",
@@ -232,8 +226,7 @@ class MigrationPanelTest {
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
     assertEquals(
-        "Finished to import 0 queries.\n\n" + "++++++++++++++++++++++++\n"
-            + "+ Successful: 0 from 0 +\n" + "++++++++++++++++++++++++\n",
+        "++++++++++++++++++++++++\n" + "+ Successful: 0 from 0 +\n" + "++++++++++++++++++++++++\n",
         messages.getValue());
   }
 
@@ -258,12 +251,11 @@ class MigrationPanelTest {
     TextArea messages = _get(panel, TextArea.class);
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
-    assertEquals("Finished to import 0 queries.\n\n" + "FAILED (sum: 1)\n"
-        + "===============\n" + "\n" + "Corpus: \"[]\"\n"
+    assertEquals("FAILED (sum: 1)\n" + "===============\n" + "\n" + "Corpus: \"[]\"\n"
         + "UUID: \"899e9bef-3a16-4d03-8ed3-70aa1abd125d\"\n"
-        + "Error: Illegal character in path at index 13: http:/invalid<host>\n"
-        + "-------\n\n" + "" + "++++++++++++++++++++++++\n"
-        + "+ Successful: 0 from 1 +\n" + "++++++++++++++++++++++++\n", messages.getValue());
+        + "Error: Illegal character in path at index 13: http:/invalid<host>\n" + "-------\n\n" + ""
+        + "++++++++++++++++++++++++\n" + "+ Successful: 0 from 1 +\n"
+        + "++++++++++++++++++++++++\n", messages.getValue());
   }
 
   @Test
@@ -287,10 +279,9 @@ class MigrationPanelTest {
     TextArea messages = _get(panel, TextArea.class);
     TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
         () -> "Migration failed, message output was:\n\n" + messages.getValue());
-    assertEquals("Finished to import 0 queries.\n\n" + "FAILED (sum: 1)\n" + "===============\n"
-        + "\n" + "UUID: \"a3cbc7da-1511-473d-abc2-fe531ff5db9a\"\n"
-        + "Error: Corpus name is empty\n" + "-------\n\n" + ""
-        + "++++++++++++++++++++++++\n" + "+ Successful: 0 from 1 +\n"
+    assertEquals("FAILED (sum: 1)\n" + "===============\n" + "\n"
+        + "UUID: \"a3cbc7da-1511-473d-abc2-fe531ff5db9a\"\n" + "Error: Corpus name is empty\n"
+        + "-------\n\n" + "" + "++++++++++++++++++++++++\n" + "+ Successful: 0 from 1 +\n"
         + "++++++++++++++++++++++++\n", messages.getValue());
   }
 

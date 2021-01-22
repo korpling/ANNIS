@@ -25,6 +25,8 @@ final class MigrationCallback implements FutureCallback<Integer> {
 
   @Override
   public void onSuccess(Integer successfulQueries) {
+    this.migrationPanel.progress.setCaption("");
+
     // output summary and detailed list of failed queries
     final Collection<URLShortenerDefinition> unknownCorpusQueries =
         failedQueries.get(QueryStatus.UNKNOWN_CORPUS);
