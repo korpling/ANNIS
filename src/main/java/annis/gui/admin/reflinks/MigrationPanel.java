@@ -314,7 +314,7 @@ public class MigrationPanel extends Panel
           }
           processedQueries++;
           float progressValue;
-          if (processedQueries < numberOfQueries) {
+          if (numberOfQueries > 0 && processedQueries < numberOfQueries) {
             progressValue = (float) processedQueries / (float) numberOfQueries;
           } else {
             progressValue = 1.0f;
