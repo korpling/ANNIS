@@ -160,8 +160,7 @@ public class MigrationPanel extends Panel
     // check the query
     try {
       ui.access(() -> progress.setCaption(String.format("testing query %s on corpus %s (UUID %s)",
-          q.getUuid(),
-          q.getQuery().getQuery().trim(), q.getQuery().getCorpora())));
+          q.getQuery().getQuery().trim(), q.getQuery().getCorpora(), q.getUuid())));
 
       QueryStatus status = q.test(searchApi, client, searchServiceBaseUrl);
 
