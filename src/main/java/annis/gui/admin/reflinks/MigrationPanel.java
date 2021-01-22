@@ -14,6 +14,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -29,11 +30,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
@@ -60,6 +64,7 @@ public class MigrationPanel extends Panel
 
   private final TextArea txtMessages = new TextArea();
   private final Upload exportedFileUpload = new Upload();
+  private final ProgressBar progress = new ProgressBar();
   final TextField emailText = new TextField();
   final Button migrateButton = new Button("Start migration");
 
@@ -98,12 +103,15 @@ public class MigrationPanel extends Panel
       formLayout.addComponent(emailText);
     }
 
+    progress.setValue(0.0f);
+    progress.setWidthFull();
+
     txtMessages.setSizeFull();
     txtMessages.setValue("");
     txtMessages.setReadOnly(true);
     txtMessages.addStyleName("message-output");
 
-    VerticalLayout layout = new VerticalLayout(formLayout, migrateButton, txtMessages);
+    VerticalLayout layout = new VerticalLayout(formLayout, migrateButton, progress, txtMessages);
     layout.setSizeFull();
     layout.setMargin(true);
     setContent(layout);
@@ -240,6 +248,7 @@ public class MigrationPanel extends Panel
 
 
     int successfulQueries = 0;
+    progress.setValue(0.0f);
 
     OkHttpClient.Builder client = new OkHttpClient.Builder();
     HttpUrl parsedServiceUrl = HttpUrl.parse(serviceURL);
@@ -275,12 +284,26 @@ public class MigrationPanel extends Panel
     Set<String> knownCorpora = new HashSet<>(corporaApi.listCorpora());
 
     if (urlShortenerFile != null && urlShortenerFile.isFile()) {
+      // Count all lines first so we can calculate the progress
+      long numberOfQueries = 0;
+      try (Stream<String> stream = Files.lines(urlShortenerFile.toPath(), StandardCharsets.UTF_8)) {
+        numberOfQueries = stream.count();
+      } catch (IOException ex) {
+        appendMessage("Could not count number of queries to migrate\n\n" + ex.toString(), ui);
+      }
+      long processedQueries = 0;
       try (CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
         String[] line;
         while ((line = csvReader.readNext()) != null) {
           if (readUrlShortenerLine(line, skipExisting, knownCorpora,
               searchApi, client.build(), searchServiceBaseUrl, failedQueries)) {
             successfulQueries++;
+          }
+          processedQueries++;
+          if (processedQueries < numberOfQueries) {
+            progress.setValue((float) processedQueries / (float) numberOfQueries);
+          } else {
+            progress.setValue(1.0f);
           }
         }
       } catch (FileNotFoundException ex) {
