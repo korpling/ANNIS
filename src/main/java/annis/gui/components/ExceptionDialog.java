@@ -43,7 +43,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener {
 
       // Check if we can handle this error without showing an explicit dialog
       if (!(ui instanceof CommonUI) || !((CommonUI) ui).handleCommonError(ex, null)) {
-        ExceptionDialog dlg = new ExceptionDialog(ex);
+        ExceptionDialog dlg = new ExceptionDialog(ex, caption);
         dlg.setClosable(true);
         dlg.setModal(true);
         dlg.setResizable(true);
@@ -88,7 +88,8 @@ public class ExceptionDialog extends Window implements Button.ClickListener {
             setCaption(caption);
         }
 
-        Label lblInfo = new Label("An unexpected error occured.<br />The error message was:", ContentMode.HTML);
+        Label lblInfo =
+            new Label("An error occured.<br />The error message was:", ContentMode.HTML);
         lblInfo.setHeight("-1px");
         lblInfo.setWidth("100%");
         layout.addComponent(lblInfo);

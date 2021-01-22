@@ -25,9 +25,6 @@ final class MigrationCallback implements FutureCallback<Integer> {
 
   @Override
   public void onSuccess(Integer successfulQueries) {
-    this.migrationPanel.appendMessage("Finished to import " + successfulQueries + " queries.\n",
-        this.migrationPanel.ui);
-
     // output summary and detailed list of failed queries
     final Collection<URLShortenerDefinition> unknownCorpusQueries =
         failedQueries.get(QueryStatus.UNKNOWN_CORPUS);
@@ -78,7 +75,7 @@ final class MigrationCallback implements FutureCallback<Integer> {
     detailedStatus.append(Strings.repeat("+", summaryString.length()));
     detailedStatus.append("\n");
 
-    this.migrationPanel.appendMessage(detailedStatus.toString(), this.migrationPanel.ui);
+    this.migrationPanel.setMessageAndScrollToEnd(detailedStatus.toString());
     this.migrationPanel.migrateButton.setEnabled(true);
     
     sendMail();
@@ -106,7 +103,7 @@ final class MigrationCallback implements FutureCallback<Integer> {
 
   @Override
   public void onFailure(Throwable t) {
-    this.migrationPanel.appendMessage("\nFailed!\n\n" + t.toString(), this.migrationPanel.ui);
+    ExceptionDialog.show(t, this.migrationPanel.ui);
     this.migrationPanel.migrateButton.setEnabled(true);
 
     sendMail();
