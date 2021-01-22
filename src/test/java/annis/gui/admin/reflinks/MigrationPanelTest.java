@@ -41,6 +41,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @NotThreadSafe
 class MigrationPanelTest {
 
+  private static final String VALID_REFERENCE_ENTRY =
+      "1763431c-79b2-4576-b532-67e241ce8396\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n";
+
   @Autowired
   private BeanFactory beanFactory;
 
@@ -99,7 +102,7 @@ class MigrationPanelTest {
     assertFalse(start.isEnabled());
 
     simulateUpload(
-        "1763431c-79b2-4576-b532-67e241ce8396\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n");
+        VALID_REFERENCE_ENTRY);
     fillOutForm();
 
     // Mock the required responses
@@ -298,15 +301,16 @@ class MigrationPanelTest {
 
     // This URI in the line has invalid characters
     simulateUpload(
-        "899e9bef-3a16-4d03-8ed3-70aa1abd125d\tanonymous\t2015-11-16 13:19:58.471+00\thttp:/invalid<host>\n");
+        VALID_REFERENCE_ENTRY);
     fillOutForm();
 
     // Mock a failing authentication
+    legacyServer.enqueue(new MockResponse().setResponseCode(401));
     legacyServer.enqueue(new MockResponse().setBody("false"));
 
     // Start the migration process
     _click(start);
-    
+
     // Wait for check to fail
     TestHelper.awaitCondition(10,
         () -> start.isEnabled() && !NotificationsKt.getNotifications().isEmpty());
@@ -314,7 +318,6 @@ class MigrationPanelTest {
     // Check that notification is shown
     NotificationsKt.expectNotifications(new kotlin.Pair<String, String>(
         "Authentication failed, please check the provided user name and password", null));
-
   }
 
 }
