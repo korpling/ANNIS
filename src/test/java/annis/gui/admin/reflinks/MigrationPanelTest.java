@@ -10,6 +10,7 @@ import annis.SingletonBeanStoreRetrievalStrategy;
 import annis.gui.AnnisUI;
 import annis.gui.TestHelper;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
+import com.github.mvysny.kaributesting.v8.NotificationsKt;
 import com.nimbusds.jose.util.StandardCharset;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
@@ -285,5 +286,35 @@ class MigrationPanelTest {
         + "++++++++++++++++++++++++\n", messages.getValue());
   }
 
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void testInvalidCredentials() throws Exception {
+    NotificationsKt.clearNotifications();
+
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    // This URI in the line has invalid characters
+    simulateUpload(
+        "899e9bef-3a16-4d03-8ed3-70aa1abd125d\tanonymous\t2015-11-16 13:19:58.471+00\thttp:/invalid<host>\n");
+    fillOutForm();
+
+    // Mock a failing authentication
+    legacyServer.enqueue(new MockResponse().setBody("false"));
+
+    // Start the migration process
+    _click(start);
+    
+    // Wait for check to fail
+    TestHelper.awaitCondition(10,
+        () -> start.isEnabled() && !NotificationsKt.getNotifications().isEmpty());
+
+    // Check that notification is shown
+    NotificationsKt.expectNotifications(new kotlin.Pair<String, String>(
+        "Authentication failed, please check the provided user name and password", null));
+
+  }
 
 }
