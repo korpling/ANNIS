@@ -18,17 +18,17 @@ package annis.gui.components;
 import annis.gui.AnnisUI;
 import annis.gui.CommonUI;
 import annis.libgui.Helper;
-import com.vaadin.server.FontAwesome;
+import com.vaadin.icons.VaadinIcons;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.v7.ui.Label;
-import com.vaadin.v7.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  * A dialog that displays the message of an exception and allows to show the
@@ -112,13 +112,13 @@ public class ExceptionDialog extends Window implements Button.ClickListener {
         layout.addComponent(actionsLayout);
 
         btDetails = new Button("Show Details", this);
-        btDetails.setStyleName(BaseTheme.BUTTON_LINK);
+        btDetails.setStyleName(ValoTheme.BUTTON_LINK);
         actionsLayout.addComponent(btDetails);
 
         btReportBug = new Button("Report Problem", this);
-        btReportBug.setStyleName(BaseTheme.BUTTON_LINK);
+        btReportBug.setStyleName(ValoTheme.BUTTON_LINK);
         btReportBug.setVisible(false);
-        btReportBug.setIcon(FontAwesome.ENVELOPE_O);
+        btReportBug.setIcon(VaadinIcons.ENVELOPE_O);
         UI ui = UI.getCurrent();
         if (ui instanceof AnnisUI) {
             btReportBug.setVisible(((AnnisUI) ui).canReportBugs());
