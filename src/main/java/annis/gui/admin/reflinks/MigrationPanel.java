@@ -6,24 +6,22 @@ import annis.gui.query_references.UrlShortener;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import au.com.bytecode.opencsv.CSVReader;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FailedEvent;
 import com.vaadin.ui.Upload.FinishedEvent;
 import com.vaadin.ui.VerticalLayout;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -71,19 +69,9 @@ public class MigrationPanel extends Panel
   private File urlShortenerFile;
   AnnisUI ui;
 
-  @Override
-  public void attach() {
-    super.attach();
+  private FormLayout formLayout;
 
-    this.ui = (AnnisUI) getUI();
-    setSizeFull();
-
-
-    exportedFileUpload.setCaption("Exported URL shortener entries as CSV file");
-    exportedFileUpload.setReceiver(this);
-    exportedFileUpload.addFinishedListener(this);
-    exportedFileUpload.addFailedListener(this);
-
+  public MigrationPanel() {
     TextField serviceUrl = new TextField("Legacy ANNIS service URL");
     serviceUrl.setWidth(TEXTFIELD_WIDTH, Unit.EM);
     serviceUrl.setPlaceholder("https://example.com/annis3-service");
@@ -93,33 +81,6 @@ public class MigrationPanel extends Panel
     servicePassword.setWidth(30, Unit.EM);
     CheckBox skipExisting = new CheckBox("Skip existing UUIDs");
 
-    emailText.setCaption("E-Mail for status reports (optional)");
-    emailText.setPlaceholder("you@example.com");
-    emailText.setWidth(TEXTFIELD_WIDTH, Unit.EM);
-
-    FormLayout formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername,
-        servicePassword, skipExisting);
-    if (ui.getConfig().getMailHost() != null) {
-      formLayout.addComponent(emailText);
-    }
-
-    progress.setValue(0.0f);
-    progress.setWidthFull();
-
-    txtMessages.setSizeFull();
-    txtMessages.setValue("");
-    txtMessages.setReadOnly(true);
-    txtMessages.addStyleName("message-output");
-
-    VerticalLayout layout = new VerticalLayout(formLayout, migrateButton, progress, txtMessages);
-    layout.setSizeFull();
-    layout.setMargin(true);
-    setContent(layout);
-    layout.setExpandRatio(txtMessages, 1.0f);
-
-
-    migrateButton.setEnabled(false);
-    migrateButton.setDisableOnClick(true);
     migrateButton.addClickListener(event -> {
       txtMessages.setValue("");
       Multimap<QueryStatus, URLShortenerDefinition> failedQueries = HashMultimap.create();
@@ -137,20 +98,56 @@ public class MigrationPanel extends Panel
       }, new MigrationCallback(this, failedQueries));
 
     });
+    
+    emailText.setCaption("E-Mail for status reports (optional)");
+    emailText.setPlaceholder("you@example.com");
+    emailText.setWidth(TEXTFIELD_WIDTH, Unit.EM);
+
+
+    formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername,
+        servicePassword, skipExisting);
   }
 
-  void appendMessage(String message, UI ui) {
+  @Override
+  public void attach() {
+    super.attach();
 
-    ui.access(() -> {
-      String oldVal = txtMessages.getValue();
-      if (oldVal == null || oldVal.isEmpty()) {
-        txtMessages.setValue(message);
-      } else {
-        txtMessages.setValue(oldVal + "\n" + message);
-      }
+    this.ui = (AnnisUI) getUI();
+    setSizeFull();
 
-      txtMessages.setCursorPosition(txtMessages.getValue().length() - 1);
-    });
+    VerticalLayout layout = new VerticalLayout(formLayout, migrateButton, progress, txtMessages);
+    layout.setSizeFull();
+    layout.setMargin(true);
+    setContent(layout);
+    layout.setExpandRatio(txtMessages, 1.0f);
+
+    if (ui.getConfig().getMailHost() != null) {
+      formLayout.addComponent(emailText);
+    }
+
+    exportedFileUpload.setCaption("Exported URL shortener entries as CSV file");
+    exportedFileUpload.setReceiver(this);
+    exportedFileUpload.addFinishedListener(this);
+    exportedFileUpload.addFailedListener(this);
+
+
+    progress.setValue(0.0f);
+    progress.setWidthFull();
+
+    txtMessages.setSizeFull();
+    txtMessages.setValue("");
+    txtMessages.setReadOnly(true);
+    txtMessages.addStyleName("message-output");
+
+
+    migrateButton.setEnabled(false);
+    migrateButton.setDisableOnClick(true);
+
+  }
+
+  void setMessageAndScrollToEnd(String message) {
+    txtMessages.setValue(message);
+    txtMessages.setCursorPosition(txtMessages.getValue().length() - 1);
   }
 
   private boolean checkSingleQuery(URLShortenerDefinition q, SearchApi searchApi,
@@ -158,8 +155,8 @@ public class MigrationPanel extends Panel
       Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
     // check the query
     try {
-      appendMessage(String.format("UUID %s, testing query %s on corpus %s", q.getUuid(),
-          q.getQuery().getQuery().trim(), q.getQuery().getCorpora()), ui);
+      progress.setCaption(String.format("testing query %s on corpus %s (UUID %s)", q.getUuid(),
+          q.getQuery().getQuery().trim(), q.getQuery().getCorpora()));
       QueryStatus status = q.test(searchApi, client, searchServiceBaseUrl);
 
       // insert URLs into new database
@@ -257,22 +254,34 @@ public class MigrationPanel extends Panel
 
         @Override
         public Request authenticate(Route route, Response response) throws IOException {
-          String credential = Credentials.basic(username, password);
-          return response.request().newBuilder().header("Authorization", credential).build();
+          // Only try authentication once
+          if (response.priorResponse() == null) {
+            String credential = Credentials.basic(username, password);
+            return response.request().newBuilder().header("Authorization", credential).build();
+          } else {
+            return null;
+          }
         }
       });
 
       // test authentication and fail early
       HttpUrl testUrl = parsedServiceUrl.newBuilder().addPathSegment("annis")
           .addPathSegment("admin").addPathSegment("is-authenticated").build();
-      Request testRequest = new Request.Builder().url(testUrl).build();
-      String result = "";
+      Request testRequest =
+          new Request.Builder().url(testUrl).build();
       try {
-        result = client.build().newCall(testRequest).execute().body().string();
+        String result =
+            client.build().newCall(testRequest).execute().body().string();
+        if (!"true".equalsIgnoreCase(result)) {
+          ui.access(() -> Notification
+              .show("Authentication failed, please check the provided user name and password",
+                  Notification.Type.ERROR_MESSAGE));
+          return 0;
+        }
       } catch (IOException ex) {
-        appendMessage(ex.toString(), ui);
+        ui.access(() -> ExceptionDialog.show(ex, "Could not connect to legacy service", ui));
+        return 0;
       }
-      Preconditions.checkArgument("true".equalsIgnoreCase(result), "Authentication failed");
     }
 
     HttpUrl searchServiceBaseUrl = parsedServiceUrl.newBuilder().addPathSegment("annis")
@@ -289,7 +298,8 @@ public class MigrationPanel extends Panel
       try (Stream<String> stream = Files.lines(urlShortenerFile.toPath(), StandardCharsets.UTF_8)) {
         numberOfQueries = stream.count();
       } catch (IOException ex) {
-        appendMessage("Could not count number of queries to migrate\n\n" + ex.toString(), ui);
+        ui.access(
+            () -> ExceptionDialog.show(ex, "Could not count number of queries to migrate", ui));
       }
       long processedQueries = 0;
       try (CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
@@ -306,13 +316,12 @@ public class MigrationPanel extends Panel
             progress.setValue(1.0f);
           }
         }
-      } catch (FileNotFoundException ex) {
-        appendMessage("File with URL shortener table not found", ui);
       } catch (IOException ex) {
-        appendMessage("Migrating URL shortener table failed\n\n" + ex.toString(), ui);
+        ui.access(() -> ExceptionDialog.show(ex, "Migrating URL shortener table failed", ui));
       }
     }
 
+    progress.setCaption("");
 
     return successfulQueries;
   }
@@ -333,13 +342,11 @@ public class MigrationPanel extends Panel
   @Override
   public void uploadFinished(FinishedEvent event) {
     migrateButton.setEnabled(true);
-
-    appendMessage("Finished CSV file upload", getUI());
   }
 
   @Override
   public void uploadFailed(FailedEvent event) {
-    appendMessage("Could not upload file: " + event.toString(), getUI());
+    setMessageAndScrollToEnd("Could not upload file: " + event.toString());
   }
 
   public String getMessages() {
