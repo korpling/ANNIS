@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import okhttp3.Authenticator;
@@ -134,6 +135,7 @@ public class MigrationPanel extends Panel
 
 
     progress.setValue(0.0f);
+    progress.setCaption("");
     progress.setWidthFull();
 
     txtMessages.setSizeFull();
@@ -243,12 +245,7 @@ public class MigrationPanel extends Panel
     return false;
   }
 
-  private int migrateUrlShortener(String serviceURL, String username, String password,
-      boolean skipExisting, Multimap<QueryStatus, URLShortenerDefinition> failedQueries)
-      throws ApiException {
-
-
-    int successfulQueries = 0;
+  private Optional<OkHttpClient> createClient(String serviceURL, String username, String password) {
     OkHttpClient.Builder client = new OkHttpClient.Builder();
 
     HttpUrl parsedServiceUrl = HttpUrl.parse(serviceURL);
@@ -279,14 +276,24 @@ public class MigrationPanel extends Panel
           ui.access(() -> Notification
               .show("Authentication failed, please check the provided user name and password",
                   Notification.Type.ERROR_MESSAGE));
-          return 0;
+          return Optional.empty();
         }
       } catch (IOException ex) {
         ui.access(() -> ExceptionDialog.show(ex, "Could not connect to legacy service", ui));
-        return 0;
+        return Optional.empty();
       }
     }
+    return Optional.of(client.build());
+  }
 
+  private int migrateUrlShortener(String serviceURL, String username, String password,
+      boolean skipExisting, Multimap<QueryStatus, URLShortenerDefinition> failedQueries)
+      throws ApiException {
+
+
+    int successfulQueries = 0;
+
+    HttpUrl parsedServiceUrl = HttpUrl.parse(serviceURL);
     HttpUrl searchServiceBaseUrl = parsedServiceUrl.newBuilder().addPathSegment("annis")
         .addPathSegment("query").addPathSegment("search").build();
 
@@ -295,7 +302,9 @@ public class MigrationPanel extends Panel
     SearchApi searchApi = new SearchApi(apiClient);
     Set<String> knownCorpora = new HashSet<>(corporaApi.listCorpora());
 
-    if (urlShortenerFile != null && urlShortenerFile.isFile()) {
+    Optional<OkHttpClient> client = createClient(serviceURL, username, password);
+
+    if (client.isPresent() && urlShortenerFile != null && urlShortenerFile.isFile()) {
       // Count all lines first so we can calculate the progress
       long numberOfQueries = 0;
       try (Stream<String> stream = Files.lines(urlShortenerFile.toPath(), StandardCharsets.UTF_8)) {
@@ -309,7 +318,7 @@ public class MigrationPanel extends Panel
         String[] line;
         while ((line = csvReader.readNext()) != null) {
           if (readUrlShortenerLine(line, skipExisting, knownCorpora,
-              searchApi, client.build(), searchServiceBaseUrl, failedQueries)) {
+              searchApi, client.get(), searchServiceBaseUrl, failedQueries)) {
             successfulQueries++;
           }
           processedQueries++;
