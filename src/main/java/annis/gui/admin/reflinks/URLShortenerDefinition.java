@@ -185,7 +185,8 @@ public class URLShortenerDefinition {
 
     // Create a file with the matches according to the new graphANNIS based implementation
     File matchesGraphANNISFile = searchApi.find(
-        new FindQuery().query(query.getQuery()).corpora(new LinkedList<>(query.getCorpora())));
+        new FindQuery().query(query.getQuery()).corpora(new LinkedList<>(query.getCorpora()))
+            .queryLanguage(query.getApiQueryLanguage()));
 
 
     HttpUrl findUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("find")
@@ -255,11 +256,6 @@ public class URLShortenerDefinition {
 
   private QueryStatus testQuirksMode(SearchApi searchApi, OkHttpClient client,
       HttpUrl annisSearchServiceBaseUrl) {
-    if (log.isInfoEnabled()) {
-      log.info("Trying quirks mode for query {} on corpus {}", this.query.getQuery().trim(),
-          this.query.getCorpora());
-    }
-
     URLShortenerDefinition quirksQuery = this.rewriteInQuirksMode();
     QueryStatus quirksStatus = quirksQuery.test(searchApi, client, annisSearchServiceBaseUrl);
     if (quirksStatus == QueryStatus.OK) {
