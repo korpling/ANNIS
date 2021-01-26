@@ -20,7 +20,6 @@ import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -128,16 +127,6 @@ public class Match implements Serializable {
     saltIDs = new ArrayList<>();
     annos = new ArrayList<>();
   }
-
-  public Match(Collection<String> originalIDs) {
-    saltIDs = new ArrayList<>(originalIDs);
-    annos = new ArrayList<>(saltIDs.size());
-    for (int i = 0; i < saltIDs.size(); i++) {
-      annos.add("");
-    }
-  }
-
-
 
   private void addSaltId(String id, String anno) {
     if (id != null) {

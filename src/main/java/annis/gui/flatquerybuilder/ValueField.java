@@ -178,7 +178,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
     }
 
     @Override
-    public void textChange(TextChangeEvent event) {
+    public void textChange(TextChangeEvent event) { // NO_UCD (test only)
         ReducingStringComparator rsc = sq.getRSC();
         String fm = sq.getFilterMechanism();
         if (!"generic".equals(fm)) {
