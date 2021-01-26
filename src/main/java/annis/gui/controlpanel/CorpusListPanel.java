@@ -25,6 +25,7 @@ import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
 import com.google.common.collect.Sets;
 import com.vaadin.data.Binder;
+import com.vaadin.data.provider.GridSortOrderBuilder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Resource;
@@ -249,7 +250,7 @@ public class CorpusListPanel extends VerticalLayout {
     });
     infoColumn.setExpandRatio(0);
 
-    Column<?, ?> docColumn = tblCorpora.addComponentColumn(corpus -> {
+    tblCorpora.addComponentColumn(corpus -> {
       final Button l = new Button();
       l.setIcon(DOC_ICON);
       l.setDescription("opens the document browser for " + corpus);
@@ -260,10 +261,8 @@ public class CorpusListPanel extends VerticalLayout {
       return l;
     });
     infoColumn.setExpandRatio(0);
-
+    tblCorpora.setSortOrder(new GridSortOrderBuilder<String>().thenAsc(nameColumn).build());
     addComponent(tblCorpora);
-
-
 
     setExpandRatio(tblCorpora, 1.0f);
 
