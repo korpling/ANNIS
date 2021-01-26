@@ -18,7 +18,7 @@ def updateEnv(instDir):
 	return env
 	
 def getversion(instDir):
-	o = subprocess.check_output([os.path.join(instDir, "bin", "annis.sh"), "version"], 
+	o = subprocess.check_output([os.path.join(instDir, "bin", "org.corpus_tools.annis.sh"), "version"], 
 		env=updateEnv(instDir), universal_newlines=True, stderr=subprocess.STDOUT)
 	
 	for raw in o.split("\n"):
@@ -28,7 +28,7 @@ def getversion(instDir):
 	return None
 
 def checkDBSchemaVersion(instDir, existingInstDir):
-	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-admin.sh"), "check-db-schema-version"], env=updateEnv(instDir))
+	p = subprocess.Popen([os.path.join(instDir, "bin", "org.corpus_tools.annis-admin.sh"), "check-db-schema-version"], env=updateEnv(instDir))
 	p.wait()
 	if p.returncode == 0:
 		return True
@@ -47,14 +47,14 @@ def checkDBSchemaVersion(instDir, existingInstDir):
 
 def startService(instDir):
 	print("Starting service in " + instDir)
-	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-service.sh"), "start"], env=updateEnv(instDir), stdout=subprocess.PIPE)
+	p = subprocess.Popen([os.path.join(instDir, "bin", "org.corpus_tools.annis-service.sh"), "start"], env=updateEnv(instDir), stdout=subprocess.PIPE)
 	p.communicate()
 	if p.returncode != 0:
 		print("Can't start service in " + instDir)
 		exit(2)		
 
 def stopService(instDir):
-	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-service.sh"), "stop"], env=updateEnv(instDir), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+	p = subprocess.Popen([os.path.join(instDir, "bin", "org.corpus_tools.annis-service.sh"), "stop"], env=updateEnv(instDir), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 	output = p.communicate()
 	if p.returncode != 0:
 		print("Can't stop service in " + instDir)
@@ -74,12 +74,12 @@ def copyUserConfig(instDir, oldInstDir):
 	
 	tmpConfigDump = tempfile.NamedTemporaryFile()
 	
-	argsDump = [os.path.join(oldInstDir, "bin", "annis-admin.sh"), "dump", "user_config", tmpConfigDump.name]
+	argsDump = [os.path.join(oldInstDir, "bin", "org.corpus_tools.annis-admin.sh"), "dump", "user_config", tmpConfigDump.name]
 	
 	pDump = subprocess.Popen(argsDump, env=updateEnv(oldInstDir))
 	pDump.wait()
 	if pDump.returncode == 0:
-		argsRestore = [os.path.join(instDir, "bin", "annis-admin.sh"), "restore", "user_config", tmpConfigDump.name]
+		argsRestore = [os.path.join(instDir, "bin", "org.corpus_tools.annis-admin.sh"), "restore", "user_config", tmpConfigDump.name]
 		pRestore = subprocess.Popen(argsRestore, env=updateEnv(instDir))
 		pRestore.wait()
 		if pRestore.returncode == 0:
@@ -95,7 +95,7 @@ def copyUserConfig(instDir, oldInstDir):
 def cleanupData(instDir):
 	
 	
-	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-admin.sh"), "cleanup-data"], env=updateEnv(instDir), stderr=subprocess.STDOUT, stdout=subprocess.PIPE, universal_newlines=True)
+	p = subprocess.Popen([os.path.join(instDir, "bin", "org.corpus_tools.annis-admin.sh"), "cleanup-data"], env=updateEnv(instDir), stderr=subprocess.STDOUT, stdout=subprocess.PIPE, universal_newlines=True)
 	for l in p.stdout:
 		print(l, end="")
 	p.communicate()
@@ -110,7 +110,7 @@ parser.add_argument("dir", help="The directory containing the ANNIS service.")
 parser.add_argument("archive", help="The archive file containing the new ANNIS version.")
 parser.add_argument("-b", "--backup", help="Perform a backup of the files of the existing installation. This parameter defines also the prefix to use for the name of the backup folder.")
 parser.add_argument("-c", "--cleanup-data", action="store_true", help="""This will delete all data files not known to the current instance of ANNIS. 
-If you have multiple parallel installations and did not use different values for the annis.data-path variable in the conf/annis-service.properties the data files of the other installations will be lost.""")
+If you have multiple parallel installations and did not use different values for the org.corpus_tools.annis.data-path variable in the conf/org.corpus_tools.annis-service.properties the data files of the other installations will be lost.""")
 parser.add_argument("-m", "--mail", help="Mail adress that should be used for notifications when copying corpora from the existing installation.")
 args = parser.parse_args()
 
@@ -127,7 +127,7 @@ extracted = tmp
 for root, dirs, files in os.walk(tmp):
 	if extracted == tmp:
 		for d in dirs:
-			if d.startswith("annis-service"):
+			if d.startswith("org.corpus_tools.annis-service"):
 				extracted = os.path.join(root, d)
 				break
 
@@ -138,11 +138,11 @@ print("Copying the config files.")
 
 # make a backup in case there are new configs and the user want's to compare the old configuration
 # to the new default one
-shutil.copy2(os.path.join(newconf, "annis-service.properties"), os.path.join(newconf, "annis-service.properties.bak"))
+shutil.copy2(os.path.join(newconf, "org.corpus_tools.annis-service.properties"), os.path.join(newconf, "org.corpus_tools.annis-service.properties.bak"))
 shutil.copy2(os.path.join(newconf, "shiro.ini"), os.path.join(newconf, "shiro.ini.bak"))
 
 # do the actual copy of the two files a user should change (other files should be untouched)
-shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(newconf, "annis-service.properties"))
+shutil.copy2(os.path.join(origconf, "org.corpus_tools.annis-service.properties"), os.path.join(newconf, "org.corpus_tools.annis-service.properties"))
 shutil.copy2(os.path.join(origconf, "shiro.ini"), os.path.join(newconf, "shiro.ini"))
 
 # TODO check if we can update without any database migration

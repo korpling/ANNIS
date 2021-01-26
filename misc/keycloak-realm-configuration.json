@@ -70,7 +70,7 @@
       }
     ],
     "client": {
-      "annis": [],
+      "org.corpus_tools.annis": [],
       "realm-management": [
         {
           "id": "5a9881f0-4762-4ab7-bb45-167452b86175",
@@ -583,7 +583,7 @@
     },
     {
       "id": "a9241b37-638b-450f-8fa4-f97f9b8fb83d",
-      "clientId": "annis",
+      "clientId": "org.corpus_tools.annis",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -633,7 +633,7 @@
             "userinfo.token.claim": "true",
             "id.token.claim": "true",
             "access.token.claim": "true",
-            "claim.name": "https://corpus-tools\\.org/annis/roles",
+            "claim.name": "https://corpus-tools\\.org/org.corpus_tools.annis/roles",
             "jsonType.label": "String"
           }
         },
@@ -647,7 +647,7 @@
             "full.path": "false",
             "id.token.claim": "true",
             "access.token.claim": "true",
-            "claim.name": "https://corpus-tools.org/annis/groups",
+            "claim.name": "https://corpus-tools.org/org.corpus_tools.annis/groups",
             "userinfo.token.claim": "true"
           }
         }

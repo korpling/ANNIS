@@ -11,7 +11,7 @@
   <Match>
     <And>
       <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
-      <Class name="annis.gui.components.codemirror.AqlCodeEditorState"/>
+      <Class name="org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditorState"/>
     </And>
   </Match>
   
@@ -23,10 +23,10 @@
         <Bug pattern="NP_UNWRITTEN_FIELD" />
       </Or>
       <Or>
-        <Class name="annis.gui.admin.EditSingleGroup"/>
-        <Class name="annis.gui.admin.EditSingleUser"/>
-        <Class name="annis.gui.HistoryPanel"/>
-        <Class name="annis.gui.CorpusBrowserPanel"/>  
+        <Class name="org.corpus_tools.annis.gui.admin.EditSingleGroup"/>
+        <Class name="org.corpus_tools.annis.gui.admin.EditSingleUser"/>
+        <Class name="org.corpus_tools.annis.gui.HistoryPanel"/>
+        <Class name="org.corpus_tools.annis.gui.CorpusBrowserPanel"/>  
       </Or>
       
     </And>

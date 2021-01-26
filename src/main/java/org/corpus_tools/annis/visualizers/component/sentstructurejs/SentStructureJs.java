@@ -1,0 +1,32 @@
+package org.corpus_tools.annis.visualizers.component.sentstructurejs;
+
+import com.vaadin.ui.Panel;
+import org.corpus_tools.annis.libgui.VisualizationToggle;
+import org.corpus_tools.annis.libgui.visualizers.AbstractVisualizer;
+import org.corpus_tools.annis.libgui.visualizers.VisualizerInput;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SentStructureJs extends AbstractVisualizer { // NO_UCD (unused code)
+
+  private static final long serialVersionUID = -5677329079488473862L;
+
+  @Override
+  public Panel createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
+    SentStructureJsPanel panel = new SentStructureJsPanel(visInput);
+    panel.setHeight("100%");
+    panel.setWidth("100%");
+    return panel;
+  }
+
+  @Override
+  public String getShortName() {
+    return "sentstructurejs";
+  }
+
+  @Override
+  public boolean isUsingText() {
+    return false;
+  }
+
+}
