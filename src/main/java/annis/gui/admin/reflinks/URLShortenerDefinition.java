@@ -248,7 +248,7 @@ public class URLShortenerDefinition {
             // reference links might exist.
             // We translate this error to "no result" instead of throwing an error.
             return 0;
-          } else if (responseCode == 408 || responseCode == 504) {
+          } else if (responseCode == 504) {
             // The legacy database query time-outs
             throw new IOException("Timeout in legacy ANNIS service");
           }
