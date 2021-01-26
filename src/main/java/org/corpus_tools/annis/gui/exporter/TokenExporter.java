@@ -15,8 +15,8 @@
  */
 package org.corpus_tools.annis.gui.exporter;
 
-import static org.corpus_tools.annis.model.AnnisConstants.ANNIS_NS;
-import static org.corpus_tools.annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+import static org.corpus_tools.annis.gui.objects.AnnisConstants.ANNIS_NS;
+import static org.corpus_tools.annis.gui.objects.AnnisConstants.FEAT_MATCHEDNODE;
 
 import com.google.common.base.Splitter;
 import com.vaadin.ui.UI;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import org.corpus_tools.annis.libgui.Helper;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;

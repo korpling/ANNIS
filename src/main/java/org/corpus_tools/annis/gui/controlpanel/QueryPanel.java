@@ -43,15 +43,15 @@ import org.corpus_tools.annis.api.model.GraphAnnisError;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.ExportPanel;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.HistoryPanel;
+import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.components.VirtualKeyboardCodeEditor;
 import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
 import org.corpus_tools.annis.gui.frequency.FrequencyQueryPanel;
+import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.querybuilder.QueryBuilderChooser;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.libgui.IDGenerator;
-import org.corpus_tools.annis.model.Query;
 import org.vaadin.hene.popupbutton.PopupButton;
 
 /**

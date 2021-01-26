@@ -22,8 +22,8 @@ import com.vaadin.server.VaadinSession;
 import java.io.IOException;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.libgui.visualizers.IFrameResource;
-import org.corpus_tools.annis.libgui.visualizers.IFrameResourceMap;
+import org.corpus_tools.annis.gui.visualizers.IFrameResource;
+import org.corpus_tools.annis.gui.visualizers.IFrameResourceMap;
 
 /**
  * A request handler that delivers visualization resources.

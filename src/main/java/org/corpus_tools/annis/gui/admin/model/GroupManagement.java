@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.CaseSensitiveOrder;
 import org.corpus_tools.annis.api.AdministrationApi;
 import org.corpus_tools.annis.api.model.Group;
+import org.corpus_tools.annis.gui.CaseSensitiveOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

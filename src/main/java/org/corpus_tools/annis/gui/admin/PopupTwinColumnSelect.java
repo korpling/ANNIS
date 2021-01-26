@@ -29,7 +29,7 @@ import com.vaadin.v7.ui.TwinColSelect;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
-import org.corpus_tools.annis.CaseSensitiveOrder;
+import org.corpus_tools.annis.gui.CaseSensitiveOrder;
 import org.corpus_tools.annis.gui.converter.CommaSeperatedStringConverterSet;
 import org.corpus_tools.annis.gui.converter.TreeSetConverter;
 

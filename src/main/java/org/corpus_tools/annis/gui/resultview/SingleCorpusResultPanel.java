@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.MetaDataPanel;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.libgui.IDGenerator;
-import org.corpus_tools.annis.model.DisplayedResultQuery;
-import org.corpus_tools.annis.service.objects.Match;
+import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
+import org.corpus_tools.annis.gui.objects.Match;
 import org.corpus_tools.salt.common.SCorpus;
 
 /**

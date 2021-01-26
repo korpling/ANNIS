@@ -53,8 +53,6 @@ import javax.mail.util.ByteArrayDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
-import org.corpus_tools.annis.VersionInfo;
-import org.corpus_tools.annis.libgui.Helper;
 import org.slf4j.LoggerFactory;
 
 /**

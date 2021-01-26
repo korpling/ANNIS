@@ -23,7 +23,7 @@ import com.vaadin.v7.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeSet;
-import org.corpus_tools.annis.libgui.Helper;
+import org.corpus_tools.annis.gui.Helper;
 
 /**
  * @author martin

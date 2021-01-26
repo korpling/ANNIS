@@ -47,10 +47,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.FrequencyChart;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.model.FrequencyQuery;
-import org.corpus_tools.annis.service.objects.FrequencyTableEntry;
+import org.corpus_tools.annis.gui.objects.FrequencyQuery;
+import org.corpus_tools.annis.gui.objects.FrequencyTableEntry;
 import org.slf4j.LoggerFactory;
 
 /**

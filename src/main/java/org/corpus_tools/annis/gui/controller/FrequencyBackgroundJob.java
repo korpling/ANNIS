@@ -24,10 +24,10 @@ import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.FrequencyQuery;
 import org.corpus_tools.annis.api.model.FrequencyQueryDefinition;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.frequency.FrequencyQueryPanel;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.service.objects.FrequencyTableEntry;
+import org.corpus_tools.annis.gui.objects.FrequencyTableEntry;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,12 +41,12 @@ public class FrequencyBackgroundJob implements Callable<List<FrequencyTableRow>>
 
   private final UI ui;
   private final QueryController queryController;
-  private final org.corpus_tools.annis.model.FrequencyQuery query;
+  private final org.corpus_tools.annis.gui.objects.FrequencyQuery query;
 
   private final FrequencyQueryPanel panel;
 
   public FrequencyBackgroundJob(UI ui, QueryController queryController,
-      org.corpus_tools.annis.model.FrequencyQuery query,
+      org.corpus_tools.annis.gui.objects.FrequencyQuery query,
       FrequencyQueryPanel panel) {
     this.ui = ui;
     this.queryController = queryController;

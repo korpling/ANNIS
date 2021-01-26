@@ -10,7 +10,6 @@ import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.vaadin.server.Page;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
-import org.corpus_tools.annis.SingletonBeanStoreRetrievalStrategy;
 import org.corpus_tools.annis.gui.UnsupportedQueryUI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

@@ -38,11 +38,9 @@ import org.corpus_tools.annis.api.model.ExampleQuery;
 import org.corpus_tools.annis.gui.controlpanel.ControlPanel;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
 import org.corpus_tools.annis.gui.controlpanel.QueryPanel;
+import org.corpus_tools.annis.gui.objects.Query;
+import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
-import org.corpus_tools.annis.libgui.Background;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.model.Query;
-import org.corpus_tools.annis.service.objects.QueryLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -15,7 +15,6 @@ import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.UI;
-import org.corpus_tools.annis.SingletonBeanStoreRetrievalStrategy;
 import org.corpus_tools.annis.gui.EmbeddedVisUI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

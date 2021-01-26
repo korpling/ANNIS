@@ -24,8 +24,8 @@ import com.vaadin.v7.ui.ComboBox;
 import java.util.HashMap;
 import java.util.Map;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.QueryController;
-import org.corpus_tools.annis.libgui.IDGenerator;
 
 /**
  * Wrapper for selecting and showing the desired query builder.

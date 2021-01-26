@@ -35,8 +35,6 @@ import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
-import org.corpus_tools.annis.libgui.Background;
-import org.corpus_tools.annis.libgui.Helper;
 import org.corpus_tools.salt.core.SMetaAnnotation;
 
 /**

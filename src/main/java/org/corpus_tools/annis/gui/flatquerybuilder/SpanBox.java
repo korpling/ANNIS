@@ -35,7 +35,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.libgui.Helper;
+import org.corpus_tools.annis.gui.Helper;
 
 /**
  * @author Tom

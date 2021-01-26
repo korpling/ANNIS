@@ -22,7 +22,6 @@ import com.vaadin.ui.UI;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.corpus_tools.annis.gui.components.StatefulBrowserComponent;
-import org.corpus_tools.annis.libgui.InstanceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

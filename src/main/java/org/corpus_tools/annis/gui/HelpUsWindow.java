@@ -27,7 +27,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.Label;
-import org.corpus_tools.annis.libgui.IDGenerator;
 
 /**
  * A window displaying an invitation to participate in the development of ANNIS.

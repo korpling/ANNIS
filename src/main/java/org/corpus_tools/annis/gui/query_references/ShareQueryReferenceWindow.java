@@ -30,7 +30,7 @@ import java.net.URISyntaxException;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
-import org.corpus_tools.annis.model.DisplayedResultQuery;
+import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

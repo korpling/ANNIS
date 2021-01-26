@@ -35,9 +35,9 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.query_references.ShareQueryReferenceWindow;
 import org.corpus_tools.annis.gui.util.ANNISFontIcon;
-import org.corpus_tools.annis.libgui.Helper;
 import org.slf4j.LoggerFactory;
 
 /**

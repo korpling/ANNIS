@@ -8,7 +8,6 @@ import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.google.common.collect.Sets;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
-import org.corpus_tools.annis.SingletonBeanStoreRetrievalStrategy;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.ExportPanel;
 import org.junit.jupiter.api.AfterEach;

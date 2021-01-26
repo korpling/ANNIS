@@ -17,8 +17,7 @@ package org.corpus_tools.annis.gui.objects;
 
 import java.util.List;
 import java.util.Objects;
-import org.corpus_tools.annis.libgui.exporter.ExporterPlugin;
-import org.corpus_tools.annis.model.ContextualizedQuery;
+import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 
 /**
  *

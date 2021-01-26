@@ -48,10 +48,10 @@ import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.QueryController;
+import org.corpus_tools.annis.gui.objects.FrequencyQuery;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.model.FrequencyQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

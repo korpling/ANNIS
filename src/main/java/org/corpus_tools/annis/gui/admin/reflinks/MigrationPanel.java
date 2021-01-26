@@ -44,10 +44,10 @@ import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Background;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
-import org.corpus_tools.annis.libgui.Background;
-import org.corpus_tools.annis.libgui.Helper;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class MigrationPanel extends Panel

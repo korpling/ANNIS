@@ -21,9 +21,9 @@ import com.vaadin.ui.UI;
 import elemental.json.JsonArray;
 import java.util.HashSet;
 import java.util.Set;
-import org.corpus_tools.annis.libgui.media.MediaPlayer;
-import org.corpus_tools.annis.libgui.media.MimeTypeErrorListener;
-import org.corpus_tools.annis.visualizers.LoadableVisualizer;
+import org.corpus_tools.annis.gui.media.MediaPlayer;
+import org.corpus_tools.annis.gui.media.MimeTypeErrorListener;
+import org.corpus_tools.annis.gui.visualizers.LoadableVisualizer;
 import org.json.JSONException;
 
 /**

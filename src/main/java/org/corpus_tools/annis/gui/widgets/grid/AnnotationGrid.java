@@ -22,9 +22,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import org.corpus_tools.annis.libgui.MatchedNodeColors;
-import org.corpus_tools.annis.libgui.media.MediaController;
-import org.corpus_tools.annis.libgui.media.PDFController;
+import org.corpus_tools.annis.gui.MatchedNodeColors;
+import org.corpus_tools.annis.gui.media.MediaController;
+import org.corpus_tools.annis.gui.media.PDFController;
 
 /**
  *

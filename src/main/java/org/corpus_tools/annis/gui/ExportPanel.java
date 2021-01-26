@@ -44,9 +44,8 @@ import java.util.Optional;
 import org.corpus_tools.annis.gui.components.HelpButton;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.corpus_tools.annis.gui.converter.CommaSeperatedStringConverterList;
+import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.corpus_tools.annis.libgui.IDGenerator;
-import org.corpus_tools.annis.libgui.exporter.ExporterPlugin;
 import org.slf4j.LoggerFactory;
 
 /**

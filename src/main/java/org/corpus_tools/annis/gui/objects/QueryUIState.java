@@ -29,9 +29,8 @@ import java.util.concurrent.Future;
 import okhttp3.Call;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.gui.exporter.CSVExporter;
+import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.frequency.UserGeneratedFrequencyEntry;
-import org.corpus_tools.annis.libgui.exporter.ExporterPlugin;
-import org.corpus_tools.annis.model.Query;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -169,11 +168,11 @@ public class QueryUIState implements Serializable {
     return queryLanguage;
   }
 
-  public org.corpus_tools.annis.service.objects.QueryLanguage getQueryLanguageLegacy() {
+  public org.corpus_tools.annis.gui.objects.QueryLanguage getQueryLanguageLegacy() {
     if (queryLanguage == QueryLanguage.AQLQUIRKSV3) {
-      return org.corpus_tools.annis.service.objects.QueryLanguage.AQL_QUIRKS_V3;
+      return org.corpus_tools.annis.gui.objects.QueryLanguage.AQL_QUIRKS_V3;
     } else {
-      return org.corpus_tools.annis.service.objects.QueryLanguage.AQL;
+      return org.corpus_tools.annis.gui.objects.QueryLanguage.AQL;
     }
   }
 
@@ -181,8 +180,8 @@ public class QueryUIState implements Serializable {
     this.queryLanguage = queryLanguage;
   }
 
-  public void setQueryLanguageLegacy(org.corpus_tools.annis.service.objects.QueryLanguage queryLanguage) {
-    if (queryLanguage == org.corpus_tools.annis.service.objects.QueryLanguage.AQL_QUIRKS_V3) {
+  public void setQueryLanguageLegacy(org.corpus_tools.annis.gui.objects.QueryLanguage queryLanguage) {
+    if (queryLanguage == org.corpus_tools.annis.gui.objects.QueryLanguage.AQL_QUIRKS_V3) {
       this.queryLanguage = QueryLanguage.AQLQUIRKSV3;
     } else {
       this.queryLanguage = QueryLanguage.AQL;

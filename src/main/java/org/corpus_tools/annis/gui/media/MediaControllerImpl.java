@@ -22,10 +22,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.corpus_tools.annis.libgui.VisualizationToggle;
-import org.corpus_tools.annis.libgui.media.MediaController;
-import org.corpus_tools.annis.libgui.media.MediaPlayer;
-import org.corpus_tools.annis.visualizers.LoadableVisualizer;
+import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.visualizers.LoadableVisualizer;
 import org.springframework.stereotype.Component;
 
 /**

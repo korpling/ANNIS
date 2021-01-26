@@ -37,12 +37,12 @@ import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Background;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.graphml.CorpusGraphMapper;
-import org.corpus_tools.annis.libgui.Background;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.service.objects.DocumentBrowserConfig;
-import org.corpus_tools.annis.service.objects.Visualizer;
+import org.corpus_tools.annis.gui.objects.DocumentBrowserConfig;
+import org.corpus_tools.annis.gui.objects.Visualizer;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 

@@ -17,8 +17,8 @@ package org.corpus_tools.annis.gui.querybuilder;
 
 import com.vaadin.ui.Component;
 import java.io.Serializable;
+import org.corpus_tools.annis.gui.AnnisBaseUI;
 import org.corpus_tools.annis.gui.QueryController;
-import org.corpus_tools.annis.libgui.AnnisBaseUI;
 
 /**
  * Every query builder must implement this interface. It' s also necessary to to

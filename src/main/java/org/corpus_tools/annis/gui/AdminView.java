@@ -40,8 +40,6 @@ import org.corpus_tools.annis.gui.admin.model.CorpusManagement;
 import org.corpus_tools.annis.gui.admin.model.GroupManagement;
 import org.corpus_tools.annis.gui.admin.reflinks.MigrationPanel;
 import org.corpus_tools.annis.gui.admin.view.UIView;
-import org.corpus_tools.annis.libgui.Background;
-import org.corpus_tools.annis.libgui.Helper;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 

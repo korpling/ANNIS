@@ -45,15 +45,15 @@ import java.util.Set;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CorpusBrowserPanel;
+import org.corpus_tools.annis.gui.CorpusSet;
 import org.corpus_tools.annis.gui.ExampleQueriesPanel;
+import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.corpus_tools.annis.libgui.Background;
-import org.corpus_tools.annis.libgui.CorpusSet;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.libgui.IDGenerator;
 import org.slf4j.LoggerFactory;
 
 /**

@@ -28,8 +28,8 @@ import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.ExportPanel;
+import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.objects.ExportQuery;
-import org.corpus_tools.annis.libgui.exporter.ExporterPlugin;
 
 /**
  *

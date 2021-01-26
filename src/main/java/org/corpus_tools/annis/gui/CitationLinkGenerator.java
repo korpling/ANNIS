@@ -23,13 +23,11 @@ import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.ui.Table;
 import java.util.HashSet;
 import java.util.Set;
-import org.corpus_tools.annis.QueryGenerator;
 import org.corpus_tools.annis.gui.beans.CitationProvider;
+import org.corpus_tools.annis.gui.objects.ContextualizedQuery;
+import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
+import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.query_references.ShareQueryReferenceWindow;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.model.ContextualizedQuery;
-import org.corpus_tools.annis.model.DisplayedResultQuery;
-import org.corpus_tools.annis.model.Query;
 
 /**
  *

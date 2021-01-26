@@ -38,12 +38,12 @@ import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.QueryController;
+import org.corpus_tools.annis.gui.objects.Query;
+import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.libgui.IDGenerator;
-import org.corpus_tools.annis.model.Query;
-import org.corpus_tools.annis.service.objects.QueryLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

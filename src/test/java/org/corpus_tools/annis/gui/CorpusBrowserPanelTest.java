@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.corpus_tools.annis.SingletonBeanStoreRetrievalStrategy;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.CorpusBrowserPanel;
 import org.corpus_tools.annis.gui.ExampleTable;

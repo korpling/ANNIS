@@ -42,10 +42,8 @@ import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.gui.beans.CorpusBrowserEntry;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
-import org.corpus_tools.annis.libgui.Background;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.model.Query;
-import org.corpus_tools.annis.service.objects.QueryLanguage;
+import org.corpus_tools.annis.gui.objects.Query;
+import org.corpus_tools.annis.gui.objects.QueryLanguage;
 
 /**
  *

@@ -13,7 +13,7 @@
  */
 package org.corpus_tools.annis.gui;
 
-import static org.corpus_tools.annis.libgui.Helper.DEFAULT_CONFIG;
+import static org.corpus_tools.annis.gui.Helper.DEFAULT_CONFIG;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -37,14 +37,13 @@ import java.util.UUID;
 import javax.servlet.ServletContext;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
+import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.querybuilder.QueryBuilderPlugin;
 import org.corpus_tools.annis.gui.requesthandler.BinaryRequestHandler;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
-import org.corpus_tools.annis.libgui.Helper;
-import org.corpus_tools.annis.libgui.exporter.ExporterPlugin;
-import org.corpus_tools.annis.libgui.visualizers.VisualizerPlugin;
+import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;

@@ -17,8 +17,8 @@ package org.corpus_tools.annis.gui.frequency;
 
 import java.io.Serializable;
 import java.util.Objects;
-import org.corpus_tools.annis.service.objects.FrequencyTableEntry;
-import org.corpus_tools.annis.service.objects.FrequencyTableEntryType;
+import org.corpus_tools.annis.gui.objects.FrequencyTableEntry;
+import org.corpus_tools.annis.gui.objects.FrequencyTableEntryType;
 
 /**
  *

@@ -14,7 +14,7 @@
 package org.corpus_tools.annis.gui.resultview;
 
 import java.io.Serializable;
-import org.corpus_tools.annis.model.PagedResultQuery;
+import org.corpus_tools.annis.gui.objects.PagedResultQuery;
 import org.corpus_tools.salt.common.SaltProject;
 
 /**

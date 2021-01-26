@@ -19,7 +19,7 @@ import com.vaadin.v7.data.util.converter.Converter;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.TreeSet;
-import org.corpus_tools.annis.CaseSensitiveOrder;
+import org.corpus_tools.annis.gui.CaseSensitiveOrder;
 
 /**
  *

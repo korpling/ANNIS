@@ -1,8 +1,8 @@
 package org.corpus_tools.annis.gui.objects;
 
 import java.util.List;
-import org.corpus_tools.annis.QueryGenerator.ContextQueryGenerator;
-import org.corpus_tools.annis.libgui.exporter.ExporterPlugin;
+import org.corpus_tools.annis.gui.QueryGenerator.ContextQueryGenerator;
+import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 
 public class ExportQueryGenerator extends ContextQueryGenerator<ExportQuery, ExportQueryGenerator> {
     public ExportQueryGenerator() {

@@ -37,10 +37,10 @@ import java.util.TreeSet;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.widgets.GripDragComponent;
 import org.corpus_tools.annis.gui.widgets.SimpleCanvas;
-import org.corpus_tools.annis.libgui.Helper;
 import org.slf4j.LoggerFactory;
 
 /**

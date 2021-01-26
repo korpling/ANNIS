@@ -28,7 +28,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.libgui.Helper;
+import org.corpus_tools.annis.gui.Helper;
 
 /**
  * A dialog that displays the message of an exception and allows to show the

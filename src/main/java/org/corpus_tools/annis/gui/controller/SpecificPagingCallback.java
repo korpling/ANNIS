@@ -17,14 +17,14 @@ import java.util.concurrent.Future;
 
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.SearchView;
+import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
+import org.corpus_tools.annis.gui.objects.PagedResultQuery;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.paging.PagingCallback;
 import org.corpus_tools.annis.gui.resultfetch.ResultFetchJob;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
-import org.corpus_tools.annis.libgui.Background;
-import org.corpus_tools.annis.model.DisplayedResultQuery;
-import org.corpus_tools.annis.model.PagedResultQuery;
 
 /**
  *
