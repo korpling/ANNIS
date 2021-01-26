@@ -17,7 +17,6 @@ import com.vaadin.shared.ui.JavaScriptComponentState;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.TreeMap;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.corpus_tools.annis.api.model.GraphAnnisErrorAQLSyntaxError;
@@ -88,7 +87,7 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
 
     public String inputPrompt = ""; // NO_UCD (unused code)
 
-    public final List<ParseError> errors = new ArrayList<>(); // NO_UCD (use default)
+    public final ArrayList<ParseError> errors = new ArrayList<>(); // NO_UCD (use default)
 
     public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator()); // NO_UCD
                                                                                                 // (use
