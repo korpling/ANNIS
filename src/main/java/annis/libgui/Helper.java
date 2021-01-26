@@ -29,7 +29,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
-import com.google.common.net.UrlEscapers;
 import com.vaadin.server.JsonCodec;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
@@ -307,11 +306,6 @@ public class Helper {
 
   private static final String ERROR_MESSAGE_CORPUS_PROPS_HEADER =
       "Corpus properties does not exist";
-
-  private static final Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-
-  private static final Escaper jerseyExtraEscape =
-      Escapers.builder().addEscape('{', "%7B").addEscape('}', "%7D").addEscape('%', "%25").build();
 
 
   public static final Escaper AQL_REGEX_VALUE_ESCAPER = Escapers.builder()
