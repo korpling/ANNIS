@@ -230,7 +230,6 @@ public class URLShortenerDefinition {
 
   private int getLegacyCount(OkHttpClient client, HttpUrl annisSearchServiceBaseUrl)
       throws IOException {
-    int countLegacy = 0;
     for (int tries = 0; tries < MAX_RETRY; tries++) {
         HttpUrl countLegacyUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("count")
             .addQueryParameter("q", query.getQuery())
@@ -242,15 +241,13 @@ public class URLShortenerDefinition {
           if (responseCode == 200) {
             String bodyString = countResponse.body().string();
             CountExtra result = mapper.readValue(bodyString, CountExtra.class);
-            countLegacy = result.getMatchCount();
-            break;
+            return result.getMatchCount();
           } else if (responseCode == 400) {
             // "Bad request" means there was a syntactic or semantic error.
             // Non-existing annotation names where not always handled as semantic error, so
             // reference links might exist.
             // We translate this error to "no result" instead of throwing an error.
-            countLegacy = 0;
-            break;
+            return 0;
           } else if (responseCode == 408 || responseCode == 504) {
             // The legacy database query time-outs
             throw new IOException("Timeout in legacy ANNIS service");
@@ -265,7 +262,7 @@ public class URLShortenerDefinition {
       }
 
     }
-    return countLegacy;
+    return 0;
   }
 
   private QueryStatus testQuirksMode(SearchApi searchApi, OkHttpClient client,
