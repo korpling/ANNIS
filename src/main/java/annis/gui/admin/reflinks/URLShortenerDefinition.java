@@ -247,9 +247,8 @@ public class URLShortenerDefinition {
           } else if (responseCode == 400) {
             // "Bad request" means there was a syntactic or semantic error.
             // Non-existing annotation names where not always handled as semantic error, so
-            // reference
-            // links might exist.
-            // We translate this error to "no result" instead of throwing an error
+            // reference links might exist.
+            // We translate this error to "no result" instead of throwing an error.
             countLegacy = 0;
             break;
           } else if (responseCode == 408 || responseCode == 504) {
