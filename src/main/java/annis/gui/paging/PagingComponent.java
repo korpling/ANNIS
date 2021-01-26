@@ -333,10 +333,6 @@ public class PagingComponent extends Panel implements Button.ClickListener {
     return (currentPage - 1) * pageSize;
   }
 
-  public boolean removeCallback(PagingCallback callback) {
-    return callbacks.remove(callback);
-  }
-
   private long sanitizePage(long page) {
     long val = Math.max(1, page);
     val = Math.min(1 + (count.get() / pageSize), val);

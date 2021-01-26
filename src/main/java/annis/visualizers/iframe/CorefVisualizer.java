@@ -98,48 +98,43 @@ public class CorefVisualizer extends WriterVisualizer { // NO_UCD (use default)
 
   }
 
-  static class TComponent implements Serializable {
+  private static class TComponent implements Serializable {
 
     /**
      * 
      */
     private static final long serialVersionUID = -6194481931107809732L;
-    List<String> tokenList;
-    String type;
+    private List<String> tokenList;
+    private String type;
 
     TComponent() {
       tokenList = new LinkedList<String>();
       type = "";
     }
-
-    TComponent(List<String> ll, String t) {
-      tokenList = ll;
-      type = t;
-    }
   }
 
-  static class TComponenttype implements Serializable {
+  private static class TComponenttype implements Serializable {
 
     /**
      * 
      */
     private static final long serialVersionUID = -2055379528368649264L;
-    String type;
-    List<String> nodeList;
+    private String type;
+    private List<String> nodeList;
 
     TComponenttype() {
       type = "";
       nodeList = new LinkedList<String>();
     }
   }
-  static class TReferent implements Serializable {
+  private static class TReferent implements Serializable {
 
     /**
      * 
      */
     private static final long serialVersionUID = 4574048056625309895L;
-    Set<SerializableAnnotation> annotations;
-    long component;
+    private Set<SerializableAnnotation> annotations;
+    private long component;
 
     TReferent() {
       component = -1;

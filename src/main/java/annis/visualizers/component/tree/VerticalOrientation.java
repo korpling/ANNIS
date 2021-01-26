@@ -13,8 +13,8 @@
  */
 package annis.visualizers.component.tree;
 
-public enum VerticalOrientation {
-  TOP_ROOT(1), BOTTOM_ROOT(-1);
+enum VerticalOrientation {
+  TOP_ROOT(1), BOTTOM_ROOT(-1); // NO_UCD (unused code)
 
   final int value;
 

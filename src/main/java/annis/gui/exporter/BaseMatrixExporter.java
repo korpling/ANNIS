@@ -15,7 +15,6 @@ package annis.gui.exporter;
 
 import annis.libgui.Helper;
 import annis.libgui.exporter.ExporterPlugin;
-import annis.service.objects.SubgraphFilter;
 import com.google.common.eventbus.EventBus;
 import com.vaadin.ui.UI;
 import java.io.File;
@@ -198,8 +197,6 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   }
 
   public abstract void getOrderedMatchNumbers();
-
-  public abstract SubgraphFilter getSubgraphFilter();
 
   /**
    * Indicates, whether the export can be cancelled or not.

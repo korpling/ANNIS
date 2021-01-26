@@ -352,9 +352,7 @@ public class SingleResultPanel extends CssLayout
     queryController.changeContext(query, match, resultNumber, context, this, left);
   }
 
-  protected SDocument getResult() {
-    return result;
-  }
+
 
   private void initVisualizer() {
     try {

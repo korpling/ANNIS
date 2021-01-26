@@ -141,25 +141,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
       addMenu.setAutoOpen(false);
     }
 
-    public void addSpanBox(SpanBox spb) {
-        if (spbox == null) {
-            spanMenu.setText(CHANGE_SPAN_PARAM);
-        } else {
-            span.removeComponent(spbox);
-        }
-        spbox = spb;
-        span.addComponent(spbox);
-        span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
-    }
 
-    public void addSpanBox(String level) {
+    void addSpanBox(String level) {
         spbox = new SpanBox(level, this);
         span.addComponent(spbox);
         span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
         spanMenu.setText(CHANGE_SPAN_PARAM);
     }
 
-    public void addMetaBox(String annoname) {
+    void addMetaBox(String annoname) {
       MetaBox mb = new MetaBox(annoname, this);
       meta.addComponent(mb);
       mboxes.add(mb);
@@ -480,15 +470,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         }
         meta.removeComponent(btInitMeta);
         meta.addComponent(addMenuMeta);
-    }
-
-    public String killNamespace(String qName) {
-        String[] splitted = qName.split(":", 2);
-        if (splitted.length > 1) {
-            return splitted[1];
-        } else {
-            return qName;
-        }
     }
 
     private void launch(QueryController cp) {

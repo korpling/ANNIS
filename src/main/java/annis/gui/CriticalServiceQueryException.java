@@ -30,9 +30,4 @@ public class CriticalServiceQueryException extends ServiceQueryException {
     public CriticalServiceQueryException(String msg) {
         super(msg);
     }
-
-    public CriticalServiceQueryException(String msg, String description) {
-        super(msg, description);
-    }
-
 }

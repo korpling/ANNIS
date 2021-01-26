@@ -17,7 +17,6 @@ package annis.gui.exporter;
 
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
-import annis.service.objects.SubgraphFilter;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.server.Page;
@@ -506,11 +505,6 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
         orderedMatchNumbersGlobal = calculateOrderedMatchNumbersGlobally(adjacencyMatrix, matrixIsFilled,
                 singleMatchesGlobal);
 
-    }
-
-    @Override
-    public SubgraphFilter getSubgraphFilter() {
-        return SubgraphFilter.all;
     }
 
     /**

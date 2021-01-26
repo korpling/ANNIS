@@ -418,10 +418,6 @@ public class VisualizerPanel extends CssLayout
     return htmlID;
   }
 
-  protected SDocument getResult() {
-    return result;
-  }
-
   public String getVisualizerShortName() {
     return visPlugin == null ? null : visPlugin.getShortName();
   }

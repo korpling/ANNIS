@@ -14,9 +14,7 @@
 package annis.service.objects;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * This is an a list of several {@link FrequencyTableEntry} entries.
@@ -30,19 +28,6 @@ public class FrequencyTableQuery extends ArrayList<FrequencyTableEntry> {
    */
   private static final long serialVersionUID = -6469357245564126773L;
 
-  public static FrequencyTableQuery parse(String completeDefinition) {
-    FrequencyTableQuery result = new FrequencyTableQuery();
-    Iterator<String> it =
-        Splitter.on(',').trimResults().omitEmptyStrings().split(completeDefinition).iterator();
-    while (it.hasNext()) {
-      String f = it.next();
-      FrequencyTableEntry entry = FrequencyTableEntry.parse(f);
-      if (entry != null) {
-        result.add(entry);
-      }
-    }
-    return result;
-  }
 
   @Override
   public String toString() {

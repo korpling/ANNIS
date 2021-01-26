@@ -53,7 +53,7 @@ import org.corpus_tools.annis.api.model.Component;
  */
 public class CorpusBrowserPanel extends Panel {
 
-  public class ExampleListener implements SelectionListener<CorpusBrowserEntry> {
+  private class ExampleListener implements SelectionListener<CorpusBrowserEntry> {
 
     private static final long serialVersionUID = 5456621606184042619L;
 

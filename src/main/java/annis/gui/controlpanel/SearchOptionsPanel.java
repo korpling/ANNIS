@@ -124,27 +124,8 @@ public class SearchOptionsPanel extends FormLayout {
    */
   private static final long serialVersionUID = 7878445496945702778L;
 
-  public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
-
-  public static final String KEY_DEFAULT_CONTEXT_SEGMENTATION = "default-context-segmentation";
-
-  public static final String KEY_DEFAULT_BASE_TEXT_SEGMENTATION = "default-base-text-segmentation";
-
-  public static final String KEY_MAX_CONTEXT_LEFT = "max-context-left";
-
-  public static final String KEY_MAX_CONTEXT_RIGHT = "max-context-right";
-
-  public static final String KEY_CONTEXT_STEPS = "context-steps";
-  public static final String KEY_DEFAULT_CONTEXT = "default-context";
-  public static final String KEY_RESULT_PER_PAGE = "results-per-page";
-
-  public static final String DEFAULT_CONFIG = "default-config";
-
-  public static final int DEFAULT_CONTEXT = 5;
-
-  public static final int DEFAULT_CONTEXT_STEPS = 5;
-
-  public static final int DEFAULT_MAX_CONTEXT = 20;
+  private static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
+  private static final String DEFAULT_CONFIG = "default-config";
 
   private static final Logger log = LoggerFactory.getLogger(SearchOptionsPanel.class);
   // TODO: make this configurable

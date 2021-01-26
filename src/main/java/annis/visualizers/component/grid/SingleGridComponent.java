@@ -49,7 +49,6 @@ import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -57,17 +56,10 @@ import org.slf4j.LoggerFactory;
  */
 public class SingleGridComponent extends Panel implements GridComponent {
 
-  public enum ElementType {
-
-    begin, end, middle, single, noEvent
-  }
-
   /**
    * 
    */
   private static final long serialVersionUID = -5105505611908943014L;
-
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(SingleGridComponent.class);
 
   private static String extractTextForToken(SNode t, String segmentation) {
     if (t instanceof SToken) {

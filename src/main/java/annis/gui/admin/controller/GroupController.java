@@ -110,10 +110,9 @@ public class GroupController implements GroupListView.Listener, UIView.Listener 
       public void onFailure(Throwable ex) {
         view.setLoadingAnimation(false);
         if (ex instanceof CriticalServiceQueryException) {
-          uiView.showWarning(ex.getMessage(),
-              ((CriticalServiceQueryException) ex).getDescription());
+          uiView.showWarning(ex.getMessage(), null);
         } else if (ex instanceof ServiceQueryException) {
-          uiView.showInfo(ex.getMessage(), ((ServiceQueryException) ex).getDescription());
+          uiView.showInfo(ex.getMessage(), null);
         } else {
           uiView.showWarning("Cannot get the group list", ex.getMessage());
           view.setGroupList(new LinkedList<Group>());

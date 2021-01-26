@@ -19,8 +19,6 @@ import annis.gui.security.SecurityConfiguration;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.IDGenerator;
-import annis.libgui.LoginDataLostException;
-import com.google.common.eventbus.Subscribe;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
@@ -98,12 +96,6 @@ public class MainToolbar extends HorizontalLayout
   private static final long serialVersionUID = -6033428470667608345L;
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(MainToolbar.class);
-
-  public static final String BUG_MAIL_KEY = "bug-e-mail";
-
-  public static final String LOGIN_URL_KEY = "login-url";
-
-  public static final String LOGIN_MAXIMIZED_KEY = "login-window-maximized";
 
   private Button btSidebar;
 
@@ -369,29 +361,11 @@ public class MainToolbar extends HorizontalLayout
     return sidebar;
   }
 
-  @Subscribe
-  public void handleLoginDataLostException(LoginDataLostException ex) {
-
-    Notification.show("Login data was lost, please login again.",
-        "Due to a server misconfiguration the login-data was lost. Please contact the adminstrator of this ANNIS instance.",
-        Notification.Type.WARNING_MESSAGE);
-
-    for (LoginListener l : loginListeners) {
-      try {
-        l.onLogout();
-      } catch (Exception loginEx) {
-        log.error("exception thrown while notifying login listeners", loginEx);
-      }
-    }
-    updateUserInformation();
-
-  }
-
   public boolean isLoggedIn() {
     return Helper.getUser(UI.getCurrent()).isPresent();
   }
 
-  public void notifiyQueryStarted() {
+  void notifiyQueryStarted() {
     if (sidebarState == SidebarState.AUTO_VISIBLE) {
       sidebarState = SidebarState.AUTO_HIDDEN;
     }
@@ -399,7 +373,7 @@ public class MainToolbar extends HorizontalLayout
     updateSidebarState();
   }
 
-  public void onLogin() {
+  void onLogin() {
     for (LoginListener l : loginListeners) {
       try {
         l.onLogin();
@@ -411,18 +385,7 @@ public class MainToolbar extends HorizontalLayout
     updateUserInformation();
   }
 
-  public void onLogout() {
 
-    for (LoginListener l : loginListeners) {
-      try {
-        l.onLogout();;
-      } catch (Exception ex) {
-        log.error("exception thrown while notifying login listeners", ex);
-      }
-    }
-
-    updateUserInformation();
-  }
 
   @Override
   public void onSettingsLoaded(SettingsStorage settings) {
@@ -443,15 +406,13 @@ public class MainToolbar extends HorizontalLayout
     updateSidebarState();
   }
 
-  public void removeLoginListener(LoginListener listener) {
-    this.loginListeners.remove(listener);
-  }
 
-  public void reportBug() {
+
+  private void reportBug() {
     reportBug(null);
   }
 
-  public void reportBug(Throwable cause) {
+  void reportBug(Throwable cause) {
     lastBugReportCause = cause;
     if (screenshotExtension.isAttached()) {
       screenshotExtension.makeScreenshot();

@@ -39,8 +39,6 @@ import org.corpus_tools.salt.core.SGraph;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.util.SaltUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Maps a GraphML stream to Salt
@@ -49,8 +47,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class DocumentGraphMapper extends AbstractGraphMLMapper {
-
-  static final Logger log = LoggerFactory.getLogger(DocumentGraphMapper.class);
 
   private final SDocumentGraph graph;
 

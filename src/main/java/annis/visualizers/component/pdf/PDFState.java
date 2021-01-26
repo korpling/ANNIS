@@ -25,9 +25,9 @@ public class PDFState extends JavaScriptComponentState {
    * 
    */
   private static final long serialVersionUID = 132678528526625567L;
-  public String binaryURL;
-  public String pdfID;
-  public Integer firstPage;
-  public Integer lastPage;
+  public String binaryURL; // NO_UCD (unused code)
+  public String pdfID; // NO_UCD (unused code)
+  public Integer firstPage; // NO_UCD (unused code)
+  public Integer lastPage; // NO_UCD (unused code)
 
 }

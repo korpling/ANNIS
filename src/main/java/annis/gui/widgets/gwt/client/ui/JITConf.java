@@ -23,7 +23,7 @@ import com.google.gwt.json.client.JSONString;
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
-public class JITConf extends JSONObject {
+public class JITConf extends JSONObject { // NO_UCD (use default)
 
   protected JITConf() {}
 
@@ -31,19 +31,19 @@ public class JITConf extends JSONObject {
     return this.getJavaScriptObject();
   }
 
-  public void setProperty(String key, Boolean value) {
+  public void setProperty(String key, Boolean value) { // NO_UCD (unused code)
     this.put(key, JSONBoolean.getInstance(value));
   }
 
-  public void setProperty(String key, Integer value) {
+  public void setProperty(String key, Integer value) { // NO_UCD (unused code)
     this.put(key, new JSONNumber(value));
   }
 
-  public void setProperty(String key, JSONObject value) {
+  public void setProperty(String key, JSONObject value) { // NO_UCD (use default)
     this.put(key, value);
   }
 
-  public void setProperty(String key, String value) {
+  public void setProperty(String key, String value) { // NO_UCD (use default)
     this.put(key, new JSONString(value));
   }
 }

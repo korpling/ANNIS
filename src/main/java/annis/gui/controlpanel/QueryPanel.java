@@ -207,8 +207,6 @@ public class QueryPanel extends GridLayout implements ValueChangeListener {
      */
     private static final long serialVersionUID = 8843266533468321213L;
     public static final int MAX_HISTORY_MENU_ITEMS = 5;
-    // the view name
-    public static final String NAME = "query";
     private AqlCodeEditor txtQuery;
     private TextArea txtStatus;
     private Button btShowResult;

@@ -21,7 +21,6 @@ import com.google.gwt.dom.client.TableRowElement;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HTMLTable.Cell;
 import com.vaadin.client.ApplicationConnection;
 import com.vaadin.client.Paintable;
 import com.vaadin.client.UIDL;
@@ -94,12 +93,7 @@ public class VAnnotationGrid extends Composite implements Paintable {
 
     private int column, row;
 
-    public Position(Cell cell) {
-      this.column = cell.getCellIndex();
-      this.row = cell.getRowIndex();
-    }
-
-    public Position(int row, int column) {
+    private Position(int row, int column) {
       this.column = column;
       this.row = row;
     }
