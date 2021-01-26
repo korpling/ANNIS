@@ -32,7 +32,7 @@ import com.vaadin.client.ui.dd.VTransferable;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-class VGripDragComponent extends VCustomComponent {
+public class VGripDragComponent extends VCustomComponent {
 
   ApplicationConnection client;
 
