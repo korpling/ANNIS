@@ -330,7 +330,7 @@ public class MigrationPanel extends Panel
   }
 
   @Override
-  public OutputStream receiveUpload(String filename, String mimeType) {
+  public OutputStream receiveUpload(String filename, String mimeType) { // NO_UCD (test only)
     try {
       urlShortenerFile = File.createTempFile(filename, "");
       urlShortenerFile.deleteOnExit();
@@ -343,7 +343,7 @@ public class MigrationPanel extends Panel
   }
 
   @Override
-  public void uploadFinished(FinishedEvent event) {
+  public void uploadFinished(FinishedEvent event) { // NO_UCD (test only)
     migrateButton.setEnabled(true);
   }
 

@@ -19,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.imageio.ImageIO;
@@ -76,8 +75,8 @@ class TigerTreeVisualizerTest {
     SDocumentGraph graph = doc.getDocumentGraph();
 
     // Mark the root node as match
-    Match m = new Match(
-        Arrays.asList(graph.getRootsByRelation(SALT_TYPE.SDOMINANCE_RELATION).get(0).getId()));
+    Match m = Match
+        .parseFromString(graph.getRootsByRelation(SALT_TYPE.SDOMINANCE_RELATION).get(0).getId());
     Helper.addMatchToDocumentGraph(m, graph);
 
     when(visInput.getDocument()).thenReturn(doc);
