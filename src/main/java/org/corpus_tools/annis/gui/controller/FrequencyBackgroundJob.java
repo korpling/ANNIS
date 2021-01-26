@@ -75,7 +75,7 @@ public class FrequencyBackgroundJob implements Callable<List<FrequencyTableRow>>
         d.setNodeRef(e.getReferencedNode());
         switch (e.getType()) {
           case span:
-            d.setNs("org.corpus_tools.annis");
+            d.setNs("annis");
             d.setName("tok");
             break;
           case annotation:

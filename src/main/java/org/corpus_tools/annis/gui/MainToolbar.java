@@ -389,7 +389,7 @@ public class MainToolbar extends HorizontalLayout
 
   @Override
   public void onSettingsLoaded(SettingsStorage settings) {
-    String sidebarStateSetting = settings.get("org.corpus_tools.annis-sidebar-state");
+    String sidebarStateSetting = settings.get("annis-sidebar-state");
     if (sidebarStateSetting != null) {
       try {
         sidebarState = SidebarState.valueOf(sidebarStateSetting);

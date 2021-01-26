@@ -105,7 +105,7 @@ public class HTMLVis extends AbstractVisualizer {
     corpusName = urlPathEscape.escape(corpusName);
 
     String wrapperClassName =
-        "org.corpus_tools.annis-wrapped-htmlvis-" + corpusName.replaceAll("[^0-9A-Za-z-]", "_");
+        "annis-wrapped-htmlvis-" + corpusName.replaceAll("[^0-9A-Za-z-]", "_");
 
     scrollPanel.addStyleName(wrapperClassName);
 

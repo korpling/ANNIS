@@ -34,7 +34,7 @@ import org.corpus_tools.salt.util.DataSourceSequence;
  * </p>
  * <ul>
  * <li>Get all spans which are annoteted with a page number.</li>
- * <li>Create intervalls left and right token index of the org.corpus_tools.annis model with the help of SFeatures
+ * <li>Create intervalls left and right token index of the annis model with the help of SFeatures
  * and {@link AnnisConstants} and build a mapping from these intervalls to the sspan.</li>
  * <li>Get the best fitting intervall for a specific span.</li>
  * </ul>

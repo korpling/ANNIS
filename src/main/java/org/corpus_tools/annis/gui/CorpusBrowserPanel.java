@@ -186,7 +186,7 @@ public class CorpusBrowserPanel extends Panel {
 
     try {
       final List<Annotation> nodeAnnos = api.nodeAnnotations(corpus, true, true).stream()
-          .filter(a -> !Objects.equals(a.getKey().getNs(), "org.corpus_tools.annis")
+          .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
               && !Objects.equals(a.getKey().getName(), "tok"))
           .collect(Collectors.toList());
 

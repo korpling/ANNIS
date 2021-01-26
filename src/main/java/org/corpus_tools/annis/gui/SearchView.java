@@ -586,7 +586,7 @@ public class SearchView extends GridLayout
             controlPanel.setVisible(state.isSidebarVisible());
 
             // set cookie
-            ui.getSettings().set("org.corpus_tools.annis-sidebar-state", state.name(), 30);
+            ui.getSettings().set("annis-sidebar-state", state.name(), 30);
         }
     }
 

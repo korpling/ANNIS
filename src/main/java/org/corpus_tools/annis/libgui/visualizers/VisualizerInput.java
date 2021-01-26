@@ -178,7 +178,7 @@ public class VisualizerInput implements Serializable {
 
   /**
    * This cachedToken annotation should displayed by the visualizer and is selected by the user in
-   * the org.corpus_tools.annis gui.
+   * the annis gui.
    */
   public Set<String> getVisibleTokenAnnos() {
     return this.tokenAnnos;
@@ -273,7 +273,7 @@ public class VisualizerInput implements Serializable {
 
   /**
    * Set all cachedToken annotations which should be displayed by the visualizer and correspondands
-   * to the annos choosen by the user in the org.corpus_tools.annis gui.
+   * to the annos choosen by the user in the annis gui.
    */
   public void setVisibleTokenAnnos(Set<String> tokenAnnos) {
     this.tokenAnnos = tokenAnnos;

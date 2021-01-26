@@ -82,7 +82,7 @@ public class AboutWindow extends Window {
         HorizontalLayout hLayout = new HorizontalLayout();
 
         Image logoAnnis = new Image();
-        logoAnnis.setSource(new ThemeResource("images/org.corpus_tools.annis-logo-128.png"));
+        logoAnnis.setSource(new ThemeResource("images/annis-logo-128.png"));
         hLayout.addComponent(logoAnnis);
 
         Image logoSfb = new Image();
@@ -105,7 +105,8 @@ public class AboutWindow extends Window {
                 new Label("ANNIS is a project of the " + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.",
                         ContentMode.HTML));
         layout.addComponent(new Label(
-                "Homepage: " + "<a href=\"http://corpus-tools.org/org.corpus_tools.annis/\">" + "http://corpus-tools.org/org.corpus_tools.annis/</a>.",
+            "Homepage: " + "<a href=\"http://corpus-tools.org/annis/\">"
+                + "http://corpus-tools.org/annis/</a>.",
                 ContentMode.HTML));
         layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
         layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));

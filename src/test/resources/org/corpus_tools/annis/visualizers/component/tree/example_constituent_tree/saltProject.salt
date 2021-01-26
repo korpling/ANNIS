@@ -12,7 +12,7 @@
 	</nodes>
 	<nodes xsi:type="sCorpusStructure:SDocument">
 		<labels xsi:type="saltCore:SElementId" namespace="salt" name="id" value="T::salt:/rootCorpus/subCorpus1/doc1"/>
-		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SDOCUMENT_GRAPH_LOCATION" value="T::file:/home/thomas/src/ANNIS/src/test/resources/org.corpus_tools.annis/visualizers/component/tree/example_constituent_tree/rootCorpus/subCorpus1/doc1.salt"/>
+		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SDOCUMENT_GRAPH_LOCATION" value="T::file:/home/thomas/src/ANNIS/src/test/resources/annis/visualizers/component/tree/example_constituent_tree/rootCorpus/subCorpus1/doc1.salt" />
 		
 		<labels xsi:type="saltCore:SFeature" namespace="salt" name="SNAME" value="T::doc1"/>
 	</nodes>

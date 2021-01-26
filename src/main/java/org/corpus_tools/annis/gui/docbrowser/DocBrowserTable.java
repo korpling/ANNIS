@@ -330,7 +330,7 @@ public class DocBrowserTable extends Table {
   }
 
   /**
-   * Retrieves date from the cache or from the org.corpus_tools.annis rest service for a specific document.
+   * Retrieves date from the cache or from the annis rest service for a specific document.
    *
    * @param document The document the data are fetched for.
    * @return The a list of meta data. Can be empty but never null.
@@ -400,7 +400,7 @@ public class DocBrowserTable extends Table {
       Collections.reverse(pathList);
       String path = StringUtils.join(pathList, " > ");
 
-      // use corpus path for row id, since it should be unique by org.corpus_tools.annis db schema
+      // use corpus path for row id, since it should be unique by annis db schema
       Item row = container.addItem(path);
       if (row != null) {
         row.getItemProperty(PROP_DOC_NAME).setValue(doc);

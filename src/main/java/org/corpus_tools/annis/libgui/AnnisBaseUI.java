@@ -70,7 +70,7 @@ public class AnnisBaseUI extends UI implements Serializable {
    * The files in the result list do not necessarily exist.
    *
    * These locations are the - base installation: WEB-INF/conf/ folder of the deployment. - global
-   * configuration: $ANNIS_CFG environment variable value or /etc/org.corpus_tools.annis/ if not set
+   * configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set
    * - user configuration: ~/.annis/
    * 
    * @param configFile The file path of the configuration file relative to the base config folder.
@@ -86,10 +86,10 @@ public class AnnisBaseUI extends UI implements Serializable {
 
     // next everything from the global config
     // When ANNIS_CFG environment variable is set use this value or default to
-    // "/etc/org.corpus_tools.annis/
+    // "/etc/annis/
     String globalConfigDir = System.getenv("ANNIS_CFG");
     if (globalConfigDir == null) {
-      globalConfigDir = "/etc/org.corpus_tools.annis";
+      globalConfigDir = "/etc/annis";
     }
     locations.add(new File(globalConfigDir + "/" + configFile));
 
@@ -203,7 +203,7 @@ public class AnnisBaseUI extends UI implements Serializable {
       String wrappedContent =
           wrapperClass == null ? cssContent : "." + wrapperClass + "{\n" + cssContent + "\n}";
 
-      File tmpFile = File.createTempFile("org.corpus_tools.annis-stylesheet", ".scss");
+      File tmpFile = File.createTempFile("annis-stylesheet", ".scss");
       Files.write(wrappedContent, tmpFile, Charsets.UTF_8);
       ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath());
       styleSheet.compile();

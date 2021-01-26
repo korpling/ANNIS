@@ -181,7 +181,7 @@ public class EmbeddedVisUI extends CommonUI {
   private void displayGeneralHelp() {
     displayMessage("Path not complete",
         "You have to specify what visualizer to use and which document of which corpus you want to visualizer by giving the correct path:<br />"
-            + "<code>http://example.com/org.corpus_tools.annis/embeddedvis/&lt;vis&gt;/&lt;corpus&gt;/&lt;doc&gt;</code>"
+            + "<code>http://example.com/annis/embeddedvis/&lt;vis&gt;/&lt;corpus&gt;/&lt;doc&gt;</code>"
             + "<ul>"
             + "<li><code>vis</code>: visualizer name (currently only \"htmldoc\" is supported)</li>"
             + "<li><code>corpus</code>: corpus name</li>"

@@ -4,12 +4,12 @@
 /.netbeans/
 /node_modules/
 /package-lock.json
-/org.corpus_tools.annis-service/src/main/antlr3/org.corpus_tools.annis/ql/output/
+/annis-service/src/main/antlr3/annis/ql/output/
 target/
 *.settings/
 /doc/html/
 /doc/latex/
-/org.corpus_tools.annis-widgets/src/main/webapp/VAADIN/
+/annis-widgets/src/main/webapp/VAADIN/
 rebel.xml
 *.project
 *.classpath

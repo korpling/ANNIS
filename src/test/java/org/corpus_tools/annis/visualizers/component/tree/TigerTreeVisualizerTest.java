@@ -91,7 +91,7 @@ class TigerTreeVisualizerTest {
     when(visInput.getMappings()).thenReturn(mappings);
 
     // Create the resource as byte array
-    File tmpFile = File.createTempFile("org.corpus_tools.annis-tree-test-", ".png");
+    File tmpFile = File.createTempFile("annis-tree-test-", ".png");
     try (FileOutputStream outStream = new FileOutputStream(tmpFile)) {
       vis.writeOutput(visInput, outStream);
     }

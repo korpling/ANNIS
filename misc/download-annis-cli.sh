@@ -4,9 +4,9 @@ GRAPHANNIS_VERSION=${1:-0.30.0}
 
 install_graphannis_cli=false
 
-if [[ -x $HOME/.cargo/bin/org.corpus_tools.annis ]]; then
+if [[ -x $HOME/.cargo/bin/annis ]]; then
     echo "Checking for graphANNIS version ${GRAPHANNIS_VERSION}"
-    EXISTING_GRAPHANNIS_VERSION=`$HOME/.cargo/bin/org.corpus_tools.annis --version`
+    EXISTING_GRAPHANNIS_VERSION=`$HOME/.cargo/bin/annis --version`
     echo "Existing: ${EXISTING_GRAPHANNIS_VERSION}"
     if [ "graphANNIS CLI ${GRAPHANNIS_VERSION}" != "${EXISTING_GRAPHANNIS_VERSION}" ]; then
         install_mdbook=true
@@ -23,18 +23,18 @@ if [ "$install_graphannis_cli" = true ] ; then
 
         if [[ "$OS_NAME" == "linux" ]];
         then
-            rm -f $HOME/.cargo/bin/org.corpus_tools.annis
-            curl -L -o $HOME/.cargo/bin/org.corpus_tools.annis https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/org.corpus_tools.annis
-            chmod u+x $HOME/.cargo/bin/org.corpus_tools.annis
+            rm -f $HOME/.cargo/bin/annis
+            curl -L -o $HOME/.cargo/bin/annis https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/annis
+            chmod u+x $HOME/.cargo/bin/annis
         elif [[ "$OS_NAME" == "osx" ]];
         then
-            rm -f $HOME/.cargo/bin/org.corpus_tools.annis
-            curl -L -o $HOME/.cargo/bin/org.corpus_tools.annis https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/org.corpus_tools.annis.osx
-            chmod u+x $HOME/.cargo/bin/org.corpus_tools.annis
+            rm -f $HOME/.cargo/bin/annis
+            curl -L -o $HOME/.cargo/bin/annis https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/annis.osx
+            chmod u+x $HOME/.cargo/bin/annis
         elif [[ "$OS_NAME" == "windows" ]];
         then
-            del /s /q $HOME/.cargo/bin/org.corpus_tools.annis.exe
-            curl -L -o $HOME/.cargo/bin/org.corpus_tools.annis.exe https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/org.corpus_tools.annis.exe
+            del /s /q $HOME/.cargo/bin/annis.exe
+            curl -L -o $HOME/.cargo/bin/annis.exe https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/annis.exe
         else
             >&2 echo "Unknown value \"${OS_NAME}\" for environment variable OS_NAME"
         	exit 1

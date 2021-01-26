@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 
 
 @JavaScript({"VisJs_Connector.js", "vaadin://jquery.js", "vis.min.js"})
-@StyleSheet({"vaadin://themes/org.corpus_tools.annis-visualizer-theme/visjs/vis.min.css"
+@StyleSheet({"vaadin://themes/annis-visualizer-theme/visjs/vis.min.css"
 
 })
 

@@ -60,7 +60,7 @@ public class ExportBackgroundJob implements Callable<File> {
 
     @Override
     public File call() throws Exception {
-        final File currentTmpFile = File.createTempFile("org.corpus_tools.annis-export", "." + exporter.getFileEnding());
+        final File currentTmpFile = File.createTempFile("annis-export", "." + exporter.getFileEnding());
         currentTmpFile.deleteOnExit();
 
         final Map<String, CorpusConfiguration> corpusConfigs = new LinkedHashMap<>();

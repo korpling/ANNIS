@@ -5,20 +5,20 @@
 # Required-Stop:     
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Start all org.corpus_tools.annis services installed on korpling
-# Description:       Start all org.corpus_tools.annis services installed on korpling
+# Short-Description: Start all annis services installed on korpling
+# Description:       Start all annis services installed on korpling
 ### END INIT INFO
 # Author: Thomas Krause <krauseto@hu-berlin.de>
 
 # Config
-ANNIS_USER=org.corpus_tools.annis
+ANNIS_USER=annis
 
-# wrapper for org.corpus_tools.annis-service.sh
+# wrapper for annis-service.sh
 service() {
 	echo $1
 	echo "-----------"
-	export ANNIS_HOME=/opt/org.corpus_tools.annis/$1/
-	sudo -u $ANNIS_USER -E $ANNIS_HOME/bin/org.corpus_tools.annis-service.sh $2
+	export ANNIS_HOME=/opt/annis/$1/
+	sudo -u $ANNIS_USER -E $ANNIS_HOME/bin/annis-service.sh $2
 	sleep 2
 }
 
@@ -28,7 +28,7 @@ service() {
 if [ -n "$2" ]; then
 	service $2 $1
 else
-	service "org.corpus_tools.annis-stable" $1
+	service "annis-stable" $1
 #	service "annis3-snapshot" $1
 fi
 

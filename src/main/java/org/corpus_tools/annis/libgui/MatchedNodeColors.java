@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * Colors for matched nodes. The names and color values correspond to the CSS standard. <br>
  * <br>
- * These colors must always be synchronized with the "match-color" definitions in the org.corpus_tools.annis.scss
+ * These colors must always be synchronized with the "match-color" definitions in the annis.scss
  * style sheet.
  * 
  * @author Thomas Krause <krauseto@hu-berlin.>

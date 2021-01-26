@@ -74,7 +74,7 @@ public class FrequencyResultPanel extends VerticalLayout {
         @Override
         public InputStream getStream() {
             try {
-                File tmpFile = File.createTempFile("org.corpus_tools.annis-frequency", ".txt");
+                File tmpFile = File.createTempFile("annis-frequency", ".txt");
                 tmpFile.deleteOnExit();
                 try (Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
                         CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\')) {

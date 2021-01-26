@@ -68,7 +68,7 @@ public class TimeHelper {
 
     for (SToken tok : token) {
 
-      SAnnotation anno = tok.getAnnotation(SaltUtil.createQName("org.corpus_tools.annis", "time"));
+      SAnnotation anno = tok.getAnnotation(SaltUtil.createQName("annis", "time"));
       if (anno != null && anno.getValue_STEXT() != null && !anno.getValue_STEXT().isEmpty()
           && !anno.getValue_STEXT().matches("\\-[0-9]*(\\.[0-9]*)?")) {
         try {

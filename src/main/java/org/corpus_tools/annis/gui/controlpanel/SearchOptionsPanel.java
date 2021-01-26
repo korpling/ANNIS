@@ -141,7 +141,7 @@ public class SearchOptionsPanel extends FormLayout {
       try {
         // Get all ordering components
         for(Component c : corporaApi.components(corpus, AnnotationComponentType.ORDERING.getValue(), null)) {
-          if (!c.getName().isEmpty() && !"org.corpus_tools.annis".equals(c.getLayer())) {
+          if (!c.getName().isEmpty() && !"annis".equals(c.getLayer())) {
             segNames.add(c.getName());
           }
         }

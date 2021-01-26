@@ -325,7 +325,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
     this.mappings = input.getMappings();
 
     /**
-     * Try to create a sorted map of nodes. The left org.corpus_tools.annis feature token index is used for sorting
+     * Try to create a sorted map of nodes. The left annis feature token index is used for sorting
      * the nodes. It is possible the different nodes has the same left token index, but the
      * probability of this is small and it seem's not to make much sense to visualize this. Mabye we
      * should use the node id.

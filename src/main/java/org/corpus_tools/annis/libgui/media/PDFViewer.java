@@ -14,7 +14,7 @@
 package org.corpus_tools.annis.libgui.media;
 
 /**
- * Provides a pdf viewer for the org.corpus_tools.annis gui and makes it controllable for all components of the gui.
+ * Provides a pdf viewer for the annis gui and makes it controllable for all components of the gui.
  *
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
