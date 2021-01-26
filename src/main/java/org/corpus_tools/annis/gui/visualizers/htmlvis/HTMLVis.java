@@ -231,86 +231,87 @@ public class HTMLVis extends AbstractVisualizer {
           }
         }
       }
+    } // end if spans not empty
 
-      int minStartTagPos = outputStartTags.firstKey().intValue();
-      int maxEndTagPos = outputEndTags.lastKey().intValue();
+    int minStartTagPos = outputStartTags.firstKey().intValue();
+    int maxEndTagPos = outputEndTags.lastKey().intValue();
 
-      // Find BEGIN and END instructions if available
-      for (VisualizationDefinition vis : definitions) {
+    // Find BEGIN and END instructions if available
+    for (VisualizationDefinition vis : definitions) {
 
-        if (vis.getMatcher() instanceof PseudoRegionMatcher) {
-          PseudoRegionMatcher.PseudoRegion psdRegionType =
-              ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
-          int positionStart = 0;
-          int positionEnd = 0;
+      if (vis.getMatcher() instanceof PseudoRegionMatcher) {
+        PseudoRegionMatcher.PseudoRegion psdRegionType =
+            ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
+        int positionStart = 0;
+        int positionEnd = 0;
 
-          if (!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null) {
-            switch (psdRegionType) {
-              case BEGIN:
-                positionStart = positionEnd = Integer.MIN_VALUE;
+        if (!outputEndTags.isEmpty() && !outputStartTags.isEmpty() && psdRegionType != null) {
+          switch (psdRegionType) {
+            case BEGIN:
+              positionStart = positionEnd = Integer.MIN_VALUE;
 
-                // def_priority is now lower than all normal annotation
-                instruction_priorities.put(vis, def_priority);
-                break;
-              case END:
-                positionStart = positionEnd = Integer.MAX_VALUE;
-
-                // def_priority is now lower than all normal annotation
-                instruction_priorities.put(vis, def_priority);
-                break;
-              case ALL:
-                // use same position as last and first key
-                positionStart = minStartTagPos;
-                positionEnd = maxEndTagPos;
-
-                // The ALL pseudo-range must enclose everything, thus it get the
-                // priority which is one lower than the smallest non BEGIN/END
-                // priority.
-                instruction_priorities.put(vis, def_priority);
-                break;
-              default:
-                break;
-            }
-          }
-
-          switch (vis.getOutputter().getType()) {
-            case META_NAME:
-              String strMetaVal = meta.get(vis.getOutputter().getMetaname().trim());
-              if (strMetaVal == null) {
-                throw new NullPointerException("no such metadata name in document: '"
-                    + vis.getOutputter().getMetaname().trim() + "'");
-              } else {
-                vis.getOutputter().outputAny(positionStart, positionEnd,
-                    ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), strMetaVal,
-                    outputStartTags, outputEndTags, instruction_priorities.getOrDefault(vis, 0));
-              }
+              // def_priority is now lower than all normal annotation
+              instruction_priorities.put(vis, def_priority);
               break;
-            case CONSTANT:
-              vis.getOutputter().outputAny(positionStart, positionEnd,
-                  ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
-                  vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
-                  instruction_priorities.getOrDefault(vis, 0));
+            case END:
+              positionStart = positionEnd = Integer.MAX_VALUE;
+
+              // def_priority is now lower than all normal annotation
+              instruction_priorities.put(vis, def_priority);
               break;
-            case EMPTY:
-              vis.getOutputter().outputAny(positionStart, positionEnd,
-                  ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), "", outputStartTags,
-                  outputEndTags, instruction_priorities.getOrDefault(vis, 0));
+            case ALL:
+              // use same position as last and first key
+              positionStart = minStartTagPos;
+              positionEnd = maxEndTagPos;
+
+              // The ALL pseudo-range must enclose everything, thus it get the
+              // priority which is one lower than the smallest non BEGIN/END
+              // priority.
+              instruction_priorities.put(vis, def_priority);
               break;
-            case ANNO_NAME:
-              break; // this shouldn't happen, since the BEGIN/END instruction has no triggering
-                     // annotation name or value
-            case VALUE:
-              break; // this shouldn't happen, since the BEGIN/END instruction has no triggering
-                     // annotation name or value
-            case ESCAPED_VALUE:
-              break; // this shouldn't happen, since the BEGIN/END instruction has no triggering
-                     // annotation name or value
             default:
+              break;
           }
+        }
 
+        switch (vis.getOutputter().getType()) {
+          case META_NAME:
+            String strMetaVal = meta.get(vis.getOutputter().getMetaname().trim());
+            if (strMetaVal == null) {
+              throw new NullPointerException("no such metadata name in document: '"
+                  + vis.getOutputter().getMetaname().trim() + "'");
+            } else {
+              vis.getOutputter().outputAny(positionStart, positionEnd,
+                  ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), strMetaVal,
+                  outputStartTags, outputEndTags, instruction_priorities.getOrDefault(vis, 0));
+            }
+            break;
+          case CONSTANT:
+            vis.getOutputter().outputAny(positionStart, positionEnd,
+                ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(),
+                vis.getOutputter().getConstant(), outputStartTags, outputEndTags,
+                instruction_priorities.getOrDefault(vis, 0));
+            break;
+          case EMPTY:
+            vis.getOutputter().outputAny(positionStart, positionEnd,
+                ((PseudoRegionMatcher) vis.getMatcher()).getAnnotationName(), "", outputStartTags,
+                outputEndTags, instruction_priorities.getOrDefault(vis, 0));
+            break;
+          case ANNO_NAME:
+            break; // this shouldn't happen, since the BEGIN/END instruction has no triggering
+                   // annotation name or value
+          case VALUE:
+            break; // this shouldn't happen, since the BEGIN/END instruction has no triggering
+                   // annotation name or value
+          case ESCAPED_VALUE:
+            break; // this shouldn't happen, since the BEGIN/END instruction has no triggering
+                   // annotation name or value
+          default:
         }
 
       }
+
+
 
       // get all used indexes
       Set<Long> indexes = new TreeSet<>();
@@ -367,7 +368,7 @@ public class HTMLVis extends AbstractVisualizer {
         }
 
       }
-    } // end if spans not empty
+    }
 
     return sb.toString();
   }
