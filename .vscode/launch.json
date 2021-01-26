@@ -9,7 +9,7 @@
       "name": "Debug Server",
       "request": "launch",
       "projectName": "annis-gui",
-      "mainClass": "annis.gui.AnnisUiApplication",
+      "mainClass": "org.corpus_tools.annis.gui.AnnisUiApplication",
       "cwd": "${workspaceFolder}",
       "preLaunchTask": "build",
     },
@@ -18,7 +18,7 @@
       "name": "Debug Desktop",
       "request": "launch",
       "projectName": "annis-gui",
-      "mainClass": "annis.gui.AnnisUiApplication",
+      "mainClass": "org.corpus_tools.annis.gui.AnnisUiApplication",
       "cwd": "${workspaceFolder}",
       "env": {
         "spring_profiles_active": "desktop"

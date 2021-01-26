@@ -95,7 +95,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="interface.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="interface-search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="interface-result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="interface-query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li class="chapter-item expanded "><a href="aql.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="aql-word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="aql-annotations.html"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="aql-regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="aql-trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="aql-pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="aql-export.html"><strong aria-hidden="true">3.6.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="aql-frequency.html"><strong aria-hidden="true">3.7.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="aql-operators.html"><strong aria-hidden="true">3.8.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="aql-compatibility-mode.html"><strong aria-hidden="true">3.9.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="interface/index.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="interface/search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="interface/result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="interface/query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li class="chapter-item expanded "><a href="aql.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="aql-word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="aql-annotations.html"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="aql-regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="aql-trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="aql-pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="aql-export.html"><strong aria-hidden="true">3.6.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="aql-frequency.html"><strong aria-hidden="true">3.7.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="aql-operators.html"><strong aria-hidden="true">3.8.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="aql-compatibility-mode.html"><strong aria-hidden="true">3.9.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,10 +166,107 @@
 It can be used to search for complex graph structures of annotated nodes and edges forming a variety of linguistic structures, such as constituent or dependency syntax trees, coreference, rhetorical structure and parallel alignment edges, span annotations and associated multi-modal data (audio/video).</p>
 <p>In this online help, you can learn more about <a href="interface.html">how to use the ANNIS interface</a> and the <a href="aql.html">query language AQL</a>.
 Additional documentation is available from the homepage at <a href="http://corpus-tools.org/annis/documentation.html" target="_blank">http://corpus-tools.org/annis/documentation.html</a>.</p>
-<p>{{#include ../../user-guide/src/interface.md}}</p>
-<p>{{#include ../../user-guide/src/interface-search-form.md}}</p>
-<p>{{#include ../../user-guide/src/interface-result-window.md}}</p>
-<p>{{#include ../../user-guide/src/interface-query-builder.md}}</p>
+<h1><a class="header" href="#using-the-annis-interface" id="using-the-annis-interface">Using the ANNIS interface</a></h1>
+<p>The ANNIS interface is comprised of several areas, the most important of
+which are the search form on the left side and the results tab on the right side.</p>
+<p><img src="interface/annis3_interface.png" alt="Screenshot of the ANNIS user interface" /></p>
+<h1><a class="header" href="#search-form" id="search-form">Search Form</a></h1>
+<p><img src="interface/searchform.png" alt="ANNIS search form" /></p>
+<p>The Search Form can be found on the left of the interface window. It's
+bottom part shows the list of currently available corpora. By clicking
+on the line with the corpus name, it is possible to select which corpora
+should be searched in (hold down 'ctrl' to select multiple corpora
+simultaneously). You may also configure groups of corpora or type in the
+filter box to view subsets of the corpora.</p>
+<p>The &quot;AQL&quot; field at the top of the form is used for inputting queries
+manually (see the tutorials on the ANNIS Query Language from the ANNIS
+website). As soon as one or several corpora are selected and a query is
+entered or modified, the query will be validated automatically and
+possible errors in the query syntax will be commented on in the
+&quot;Status&quot; box below (which says &quot;valid query&quot; in the image above).</p>
+<p>Once a valid query has been entered, pressing the &quot;Search&quot; button will
+retrieve the number of matching positions and documents in the selected
+corpora in the Status box and open the Result tab to display the first
+set of matches.</p>
+<p><img src="interface/searchoptions.png" alt="ANNIS search options" /></p>
+<p>In order to get more control over the search you can click on &quot;Search
+Options&quot; to unfold more detailed search options. The context
+surrounding the matching expressions in the result list ist determined
+by the &quot;Left Context&quot; and &quot;Right Context&quot; options and can be changed
+on each side (by default up to 20 tokens). You can also configure how
+many results are shown per page, what order results are shown in
+(ascending, descending or random) and for some corpora, you can select
+alternative segmentation layers to visualize data (relevant for
+languages with multiple tokens per word form, etc., such as Arabic).
+Entire texts can also be viewed using special document visualizations or
+by clicking on the document icon next to each corpus name, if available.</p>
+<p>The &quot;Query Language&quot; option allows to switch between the default AQL dialect 
+and an <a href="interface/../aql-compatibility-mode.html">compatibility mode</a> emulating the behavior of the older ANNIS3.
+Make sure to use the latest version for all new queries.</p>
+<h1><a class="header" href="#result-window" id="result-window">Result Window</a></h1>
+<p><img src="interface/search_bar.png" alt="ANNIS result window toolbar" /></p>
+<p>The result window shows search results in pages of 10 hits each by
+default (this can be changed in the Search Form). The toolbar at the top
+of the window allows you to navigate between these pages. The &quot;Token
+Annotations&quot; button on the toolbar allows you to toggle the token based
+annotations, such as lemmas and parts-of-speech, on or off for you
+convenience. You can use hyperlinks to your queries by copying the
+current browser URL for e-mail or citation purposes, allowing others to
+reproduce your query.</p>
+<p>If your corpus contains multiple alternative text layers or
+segmentations (e.g. normalized and un-normalized text), you may switch
+between these on the fly by using the &quot;base text&quot; menu.</p>
+<p><img src="interface/KWIC_narrow.png" alt="KWIC concordance in ANNIS" /></p>
+<p>The result list itself initially shows a KWIC (key word in context)
+concordance of matching positions in the selected corpora, with the
+matching regions marked in color and the context in black on either
+side. Colors in the result match the colors of search expressions in the
+search box (red for the search item #1, purple for #2, etc.).</p>
+<p>Context can be adjusted for individual search results up to the maximum
+allowed for the current corpus. Token annotations are displayed in gray
+under each token, and hovering over them with the mouse will show the
+annotation name and namespace. More complex annotation levels can be
+expanded, if available, by clicking on the plus icon next to the
+level's name, e.g. dependencies and referent information for the
+annotations in the dependency tree and grid views in the picture below.</p>
+<p><img src="interface/annotation_levels.png" alt="visualization of different annotation levels" /></p>
+<h1><a class="header" href="#query-builder" id="query-builder">Query Builder</a></h1>
+<p>To open the graphical query builder, click on the <strong>Query Builder</strong>
+button. On the left-hand side of the toolbar at the top of the query
+builder canvans, you will see the <strong>Add Node</strong> button. Use this button
+to define nodes to be searched for (tokens, non-terminal nodes or
+annotations). Creating nodes and modifying them on the canvas will
+immediately update the AQL field in the Search Form with your query,
+though updating the query on the Search Form will not create a new graph
+in the Query Builder.</p>
+<p><img src="interface/query_builder_empty.png" alt="The Query Builder tab and the Create Node button" /></p>
+<p>In each node you create you may click on <img src="interface/list-add.png" alt="The Add Node button" /> to specify an 
+annotation value. The annotation name can be typed in or selected from a drop down list once a corpus is
+selected. The operator field in the middle allows you to choose between
+an exact match (the '=' symbol) or wildcard search using Regular
+Expressions (the '~' symbol). The annotation value is given on the
+right, and should <strong>NOT</strong> be surrounded by quotations (see the example
+below). It is also possible to specify multiple annotations applying to
+the same position by clicking on <img src="interface/list-add.png" alt="The Add Node button" />
+multiple times. Clicking on <img src="interface/edit-clear.png" alt="The Clear all nodes button" />
+will delete the values in the node. To search
+for word forms, simply choose &quot;tok&quot; as the field name on the left. A
+node with no data entered will match any node, that is an underspecified
+token or non-terminal node or annotation.</p>
+<p><img src="interface/node.png" alt="Query Builder node" /></p>
+<p>To specify the relationship between nodes, first click on the &quot;Edge&quot;
+link at the top left of one node, and then click the &quot;Dock&quot; link which
+becomes available on the other nodes. An edge will connect the nodes
+with an extra box from which operators may be selected (see below). For
+operators allowing additional labels (e.g. the dominance operator <code>&gt;</code>
+allows edge labels to be specified), you may type directly into the
+edge's operator box, as in the example with a &quot;func&quot; label in the
+image below. Note that the node clicked on first (where the &quot;Edge&quot;
+button was clicked) will be the first node in the resulting quey, i.e.
+if this is the first node it will dominate the second node (<code>#1 &gt; #2</code>)
+and not the other way around, as also represented by the arrows along
+the edge.</p>
+<p><img src="interface/edge.png" alt="Connecting nodes with an edge" /></p>
 <h1><a class="header" href="#annis-query-language-aql" id="annis-query-language-aql">ANNIS Query Language (AQL)</a></h1>
 <p>ANNIS comes with its own query language called ANNIS Query Language (AQL).
 AQL is based on the concept of searching for annotation attributes and relations between them.</p>
