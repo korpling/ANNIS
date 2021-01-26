@@ -24,7 +24,8 @@ import com.vaadin.server.FontIcon;
  */
 public enum ANNISFontIcon implements FontIcon {
 
-    SPACE(0xe600), RIGHT_ARROW(0xe601), LEFT_ARROW(0xe602), LAST(0xe603), FIRST(0xe604), MENU_RIGHT(0xe605), MENU_LEFT(
+  RIGHT_ARROW(0xe601), LEFT_ARROW(0xe602), LAST(0xe603), FIRST(0xe604), MENU_RIGHT(
+      0xe605), MENU_LEFT(
             0xe606), MENU_AUTO(0xe607), LOGO(0xe608);
 
     private final int codepoint;

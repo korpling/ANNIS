@@ -74,10 +74,7 @@ public class VerticalNode extends Panel implements Button.ClickListener {
         setContent(vframe);
     }
 
-    public void addSearchBox(SearchBox sb) {
-        this.sboxes.add(sb);
-        v.addComponent(sb);
-    }
+
 
     @Override
     public void buttonClick(Button.ClickEvent event) {

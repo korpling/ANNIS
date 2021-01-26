@@ -68,15 +68,6 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
    * Returns a generic Grid-Object.
    *
    * @param resultID The salt Id of the result.
-   */
-  public AnnotationGrid(String resultID) {
-    this(null, null, resultID);
-  }
-
-  /**
-   * Returns a generic Grid-Object.
-   *
-   * @param resultID The salt Id of the result.
    * @param tokRowKey Defines the tok row and applies the token style. If null the "tok" value is
    *        used.
    */

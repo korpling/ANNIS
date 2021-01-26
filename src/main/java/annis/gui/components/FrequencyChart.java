@@ -60,7 +60,6 @@ public class FrequencyChart extends VerticalLayout {
 
     public static final org.slf4j.Logger log = LoggerFactory.getLogger(FrequencyChart.class);
 
-    public static final int MAX_ITEMS = 25;
     private FrequencyWhiteboard whiteboard;
     private final OptionGroup options;
 

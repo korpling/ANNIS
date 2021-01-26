@@ -14,10 +14,8 @@
 package annis.service.objects;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
@@ -35,42 +33,13 @@ public class MatchGroup implements Serializable {
    * 
    */
   private static final long serialVersionUID = -439541347794416714L;
-
-  public final static Splitter lineSplitter = Splitter.on('\n').trimResults().omitEmptyStrings();
-
   private final static Joiner lineJoiner = Joiner.on('\n');
-
-  /**
-   * Parses a string representation of a {@link MatchGroup}. Each group is separated with a new line
-   * and each Salt ID with a space. Example: {@code 
-   * salt://id1,salt://id2 salt://id3
-   * salt://id4
-   * salt://id5 salt://id6
-   * }
-   * 
-   * @param raw string representation of the {@link MatchGroup}
-   * @return
-   */
-  public static MatchGroup parseString(String raw) {
-    MatchGroup saltIDs = new MatchGroup();
-    for (String group : lineSplitter.split(raw)) {
-      saltIDs.matches.add(Match.parseFromString(group));
-    }
-
-    return saltIDs;
-  }
 
   private List<Match> matches;
 
   public MatchGroup() {
     matches = new ArrayList<>();
   }
-
-  public MatchGroup(Collection<Match> orig) {
-    matches = new ArrayList<>(orig);
-  }
-
-
 
   @XmlElement(name = "match")
   public List<Match> getMatches() {

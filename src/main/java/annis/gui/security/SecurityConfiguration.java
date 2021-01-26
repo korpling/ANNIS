@@ -21,19 +21,21 @@ public class SecurityConfiguration {
   public static final String FRAGMENT_TO_RESTORE = "ANNIS_FRAGENT_TO_RESTORE";
 
 
-  public static class NoClientsConfiguredCondition extends NoneNestedConditions {
+  private static class NoClientsConfiguredCondition extends NoneNestedConditions {
     NoClientsConfiguredCondition() {
       super(ConfigurationPhase.REGISTER_BEAN);
     }
 
     @Conditional(ClientsConfiguredCondition.class)
-    static class ClientsConfigured {
+    static class ClientsConfigured { // NO_UCD (unused code)
     }
   }
 
   @EnableWebSecurity
   @Conditional(ClientsConfiguredCondition.class)
-  public static class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter {
+  public static class OAuth2LoginSecurityConfig extends WebSecurityConfigurerAdapter { // NO_UCD
+                                                                                       // (unused
+                                                                                       // code)
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -52,7 +54,8 @@ public class SecurityConfiguration {
 
   @EnableWebSecurity
   @Conditional(NoClientsConfiguredCondition.class)
-  public static class NoLoginSecurityConfig extends WebSecurityConfigurerAdapter {
+  public static class NoLoginSecurityConfig extends WebSecurityConfigurerAdapter { // NO_UCD (unused
+                                                                                   // code)
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

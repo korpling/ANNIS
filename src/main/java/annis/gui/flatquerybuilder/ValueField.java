@@ -115,12 +115,6 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
         setContent(frame);
     }
 
-    @Deprecated /* ever seen this? ^^ just wrote it and it's already deprecated */
-    public ValueField(FlatQueryBuilder sq, SearchBox sb, String level, String value) {
-        this(sq, sb, level);
-        scb.setValue(value);
-    }
-
     private void buildValues(ValueMode vm) {
         this.vm = vm;
         if (vm.equals(ValueMode.REGEX)) {

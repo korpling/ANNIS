@@ -61,9 +61,9 @@ public class CorpusController implements CorpusListView.Listener, UIView.Listene
                 model.delete(c);
                 deleted.add(c);
             } catch (CriticalServiceQueryException ex) {
-                uiView.showWarning(ex.getMessage(), ex.getDescription());
+              uiView.showWarning(ex.getMessage(), null);
             } catch (ServiceQueryException ex) {
-                uiView.showInfo(ex.getMessage(), ex.getDescription());
+              uiView.showInfo(ex.getMessage(), null);
             }
         }
         if (!deleted.isEmpty()) {

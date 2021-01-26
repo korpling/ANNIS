@@ -60,8 +60,4 @@ public class SensitiveComboBox extends ComboBox {
         }
         super.changeVariables(source, variables);
     }
-
-    public void removeListener(TextChangeListener listener) {
-        removeListener(TextChangeListener.EVENT_ID, TextChangeEvent.class, listener);
-    }
 }

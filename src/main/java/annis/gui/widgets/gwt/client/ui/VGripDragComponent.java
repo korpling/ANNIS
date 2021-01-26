@@ -32,11 +32,9 @@ import com.vaadin.client.ui.dd.VTransferable;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class VGripDragComponent extends VCustomComponent {
+class VGripDragComponent extends VCustomComponent {
 
-  /** Set the CSS class name to allow styling. */
-  public static final String CLASSNAME = "v-moveablepanel";
-  public ApplicationConnection client;
+  ApplicationConnection client;
 
   public VGripDragComponent() {
     super();

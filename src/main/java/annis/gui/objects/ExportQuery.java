@@ -17,7 +17,6 @@ package annis.gui.objects;
 
 import annis.libgui.exporter.ExporterPlugin;
 import annis.model.ContextualizedQuery;
-import com.google.common.base.Splitter;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,16 +36,6 @@ public class ExportQuery extends ContextualizedQuery {
     private String parameters;
     private boolean alignmc;
 
-    public ExportQuery alignmc(boolean alignmc) {
-        this.alignmc = alignmc;
-        return this;
-    }
-
-    public ExportQuery annotationKeys(String annotationKeys) {
-        this.annotationKeys = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(annotationKeys);
-        return this;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
@@ -64,12 +53,6 @@ public class ExportQuery extends ContextualizedQuery {
                 && Objects.equals(getExporter(), other.getExporter())
                 && Objects.equals(getParameters(), other.getParameters());
     }
-
-    public ExportQuery exporter(Class<? extends ExporterPlugin> exporter) {
-        this.exporter = exporter;
-        return this;
-    }
-
     public boolean getAlignmc() {
         return alignmc;
     }
@@ -90,11 +73,6 @@ public class ExportQuery extends ContextualizedQuery {
     public int hashCode() {
         return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(),
                 getAnnotationKeys(), getExporter(), getParameters());
-    }
-
-    public ExportQuery params(String parameters) {
-        this.parameters = parameters;
-        return this;
     }
 
     public void setAlignmc(boolean alignmc) {

@@ -15,10 +15,6 @@ public class AutoHeightIFrame extends AbstractComponent {
    */
   private static final long serialVersionUID = -9009947408098698710L;
 
-  public static final int ADDITIONAL_HEIGHT = -1;
-
-  public final static String RES_KEY = "iframe-vis-res";
-
   private boolean heightWasSet = false;
 
   private AutoHeightIFrameServerRpc rpc = height -> {
@@ -33,7 +29,7 @@ public class AutoHeightIFrame extends AbstractComponent {
     registerRpc(rpc);
 
     getState().setUrl(uri.toASCIIString());
-    getState().setAdditionalHeight(ADDITIONAL_HEIGHT);
+    getState().setAdditionalHeight(-1);
   }
 
   @Override

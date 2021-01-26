@@ -17,7 +17,6 @@ package annis.gui.exporter;
 
 import annis.libgui.Helper;
 import annis.model.AnnisConstants;
-import annis.service.objects.SubgraphFilter;
 import com.vaadin.ui.UI;
 import java.io.IOException;
 import java.io.Writer;
@@ -136,11 +135,6 @@ public class CSVExporter extends BaseMatrixExporter {
     @Override
     public void getOrderedMatchNumbers() {
       // TODO
-    }
-
-    @Override
-    public SubgraphFilter getSubgraphFilter() {
-        return SubgraphFilter.all;
     }
 
     @Override

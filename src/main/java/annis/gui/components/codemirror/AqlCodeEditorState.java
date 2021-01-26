@@ -13,7 +13,6 @@
  */
 package annis.gui.components.codemirror;
 
-import annis.model.ParsedEntityLocation;
 import com.vaadin.shared.ui.JavaScriptComponentState;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -38,13 +37,13 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
 
         private static final long serialVersionUID = -5677925443009922921L;
 
-        public int startLine;
+        public int startLine; // NO_UCD (use private)
 
-        public int startColumn;
+        public int startColumn; // NO_UCD (unused code)
 
-        public int endLine;
+        public int endLine; // NO_UCD (unused code)
 
-        public int endColumn;
+        public int endColumn; // NO_UCD (unused code)
 
         public String message;
 
@@ -61,15 +60,6 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
             }
             this.message = orig.getDesc();
         }
-
-        public ParseError(ParsedEntityLocation location, String message) {
-            this.startLine = location.getStartLine();
-            this.startColumn = location.getStartColumn();
-            this.endLine = location.getEndLine();
-            this.endColumn = location.getEndColumn();
-            this.message = message;
-        }
-
     }
 
     /**
@@ -94,20 +84,22 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
     /**
      * The current text of the editor *
      */
-    public String text = "";
+    public String text = ""; // NO_UCD (use default)
 
-    public String inputPrompt = "";
+    public String inputPrompt = ""; // NO_UCD (unused code)
 
-    public final List<ParseError> errors = new ArrayList<>();
+    public final List<ParseError> errors = new ArrayList<>(); // NO_UCD (use default)
 
-    public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator());
+    public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator()); // NO_UCD
+                                                                                                // (use
+                                                                                                // default)
 
-    public String textareaClass;
+    public String textareaClass; // NO_UCD (use default)
 
     /**
      * Everytime the server wants to set the {@link #text} variable this counter needs to be
      * increased.
      */
-    public long serverRequestCounter = 0;
+    public long serverRequestCounter = 0; // NO_UCD (use default)
 
 }

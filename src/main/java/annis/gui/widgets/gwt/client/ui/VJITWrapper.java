@@ -31,14 +31,6 @@ import com.vaadin.client.ValueMap;
  */
 public class VJITWrapper extends Widget implements Paintable {
 
-  // some css properties
-  protected static final String background = "#ECF0F6";
-
-
-  protected static final String width = "900px";
-
-  protected static final String height = "600px";
-
   private Document doc = Document.get();
 
   private final String elementID;

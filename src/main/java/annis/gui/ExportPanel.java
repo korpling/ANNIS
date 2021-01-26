@@ -370,7 +370,7 @@ public class ExportPanel extends GridLayout {
   }
 
   @Subscribe
-  public void handleExportProgress(final Integer exports) {
+  public void handleExportProgress(final Integer exports) { // NO_UCD (unused code)
     UI ui = getUI();
     if (ui != null) {
       // if we ui access() here it seems to confuse the isInterrupted() flag

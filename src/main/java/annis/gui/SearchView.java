@@ -63,7 +63,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.slf4j.LoggerFactory;
@@ -562,19 +561,7 @@ public class SearchView extends GridLayout
         }
     }
 
-    /**
-     * Adds the _c fragement to the URL in the browser adress bar when a corpus is selected.
-     *
-     * @param corpora A list of corpora, which are add to the fragment.
-     */
-    public void updateFragementWithSelectedCorpus(Set<String> corpora) {
-        if (corpora != null && !corpora.isEmpty()) {
-          String fragment = "_c=" + Helper.encodeBase64URL(StringUtils.join(corpora, ","));
-            UI.getCurrent().getPage().setUriFragment(fragment);
-        } else {
-            UI.getCurrent().getPage().setUriFragment("");
-        }
-    }
+
 
     /**
      * Updates the browser address bar with the current query parameters and the query itself.

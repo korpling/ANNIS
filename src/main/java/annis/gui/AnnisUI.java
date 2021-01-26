@@ -280,10 +280,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     initTransients();
   }
 
-  public void reportBug() {
-    toolbar.reportBug();
-  }
-
   public void reportBug(Throwable cause) {
     toolbar.reportBug(cause);
   }

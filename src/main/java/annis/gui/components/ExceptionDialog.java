@@ -70,11 +70,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener {
 
     private HorizontalLayout actionsLayout;
 
-    public ExceptionDialog(Throwable ex) {
-        this(ex, null);
-    }
-
-    public ExceptionDialog(Throwable ex, String caption) {
+    private ExceptionDialog(Throwable ex, String caption) {
         this.cause = ex;
 
         layout = new VerticalLayout();

@@ -119,9 +119,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
 
-    public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
-
-    public static final String FILESYSTEM_CACHE_RESULT = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
+    private static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
     private final Map<HashSet<SingleResolverRequest>, LinkedHashSet<VisualizerRule>> cacheResolver;
 

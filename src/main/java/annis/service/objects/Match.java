@@ -53,7 +53,7 @@ public class Match implements Serializable {
     return parseFromString(raw, ' ');
   }
 
-  public static Match parseFromString(String raw, char separator) {
+  private static Match parseFromString(String raw, char separator) {
     Match match = new Match();
 
     Splitter splitter = matchSplitter;
@@ -109,7 +109,7 @@ public class Match implements Serializable {
     result.addSaltId(id, anno);
   }
 
-  public static String singleMatchToString(String id, String anno) {
+  private static String singleMatchToString(String id, String anno) {
     if (id != null) {
       String v = id;
       if (anno != null && !anno.isEmpty()) {
@@ -137,16 +137,9 @@ public class Match implements Serializable {
     }
   }
 
-  public Match(Collection<String> originalIDs, Collection<String> originalAnnos) {
-    saltIDs = new ArrayList<>(originalIDs);
-    annos = new ArrayList<>(originalAnnos);
-  }
 
-  public void addSaltId(String id) {
-    addSaltId(id, null);
-  }
 
-  public void addSaltId(String id, String anno) {
+  private void addSaltId(String id, String anno) {
     if (id != null) {
       saltIDs.add(id);
       if (anno == null) {

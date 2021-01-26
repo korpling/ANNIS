@@ -516,39 +516,6 @@ public class Helper {
     return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).getEncodedValue();
   }
 
-  /**
-   * This will percent encode Jersey template argument braces (enclosed in "{...}") and the percent
-   * character. Both would not be esccaped by jersey and/or would cause an error when this is not a
-   * valid template.
-   *
-   * @param v the value
-   * @return encoded value
-   */
-  public static String encodeJersey(final String v) {
-    return jerseyExtraEscape.escape(v);
-  }
-
-  /**
-   * Encodes a String so it can be used as path parameter.
-   *
-   * @param v value
-   * @return encoded value
-   */
-  public static String encodePath(final String v) {
-    return urlPathEscape.escape(v);
-  }
-
-  /**
-   * Encodes a String so it can be used as query parameter.
-   *
-   * @param v value
-   * @return encoded value
-   */
-  public static String encodeQueryParam(final String v) {
-    final String encoded = UrlEscapers.urlFormParameterEscaper().escape(v);
-    return encoded;
-  }
-
   public static String encodeBase64URL(final String val) {
     return Base64.encodeBase64URLSafeString(val.getBytes(StandardCharsets.UTF_8));
   }
