@@ -41,8 +41,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @NotThreadSafe
 class MigrationPanelTest {
 
-  private static final String VALID_REFERENCE_ENTRY =
-      "1763431c-79b2-4576-b532-67e241ce8396\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n";
+  private static final String VALID_PARTIAL_REFERENCE_ENTRY =
+      "\tanonymous\t2015-11-16 13:19:58.471+00\t/#_q=Ilpvc3NlbiI&c=pcc2&cl=5&cr=5&s=0&l=10\n";
 
   @Autowired
   private BeanFactory beanFactory;
@@ -101,8 +101,7 @@ class MigrationPanelTest {
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
 
-    simulateUpload(
-        VALID_REFERENCE_ENTRY);
+    simulateUpload("1763431c-79b2-4576-b532-67e241ce8396" + VALID_PARTIAL_REFERENCE_ENTRY);
     fillOutForm();
 
     // Mock the required responses
@@ -289,6 +288,62 @@ class MigrationPanelTest {
         + "++++++++++++++++++++++++\n", messages.getValue());
   }
 
+  @Test
+  void testLegacyServiceTimeout() throws Exception {
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    simulateUpload("29298bcc-395d-4e50-876b-f66b7ab7c66b" + VALID_PARTIAL_REFERENCE_ENTRY);
+    fillOutForm();
+
+    // Indicate several remote query database timeouts in response
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+    legacyServer.enqueue(new MockResponse().setBody("Timeout").setResponseCode(504));
+    legacyServer.enqueue(new MockResponse().setBody("Timeout").setResponseCode(504));
+    legacyServer.enqueue(new MockResponse().setBody("Timeout").setResponseCode(504));
+    legacyServer.enqueue(new MockResponse().setBody("Timeout").setResponseCode(504));
+    legacyServer.enqueue(new MockResponse().setBody("Timeout").setResponseCode(504));
+
+    // Start the migration process
+    _click(start);
+
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals("Other server error (sum: 1)\n" + "===========================\n" + "\n"
+        + "Corpus: \"[pcc2]\"\n" + "UUID: \"29298bcc-395d-4e50-876b-f66b7ab7c66b\"\n" + "Query:\n"
+        + "\"Zossen\"\n" + "Error: java.io.IOException: Timeout in legacy ANNIS service\n"
+        + "-------\n\n" + "" + "++++++++++++++++++++++++\n" + "+ Successful: 0 from 1 +\n"
+        + "++++++++++++++++++++++++\n", messages.getValue());
+  }
+
+  @Test
+  void testSemanticError() throws Exception {
+    // Button should be disabled until we upload a file
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    simulateUpload("ac05ec94-c529-4ae8-af48-63676f092efe\t" + "anonymous\t"
+        + "2015-11-16 13:19:58.471+00\t" + "/#q=notanannotation&c=pcc2&cl=5&cr=5&s=0&l=10\n");
+    fillOutForm();
+
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+
+    // Send a single "Bad Query" response, which should map to a result of "0"
+    legacyServer
+        .enqueue(new MockResponse().setBody("Annotation does not exist").setResponseCode(400));
+
+    // Start the migration process
+    _click(start);
+
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals(
+        "++++++++++++++++++++++++\n" + "+ Successful: 1 from 1 +\n" + "++++++++++++++++++++++++\n",
+        messages.getValue());
+  }
 
   @SuppressWarnings("unchecked")
   @Test
@@ -300,8 +355,7 @@ class MigrationPanelTest {
     assertFalse(start.isEnabled());
 
     // This URI in the line has invalid characters
-    simulateUpload(
-        VALID_REFERENCE_ENTRY);
+    simulateUpload("cd85bc17-2d93-4850-9b6e-73a557f4d186" + VALID_PARTIAL_REFERENCE_ENTRY);
     fillOutForm();
 
     // Mock a failing authentication
@@ -319,5 +373,6 @@ class MigrationPanelTest {
     NotificationsKt.expectNotifications(new kotlin.Pair<String, String>(
         "Authentication failed, please check the provided user name and password", null));
   }
+
 
 }
