@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Component
-public class PDFFullVisualizer extends AbstractVisualizer {
+public class PDFFullVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
 
   /**
    * 

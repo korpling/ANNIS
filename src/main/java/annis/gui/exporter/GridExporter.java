@@ -36,7 +36,7 @@ import org.corpus_tools.salt.core.SNode;
 import org.springframework.stereotype.Component;
 
 @Component
-public class GridExporter extends GeneralTextExporter {
+public class GridExporter extends GeneralTextExporter { // NO_UCD (unused code)
 
     private static class Span {
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class VisJs extends AbstractVisualizer {
+public class VisJs extends AbstractVisualizer { // NO_UCD (unused code)
 
 
 

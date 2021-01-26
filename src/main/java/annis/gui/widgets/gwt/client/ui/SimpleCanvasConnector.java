@@ -22,7 +22,7 @@ import com.vaadin.shared.ui.Connect;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Connect(SimpleCanvas.class)
-public class SimpleCanvasConnector extends LegacyConnector {
+public class SimpleCanvasConnector extends LegacyConnector { // NO_UCD (unused code)
 
   /**
    * 

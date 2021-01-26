@@ -59,7 +59,7 @@ import org.springframework.stereotype.Component;
  * @author irina
  */
 @Component
-public class TextColumnExporter extends BaseMatrixExporter {
+public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use default)
     private class IsDominatedByMatch implements GraphTraverseHandler {
 
         Long matchedNode = null;

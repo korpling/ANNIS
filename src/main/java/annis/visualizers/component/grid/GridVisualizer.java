@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Component
-public class GridVisualizer extends AbstractVisualizer {
+public class GridVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
 
   /**
    * 

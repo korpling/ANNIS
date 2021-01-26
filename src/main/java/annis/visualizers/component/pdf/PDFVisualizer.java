@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Component
-public class PDFVisualizer extends AbstractVisualizer {
+public class PDFVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
 
   private static class PDFViewerImpl extends Panel implements PDFViewer {
 

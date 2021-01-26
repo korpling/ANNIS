@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  */
 @WebServlet(urlPatterns = "/Cite/*")
 @Component
-public class CitationRedirectionServlet extends HttpServlet {
+public class CitationRedirectionServlet extends HttpServlet { // NO_UCD (use default)
 
     /**
      * 

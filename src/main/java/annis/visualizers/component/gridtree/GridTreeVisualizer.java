@@ -67,7 +67,7 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-public class GridTreeVisualizer extends AbstractVisualizer {
+public class GridTreeVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
 
   private static class GridTreePanel extends Panel {
 

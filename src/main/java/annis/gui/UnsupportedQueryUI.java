@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 
 @SpringUI(path = "/unsupported-query")
 @Widgetset("annis.gui.widgets.gwt.AnnisWidgetSet")
-public class UnsupportedQueryUI extends CommonUI {
+public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
 
   public class UnsupportedQueryPanel extends Panel {
 

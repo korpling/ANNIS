@@ -32,7 +32,9 @@ import org.springframework.stereotype.Component;
  * @author thomas
  */
 @Component
-public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<com.vaadin.ui.Component> {
+public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<com.vaadin.ui.Component> { // NO_UCD
+                                                                                              // (unused
+                                                                                              // code)
 
     public static class TigerQueryBuilder extends Panel implements Button.ClickListener {
 

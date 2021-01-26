@@ -45,7 +45,7 @@ import org.springframework.stereotype.Component;
  */
 @WebServlet(urlPatterns = "/Resource/*")
 @Component
-public class ResourceServlet extends HttpServlet {
+public class ResourceServlet extends HttpServlet { // NO_UCD (unused code)
 
     private static final long serialVersionUID = -8182635617256833563L;
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResourceServlet.class);

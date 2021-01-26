@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Component
-public class SimpleTextExporter extends GeneralTextExporter {
+public class SimpleTextExporter extends GeneralTextExporter { // NO_UCD (test only)
 
     /**
      * 

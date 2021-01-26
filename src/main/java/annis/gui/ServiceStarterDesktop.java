@@ -1,5 +1,10 @@
 package annis.gui;
 
+import annis.gui.security.SecurityConfiguration;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.moandjiezana.toml.Toml;
+import com.moandjiezana.toml.TomlWriter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -20,19 +25,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.moandjiezana.toml.Toml;
-import com.moandjiezana.toml.TomlWriter;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,11 +46,9 @@ import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.stereotype.Component;
 
-import annis.gui.security.SecurityConfiguration;
-
 @Component
 @Profile("desktop")
-public class ServiceStarterDesktop extends ServiceStarter {
+public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused code)
 
     private static final String USER_NAME = "desktop";
     private static final Logger log = LoggerFactory.getLogger(ServiceStarterDesktop.class);

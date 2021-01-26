@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Component
-public class MatchCorefVisualizer extends CorefVisualizer {
+public class MatchCorefVisualizer extends CorefVisualizer { // NO_UCD (unused code)
 
   /**
    * 
