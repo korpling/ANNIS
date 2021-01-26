@@ -7,7 +7,7 @@ import com.vaadin.ui.Panel;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SentStructureJs extends AbstractVisualizer {
+public class SentStructureJs extends AbstractVisualizer { // NO_UCD (unused code)
 
   private static final long serialVersionUID = -5677329079488473862L;
 

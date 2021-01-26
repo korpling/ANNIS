@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-public class VisJsDoc extends AbstractVisualizer {
+public class VisJsDoc extends AbstractVisualizer { // NO_UCD (unused code)
 
   private static final long serialVersionUID = -4818088208741889964L;
 

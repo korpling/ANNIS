@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Component
-public class HTMLVisFull extends HTMLVis {
+public class HTMLVisFull extends HTMLVis { // NO_UCD (unused code)
 
   /**
    * 

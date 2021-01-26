@@ -38,7 +38,7 @@ import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TokenExporter extends GeneralTextExporter {
+public class TokenExporter extends GeneralTextExporter { // NO_UCD (unused code)
 
     /**
      * 

@@ -25,7 +25,9 @@ import com.vaadin.shared.ui.Connect;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Connect(GripDragComponent.class)
-public class GripDragComponentConnector extends CustomComponentConnector implements Paintable {
+public class GripDragComponentConnector extends CustomComponentConnector implements Paintable { // NO_UCD
+                                                                                                // (unused
+                                                                                                // code)
 
   /**
    * 

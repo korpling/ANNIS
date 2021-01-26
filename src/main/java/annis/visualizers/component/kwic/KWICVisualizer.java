@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Component
-public class KWICVisualizer extends AbstractVisualizer {
+public class KWICVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
   /**
    * 
    */

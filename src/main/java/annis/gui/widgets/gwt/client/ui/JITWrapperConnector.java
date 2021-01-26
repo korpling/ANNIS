@@ -22,7 +22,7 @@ import com.vaadin.shared.ui.Connect;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Connect(JITWrapper.class)
-public class JITWrapperConnector extends LegacyConnector {
+public class JITWrapperConnector extends LegacyConnector { // NO_UCD (unused code)
 
   /**
    * 

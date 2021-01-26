@@ -72,7 +72,7 @@ import org.springframework.stereotype.Component;
  * @author Christian Schulz-Hanke
  */
 @Component
-public class CorefVisualizer extends WriterVisualizer {
+public class CorefVisualizer extends WriterVisualizer { // NO_UCD (use default)
 
   private static class SerializableAnnotation implements Serializable {
     /**

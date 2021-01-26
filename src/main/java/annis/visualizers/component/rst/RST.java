@@ -58,7 +58,7 @@ import org.springframework.stereotype.Component;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 @Component
-public class RST extends AbstractVisualizer {
+public class RST extends AbstractVisualizer { // NO_UCD (unused code)
 
   /**
    * 

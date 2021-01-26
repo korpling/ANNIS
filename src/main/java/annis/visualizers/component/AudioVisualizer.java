@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @Component
-public class AudioVisualizer extends AbstractVisualizer {
+public class AudioVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
 
   /**
    * 

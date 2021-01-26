@@ -62,7 +62,7 @@ import org.springframework.stereotype.Component;
  * @author Kim Gerdes
  */
 @Component
-public class VakyarthaDependencyTree extends WriterVisualizer {
+public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unused code)
 
   /**
    * 
