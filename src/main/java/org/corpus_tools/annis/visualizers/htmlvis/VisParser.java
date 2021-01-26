@@ -13,9 +13,7 @@
  */
 package org.corpus_tools.annis.visualizers.htmlvis;
 
-import annis.visualizers.htmlvis.HTMLVisConfigBaseListener;
-import annis.visualizers.htmlvis.HTMLVisConfigLexer;
-import annis.visualizers.htmlvis.HTMLVisConfigParser;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
