@@ -374,5 +374,38 @@ class MigrationPanelTest {
         "Authentication failed, please check the provided user name and password", null));
   }
 
+  @Test
+  void testFallbackToQuirksMode() throws Exception {
+    Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
+    assertFalse(start.isEnabled());
+
+    // Query for ‎"Wunder" & meta::Genre="Sport" on pcc2 corpus
+    // This need to downgrade the query to quirks mode because of the meta-search, but should not
+    // fail
+    simulateUpload(
+        "ff2e2780-410d-4f9b-b781-69656897bd90\tanonymous\t2017-10-04 18:46:56.074+00\t"
+            + "/#_q=Ild1bmRlciIgJiBtZXRhOjpHZW5yZT0iU3BvcnQ&c=pcc2");
+    fillOutForm();
+
+    // Mock the required responses
+    legacyServer.enqueue(new MockResponse().setBody("true"));
+    legacyServer.enqueue(
+        new MockResponse().setBody("<matchAndDocumentCount><documentCount>1</documentCount>"
+            + "  <matchCount>1</matchCount></matchAndDocumentCount>"));
+    legacyServer.enqueue(new MockResponse().setBody("salt:/pcc2/4282#tok_2"));
+
+    // Start the migration process
+    assertTrue(start.isEnabled());
+    _click(start);
+
+    // Check that migration was successful
+    TextArea messages = _get(panel, TextArea.class);
+    TestHelper.awaitCondition(60, () -> messages.getValue().trim().endsWith("++++"),
+        () -> "Migration failed, message output was:\n\n" + messages.getValue());
+    assertEquals(
+        "++++++++++++++++++++++++\n" + "+ Successful: 1 from 1 +\n" + "++++++++++++++++++++++++\n",
+        messages.getValue());
+    
+  }
 
 }
