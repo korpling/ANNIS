@@ -384,11 +384,17 @@ class MigrationPanelTest {
     // fail
     simulateUpload(
         "ff2e2780-410d-4f9b-b781-69656897bd90\tanonymous\t2017-10-04 18:46:56.074+00\t"
-            + "/#_q=Ild1bmRlciIgJiBtZXRhOjpHZW5yZT0iU3BvcnQ&c=pcc2");
+            + "/#_q=Ild1bmRlciIgJiBtZXRhOjpHZW5yZT0iU3BvcnQi&c=pcc2");
     fillOutForm();
 
     // Mock the required responses
     legacyServer.enqueue(new MockResponse().setBody("true"));
+    legacyServer.enqueue(
+        new MockResponse().setBody("<matchAndDocumentCount><documentCount>1</documentCount>"
+            + "  <matchCount>1</matchCount></matchAndDocumentCount>"));
+    // At this point the graphANNIS query should fail and the migration would ask for a new count of
+    // the
+    // legacy server
     legacyServer.enqueue(
         new MockResponse().setBody("<matchAndDocumentCount><documentCount>1</documentCount>"
             + "  <matchCount>1</matchCount></matchAndDocumentCount>"));

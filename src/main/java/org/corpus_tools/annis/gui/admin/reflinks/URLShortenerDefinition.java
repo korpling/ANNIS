@@ -292,20 +292,34 @@ public class URLShortenerDefinition {
     try {
 
       // check count first (also warmup for the corpus)
-      int countGraphANNIS = searchApi.count(new CountQuery().query(query.getQuery())
-          .queryLanguage(query.getApiQueryLanguage()).corpora(new LinkedList<>(query.getCorpora())))
-          .getMatchCount();
-      int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
-
       QueryStatus status;
-      if (countGraphANNIS != countLegacy) {
-        this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
-        status = QueryStatus.COUNT_DIFFERS;
-      } else if (countGraphANNIS == 0) {
-        status = QueryStatus.OK;
-      } else {
-        status = testFind(searchApi, client, annisSearchServiceBaseUrl);
+      try {
+        int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
+
+        int countGraphANNIS = searchApi.count(
+            new CountQuery().query(query.getQuery()).queryLanguage(query.getApiQueryLanguage())
+                .corpora(new LinkedList<>(query.getCorpora())))
+            .getMatchCount();
+        if (countGraphANNIS != countLegacy) {
+          this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
+          status = QueryStatus.COUNT_DIFFERS;
+        } else if (countGraphANNIS == 0) {
+          status = QueryStatus.OK;
+        } else {
+          status = testFind(searchApi, client, annisSearchServiceBaseUrl);
+        }
+
+      } catch (ApiException ex) {
+        if (ex.getCode() == 400 && this.query.getQueryLanguage() == QueryLanguage.AQL) {
+          // Bad requests means the query was invalid, try again with quirks mode
+          status = QueryStatus.SERVER_ERROR;
+          this.errorMsg = ex.toString();
+        } else {
+          // Non-recoverable exception
+          throw ex;
+        }
       }
+
 
       if (status != QueryStatus.OK && this.query.getQueryLanguage() == QueryLanguage.AQL) {
         // check in quirks mode and rewrite if necessary
