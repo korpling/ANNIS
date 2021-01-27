@@ -281,6 +281,26 @@ public class URLShortenerDefinition {
     }
   }
 
+
+  private QueryStatus testCountAndFind(SearchApi searchApi, OkHttpClient client,
+      HttpUrl annisSearchServiceBaseUrl) throws IOException, ApiException {
+    int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
+
+    int countGraphANNIS = searchApi
+        .count(new CountQuery().query(query.getQuery()).queryLanguage(query.getApiQueryLanguage())
+            .corpora(new LinkedList<>(query.getCorpora())))
+        .getMatchCount();
+    if (countGraphANNIS != countLegacy) {
+      this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
+      return QueryStatus.COUNT_DIFFERS;
+    } else if (countGraphANNIS == 0) {
+      return QueryStatus.OK;
+    } else {
+      // When count is the same and non-empty test if the returned IDs are the same
+      return testFind(searchApi, client, annisSearchServiceBaseUrl);
+    }
+  }
+
   public QueryStatus test(SearchApi searchApi, OkHttpClient client,
       HttpUrl annisSearchServiceBaseUrl) {
 
@@ -294,21 +314,7 @@ public class URLShortenerDefinition {
       // check count first (also warmup for the corpus)
       QueryStatus status;
       try {
-        int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
-
-        int countGraphANNIS = searchApi.count(
-            new CountQuery().query(query.getQuery()).queryLanguage(query.getApiQueryLanguage())
-                .corpora(new LinkedList<>(query.getCorpora())))
-            .getMatchCount();
-        if (countGraphANNIS != countLegacy) {
-          this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
-          status = QueryStatus.COUNT_DIFFERS;
-        } else if (countGraphANNIS == 0) {
-          status = QueryStatus.OK;
-        } else {
-          status = testFind(searchApi, client, annisSearchServiceBaseUrl);
-        }
-
+        status = testCountAndFind(searchApi, client, annisSearchServiceBaseUrl);
       } catch (ApiException ex) {
         if (ex.getCode() == 400 && this.query.getQueryLanguage() == QueryLanguage.AQL) {
           // Bad requests means the query was invalid, try again with quirks mode
@@ -319,7 +325,6 @@ public class URLShortenerDefinition {
           throw ex;
         }
       }
-
 
       if (status != QueryStatus.OK && this.query.getQueryLanguage() == QueryLanguage.AQL) {
         // check in quirks mode and rewrite if necessary
