@@ -251,6 +251,9 @@ public class URLShortenerDefinition {
         } else if (responseCode == 504) {
           // The legacy database query time-outs
           throw new IOException("Timeout in legacy ANNIS service");
+        } else {
+          // Some other error we should catch
+          throw new IOException("Legacy ANNIS service returned error code " + responseCode);
         }
       } catch (IOException ex) {
         if (tries >= MAX_RETRY - 1) {
@@ -260,7 +263,6 @@ public class URLShortenerDefinition {
           log.warn("Server error when executing query {}", query.getQuery(), ex);
         }
       }
-
     }
     return 0;
   }
