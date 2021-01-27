@@ -122,9 +122,10 @@ public class URLShortenerDefinition {
       Set<String> corpora = new LinkedHashSet<>(Arrays.asList(corporaRaw.split("\\s*,\\s*")));
       corpora.remove("");
 
-      return QueryGenerator.displayed().left(Integer.parseInt(args.get("cl")))
-          .right(Integer.parseInt(args.get("cr"))).offset(Integer.parseInt(args.get("s")))
-          .limit(Integer.parseInt(args.get("l"))).segmentation(args.get("seg"))
+      return QueryGenerator.displayed().left(Integer.parseInt(args.getOrDefault("cl", "0")))
+          .right(Integer.parseInt(args.getOrDefault("cr", "0")))
+          .offset(Integer.parseInt(args.getOrDefault("s", "0")))
+          .limit(Integer.parseInt(args.getOrDefault("l", "0"))).segmentation(args.get("seg"))
           .baseText(args.get("bt")).query(args.get("q")).corpora(corpora).build();
     }
     return null;
