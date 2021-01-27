@@ -185,9 +185,8 @@ public class URLShortenerDefinition {
       HttpUrl annisSearchServiceBaseUrl) throws IOException, ApiException {
 
     // Create a file with the matches according to the new graphANNIS based implementation
-    File matchesGraphANNISFile = searchApi.find(
-        new FindQuery().query(query.getQuery()).corpora(new LinkedList<>(query.getCorpora()))
-            .queryLanguage(query.getApiQueryLanguage()));
+    File matchesGraphANNISFile = searchApi.find(new FindQuery().query(query.getQuery())
+        .corpora(new LinkedList<>(query.getCorpora())).queryLanguage(query.getApiQueryLanguage()));
 
 
     HttpUrl findUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("find")
@@ -232,27 +231,27 @@ public class URLShortenerDefinition {
   private int getLegacyCount(OkHttpClient client, HttpUrl annisSearchServiceBaseUrl)
       throws IOException {
     for (int tries = 0; tries < MAX_RETRY; tries++) {
-        HttpUrl countLegacyUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("count")
-            .addQueryParameter("q", query.getQuery())
-            .addQueryParameter("corpora", Joiner.on(",").join(query.getCorpora())).build();
-        try(Response countResponse =
-            client.newCall(new Request.Builder().url(countLegacyUrl).build()).execute()) {
+      HttpUrl countLegacyUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("count")
+          .addQueryParameter("q", query.getQuery())
+          .addQueryParameter("corpora", Joiner.on(",").join(query.getCorpora())).build();
+      try (Response countResponse =
+          client.newCall(new Request.Builder().url(countLegacyUrl).build()).execute()) {
 
-          int responseCode = countResponse.code();
-          if (responseCode == 200) {
-            String bodyString = countResponse.body().string();
-            CountExtra result = mapper.readValue(bodyString, CountExtra.class);
-            return result.getMatchCount();
-          } else if (responseCode == 400) {
-            // "Bad request" means there was a syntactic or semantic error.
-            // Non-existing annotation names where not always handled as semantic error, so
-            // reference links might exist.
-            // We translate this error to "no result" instead of throwing an error.
-            return 0;
-          } else if (responseCode == 504) {
-            // The legacy database query time-outs
-            throw new IOException("Timeout in legacy ANNIS service");
-          }
+        int responseCode = countResponse.code();
+        if (responseCode == 200) {
+          String bodyString = countResponse.body().string();
+          CountExtra result = mapper.readValue(bodyString, CountExtra.class);
+          return result.getMatchCount();
+        } else if (responseCode == 400) {
+          // "Bad request" means there was a syntactic or semantic error.
+          // Non-existing annotation names where not always handled as semantic error, so
+          // reference links might exist.
+          // We translate this error to "no result" instead of throwing an error.
+          return 0;
+        } else if (responseCode == 504) {
+          // The legacy database query time-outs
+          throw new IOException("Timeout in legacy ANNIS service");
+        }
       } catch (IOException ex) {
         if (tries >= MAX_RETRY - 1) {
           // Rethrow server error so it can be properly processed by the calling function
@@ -284,20 +283,30 @@ public class URLShortenerDefinition {
 
   private QueryStatus testCountAndFind(SearchApi searchApi, OkHttpClient client,
       HttpUrl annisSearchServiceBaseUrl) throws IOException, ApiException {
-    int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
-
-    int countGraphANNIS = searchApi
-        .count(new CountQuery().query(query.getQuery()).queryLanguage(query.getApiQueryLanguage())
-            .corpora(new LinkedList<>(query.getCorpora())))
-        .getMatchCount();
-    if (countGraphANNIS != countLegacy) {
-      this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
-      return QueryStatus.COUNT_DIFFERS;
-    } else if (countGraphANNIS == 0) {
-      return QueryStatus.OK;
-    } else {
-      // When count is the same and non-empty test if the returned IDs are the same
-      return testFind(searchApi, client, annisSearchServiceBaseUrl);
+    try {
+      // check count first (also warmup for the corpus)
+      int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
+      int countGraphANNIS = searchApi.count(new CountQuery().query(query.getQuery())
+          .queryLanguage(query.getApiQueryLanguage()).corpora(new LinkedList<>(query.getCorpora())))
+          .getMatchCount();
+      if (countGraphANNIS != countLegacy) {
+        this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
+        return QueryStatus.COUNT_DIFFERS;
+      } else if (countGraphANNIS == 0) {
+        return QueryStatus.OK;
+      } else {
+        // When count is the same and non-empty test if the returned IDs are the same
+        return testFind(searchApi, client, annisSearchServiceBaseUrl);
+      }
+    } catch (ApiException ex) {
+      if (ex.getCode() == 400 && this.query.getQueryLanguage() == QueryLanguage.AQL) {
+        // Bad requests means the query was invalid, return error instead of throwing exception
+        this.errorMsg = ex.toString();
+        return QueryStatus.FAILED;
+      } else {
+        // Non-recoverable exception
+        throw ex;
+      }
     }
   }
 
@@ -310,22 +319,7 @@ public class URLShortenerDefinition {
     }
 
     try {
-
-      // check count first (also warmup for the corpus)
-      QueryStatus status;
-      try {
-        status = testCountAndFind(searchApi, client, annisSearchServiceBaseUrl);
-      } catch (ApiException ex) {
-        if (ex.getCode() == 400 && this.query.getQueryLanguage() == QueryLanguage.AQL) {
-          // Bad requests means the query was invalid, try again with quirks mode
-          status = QueryStatus.SERVER_ERROR;
-          this.errorMsg = ex.toString();
-        } else {
-          // Non-recoverable exception
-          throw ex;
-        }
-      }
-
+      QueryStatus status = testCountAndFind(searchApi, client, annisSearchServiceBaseUrl);
       if (status != QueryStatus.OK && this.query.getQueryLanguage() == QueryLanguage.AQL) {
         // check in quirks mode and rewrite if necessary
         status = testQuirksMode(searchApi, client, annisSearchServiceBaseUrl);
