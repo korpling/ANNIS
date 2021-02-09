@@ -15,7 +15,7 @@ package org.corpus_tools.annis.gui.paging;
 
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
-import com.vaadin.server.FontAwesome;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
@@ -200,7 +200,7 @@ public class PagingComponent extends Panel implements Button.ClickListener {
     lblInfo.setContentMode(ContentMode.HTML);
     lblInfo.addStyleName("right-aligned-text");
 
-    btShareQuery = new Button(FontAwesome.SHARE_ALT);
+    btShareQuery = new Button(VaadinIcons.CONNECT);
     btShareQuery.setDescription("Share query reference link");
     btShareQuery.addStyleName(ValoTheme.BUTTON_BORDERLESS);
 

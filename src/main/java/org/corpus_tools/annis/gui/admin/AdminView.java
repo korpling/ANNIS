@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.corpus_tools.annis.gui;
+package org.corpus_tools.annis.gui.admin;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
@@ -30,15 +29,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.gui.admin.CorpusAdminPanel;
-import org.corpus_tools.annis.gui.admin.GroupManagementPanel;
-import org.corpus_tools.annis.gui.admin.ImportPanel;
+import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Background;
+import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.LoginListener;
+import org.corpus_tools.annis.gui.MainToolbar;
 import org.corpus_tools.annis.gui.admin.controller.CorpusController;
 import org.corpus_tools.annis.gui.admin.controller.GroupController;
 import org.corpus_tools.annis.gui.admin.model.ApiClientProvider;
 import org.corpus_tools.annis.gui.admin.model.CorpusManagement;
 import org.corpus_tools.annis.gui.admin.model.GroupManagement;
 import org.corpus_tools.annis.gui.admin.reflinks.MigrationPanel;
+import org.corpus_tools.annis.gui.admin.reflinks.ReferenceLinkEditor;
 import org.corpus_tools.annis.gui.admin.view.UIView;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -71,6 +73,7 @@ public class AdminView extends VerticalLayout
     private final SecurityContext securityContext;
 
     private MigrationPanel migrationPanel;
+    private ReferenceLinkEditor referenceLinkEditor;
 
     public AdminView(AnnisUI ui) {
         this.ui = ui;
@@ -93,11 +96,13 @@ public class AdminView extends VerticalLayout
         importPanel = new ImportPanel();
 
         migrationPanel = new MigrationPanel();
+        referenceLinkEditor = new ReferenceLinkEditor();
 
         tabSheet = new TabSheet();
-        tabSheet.addTab(importPanel, "Import Corpus", FontAwesome.UPLOAD);
-        tabSheet.addTab(corpusAdminPanel, "Corpus management", FontAwesome.LIST_ALT);
-        tabSheet.addTab(groupManagementPanel, "Group management", FontAwesome.USERS);
+        tabSheet.addTab(importPanel, "Import Corpus", VaadinIcons.UPLOAD);
+        tabSheet.addTab(corpusAdminPanel, "Corpus management", VaadinIcons.LIST);
+        tabSheet.addTab(groupManagementPanel, "Group management", VaadinIcons.USERS);
+        tabSheet.addTab(referenceLinkEditor, "Reference links", VaadinIcons.CONNECT);
         tabSheet.addTab(migrationPanel, "Reference link migration", VaadinIcons.CLOUD_DOWNLOAD_O);
 
         tabSheet.setSizeFull();
@@ -170,6 +175,8 @@ public class AdminView extends VerticalLayout
                 return groupManagementPanel;
               case "reference-link-migration":
                 return migrationPanel;
+              case "reference-link-editor":
+                return referenceLinkEditor;
             default:
                 break;
             }
@@ -178,15 +185,17 @@ public class AdminView extends VerticalLayout
     }
 
     private String getFragmentForComponent(Component c) {
-        if (c == importPanel) {
-            return "import";
-        } else if (c == corpusAdminPanel) {
-            return "corpora";
-        } else if (c == groupManagementPanel) {
-            return "groups";
-          } else if (c == migrationPanel) {
-            return "reference-link-migration";
-        }
+      if (c == importPanel) {
+        return "import";
+      } else if (c == corpusAdminPanel) {
+        return "corpora";
+      } else if (c == groupManagementPanel) {
+        return "groups";
+      } else if (c == migrationPanel) {
+        return "reference-link-migration";
+      } else if (c == referenceLinkEditor) {
+        return "reference-link-editor";
+      }
         return "";
     }
 

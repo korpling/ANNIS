@@ -13,6 +13,7 @@
  */
 package org.corpus_tools.annis.gui.resultview;
 
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
@@ -213,7 +214,7 @@ public class SingleResultPanel extends CssLayout
 
     btLink = new Button();
     btLink.setStyleName(ValoTheme.BUTTON_BORDERLESS);
-    btLink.setIcon(FontAwesome.SHARE_ALT);
+    btLink.setIcon(VaadinIcons.CONNECT);
     btLink.setDescription("Share match reference");
     btLink.setDisableOnClick(true);
     btLink.addClickListener(event -> showShareSingleMatchGenerator());

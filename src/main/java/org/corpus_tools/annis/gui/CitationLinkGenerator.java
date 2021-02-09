@@ -13,8 +13,7 @@
  */
 package org.corpus_tools.annis.gui;
 
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.VaadinSession;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification;
@@ -129,7 +128,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator, Button.Clic
     public Object generateCell(Table source, Object itemId, Object columnId) {
         Button btLink = new Button();
         btLink.addStyleName(ValoTheme.BUTTON_BORDERLESS);
-        btLink.setIcon(FontAwesome.SHARE_ALT);
+        btLink.setIcon(VaadinIcons.CONNECT);
         btLink.setDescription("Share query reference link");
         btLink.addClickListener(this);
 
