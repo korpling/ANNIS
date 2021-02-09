@@ -32,13 +32,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-import okhttp3.Authenticator;
 import okhttp3.Credentials;
 import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.Route;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -249,17 +248,15 @@ public class MigrationPanel extends Panel
 
     HttpUrl parsedServiceUrl = HttpUrl.parse(serviceURL);
     if (username != null && password != null) {
-      client.authenticator(new Authenticator() {
+      // Preemptivly add the authorization header to all requests
+      client.addInterceptor(new Interceptor() {
 
         @Override
-        public Request authenticate(Route route, Response response) throws IOException {
-          // Only try authentication once
-          if (response.priorResponse() == null) {
-            String credential = Credentials.basic(username, password);
-            return response.request().newBuilder().header("Authorization", credential).build();
-          } else {
-            return null;
-          }
+        public Response intercept(Chain chain) throws IOException {
+          String credential = Credentials.basic(username, password);
+          Request.Builder requestBuilder =
+              chain.request().newBuilder().header("Authorization", credential);
+          return chain.proceed(requestBuilder.build());
         }
       });
 
