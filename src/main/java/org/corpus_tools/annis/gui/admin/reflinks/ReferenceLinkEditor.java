@@ -8,11 +8,13 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.components.grid.HeaderRow;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
 
@@ -30,20 +32,39 @@ public class ReferenceLinkEditor extends Panel {
 
     Column<UrlShortenerEntry, UUID> idColumn = grid.addColumn(UrlShortenerEntry::getId);
     idColumn.setCaption("UUID");
-    TextField txtUUID = new TextField();
-    Binding<UrlShortenerEntry, String> idBinding =
-        binder.bind(txtUUID, entry -> entry.getId().toString()
-            , (entry, value) -> {
-              entry.setId(UUID.fromString(value));
-    });
-    idColumn.setEditorBinding(idBinding);
+
     Column<UrlShortenerEntry, Date> createdColumn = grid.addColumn(UrlShortenerEntry::getCreated);
     createdColumn.setCaption("Timestamp");
+
     Column<UrlShortenerEntry, String> ownerColumn = grid.addColumn(UrlShortenerEntry::getOwner);
     ownerColumn.setCaption("Created by");
+
     Column<UrlShortenerEntry, URI> temporaryColumn =
         grid.addColumn(UrlShortenerEntry::getTemporaryUrl);
     temporaryColumn.setCaption("Temporary URL");
+    TextField txtTemporary = new TextField();
+    Binding<UrlShortenerEntry, String> temporaryBinding =
+        binder.bind(txtTemporary, entry -> {
+          if (entry.getTemporaryUrl() == null) {
+            return "";
+          } else {
+            return entry.getTemporaryUrl().toString();
+          }
+        }, (entry, value) -> {
+          if (value == null || value.isEmpty()) {
+            entry.setTemporaryUrl(null);
+          } else {
+            try {
+              entry.setTemporaryUrl(new URI(value));
+            } catch (URISyntaxException ex) {
+              ExceptionDialog.show(ex, getUI());
+            }
+          }
+
+        });
+    temporaryColumn.setEditorBinding(temporaryBinding);
+
+
     Column<UrlShortenerEntry, URI> urlColumn = grid.addColumn(UrlShortenerEntry::getUrl);
     urlColumn.setCaption("URL");
     
@@ -57,6 +78,9 @@ public class ReferenceLinkEditor extends Panel {
     });
 
     filterRow.getCell(idColumn).setComponent(txtFilterId);
+
+    grid.getEditor().setEnabled(true);
+    grid.getEditor().setBuffered(true);
 
   }
   
