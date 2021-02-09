@@ -2,9 +2,7 @@ package org.corpus_tools.annis.gui.query_references;
 
 import com.google.common.base.Preconditions;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -91,12 +89,7 @@ public class UrlShortener {
     });
   }
 
-  @Transactional
-  public Collection<UrlShortenerEntry> list() {
-    LinkedList<UrlShortenerEntry> result = new LinkedList<>();
-    for (UrlShortenerEntry e : repo.findAll()) {
-      result.add(e);
-    }
-    return result;
+  public UrlShortenerRepository getRepo() {
+    return repo;
   }
 }
