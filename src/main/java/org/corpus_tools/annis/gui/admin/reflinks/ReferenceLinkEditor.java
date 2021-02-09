@@ -1,9 +1,15 @@
 package org.corpus_tools.annis.gui.admin.reflinks;
 
+import com.vaadin.data.Binder;
+import com.vaadin.data.Binder.Binding;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.components.grid.HeaderRow;
+import java.net.URI;
+import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.corpus_tools.annis.gui.AnnisUI;
@@ -17,10 +23,30 @@ public class ReferenceLinkEditor extends Panel {
   private final TextField txtFilterId;
 
   public ReferenceLinkEditor() {
-    grid = new Grid<>(UrlShortenerEntry.class);
-
-
+    grid = new Grid<>();
     grid.setSizeFull();
+    
+    Binder<UrlShortenerEntry> binder = grid.getEditor().getBinder();
+
+    Column<UrlShortenerEntry, UUID> idColumn = grid.addColumn(UrlShortenerEntry::getId);
+    idColumn.setCaption("UUID");
+    TextField txtUUID = new TextField();
+    Binding<UrlShortenerEntry, String> idBinding =
+        binder.bind(txtUUID, entry -> entry.getId().toString()
+            , (entry, value) -> {
+              entry.setId(UUID.fromString(value));
+    });
+    idColumn.setEditorBinding(idBinding);
+    Column<UrlShortenerEntry, Date> createdColumn = grid.addColumn(UrlShortenerEntry::getCreated);
+    createdColumn.setCaption("Timestamp");
+    Column<UrlShortenerEntry, String> ownerColumn = grid.addColumn(UrlShortenerEntry::getOwner);
+    ownerColumn.setCaption("Created by");
+    Column<UrlShortenerEntry, URI> temporaryColumn =
+        grid.addColumn(UrlShortenerEntry::getTemporaryUrl);
+    temporaryColumn.setCaption("Temporary URL");
+    Column<UrlShortenerEntry, URI> urlColumn = grid.addColumn(UrlShortenerEntry::getUrl);
+    urlColumn.setCaption("URL");
+    
     HeaderRow filterRow = grid.appendHeaderRow();
     
     txtFilterId = new TextField();
@@ -30,7 +56,7 @@ public class ReferenceLinkEditor extends Panel {
       refreshItems();
     });
 
-    filterRow.getCell("id").setComponent(txtFilterId);
+    filterRow.getCell(idColumn).setComponent(txtFilterId);
 
   }
   
