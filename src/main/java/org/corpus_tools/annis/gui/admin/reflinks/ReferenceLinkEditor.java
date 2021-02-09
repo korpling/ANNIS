@@ -66,6 +66,11 @@ public class ReferenceLinkEditor extends Panel {
               ExceptionDialog.show(ex, getUI());
             }
           }
+          if (getUI() instanceof AnnisUI) {
+            AnnisUI annisUI = (AnnisUI) getUI();
+            UrlShortener shortener = annisUI.getUrlShortener();
+            shortener.getRepo().save(entry);
+          }
 
         });
     temporaryColumn.setEditorBinding(temporaryBinding);
