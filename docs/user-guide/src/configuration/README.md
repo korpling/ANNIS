@@ -17,7 +17,7 @@ The main configuration is located in a Java Properties file called `annis-gui.pr
 
 
 
-The following is an example configuration with all possible configuration values
+The following is an example configuration with ANNIS-specific configuration values.
 ```properties
 # The port on which this service is listening
 server.port=5712
@@ -42,6 +42,9 @@ annis.bug-e-mail=user@example.com
 
 # If "true", the user can create reference links with shortened URLs
 annis.shorten-reference-links=true
+
+# Path to the persistent database, where e.g. the reference links are stored  
+spring.datasource.url=jdbc:h2:file:${user.home}/.annis/v4/frontend_data.h2
 ```
 
 Being a Spring Boot application, ANNIS configuration properties also be given as [command line argument](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-command-line-args) or using [various other means](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files).
