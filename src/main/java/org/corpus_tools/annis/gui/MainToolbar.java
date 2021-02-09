@@ -30,6 +30,7 @@ import com.vaadin.v7.data.validator.EmailValidator;
 import com.vaadin.v7.ui.themes.BaseTheme;
 import java.util.LinkedHashSet;
 import java.util.Optional;
+import org.corpus_tools.annis.gui.admin.AdminView;
 import org.corpus_tools.annis.gui.components.ScreenshotMaker;
 import org.corpus_tools.annis.gui.components.SettingsStorage;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
