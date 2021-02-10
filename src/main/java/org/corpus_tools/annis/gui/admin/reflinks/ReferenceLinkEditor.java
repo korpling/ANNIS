@@ -4,6 +4,7 @@ import com.vaadin.data.Binder;
 import com.vaadin.data.Binder.Binding;
 import com.vaadin.data.provider.ConfigurableFilterDataProvider;
 import com.vaadin.data.provider.DataProvider;
+import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Panel;
@@ -16,12 +17,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 
 public class ReferenceLinkEditor extends Panel {
 
@@ -38,16 +41,20 @@ public class ReferenceLinkEditor extends Panel {
 
     Column<UrlShortenerEntry, UUID> idColumn = grid.addColumn(UrlShortenerEntry::getId);
     idColumn.setCaption("UUID");
+    idColumn.setSortProperty("id");
 
     Column<UrlShortenerEntry, Date> createdColumn = grid.addColumn(UrlShortenerEntry::getCreated);
     createdColumn.setCaption("Timestamp");
+    createdColumn.setSortProperty("created");
 
     Column<UrlShortenerEntry, String> ownerColumn = grid.addColumn(UrlShortenerEntry::getOwner);
     ownerColumn.setCaption("Created by");
+    ownerColumn.setSortProperty("owner");
 
     Column<UrlShortenerEntry, URI> temporaryColumn =
         grid.addColumn(UrlShortenerEntry::getTemporaryUrl);
     temporaryColumn.setCaption("Temporary URL");
+    temporaryColumn.setSortProperty("temporaryUrl");
     TextField txtTemporary = new TextField();
     Binding<UrlShortenerEntry, String> temporaryBinding = binder.bind(txtTemporary, entry -> {
       if (entry.getTemporaryUrl() == null) {
@@ -73,10 +80,11 @@ public class ReferenceLinkEditor extends Panel {
 
     });
     temporaryColumn.setEditorBinding(temporaryBinding);
-
+    temporaryColumn.setSortable(true);
 
     Column<UrlShortenerEntry, URI> urlColumn = grid.addColumn(UrlShortenerEntry::getUrl);
     urlColumn.setCaption("URL");
+    urlColumn.setSortProperty("url");
 
     HeaderRow filterRow = grid.appendHeaderRow();
 
@@ -99,6 +107,7 @@ public class ReferenceLinkEditor extends Panel {
 
     grid.getEditor().setEnabled(true);
     grid.getEditor().setBuffered(true);
+
 
   }
 
@@ -125,7 +134,16 @@ public class ReferenceLinkEditor extends Panel {
       AnnisUI annisUI = (AnnisUI) getUI();
       UrlShortener shortener = annisUI.getUrlShortener();
       DataProvider<UrlShortenerEntry, UUID> dp = DataProvider.fromFilteringCallbacks(query -> {
-        Sort sort = Sort.by("id");
+        Sort sort = Sort.by(query.getSortOrders().stream().map(o -> {
+
+          if (o.getDirection() == SortDirection.DESCENDING) {
+            return Order.desc(o.getSorted());
+          } else {
+            return Order.asc(o.getSorted());
+          }
+
+        })
+            .collect(Collectors.toList()));
         PageRequest request = createPageRequest(query.getOffset(), query.getLimit(), sort);
 
         if (query.getFilter().isPresent()) {
