@@ -2,9 +2,8 @@ package org.corpus_tools.annis.gui.admin.reflinks;
 
 import com.vaadin.data.Binder;
 import com.vaadin.data.Binder.Binding;
-import com.vaadin.data.provider.Query;
-import com.vaadin.data.provider.QuerySortOrder;
-import com.vaadin.data.provider.Sort;
+import com.vaadin.data.provider.ConfigurableFilterDataProvider;
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Panel;
@@ -13,27 +12,28 @@ import com.vaadin.ui.components.grid.HeaderRow;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.vaadin.artur.spring.dataprovider.FilterablePageableDataProvider;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 public class ReferenceLinkEditor extends Panel {
 
   private static final long serialVersionUID = 6191359393713574090L;
   private final Grid<UrlShortenerEntry> grid;
   private final TextField txtFilterId;
-  private FilterablePageableDataProvider<UrlShortenerEntry, Object> dataProvider;
+  private ConfigurableFilterDataProvider<UrlShortenerEntry, Void, UUID> dataProvider;
 
   public ReferenceLinkEditor() {
     grid = new Grid<>();
     grid.setSizeFull();
-    
+
     Binder<UrlShortenerEntry> binder = grid.getEditor().getBinder();
 
     Column<UrlShortenerEntry, UUID> idColumn = grid.addColumn(UrlShortenerEntry::getId);
@@ -49,44 +49,49 @@ public class ReferenceLinkEditor extends Panel {
         grid.addColumn(UrlShortenerEntry::getTemporaryUrl);
     temporaryColumn.setCaption("Temporary URL");
     TextField txtTemporary = new TextField();
-    Binding<UrlShortenerEntry, String> temporaryBinding =
-        binder.bind(txtTemporary, entry -> {
-          if (entry.getTemporaryUrl() == null) {
-            return "";
-          } else {
-            return entry.getTemporaryUrl().toString();
-          }
-        }, (entry, value) -> {
-          if (value == null || value.isEmpty()) {
-            entry.setTemporaryUrl(null);
-          } else {
-            try {
-              entry.setTemporaryUrl(new URI(value));
-            } catch (URISyntaxException ex) {
-              ExceptionDialog.show(ex, getUI());
-            }
-          }
-          if (getUI() instanceof AnnisUI) {
-            AnnisUI annisUI = (AnnisUI) getUI();
-            UrlShortener shortener = annisUI.getUrlShortener();
-            shortener.getRepo().save(entry);
-          }
+    Binding<UrlShortenerEntry, String> temporaryBinding = binder.bind(txtTemporary, entry -> {
+      if (entry.getTemporaryUrl() == null) {
+        return "";
+      } else {
+        return entry.getTemporaryUrl().toString();
+      }
+    }, (entry, value) -> {
+      if (value == null || value.isEmpty()) {
+        entry.setTemporaryUrl(null);
+      } else {
+        try {
+          entry.setTemporaryUrl(new URI(value));
+        } catch (URISyntaxException ex) {
+          ExceptionDialog.show(ex, getUI());
+        }
+      }
+      if (getUI() instanceof AnnisUI) {
+        AnnisUI annisUI = (AnnisUI) getUI();
+        UrlShortener shortener = annisUI.getUrlShortener();
+        shortener.getRepo().save(entry);
+      }
 
-        });
+    });
     temporaryColumn.setEditorBinding(temporaryBinding);
 
 
     Column<UrlShortenerEntry, URI> urlColumn = grid.addColumn(UrlShortenerEntry::getUrl);
     urlColumn.setCaption("URL");
-    
+
     HeaderRow filterRow = grid.appendHeaderRow();
-    
+
     txtFilterId = new TextField();
-    txtFilterId.setPlaceholder("Filter by UUID");
+    txtFilterId.setPlaceholder("Find UUID");
     txtFilterId.setWidthFull();
-    txtFilterId.addValueChangeListener((e) -> {
-      if (dataProvider != null) {
-        dataProvider.refreshAll();
+    txtFilterId.addValueChangeListener(event -> {
+      dataProvider.setFilter(null);
+      if (event.getValue() != null && !event.getValue().isEmpty()) {
+        try {
+          UUID id = UUID.fromString(event.getValue());
+          dataProvider.setFilter(id);
+        } catch (IllegalArgumentException ex) {
+          // Don't set the filter but ignore otherwisse
+        }
       }
     });
 
@@ -95,10 +100,23 @@ public class ReferenceLinkEditor extends Panel {
     grid.getEditor().setEnabled(true);
     grid.getEditor().setBuffered(true);
 
-
-
   }
-  
+
+  private PageRequest createPageRequest(int offset, int limit, Sort sort) {
+    int minPageSize = limit;
+    int lastIndex = offset + limit - 1;
+    int maxPageSize = lastIndex + 1;
+
+    for (double pageSize = minPageSize; pageSize <= maxPageSize; pageSize++) {
+      int startPage = (int) (offset / pageSize);
+      int endPage = (int) (lastIndex / pageSize);
+      if (startPage == endPage) {
+        return PageRequest.of(startPage, (int) pageSize, sort);
+      }
+    }
+    return PageRequest.of(0, maxPageSize, sort);
+  }
+
   @Override
   public void attach() {
     super.attach();
@@ -106,32 +124,45 @@ public class ReferenceLinkEditor extends Panel {
     if (getUI() instanceof AnnisUI) {
       AnnisUI annisUI = (AnnisUI) getUI();
       UrlShortener shortener = annisUI.getUrlShortener();
-      dataProvider = new FilterablePageableDataProvider<UrlShortenerEntry, Object>() {
+      DataProvider<UrlShortenerEntry, UUID> dp = DataProvider.fromFilteringCallbacks(query -> {
+        Sort sort = Sort.by("id");
+        PageRequest request = createPageRequest(query.getOffset(), query.getLimit(), sort);
 
-        private static final long serialVersionUID = -1727729720680112512L;
+        if (query.getFilter().isPresent()) {
+          List<UrlShortenerEntry> result = new LinkedList<>();
+          // TODO: how to get partial matches?
+          try {
+            Optional<UrlShortenerEntry> entry =
+                shortener.getRepo().findById(query.getFilter().get());
+            if (entry.isPresent()) {
+              result.add(entry.get());
+            }
+          } catch (IllegalArgumentException ex) {
+            // Ignore
+          }
+          return result.stream();
 
-        @Override
-        protected Page<UrlShortenerEntry> fetchFromBackEnd(
-            Query<UrlShortenerEntry, Object> query, Pageable pageable) {
-          return shortener.getRepo().findAll(pageable);
+        } else {
+          return shortener.getRepo().findAll(request).stream();
+
         }
-
-        @Override
-        protected List<QuerySortOrder> getDefaultSortOrders() {
-          return Sort.asc("id").build();
-        }
-
-        @Override
-        protected int sizeInBackEnd(Query<UrlShortenerEntry, Object> query) {
+      }, query -> {
+        if (query.getFilter().isPresent()) {
+          if (shortener.getRepo().findById(query.getFilter().get()).isPresent()) {
+            return 1;
+          } else {
+            return 0;
+          }
+        } else {
           return (int) shortener.getRepo().count();
         }
-
-
-      };
+      });
+      dataProvider = dp.withConfigurableFilter();
       grid.setDataProvider(dataProvider);
     }
-    
+
     setContent(grid);
+    setSizeFull();
   }
 
 }
