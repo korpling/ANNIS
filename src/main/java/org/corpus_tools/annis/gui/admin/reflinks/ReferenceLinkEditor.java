@@ -40,8 +40,6 @@ public class ReferenceLinkEditor extends Panel {
     grid = new Grid<>();
     grid.setSizeFull();
 
-    Binder<UrlShortenerEntry> binder = grid.getEditor().getBinder();
-
     Column<UrlShortenerEntry, UUID> idColumn = grid.addColumn(UrlShortenerEntry::getId);
     idColumn.setCaption("UUID");
     idColumn.setSortProperty("id");
@@ -58,7 +56,45 @@ public class ReferenceLinkEditor extends Panel {
         grid.addColumn(UrlShortenerEntry::getTemporaryUrl);
     temporaryColumn.setCaption("Temporary URL");
     temporaryColumn.setSortProperty("temporaryUrl");
+    addEditableBindings(temporaryColumn);
+
+
+    Column<UrlShortenerEntry, URI> urlColumn = grid.addColumn(UrlShortenerEntry::getUrl);
+    urlColumn.setCaption("URL");
+    urlColumn.setSortProperty("url");
+
+    HeaderRow filterRow = grid.appendHeaderRow();
+
+    txtFilterId = new TextField();
+    txtFilterId.setPlaceholder("Find UUID");
+    txtFilterId.setWidthFull();
+    txtFilterId.addValueChangeListener(event -> {
+      dataProvider.setFilter(null);
+      if (event.getValue() != null && !event.getValue().isEmpty()) {
+        try {
+          UUID id = UUID.fromString(event.getValue());
+          dataProvider.setFilter(id);
+        } catch (IllegalArgumentException ex) {
+          // Don't set the filter but ignore otherwise
+        }
+      }
+    });
+
+    filterRow.getCell(idColumn).setComponent(txtFilterId);
+
+
+    grid.getEditor().setEnabled(true);
+    grid.getEditor().setBuffered(true);
+
+
+    setSizeFull();
+  }
+
+  private void addEditableBindings(Column<UrlShortenerEntry, URI> temporaryColumn) {
     TextField txtTemporary = new TextField();
+    Binder<UrlShortenerEntry> binder = grid.getEditor().getBinder();
+
+
     Binding<UrlShortenerEntry, String> temporaryBinding = binder.bind(txtTemporary, entry -> {
       if (entry.getTemporaryUrl() == null) {
         return "";
@@ -83,36 +119,6 @@ public class ReferenceLinkEditor extends Panel {
 
     });
     temporaryColumn.setEditorBinding(temporaryBinding);
-    temporaryColumn.setSortable(true);
-
-    Column<UrlShortenerEntry, URI> urlColumn = grid.addColumn(UrlShortenerEntry::getUrl);
-    urlColumn.setCaption("URL");
-    urlColumn.setSortProperty("url");
-
-    HeaderRow filterRow = grid.appendHeaderRow();
-
-    txtFilterId = new TextField();
-    txtFilterId.setPlaceholder("Find UUID");
-    txtFilterId.setWidthFull();
-    txtFilterId.addValueChangeListener(event -> {
-      dataProvider.setFilter(null);
-      if (event.getValue() != null && !event.getValue().isEmpty()) {
-        try {
-          UUID id = UUID.fromString(event.getValue());
-          dataProvider.setFilter(id);
-        } catch (IllegalArgumentException ex) {
-          // Don't set the filter but ignore otherwisse
-        }
-      }
-    });
-
-    filterRow.getCell(idColumn).setComponent(txtFilterId);
-
-    grid.getEditor().setEnabled(true);
-    grid.getEditor().setBuffered(true);
-
-
-    setSizeFull();
   }
 
   private PageRequest createPageRequest(int offset, int limit, Sort sort) {
