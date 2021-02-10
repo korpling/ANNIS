@@ -145,6 +145,7 @@ public class AdminView extends VerticalLayout
         // (in desktop mode)
         tabSheet.getTab(groupManagementPanel).setVisible(!ui.isDesktopMode());
         tabSheet.getTab(migrationPanel).setVisible(!ui.isDesktopMode());
+        tabSheet.getTab(referenceLinkEditor).setVisible(!ui.isDesktopMode());
 
         Component selectedTab = getComponentForFragment(event.getParameters());
         if (selectedTab != null && selectedTab != tabSheet.getSelectedTab()) {
