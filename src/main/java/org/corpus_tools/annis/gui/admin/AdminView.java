@@ -203,6 +203,7 @@ public class AdminView extends VerticalLayout
 
     @Override
     public void invalidateClient() {
+      // The current client implementation the client is always fresh
     }
 
     @Override
