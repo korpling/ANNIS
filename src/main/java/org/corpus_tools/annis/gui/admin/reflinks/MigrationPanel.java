@@ -47,6 +47,8 @@ import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
+import org.corpus_tools.annis.gui.security.SecurityConfiguration;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class MigrationPanel extends Panel
@@ -120,7 +122,6 @@ public class MigrationPanel extends Panel
     VerticalLayout layout = new VerticalLayout(formLayout, migrateButton, progress, txtMessages);
     layout.setSizeFull();
     layout.setMargin(true);
-    setContent(layout);
     layout.setExpandRatio(txtMessages, 1.0f);
 
     if (ui.getConfig().getMailHost() != null) {
@@ -145,6 +146,13 @@ public class MigrationPanel extends Panel
 
     migrateButton.setEnabled(false);
     migrateButton.setDisableOnClick(true);
+
+
+    Optional<OidcUser> user = Helper.getUser(getUI());
+    if (user.isPresent() && user.get().containsClaim(SecurityConfiguration.ROLES_CLAIM)
+        && user.get().getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM).contains("admin")) {
+      setContent(layout);
+    }
 
   }
 

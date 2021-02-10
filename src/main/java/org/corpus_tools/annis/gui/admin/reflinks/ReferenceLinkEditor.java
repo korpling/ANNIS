@@ -19,12 +19,15 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
+import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
 public class ReferenceLinkEditor extends Panel {
 
@@ -109,6 +112,7 @@ public class ReferenceLinkEditor extends Panel {
     grid.getEditor().setBuffered(true);
 
 
+    setSizeFull();
   }
 
   private PageRequest createPageRequest(int offset, int limit, Sort sort) {
@@ -132,6 +136,7 @@ public class ReferenceLinkEditor extends Panel {
 
     if (getUI() instanceof AnnisUI) {
       AnnisUI annisUI = (AnnisUI) getUI();
+
       UrlShortener shortener = annisUI.getUrlShortener();
       DataProvider<UrlShortenerEntry, UUID> dp = DataProvider.fromFilteringCallbacks(query -> {
         Sort sort = Sort.by(query.getSortOrders().stream().map(o -> {
@@ -177,10 +182,16 @@ public class ReferenceLinkEditor extends Panel {
       });
       dataProvider = dp.withConfigurableFilter();
       grid.setDataProvider(dataProvider);
+
     }
 
-    setContent(grid);
-    setSizeFull();
+    Optional<OidcUser> user = Helper.getUser(getUI());
+    if (user.isPresent() && user.get().containsClaim(SecurityConfiguration.ROLES_CLAIM)
+        && user.get().getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM)
+        .contains("admin")) {
+      setContent(grid);
+    }
+
   }
 
 }
