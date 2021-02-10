@@ -136,6 +136,51 @@ public class ReferenceLinkEditor extends Panel {
     return PageRequest.of(0, maxPageSize, sort);
   }
 
+  private DataProvider<UrlShortenerEntry, UUID> createDataProvider(UrlShortener shortener) {
+    DataProvider<UrlShortenerEntry, UUID> dp = DataProvider.fromFilteringCallbacks(query -> {
+      Sort sort = Sort.by(query.getSortOrders().stream().map(o -> {
+
+        if (o.getDirection() == SortDirection.DESCENDING) {
+          return Order.desc(o.getSorted());
+        } else {
+          return Order.asc(o.getSorted());
+        }
+
+      }).collect(Collectors.toList()));
+      PageRequest request = createPageRequest(query.getOffset(), query.getLimit(), sort);
+
+      if (query.getFilter().isPresent()) {
+        List<UrlShortenerEntry> result = new LinkedList<>();
+        // TODO: how to get partial matches?
+        try {
+          Optional<UrlShortenerEntry> entry = shortener.getRepo().findById(query.getFilter().get());
+          if (entry.isPresent()) {
+            result.add(entry.get());
+          }
+        } catch (IllegalArgumentException ex) {
+          // Ignore
+        }
+        return result.stream();
+
+      } else {
+        return shortener.getRepo().findAll(request).stream();
+
+      }
+    }, query -> {
+      if (query.getFilter().isPresent()) {
+        if (shortener.getRepo().findById(query.getFilter().get()).isPresent()) {
+          return 1;
+        } else {
+          return 0;
+        }
+      } else {
+        return (int) shortener.getRepo().count();
+      }
+    });
+
+    return dp;
+  }
+
   @Override
   public void attach() {
     super.attach();
@@ -144,49 +189,8 @@ public class ReferenceLinkEditor extends Panel {
       AnnisUI annisUI = (AnnisUI) getUI();
 
       UrlShortener shortener = annisUI.getUrlShortener();
-      DataProvider<UrlShortenerEntry, UUID> dp = DataProvider.fromFilteringCallbacks(query -> {
-        Sort sort = Sort.by(query.getSortOrders().stream().map(o -> {
 
-          if (o.getDirection() == SortDirection.DESCENDING) {
-            return Order.desc(o.getSorted());
-          } else {
-            return Order.asc(o.getSorted());
-          }
-
-        })
-            .collect(Collectors.toList()));
-        PageRequest request = createPageRequest(query.getOffset(), query.getLimit(), sort);
-
-        if (query.getFilter().isPresent()) {
-          List<UrlShortenerEntry> result = new LinkedList<>();
-          // TODO: how to get partial matches?
-          try {
-            Optional<UrlShortenerEntry> entry =
-                shortener.getRepo().findById(query.getFilter().get());
-            if (entry.isPresent()) {
-              result.add(entry.get());
-            }
-          } catch (IllegalArgumentException ex) {
-            // Ignore
-          }
-          return result.stream();
-
-        } else {
-          return shortener.getRepo().findAll(request).stream();
-
-        }
-      }, query -> {
-        if (query.getFilter().isPresent()) {
-          if (shortener.getRepo().findById(query.getFilter().get()).isPresent()) {
-            return 1;
-          } else {
-            return 0;
-          }
-        } else {
-          return (int) shortener.getRepo().count();
-        }
-      });
-      dataProvider = dp.withConfigurableFilter();
+      dataProvider = createDataProvider(shortener).withConfigurableFilter();
       grid.setDataProvider(dataProvider);
 
     }
