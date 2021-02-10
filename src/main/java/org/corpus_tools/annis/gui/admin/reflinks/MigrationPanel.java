@@ -149,11 +149,12 @@ public class MigrationPanel extends Panel
 
 
     Optional<OidcUser> user = Helper.getUser(getUI());
-    if (user.isPresent() && user.get().containsClaim(SecurityConfiguration.ROLES_CLAIM)
-        && user.get().getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM).contains("admin")) {
-      setContent(layout);
+    if (user.isPresent()) {
+      List<String> roles = user.get().getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM);
+      if (roles != null && roles.contains("admin")) {
+        setContent(layout);
+      }
     }
-
   }
 
   void setMessageAndScrollToEnd(String message) {
