@@ -2,19 +2,11 @@
 
 For the desktop version of ANNIS, you most probably don't need to change any of the default configuration and you can skip this section.
 If you are installing ANNIS on a server however, you might want to tweak the settings.
-
-ANNIS will search in different folders for its configuration.
-
-Folder | Description
------- | -----------
-`$ANNIS_CFG` or `/etc/annis/` | The global configuration folder defined by the environment variable `ANNIS_CFG` or a default path if not set.
-`~/.annis/` | User-specific configuration inside the `.annis` sub-folder inside the home folder of the user who is running the frontend.
-
 The [Java Properties](http://en.wikipedia.org/w/index.php?title=.properties&oldid=521500688), [TOML](https://toml.io/) and [JSON](http://www.json.org/) file formats are used for different kind of configuration.
-Configuration files from the user directory can overwrite the global configuration and the global configuration overwrites the
-default configuration.
-The main configuration is located in a Java Properties file called `annis-gui.properties` and must be located in one of previously listed folders.
 
+ANNIS uses the Spring Boot configuration system and thus it will search for a Java Properties based configuration file named `application.properties` in the current working directory or a `config` sub-directory of the working directory.
+You can also use the command line argument `--spring.config.location=file:/<location-on-disk>` to specify a specific configuration file.
+More options are documented in the [Spring Boot documentation](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files).
 
 
 The following is an example configuration with ANNIS-specific configuration values.
@@ -47,4 +39,4 @@ annis.shorten-reference-links=true
 spring.datasource.url=jdbc:h2:file:${user.home}/.annis/v4/frontend_data.h2
 ```
 
-Being a Spring Boot application, ANNIS configuration properties also be given as [command line argument](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-command-line-args) or using [various other means](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files).
+Being a Spring Boot application, ANNIS configuration properties also be directly given as [command line argument](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-command-line-args).
