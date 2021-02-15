@@ -72,7 +72,7 @@ The Keycloak server needs to know which URIs are valid client URIs. Go to “Con
 
 ### Configure the ANNIS frontend service
 
-Edit the `annis-gui.properties` file in one of the configuration folders (e.g. `~/.annis/`).
+Edit the application property file (e.g. `application.properties` in the working directory).
 
 Add the following lines to configure ANNIS to use the Keycloak server:
 ```properties
