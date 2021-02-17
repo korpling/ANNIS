@@ -64,6 +64,9 @@ class AdminViewTest {
 
     tab.setSelectedTab(_get(CorpusAdminPanel.class));
     assertEquals("!admin/corpora", ui.getPage().getUriFragment());
+    
+    tab.setSelectedTab(_get(GroupManagementPanel.class));
+    assertEquals("!admin/groups", ui.getPage().getUriFragment());
 
     tab.setSelectedTab(_get(ReferenceLinkEditor.class));
     assertEquals("!admin/reference-link-editor", ui.getPage().getUriFragment());
