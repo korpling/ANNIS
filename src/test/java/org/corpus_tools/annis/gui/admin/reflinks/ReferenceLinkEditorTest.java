@@ -1,0 +1,88 @@
+package org.corpus_tools.annis.gui.admin.reflinks;
+
+import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
+import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import com.github.mvysny.kaributesting.v8.GridKt;
+import com.github.mvysny.kaributesting.v8.MockVaadin;
+import com.vaadin.spring.internal.UIScopeImpl;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.TabSheet;
+import java.io.IOException;
+import java.net.URI;
+import java.util.UUID;
+import net.jcip.annotations.NotThreadSafe;
+import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.SingletonBeanStoreRetrievalStrategy;
+import org.corpus_tools.annis.gui.query_references.UrlShortener;
+import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.web.WebAppConfiguration;
+
+@SpringBootTest
+@ActiveProfiles({"desktop", "test", "headless"})
+@WebAppConfiguration
+@NotThreadSafe
+class ReferenceLinkEditorTest {
+
+  @Autowired
+  private BeanFactory beanFactory;
+
+  private AnnisUI ui;
+
+  private ReferenceLinkEditor panel;
+
+  private UrlShortenerEntry entry2;
+
+  private UrlShortenerEntry entry1;
+
+
+  @BeforeEach
+  void setup() throws IOException {
+    UIScopeImpl.setBeanStoreRetrievalStrategy(new SingletonBeanStoreRetrievalStrategy());
+    this.ui = beanFactory.getBean(AnnisUI.class);
+
+    MockVaadin.setup(() -> ui);
+
+    _click(_get(Button.class, spec -> spec.withCaption("Administration")));
+    TabSheet tab = _get(TabSheet.class);
+    panel = _get(ReferenceLinkEditor.class);
+    tab.setSelectedTab(panel);
+
+    // Add some example entries
+    UrlShortener urlShortener = this.ui.getUrlShortener();
+    entry1 = new UrlShortenerEntry();
+    entry1.setId(UUID.fromString("4366b0a5-6b27-40fe-ac5d-08e75c9eef51"));
+    entry1.setUrl(URI.create("/test1"));
+    urlShortener.getRepo().save(entry1);
+
+    entry2 = new UrlShortenerEntry();
+    entry2.setId(UUID.fromString("b1912b10-93f3-4018-84e8-6bf7572ee163"));
+    entry2.setUrl(URI.create("/test2"));
+    urlShortener.getRepo().save(entry2);
+
+  }
+
+
+
+  @Test
+  void testShowEntries() throws Exception {
+    @SuppressWarnings("unchecked")
+    Grid<UrlShortenerEntry> grid = _get(panel, Grid.class);
+
+    UrlShortenerEntry row1 = GridKt._get(grid, 0);
+    assertEquals(entry1, row1);
+
+    UrlShortenerEntry row2 = GridKt._get(grid, 1);
+    assertEquals(entry2, row2);
+  }
+
+
+}
