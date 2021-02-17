@@ -61,6 +61,7 @@ class ReferenceLinkEditorTest {
     tab.setSelectedTab(panel);
 
     // Add some example entries
+    ui.getUrlShortener().getRepo().deleteAll();
     UrlShortener urlShortener = this.ui.getUrlShortener();
     entry1 = new UrlShortenerEntry();
     entry1.setId(UUID.fromString("4366b0a5-6b27-40fe-ac5d-08e75c9eef51"));
