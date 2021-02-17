@@ -2,10 +2,13 @@ package org.corpus_tools.annis.gui.admin.reflinks;
 
 import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.github.mvysny.kaributesting.v8.NotificationsKt;
 import com.nimbusds.jose.util.StandardCharset;
@@ -19,19 +22,35 @@ import com.vaadin.ui.Upload;
 import com.vaadin.ui.Upload.FinishedEvent;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
 import net.jcip.annotations.NotThreadSafe;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.SingletonBeanStoreRetrievalStrategy;
 import org.corpus_tools.annis.gui.TestHelper;
+import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -62,16 +81,19 @@ class MigrationPanelTest {
 
     MockVaadin.setup(() -> ui);
 
-    _click(_get(Button.class, spec -> spec.withCaption("Administration")));
-    TabSheet tab = _get(TabSheet.class);
-    panel = _get(MigrationPanel.class);
-    tab.setSelectedTab(panel);
   }
 
   @AfterEach
   public void tearDown() throws IOException {
     MockVaadin.tearDown();
     this.legacyServer.shutdown();
+  }
+
+  private void showMigrationPanel() {
+    _click(_get(Button.class, spec -> spec.withCaption("Administration")));
+    TabSheet tab = _get(TabSheet.class);
+    panel = _get(MigrationPanel.class);
+    tab.setSelectedTab(panel);
   }
 
   private void simulateUpload(String fileContent) throws Exception {
@@ -97,6 +119,8 @@ class MigrationPanelTest {
 
   @Test
   void testSuccessfulMigration() throws Exception {
+    showMigrationPanel();
+
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
@@ -146,6 +170,8 @@ class MigrationPanelTest {
 
   @Test
   void testUnknownCorpus() throws Exception {
+    showMigrationPanel();
+
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
@@ -174,6 +200,8 @@ class MigrationPanelTest {
 
   @Test
   void testFailingQuery() throws Exception {
+    showMigrationPanel();
+
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
@@ -209,6 +237,8 @@ class MigrationPanelTest {
 
   @Test
   void testInvalidLine() throws Exception {
+    showMigrationPanel();
+
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
@@ -235,6 +265,8 @@ class MigrationPanelTest {
 
   @Test
   void testInvalidUri() throws Exception {
+    showMigrationPanel();
+
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
@@ -263,6 +295,8 @@ class MigrationPanelTest {
 
   @Test
   void testEmptyCorpusName() throws Exception {
+    showMigrationPanel();
+
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
@@ -290,6 +324,8 @@ class MigrationPanelTest {
 
   @Test
   void testLegacyServiceTimeout() throws Exception {
+    showMigrationPanel();
+
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
@@ -320,6 +356,8 @@ class MigrationPanelTest {
 
   @Test
   void testSemanticError() throws Exception {
+    showMigrationPanel();
+
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
@@ -348,7 +386,10 @@ class MigrationPanelTest {
   @SuppressWarnings("unchecked")
   @Test
   void testInvalidCredentials() throws Exception {
+
+    showMigrationPanel();
     NotificationsKt.clearNotifications();
+
 
     // Button should be disabled until we upload a file
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
@@ -376,6 +417,8 @@ class MigrationPanelTest {
 
   @Test
   void testFallbackToQuirksMode() throws Exception {
+    showMigrationPanel();
+
     Button start = _get(Button.class, spec -> spec.withCaption("Start migration"));
     assertFalse(start.isEnabled());
 
@@ -412,6 +455,60 @@ class MigrationPanelTest {
         "++++++++++++++++++++++++\n" + "+ Successful: 1 from 1 +\n" + "++++++++++++++++++++++++\n",
         messages.getValue());
     
+  }
+
+  @Test
+  void testLoggedOut() {
+    // Test that the test environment provides us with a logged in administrator user first
+    Authentication oldAuth = ui.getSecurityContext().getAuthentication();
+    Optional<OidcUser> user = Helper.getUser(ui);
+    assertTrue(user.isPresent());
+    OidcUser adminUser = user.get();
+    assertTrue(adminUser.getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM).contains("admin"));
+
+    // Logout the current user
+    ui.getSecurityContext().setAuthentication(null);
+    assertFalse(Helper.getUser(ui).isPresent());
+
+    // Change to migration tab panel
+    showMigrationPanel();
+    // Since we are logged out, the panel should be empty
+    assertNull(panel.getContent());
+
+    // Login in the admin user again
+    ui.getSecurityContext().setAuthentication(oldAuth);
+  }
+
+  @Test
+  void testNotAnAdminUser() {
+    Authentication oldAuth = ui.getSecurityContext().getAuthentication();
+    // Change the current user to not have the administration role
+    List<String> roles = Arrays.asList();
+    Instant issuedAt = Instant.now();
+    Instant expiresAt = Instant.now().plus(7l, ChronoUnit.DAYS);
+
+    // Use the secret to sign a new JWT token with admin rights
+    String signedToken = JWT.create().withSubject("non-admin")
+        .withClaim(SecurityConfiguration.ROLES_CLAIM, roles).withExpiresAt(Date.from(expiresAt))
+        .withIssuedAt(Date.from(issuedAt)).sign(Algorithm.HMAC256("whatever-secret"));
+
+    List<? extends GrantedAuthority> grantedAuthorities =
+        Arrays.asList(new SimpleGrantedAuthority("justauser"));
+    LinkedHashMap<String, Object> claims = new LinkedHashMap<>();
+    claims.put("sub", "non-admin");
+    OidcIdToken token = new OidcIdToken(signedToken, issuedAt, expiresAt, claims);
+    DefaultOidcUser newUser = new DefaultOidcUser(grantedAuthorities, token);
+    ui.getSecurityContext().setAuthentication(
+        new UsernamePasswordAuthenticationToken(newUser, signedToken, grantedAuthorities));
+
+
+    // Change to migration tab panel
+    showMigrationPanel();
+    // Since we are logged out, the panel should be empty
+    assertNull(panel.getContent());
+
+    // Login in the admin user again
+    ui.getSecurityContext().setAuthentication(oldAuth);
   }
 
 }
