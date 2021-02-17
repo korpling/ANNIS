@@ -43,9 +43,10 @@ class ReferenceLinkEditorTest {
 
   private ReferenceLinkEditor panel;
 
-  private UrlShortenerEntry entry2;
 
   private UrlShortenerEntry entry1;
+  private UrlShortenerEntry entry2;
+
 
 
   @BeforeEach
