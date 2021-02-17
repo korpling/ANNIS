@@ -1,5 +1,6 @@
 package org.corpus_tools.annis.gui.admin.reflinks;
 
+import com.vaadin.data.provider.DataProvider;
 import com.vaadin.server.Setter;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -14,24 +15,24 @@ class TemporaryUrlSetter implements Setter<UrlShortenerEntry, String> {
   private static final long serialVersionUID = -1917211320939260447L;
 
   private final AnnisUI ui;
+  private final DataProvider<UrlShortenerEntry, ?> provider;
 
-  public TemporaryUrlSetter(AnnisUI ui) {
+  public TemporaryUrlSetter(AnnisUI ui, DataProvider<UrlShortenerEntry, ?> provider) {
     this.ui = ui;
+    this.provider = provider;
   }
 
   @Override
   public void accept(UrlShortenerEntry entry, String value) {
     UrlShortener shortener = ui.getUrlShortener();
-    if (value == null || value.isEmpty()) {
-      entry.setTemporaryUrl(null);
+
+    try {
+      URI temporary = value == null || value.isEmpty() ? null : new URI(value);
+      entry.setTemporaryUrl(temporary);
       shortener.getRepo().save(entry);
-    } else {
-      try {
-        entry.setTemporaryUrl(new URI(value));
-        shortener.getRepo().save(entry);
-      } catch (URISyntaxException ex) {
-        ExceptionDialog.show(ex, ui);
-      }
+      provider.refreshItem(entry);
+    } catch (URISyntaxException ex) {
+      ExceptionDialog.show(ex, ui);
     }
   }
 }

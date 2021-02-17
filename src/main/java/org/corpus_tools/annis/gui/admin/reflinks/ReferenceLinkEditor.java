@@ -87,12 +87,13 @@ public class ReferenceLinkEditor extends Panel {
     setSizeFull();
   }
 
-  private void addEditableBindings(Column<UrlShortenerEntry, URI> temporaryColumn, AnnisUI ui) {
+  private void addEditableBindings(Column<UrlShortenerEntry, URI> temporaryColumn,
+      DataProvider<UrlShortenerEntry, ?> provider, AnnisUI ui) {
     TextField txtTemporary = new TextField();
     Binder<UrlShortenerEntry> binder = grid.getEditor().getBinder();
 
     Binding<UrlShortenerEntry, String> temporaryBinding = binder.bind(txtTemporary,
-        new TemporaryUrlValueProvider(), new TemporaryUrlSetter((AnnisUI) getUI()));
+        new TemporaryUrlValueProvider(), new TemporaryUrlSetter(ui, provider));
     temporaryColumn.setEditorBinding(temporaryBinding);
 
   }
@@ -165,10 +166,11 @@ public class ReferenceLinkEditor extends Panel {
       AnnisUI annisUI = (AnnisUI) getUI();
 
       UrlShortener shortener = annisUI.getUrlShortener();
-      addEditableBindings(temporaryColumn, annisUI);
+
 
       dataProvider = createDataProvider(shortener).withConfigurableFilter();
       grid.setDataProvider(dataProvider);
+      addEditableBindings(temporaryColumn, dataProvider, annisUI);
 
     }
 
