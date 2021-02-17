@@ -11,13 +11,14 @@ import org.junit.jupiter.api.Test;
 
 class UrlShortenerEntryTest {
 
+  @SuppressWarnings("unlikely-arg-type")
   @Test
   void testEquals() {
     UrlShortenerEntry e1 = new UrlShortenerEntry();
 
     assertEquals(e1, e1);
     assertFalse(e1.equals(null));
-    assertNotEquals("Someobject", e1);
+    assertFalse(e1.equals("Someobject"));
 
     UrlShortenerEntry e2 = new UrlShortenerEntry();
 
