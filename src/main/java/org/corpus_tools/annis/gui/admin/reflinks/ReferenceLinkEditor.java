@@ -11,7 +11,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.components.grid.HeaderRow;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,7 +19,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
@@ -56,6 +54,7 @@ public class ReferenceLinkEditor extends Panel {
         grid.addColumn(UrlShortenerEntry::getTemporaryUrl);
     temporaryColumn.setCaption("Temporary URL");
     temporaryColumn.setSortProperty("temporaryUrl");
+    temporaryColumn.setId("temporaryUrl");
     addEditableBindings(temporaryColumn);
 
 
@@ -94,31 +93,13 @@ public class ReferenceLinkEditor extends Panel {
     TextField txtTemporary = new TextField();
     Binder<UrlShortenerEntry> binder = grid.getEditor().getBinder();
 
+    if (getUI() instanceof AnnisUI) {
 
-    Binding<UrlShortenerEntry, String> temporaryBinding = binder.bind(txtTemporary, entry -> {
-      if (entry.getTemporaryUrl() == null) {
-        return "";
-      } else {
-        return entry.getTemporaryUrl().toString();
-      }
-    }, (entry, value) -> {
-      if (value == null || value.isEmpty()) {
-        entry.setTemporaryUrl(null);
-      } else {
-        try {
-          entry.setTemporaryUrl(new URI(value));
-        } catch (URISyntaxException ex) {
-          ExceptionDialog.show(ex, getUI());
-        }
-      }
-      if (getUI() instanceof AnnisUI) {
-        AnnisUI annisUI = (AnnisUI) getUI();
-        UrlShortener shortener = annisUI.getUrlShortener();
-        shortener.getRepo().save(entry);
-      }
-
-    });
-    temporaryColumn.setEditorBinding(temporaryBinding);
+      Binding<UrlShortenerEntry, String> temporaryBinding =
+          binder.bind(txtTemporary, new TemporaryUrlValueProvider(),
+              new TemporaryUrlSetter((AnnisUI) getUI()));
+      temporaryColumn.setEditorBinding(temporaryBinding);
+    }
   }
 
   private PageRequest createPageRequest(int offset, int limit, Sort sort) {
