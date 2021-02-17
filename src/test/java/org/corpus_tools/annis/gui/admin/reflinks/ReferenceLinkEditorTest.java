@@ -21,6 +21,7 @@ import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.SingletonBeanStoreRetrievalStrategy;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanFactory;
@@ -74,10 +75,15 @@ class ReferenceLinkEditorTest {
 
   }
 
+  @AfterEach
+  void cleanup() {
+    ui.getUrlShortener().getRepo().deleteAll();
+  }
+
 
 
   @Test
-  void testShowAndSortEntries() throws Exception {
+  void testShowAndSortEntries() {
     @SuppressWarnings("unchecked")
     Grid<UrlShortenerEntry> grid = _get(panel, Grid.class);
 
@@ -96,7 +102,7 @@ class ReferenceLinkEditorTest {
   }
 
   @Test
-  void testFilterByUUID() throws Exception {
+  void testFilterByUUID() {
     @SuppressWarnings("unchecked")
     Grid<UrlShortenerEntry> grid = _get(panel, Grid.class);
 
@@ -113,6 +119,7 @@ class ReferenceLinkEditorTest {
     // Set to a non-existing but valid UUID, this should hide all entries
     _setValue(filter, "8307fbb6-f426-433d-9b11-71244b970e0d");
     assertEquals(0, GridKt._size(grid));
-
   }
+
+
 }
