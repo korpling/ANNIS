@@ -17,7 +17,7 @@ class UrlShortenerEntryTest {
 
     assertEquals(e1, e1);
     assertFalse(e1.equals(null));
-    assertNotEquals(e1, "Someobject");
+    assertNotEquals("Someobject", e1);
 
     UrlShortenerEntry e2 = new UrlShortenerEntry();
 
