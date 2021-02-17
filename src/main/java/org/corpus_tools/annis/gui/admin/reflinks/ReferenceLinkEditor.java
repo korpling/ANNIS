@@ -33,6 +33,7 @@ public class ReferenceLinkEditor extends Panel {
   private final Grid<UrlShortenerEntry> grid;
   private final TextField txtFilterId;
   private ConfigurableFilterDataProvider<UrlShortenerEntry, Void, UUID> dataProvider;
+  private Column<UrlShortenerEntry, URI> temporaryColumn;
 
   public ReferenceLinkEditor() {
     grid = new Grid<>();
@@ -50,13 +51,10 @@ public class ReferenceLinkEditor extends Panel {
     ownerColumn.setCaption("Created by");
     ownerColumn.setSortProperty("owner");
 
-    Column<UrlShortenerEntry, URI> temporaryColumn =
-        grid.addColumn(UrlShortenerEntry::getTemporaryUrl);
+    temporaryColumn = grid.addColumn(UrlShortenerEntry::getTemporaryUrl);
     temporaryColumn.setCaption("Temporary URL");
     temporaryColumn.setSortProperty("temporaryUrl");
     temporaryColumn.setId("temporaryUrl");
-    addEditableBindings(temporaryColumn);
-
 
     Column<UrlShortenerEntry, URI> urlColumn = grid.addColumn(UrlShortenerEntry::getUrl);
     urlColumn.setCaption("URL");
@@ -89,17 +87,14 @@ public class ReferenceLinkEditor extends Panel {
     setSizeFull();
   }
 
-  private void addEditableBindings(Column<UrlShortenerEntry, URI> temporaryColumn) {
+  private void addEditableBindings(Column<UrlShortenerEntry, URI> temporaryColumn, AnnisUI ui) {
     TextField txtTemporary = new TextField();
     Binder<UrlShortenerEntry> binder = grid.getEditor().getBinder();
 
-    if (getUI() instanceof AnnisUI) {
+    Binding<UrlShortenerEntry, String> temporaryBinding = binder.bind(txtTemporary,
+        new TemporaryUrlValueProvider(), new TemporaryUrlSetter((AnnisUI) getUI()));
+    temporaryColumn.setEditorBinding(temporaryBinding);
 
-      Binding<UrlShortenerEntry, String> temporaryBinding =
-          binder.bind(txtTemporary, new TemporaryUrlValueProvider(),
-              new TemporaryUrlSetter((AnnisUI) getUI()));
-      temporaryColumn.setEditorBinding(temporaryBinding);
-    }
   }
 
   private PageRequest createPageRequest(int offset, int limit, Sort sort) {
@@ -170,6 +165,7 @@ public class ReferenceLinkEditor extends Panel {
       AnnisUI annisUI = (AnnisUI) getUI();
 
       UrlShortener shortener = annisUI.getUrlShortener();
+      addEditableBindings(temporaryColumn, annisUI);
 
       dataProvider = createDataProvider(shortener).withConfigurableFilter();
       grid.setDataProvider(dataProvider);
