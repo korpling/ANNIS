@@ -2,7 +2,6 @@ package org.corpus_tools.annis.gui.admin.reflinks;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -46,8 +45,8 @@ class TemporaryUrlSetterTest {
 
     fixture.accept(entry, null);
     assertNull(entry.getTemporaryUrl());
-    verify(repo).save(eq(entry));
-    verify(provider).refreshItem(eq(entry));
+    verify(repo).save(entry);
+    verify(provider).refreshItem(entry);
     verifyNoMoreInteractions(repo);
     verifyNoMoreInteractions(provider);
   }
@@ -58,8 +57,8 @@ class TemporaryUrlSetterTest {
     // Empty string should be handled as null value
     fixture.accept(entry, "");
     assertNull(entry.getTemporaryUrl());
-    verify(repo).save(eq(entry));
-    verify(provider).refreshItem(eq(entry));
+    verify(repo).save(entry);
+    verify(provider).refreshItem(entry);
     verifyNoMoreInteractions(repo);
     verifyNoMoreInteractions(provider);
   }
@@ -68,8 +67,8 @@ class TemporaryUrlSetterTest {
   void testAcceptNonEmpty() {
     fixture.accept(entry, "/example");
     assertEquals("/example", entry.getTemporaryUrl().toASCIIString());
-    verify(repo).save(eq(entry));
-    verify(provider).refreshItem(eq(entry));
+    verify(repo).save(entry);
+    verify(provider).refreshItem(entry);
     verifyNoMoreInteractions(repo);
     verifyNoMoreInteractions(provider);
   }

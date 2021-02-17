@@ -114,7 +114,7 @@ public class ReferenceLinkEditor extends Panel {
   }
 
   private DataProvider<UrlShortenerEntry, UUID> createDataProvider(UrlShortener shortener) {
-    DataProvider<UrlShortenerEntry, UUID> dp = DataProvider.fromFilteringCallbacks(query -> {
+    return DataProvider.fromFilteringCallbacks(query -> {
       Sort sort = Sort.by(query.getSortOrders().stream().map(o -> {
 
         if (o.getDirection() == SortDirection.DESCENDING) {
@@ -128,7 +128,6 @@ public class ReferenceLinkEditor extends Panel {
 
       if (query.getFilter().isPresent()) {
         List<UrlShortenerEntry> result = new LinkedList<>();
-        // TODO: how to get partial matches?
         try {
           Optional<UrlShortenerEntry> entry = shortener.getRepo().findById(query.getFilter().get());
           if (entry.isPresent()) {
@@ -154,8 +153,6 @@ public class ReferenceLinkEditor extends Panel {
         return (int) shortener.getRepo().count();
       }
     });
-
-    return dp;
   }
 
   @Override
