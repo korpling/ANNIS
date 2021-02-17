@@ -122,13 +122,12 @@ class ReferenceLinkEditorTest {
     assertEquals(0, GridKt._size(grid));
   }
 
-  /**
-   * Test that the grid also works in case there are many entries and paging is necessary.
-   */
   @Test
-  void testManyEntries() {
+  void testManyEntriesAscending() {
     @SuppressWarnings("unchecked")
     Grid<UrlShortenerEntry> grid = _get(panel, Grid.class);
+
+    grid.sort(grid.getColumns().get(4), SortDirection.ASCENDING);
 
     // Add random UUIDs
     for (int i = 0; i < 10000; i++) {
@@ -146,12 +145,34 @@ class ReferenceLinkEditorTest {
     firstEntry.setUrl(URI.create("/"));
     ui.getUrlShortener().getRepo().save(firstEntry);
 
-    grid.sort(grid.getColumns().get(4), SortDirection.ASCENDING);
     assertEquals(firstEntry, GridKt._get(grid, 0));
 
-    grid.sort(grid.getColumns().get(4), SortDirection.DESCENDING);
-    assertEquals(firstEntry, GridKt._get(grid, 10002));
+  }
 
+  @Test
+  void testManyEntriesDescending() {
+    @SuppressWarnings("unchecked")
+    Grid<UrlShortenerEntry> grid = _get(panel, Grid.class);
+
+    grid.sort(grid.getColumns().get(4), SortDirection.DESCENDING);
+
+    // Add random UUIDs
+    for (int i = 0; i < 10000; i++) {
+      UrlShortenerEntry e = new UrlShortenerEntry();
+      e.setId(UUID.randomUUID());
+      e.setUrl(URI.create("/doesnotexist"));
+      ui.getUrlShortener().getRepo().save(e);
+    }
+
+    assertEquals(10002, GridKt._size(grid));
+
+    // Add a single UUID which will be shown at the end of the grid when sorted
+    UrlShortenerEntry lastEntry = new UrlShortenerEntry();
+    lastEntry.setId(UUID.randomUUID());
+    lastEntry.setUrl(URI.create("/"));
+    ui.getUrlShortener().getRepo().save(lastEntry);
+
+    assertEquals(lastEntry, GridKt._get(grid, 10002));
   }
 
 }
