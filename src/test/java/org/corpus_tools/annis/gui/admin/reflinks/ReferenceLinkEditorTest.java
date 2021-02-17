@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.mvysny.kaributesting.v8.GridKt;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
+import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
@@ -66,6 +67,7 @@ class ReferenceLinkEditorTest {
     entry2 = new UrlShortenerEntry();
     entry2.setId(UUID.fromString("b1912b10-93f3-4018-84e8-6bf7572ee163"));
     entry2.setUrl(URI.create("/test2"));
+    entry2.setTemporaryUrl(URI.create("/temp2"));
     urlShortener.getRepo().save(entry2);
 
   }
@@ -73,16 +75,23 @@ class ReferenceLinkEditorTest {
 
 
   @Test
-  void testShowEntries() throws Exception {
+  void testShowAndSortEntries() throws Exception {
     @SuppressWarnings("unchecked")
     Grid<UrlShortenerEntry> grid = _get(panel, Grid.class);
 
-    UrlShortenerEntry row1 = GridKt._get(grid, 0);
-    assertEquals(entry1, row1);
+    assertEquals(2, GridKt._size(grid));
+    assertEquals(entry1, GridKt._get(grid, 0));
+    assertEquals(entry2, GridKt._get(grid, 1));
 
-    UrlShortenerEntry row2 = GridKt._get(grid, 1);
-    assertEquals(entry2, row2);
+    // Sort by the "Temporary URL" column
+    grid.sort(grid.getColumns().get(3), SortDirection.ASCENDING);
+    assertEquals(entry1, GridKt._get(grid, 0));
+    assertEquals(entry2, GridKt._get(grid, 1));
+
+    grid.sort(grid.getColumns().get(3), SortDirection.DESCENDING);
+    assertEquals(entry2, GridKt._get(grid, 0));
+    assertEquals(entry1, GridKt._get(grid, 1));
+
   }
-
 
 }
