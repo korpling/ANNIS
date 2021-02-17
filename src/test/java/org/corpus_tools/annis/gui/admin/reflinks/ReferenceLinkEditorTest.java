@@ -121,6 +121,23 @@ class ReferenceLinkEditorTest {
     // Set to a non-existing but valid UUID, this should hide all entries
     _setValue(filter, "8307fbb6-f426-433d-9b11-71244b970e0d");
     assertEquals(0, GridKt._size(grid));
+
+    // Create a lot of UUIDs with the filter active
+    for (int i = 0; i < 10000; i++) {
+      UrlShortenerEntry e = new UrlShortenerEntry();
+      e.setId(UUID.randomUUID());
+      e.setUrl(URI.create("/doesnotexist"));
+      ui.getUrlShortener().getRepo().save(e);
+    }
+    // Since the UUID is not included, the grid should be still empty
+    assertEquals(0, GridKt._size(grid));
+
+    // Create a new entry for the missing UUID with an existing filter active
+    UrlShortenerEntry e = new UrlShortenerEntry();
+    e.setId(UUID.fromString("8307fbb6-f426-433d-9b11-71244b970e0d"));
+    e.setUrl(URI.create("/"));
+    ui.getUrlShortener().getRepo().save(e);
+    assertEquals(1, GridKt._size(grid));
   }
 
   @Test
