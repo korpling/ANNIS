@@ -2,6 +2,7 @@ package org.corpus_tools.annis.gui.admin.reflinks;
 
 import static com.github.mvysny.kaributesting.v8.LocatorJ._click;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
+import static com.github.mvysny.kaributesting.v8.LocatorJ._setValue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.mvysny.kaributesting.v8.GridKt;
@@ -11,6 +12,7 @@ import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TextField;
 import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
@@ -91,7 +93,26 @@ class ReferenceLinkEditorTest {
     grid.sort(grid.getColumns().get(3), SortDirection.DESCENDING);
     assertEquals(entry2, GridKt._get(grid, 0));
     assertEquals(entry1, GridKt._get(grid, 1));
-
   }
 
+  @Test
+  void testFilterByUUID() throws Exception {
+    @SuppressWarnings("unchecked")
+    Grid<UrlShortenerEntry> grid = _get(panel, Grid.class);
+
+    TextField filter = _get(grid, TextField.class);
+
+    // Set an existing UUID
+    _setValue(filter, "4366b0a5-6b27-40fe-ac5d-08e75c9eef51");
+    assertEquals(1, GridKt._size(grid));
+
+    // Set an invalid UUID, this should not apply the filter
+    _setValue(filter, "4366b0a5-");
+    assertEquals(2, GridKt._size(grid));
+    
+    // Set to a non-existing but valid UUID, this should hide all entries
+    _setValue(filter, "8307fbb6-f426-433d-9b11-71244b970e0d");
+    assertEquals(0, GridKt._size(grid));
+
+  }
 }
