@@ -122,5 +122,36 @@ class ReferenceLinkEditorTest {
     assertEquals(0, GridKt._size(grid));
   }
 
+  /**
+   * Test that the grid also works in case there are many entries and paging is necessary.
+   */
+  @Test
+  void testManyEntries() {
+    @SuppressWarnings("unchecked")
+    Grid<UrlShortenerEntry> grid = _get(panel, Grid.class);
+
+    // Add random UUIDs
+    for (int i = 0; i < 10000; i++) {
+      UrlShortenerEntry e = new UrlShortenerEntry();
+      e.setId(UUID.randomUUID());
+      e.setUrl(URI.create("/doesnotexist"));
+      ui.getUrlShortener().getRepo().save(e);
+    }
+
+    assertEquals(10002, GridKt._size(grid));
+
+    // Add a single UUID which will be shown at the beginning of the grid when sorted
+    UrlShortenerEntry firstEntry = new UrlShortenerEntry();
+    firstEntry.setId(UUID.randomUUID());
+    firstEntry.setUrl(URI.create("/"));
+    ui.getUrlShortener().getRepo().save(firstEntry);
+
+    grid.sort(grid.getColumns().get(4), SortDirection.ASCENDING);
+    assertEquals(firstEntry, GridKt._get(grid, 0));
+
+    grid.sort(grid.getColumns().get(4), SortDirection.DESCENDING);
+    assertEquals(firstEntry, GridKt._get(grid, 10002));
+
+  }
 
 }
