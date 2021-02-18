@@ -25,11 +25,11 @@ This will also update the citation file (`CITATION.cff`) and the contents of the
 ### Testing cycle
 
 1. **Build** the complete project *with* tests.
+
 ~~~bash
-mvn clean
-mvn -DskipTests=true install
-mvn test
+mvn clean install
 ~~~
+
 2. **Do manual tests.** If you have to fix any bug document it in the issue tracker, update the changelog and start over at step 1.
 If no known bugs are left to fix go to the next section. 
 
