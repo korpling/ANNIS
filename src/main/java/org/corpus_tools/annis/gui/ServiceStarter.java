@@ -68,7 +68,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
             try {
                 // Extract the bundled resource to a temporary file
                 Optional<String> execPath = Optional.empty();
-                if ("amd64".equals(SystemUtils.OS_ARCH)) {
+                if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
                     if (SystemUtils.IS_OS_LINUX) {
                         execPath = Optional.of("linux-x86-64/graphannis-webservice");
                     } else if (SystemUtils.IS_OS_MAC_OSX) {
@@ -78,7 +78,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                     }
                 } else {
                   log.error(
-                      "GraphANNIS can only be run on 64 bit operating systems (\"amd64\"), but this is reported as architecture {}!",
+                      "GraphANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\"), but this is reported as architecture {}!",
                       SystemUtils.OS_ARCH);
                 }
 
