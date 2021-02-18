@@ -1,9 +1,0 @@
-[book]
-authors = ["Thomas Krause"]
-multilingual = false
-src = "src"
-title = "ANNIS User Guide"
-
-[output.html]
-
-#[output.linkcheck]
