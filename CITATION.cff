@@ -37,8 +37,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.0.1-beta.4-SNAPSHOT
-date-released: 2021-01-12
+version: 4.0.0-beta.5
+date-released: 2021-02-18
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -129,7 +129,7 @@ references:
   authors: []
 - type: software
   title: Apache Commons Codec
-  version: '1.9'
+  version: '1.14'
   abbreviation: commons-codec:commons-codec
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Codec
@@ -145,7 +145,8 @@ references:
   - name: David Graham
   - name: Julius Davies
   - name: Thomas Neidhart
-  repository-code: http://svn.apache.org/viewvc/commons/proper/codec/trunk
+  - name: Rob Tompkins
+  repository-code: https://github.com/apache/commons-codec
 - type: software
   title: Apache Commons IO
   version: '2.7'
@@ -482,7 +483,7 @@ references:
   title: ICU4J
   version: '61.1'
   abbreviation: com.ibm.icu:icu4j
-  license: NOASSERTION
+  license: Unicode-DFS-2016
   notes: More license information can be found in the THIRD-PARTY/ICU4J directory.
   authors:
   - name: Mark Davis
@@ -1345,6 +1346,16 @@ references:
   - name: Pivotal
   repository-code: https://github.com/spring-projects/spring-boot
 - type: software
+  title: spring-boot-configuration-processor
+  version: 2.3.4.RELEASE
+  abbreviation: org.springframework.boot:spring-boot-configuration-processor
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/spring_boot_configuration_processor
+    directory.
+  authors:
+  - name: Pivotal
+  repository-code: https://github.com/spring-projects/spring-boot
+- type: software
   title: spring-boot-starter
   version: 2.3.4.RELEASE
   abbreviation: org.springframework.boot:spring-boot-starter
@@ -1546,6 +1557,15 @@ references:
   authors:
   - name: Moandji Ezana
   repository-code: https://github.com/mwanji/toml4j
+- type: software
+  title: tomlj
+  version: 1.0.0
+  abbreviation: org.tomlj:tomlj
+  license-url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  notes: More license information can be found in the THIRD-PARTY/tomlj directory.
+  authors:
+  - name: Chris Leishman
+  repository-code: https://github.com/tomlj/tomlj
 - type: software
   title: vaadin-client
   version: 8.12.0
