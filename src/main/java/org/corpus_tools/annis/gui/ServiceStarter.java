@@ -77,7 +77,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         execPath = Optional.of("win32-x86-64/graphannis-webservice.exe");
                     }
                 } else {
-                    log.error("GraphANNIS can only be run on 64 bit operating systems!");
+                  log.error(
+                      "GraphANNIS can only be run on 64 bit operating systems (\"amd64\"), but this is reported as architecture {}!",
+                      SystemUtils.OS_ARCH);
                 }
 
                 if (execPath.isPresent()) {
