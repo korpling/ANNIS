@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Upgrade to graphANNIS 0.30.0 which brings its own REST service
+- Upgrade to graphANNIS 0.31.0 which brings its own REST service
 - User interface now uses Spring Boot to create a runnable jar file which can be executed easily without explicit installation.
 
 ### Removed
