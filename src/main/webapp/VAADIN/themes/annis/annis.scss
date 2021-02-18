@@ -1,0 +1,319 @@
+$annis-color: #ecf0f6;
+
+/* TODO: adjust Valo parameters here */
+
+$v-app-loading-text: "ANNIS corpus search";
+$v-font-size: 13px;
+$v-font-weight: 400;
+$v-app-background-color: $annis-color;
+$v-panel-background-color: #ffffff;
+$v-unit-size: 25px;
+$v-animations-enabled: false;
+
+$v-layout-margin-top: 12px;
+$v-layout-margin-right: 12px;
+$v-layout-margin-bottom: 12px; 
+$v-layout-margin-left: 12px;
+
+
+@import "../valo/valo";
+
+/* @import "../chameleon/chameleon.scss"; */
+
+@import "partitur.scss";
+@import "pdf.scss";
+@import "raw_text.scss";
+@import "fqb.scss";
+
+$font-size: 10pt;
+
+
+@mixin match-color($nr, $color) {
+  .v-table-cell-content-match_#{$nr}  {
+    color: $color;
+  }
+  .kwic td.v-table-cell-content-match_#{$nr}  {
+    color: $color;
+  }
+
+  .aql-code-editor .cm-node_#{$nr} {
+    color: $color;
+    font-weight: bold;
+  }
+  
+  .no-document-info-bar .match_#{$nr}  {	
+    color: $color;
+    text-decoration: underline;
+  }
+  
+  
+}
+
+@mixin annis {
+  @include valo;
+  @include partitur;
+
+  .hidden {
+    display: none;
+  }
+
+  .result-view-css {
+    width: 100%;
+  }
+
+  .result-view-no-content {
+    text-align: center;
+  }
+
+  .v-table-cell-content-kwic-anno {
+    color: grey;
+  }
+
+  .kwic {
+    td {
+      color: grey;
+      padding: 0px 6px;
+    }
+    td.token {
+      color: black;
+    }
+    td.speaker {
+      /* we need enough space for the speaker logo */
+      min-width: 32px;
+      min-height: 32px;
+    }
+
+    .partitur_table td.single_event {
+      background-color: white;
+      border-style:none;
+    }    
+  } // end kwic
+
+  .aql-code-editor {
+    border-style: solid;
+    border-width: 1px;
+    border-bottom-color: rgb(163, 173, 185);
+    border-left-color: rgb(163, 173, 185);
+    border-right-color: rgb(163, 173, 185);
+  }
+
+  .CodeMirror-placeholder {
+    color: #ABABAB;
+  }
+
+  .v-table-cell-content-kwic-clickable {
+    color: grey;
+  }
+
+  .pointer, 
+  .v-table-cell-content-kwic-media,
+  .menu-hover .v-menubar-menuitem {
+    cursor: pointer !important;
+  }
+
+  .drag-source-enabled {
+    cursor: move;
+  }
+
+  .right-aligned-text {
+    text-align: right;
+  }
+
+  .rtl {
+    direction: rtl;
+  }
+  
+  textarea.shared-text, div.shared-text {
+    background-color: white;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+    border-width: 1px;
+    border-radius: 4px;
+    padding: 4px;
+    font-family: monospace;
+    &:focus {
+      border-color: black;
+    }
+  }
+
+
+  textarea.query {
+    font-family: monospace;
+  }
+  
+  textarea.message-output {
+    font-family: monospace;
+  }
+
+  .tigerquery-builder-canvas {
+    z-index: 0;
+  }
+  .tigerquery-builder-overlay {
+    z-index: 10;
+  }
+
+  textarea.border-layout {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #b3b3b3;
+  }
+
+  .border-layout {
+    border-width: 1px;
+    border-style: solid;
+    border-color: #b3b3b3;
+  }
+
+  .white-panel {
+    background-color: white;
+  }
+
+
+  /* Always synchronize with the MatchedNodeColors class! */
+  @include match-color(1, rgb(255,0,0)); // Red
+  @include match-color(2, rgb(199,21,133)); // MediumVioletRed
+  @include match-color(3, rgb(50, 205, 50)); // LimeGreen
+  @include match-color(4, rgb(205,133,63)); // Peru
+  @include match-color(5, rgb(135, 206, 235)); // SkyBlue
+  @include match-color(6, rgb(205,92,92)); // IndianRed
+  @include match-color(7, rgb(173,255,47)); // YellowGreen
+  @include match-color(8, rgb(139,0,0)); // DarkRed
+  @include match-color(9, rgb(255,69,0)); // OrangeRed
+  @include match-color(10, rgb(255,215,0)); // Gold
+  @include match-color(11, rgb(210, 180, 140)); // Tan
+  @include match-color(12, rgb(0, 0, 128)); // Navy
+  @include match-color(13, rgb(0, 250, 154)); // MediumSpringGreen
+  @include match-color(14, rgb(30, 144, 255)); // DodgerBlue
+  @include match-color(15, rgb(107, 142,  35)); // OliveDrab
+  @include match-color(16, rgb(255, 182, 193)); // LightPink
+
+  .left-button, .right-button {
+    background-position: center;
+    background-repeat: repeat-y;
+  }
+
+  .left-button {
+    background-image: url(images/left_rst_arrow.png);
+    background-repeat: repeat-y;
+  }
+
+  .right-button {
+    background-image: url(images/right_rst_arrow.png);
+    background-repeat: repeat-y;
+  }
+
+  .right-button .v-button-wrap {
+    background: none;
+    border: medium none;
+    border-radius: 2px 2px 2px 2px;
+    display: block;
+    height: 100%;
+    padding: 4px 13px;
+    text-overflow: ellipsis;
+  }
+
+  .exception-message-caption {
+    font-size: 12pt;
+  }
+  .exception-message-content {
+    font-size: 12pt;
+    background-color: #ffcccc;
+    border-style: dashed;
+    border-width: 1px;
+  }
+
+  .help-tab {
+    .v-accordion-item-caption {
+      background-color: #ecffe7;
+    }
+    .v-captiontext {
+      text-decoration: underline;
+      color: #3137F5;
+    }
+    
+    .v-disabled .v-captiontext  {
+      color: lightgray;
+      text-decoration: none;
+    }
+    
+    .v-disabled .v-icon  {
+      color: lightgray;
+    }
+    
+    .v-accordion-item-open .v-captiontext {
+      text-decoration: none;
+      color: black;
+    }
+  } 
+
+  .info-bar {
+    background-color: $annis-color;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px 0px 0px 0px;
+  }
+  
+  .selected-match .info-bar {
+      background-color: rgb(129, 184, 255);
+      .path-label {
+        font-weight: bold;
+      }
+   }
+ 
+  .no-document-info-bar .path-label {
+  	text-decoration: underline;
+  }  
+
+  $huge-menubar-height: 40px;
+
+  .v-menubar-popup {
+
+    .v-menubar-menuitem-huge, .v-menubar-menuitem-huge-selected {
+      line-height: $huge-menubar-height;
+      .v-menubar-submenu-indicator + .v-menubar-menuitem-caption:after {
+        line-height: $huge-menubar-height;
+      }
+    }
+
+    .v-menubar-menuitem-huge-selected {
+      text-decoration: underline;
+    }
+  }
+
+  .v-menubar-huge {
+    line-height: $huge-menubar-height;
+    height: $huge-menubar-height + 2px;
+  }
+  
+  .v-tabsheet-tabs {
+    .v-tabsheet-tabitem-selected {
+      .v-caption {
+        cursor: default;
+        .v-icon, .v-captiontext {
+          color: #4C607F;
+        }
+      }
+      
+    }
+  }
+  
+  .default-query-font {
+    font-family: monospace;
+  }
+  
+  .embedded-warning {
+    background-color: #FFF3D2;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #AC7C00;
+  }
+  
+  /* Code mirror theme changes */
+  .cm-s-default {
+    .cm-string, .cm-string-2 {
+      color: rgb(129, 27, 0);
+    }
+  }
+
+}

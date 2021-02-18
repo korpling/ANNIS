@@ -3,42 +3,28 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.hu-berlin.german.korpling.annis</groupId>
-	<artifactId>annis-all</artifactId>
-	<packaging>pom</packaging>
-	<name>ANNIS corpus search</name>
-	<version>4.0.0-beta.4</version>
-	<description>
-    ANNIS is an open source, versatile web browser-based search and
-    visualization architecture for complex multilevel linguistic corpora with
-    diverse types of annotation. ANNIS, which stands for ANNotation of Information
-    Structure, has been designed to provide access to the data of the
-    SFB 632 - "Information Structure: The Linguistic Means for Structuring
-    Utterances, Sentences and Texts". Since information structure interacts with
-    linguistic phenomena on many levels, ANNIS addresses the SFB's need to
-    concurrently annotate, query and visualize data from such varied areas as
-    syntax, semantics, morphology, prosody, referentiality, lexis and more.
-    For projects working with spoken language, support for audio / video
-    annotations is also required.
-  </description>
 
-	<url>http://corpus-tools.org/annis/</url>
-	<developers>
-		<developer>
-			<name>Thomas Krause</name>
-			<email>krauseto@hu-berlin.de</email>
-			<organization>Humboldt-Universität zu Berlin</organization>
-			<organizationUrl>https://www.hu-berlin.de</organizationUrl>
-		</developer>
-	</developers>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.3.4.RELEASE</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<groupId>org.corpus-tools</groupId>
+	<artifactId>annis</artifactId>
+	<version>4.0.0-beta.5</version>
+	<name>ANNIS user interface</name>
+	<packaging>jar</packaging>
 	<scm>
 		<connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/korpling/ANNIS.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:korpling/ANNIS.git</developerConnection>
 		<url>https://github.com/korpling/ANNIS</url>
 	</scm>
+	
 	<organization>
-		<name>SFB 632</name>
-		<url>http://www.sfb632.uni-potsdam.de/</url>
+		<name>Corpuslinguistic working group Humboldt University Berlin</name>
+		<url>http://www.linguistik.hu-berlin.de/institut/professuren/korpuslinguistik/</url>
 	</organization>
 	<licenses>
 		<license>
@@ -46,61 +32,124 @@
 			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
 		</license>
 	</licenses>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.8</java.version>
+		<vaadin.version>8.12.0</vaadin.version>
+		<start-class>org.corpus_tools.annis.gui.AnnisUiApplication</start-class>
+		<graphannis.version>0.31.0</graphannis.version>
+		<antlr4.version>4.7.2</antlr4.version>
+		<spring.profiles.active>server</spring.profiles.active>
+		<swagger-core-version>1.5.24</swagger-core-version>
+		<gson-fire-version>1.8.4</gson-fire-version>
+		<kotlin.version>1.4.0</kotlin.version>
+	</properties>
+
 	<repositories>
 		<repository>
-			<id>korpling</id>
-			<url>https://korpling.german.hu-berlin.de/maven2/</url>
+			<id>vaadin-snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
 			<releases>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</releases>
 			<snapshots>
-				<enabled>false</enabled>
+				<enabled>true</enabled>
 			</snapshots>
 		</repository>
 		<repository>
-			<id>oss-snapshot</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
+			<id>vaadin-addons</id>
+			<url>https://maven.vaadin.com/vaadin-addons</url>
 		</repository>
 	</repositories>
-	<properties>
-		<servlet.version>3.0.1</servlet.version>
-		<vaadin.version>8.9.4</vaadin.version>
-		<jetty.version>9.3.28.v20191105</jetty.version>
-        <jersey.version>2.27</jersey.version>
-		<main.basedir>${project.basedir}</main.basedir>
-	</properties>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
 
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*.properties</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>src/main/webapp</directory>
+			</resource>
+			<resource>
+				<directory>${project.build.directory}/native/</directory>
+			</resource>
+		</resources>
+
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>0.8.6</version>
+					<configuration>
+						<excludes>
+							<exclude>VAADIN/**</exclude>
+						</excludes>
+					</configuration>
+					<executions>
+						<execution>
+							<id>pre-unit-test</id>
+							<goals>
+								<goal>prepare-agent</goal>
+							</goals>
+							<configuration>
+								<propertyName>jacoco.agent.arg</propertyName>
+							</configuration>
+						</execution>
+						<execution>
+							<id>report</id>
+							<phase>verify</phase>
+							<goals>
+								<goal>report</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+					<configuration>
+						<mainClass>${start-class}</mainClass>
+					</configuration>
+					<executions>
+						<execution>
+							<id>repackage</id>
+							<goals>
+								<goal>repackage</goal>
+							</goals>
+							<configuration>
+								<classifier>${spring.profiles.active}</classifier>
+								<executable>true</executable>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+                <plugin>
+                    <groupId>org.corpus-tools</groupId>
+                    <artifactId>cff-maven-plugin</artifactId>
+                    <version>0.4.0</version>
+                    <configuration>
+                        <input>${project.basedir}/misc/cff-templates/CITATION_input.yml</input>
+                        <includeEmail>false</includeEmail>
+                    </configuration>
+                </plugin>
+			</plugins>
+		</pluginManagement>
+
+		<plugins>
 			<plugin>
 				<groupId>com.amashchenko.maven.plugin</groupId>
 				<artifactId>gitflow-maven-plugin</artifactId>
-				<version>1.11.0</version>
+				<version>1.15.1</version>
 				<configuration>
 					<pushRemote>true</pushRemote>
 					<postReleaseGoals>-Prelease,mdbook install javadoc:jar deploy</postReleaseGoals>
@@ -118,46 +167,52 @@
 					</gitFlowConfig>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>co.enear.maven.plugins</groupId>
 				<artifactId>keepachangelog-maven-plugin</artifactId>
 				<version>1.2.2</version>
 				<inherited>false</inherited>
 			</plugin>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>update-theme</goal>
+							<goal>update-widgetset</goal>
+							<goal>compile</goal>
+							<goal>compile-theme</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<optimizationLevel>9</optimizationLevel>
+					<style>OBF</style>
+				</configuration>
+			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>${antlr4.version}</version>
 				<configuration>
-					<doclint>none</doclint>
+					<sourceDirectory>src/main/antlr4</sourceDirectory>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.3.7</version>
-				<extensions>true</extensions>
-			</plugin>
-			<!-- update this with mvn license:add-third-party license:download-licenses -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>1.4</version>
-				<configuration>
-					<useMissingFile>true</useMissingFile>
-					<missingFile>${basedir}/src/license/THIRD-PARTY.properties</missingFile>
-					<licensesConfigFile>${basedir}/src/licenses.xml</licensesConfigFile>
-					<outputDirectory>${basedir}/THIRD-PARTY</outputDirectory>
-					<thirdPartyFilename>${project.name}_dependencies.txt</thirdPartyFilename>
-					<licensesOutputDirectory>${basedir}/THIRD-PARTY/licenses</licensesOutputDirectory>
-				</configuration>
-			</plugin>
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>buildnumber-maven-plugin</artifactId>
-				<version>1.3</version>
+				<version>1.4</version>
 				<executions>
 					<execution>
 						<phase>validate</phase>
@@ -174,100 +229,509 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.5</version>
-				<extensions>true</extensions>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>false</autoReleaseAfterClose>
-					<stagingProgressTimeoutMinutes>120</stagingProgressTimeoutMinutes>
+					<argLine>${jacoco.agent.arg}</argLine>
 				</configuration>
 			</plugin>
-		</plugins>
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
-				<version>1.0</version>
-			</extension>
-		</extensions>
-	</build>
-	<reporting>
-		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.6</version>
-				<configuration>
-					<dependencyLocationsEnabled>false</dependencyLocationsEnabled>
-				</configuration>
-				<reportSets>
-					<reportSet>
-						<reports>
-							<report>index</report>
-							<report>summary</report>
-							<report>license</report>
-						</reports>
-					</reportSet>
-				</reportSets>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.9.1</version>
 			</plugin>
-
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.5</version>
-				<configuration>
-					<excludeFilterFile>${basedir}/src/findbugs/excludeFilter.xml</excludeFilterFile>
-				</configuration>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<id>download-linux-binaries</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice</url>
+							<outputDirectory>${project.build.directory}/native/linux-x86-64/</outputDirectory>
+							<sha256>ca16ed0c6a1831929614b763c4d107d304e34eb74d817023437b44164e7fb57e</sha256>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-windows-binaries</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice.exe</url>
+							<outputDirectory>${project.build.directory}/native/win32-x86-64/</outputDirectory>
+							<sha256>d5c5af0e82b5b57dadab03286cb89ffab0be60ea97d1555da80fad18aaf7ce68</sha256>
+						</configuration>
+					</execution>
+					<execution>
+						<id>download-mac-binaries</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+						<configuration>
+							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice.osx</url>
+							<outputDirectory>${project.build.directory}/native/darwin/</outputDirectory>
+							<sha256>3aec0c17d3318ca1b912a91ffd2ea4d0bfb50b75e2583154f5a42f7856db885d</sha256>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
-
+			<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-resources-plugin</artifactId>
+			    <executions>
+			        <execution>
+			            <id>copy-citation-cff</id>
+			            <phase>validate</phase>
+			            <goals>
+			                <goal>copy-resources</goal>
+			            </goals>
+			            <configuration>
+			                <outputDirectory>${project.build.directory}/classes</outputDirectory>
+			                <resources>
+			                    <resource>
+			                        <directory>${basedir}</directory>
+			                        <includes>
+			                            <include>CITATION.cff</include>
+			                        </includes>
+			                    </resource>
+			                </resources>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+			<plugin>
+				<groupId>org.openapitools</groupId>
+				<artifactId>openapi-generator-maven-plugin</artifactId>
+				<version>4.3.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>
+								${project.basedir}/src/main/resources/openapi.yml
+							</inputSpec>
+							<generatorName>java</generatorName>
+							<apiPackage>org.corpus_tools.annis.api</apiPackage>
+							<modelPackage>org.corpus_tools.annis.api.model</modelPackage>
+							<generateSupportingFiles>true</generateSupportingFiles>
+							<supportingFilesToGenerate>ApiResponse.java,ApiException.java,ApiCallback.java,Pair.java,ApiClient.java,Configuration.java,ProgressRequestBody.java,JSON.java,Authentication.java,StringUtil.java,ApiKeyAuth.java,HttpBasicAuth.java,ProgressResponseBody.java,HttpBearerAuth.java</supportingFilesToGenerate>
+							<generateApiTests>false</generateApiTests>
+							<generateApiDocumentation>false</generateApiDocumentation>
+							<generateModelTests>false</generateModelTests>
+							<generateModelDocumentation>false</generateModelDocumentation>
+							<configOptions>
+								<java8>true</java8>
+								<dateLibrary>java8</dateLibrary>
+							</configOptions>
+							<additionalProperties>serializableModel=true</additionalProperties>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
-	</reporting>
+	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-bom</artifactId>
+				<version>${vaadin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.keycloak.bom</groupId>
+				<artifactId>keycloak-adapter-bom</artifactId>
+				<version>11.0.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-spring-boot-starter</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-push</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-compatibility-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-compatibility-themes</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-compatibility-client</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-compatibility-client-compiled</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>org.junit.vintage</groupId>
+					<artifactId>junit-vintage-engine</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+		</dependency>
+		
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-configuration-processor</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+		</dependency>
+
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.corpus-tools</groupId>
+			<artifactId>salt-api</artifactId>
+			<version>3.4.2</version>
+			<exclusions>
+				<!-- Salt uses non-GWT version of Guava, which will fail with our widgetset -->
+				<exclusion>
+					<groupId>com.google.guava</groupId>
+					<artifactId>guava</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-annotations</artifactId>
+			<version>${swagger-core-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>mockwebserver</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>logging-interceptor</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.gsonfire</groupId>
+			<artifactId>gson-fire</artifactId>
+			<version>${gson-fire-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>jsr311-api</artifactId>
+			<version>1.1.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.vaadin4qbanos</groupId>
+			<artifactId>jsclipboard</artifactId>
+			<version>1.0.12</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vaadin</groupId>
+					<artifactId>vaadin-server</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.3</version>
+			<type>jar</type>
+		</dependency>
+
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.10.3</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>net.sf.jung</groupId>
+			<artifactId>jung-api</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jung</groupId>
+			<artifactId>jung-graph-impl</artifactId>
+			<version>2.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.hp.gagawa</groupId>
+			<artifactId>gagawa</artifactId>
+			<version>1.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4</artifactId>
+			<version>${antlr4.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>${antlr4.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jetbrains.kotlin</groupId>
+			<artifactId>kotlin-stdlib</artifactId>
+			<version>${kotlin.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
+	
+		<dependency>
+			<groupId>com.github.romankh3</groupId>
+			<artifactId>image-comparison</artifactId>
+			<version>4.3.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.11.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aeonbits.owner</groupId>
+			<artifactId>owner</artifactId>
+			<version>1.0.10</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>1.24.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.10.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.moandjiezana.toml</groupId>
+			<artifactId>toml4j</artifactId>
+			<version>0.7.2</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>org.tomlj</groupId>
+		  <artifactId>tomlj</artifactId>
+		  <version>1.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-email</artifactId>
+			<version>1.3.2</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.7</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+		    <groupId>com.fasterxml.jackson.dataformat</groupId>
+		    <artifactId>jackson-dataformat-xml</artifactId>
+		    </dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-gwt</artifactId>
+			<version>20.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.github.mvysny.kaributesting</groupId>
+			<artifactId>karibu-testing-v8</artifactId>
+			<version>1.2.6</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- other widget sets we use -->
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>popupbutton</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
+
+	</dependencies>
+
 	<profiles>
 		<profile>
-			<id>release</id>
+			<id>coverage</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>desktop</id>
+			<properties>
+				<spring.profiles.active>desktop</spring.profiles.active>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.4</version>
+						<artifactId>maven-jar-plugin</artifactId>
+						<configuration>
+							<archive>
+								<manifestEntries>
+									<splashscreen-image>BOOT-INF/classes/splashscreen.gif</splashscreen-image>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>mdbook</id>
+			<activation>
+				<file>
+					<exists>${user.home}/.cargo/bin/mdbook</exists>
+				</file>
+			</activation>
+
+			<build>
+				<plugins>
+					<!-- Compile the online help with mdBook -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>attach-sources</id>
+								<id>compile-online-help</id>
+								<phase>compile</phase>
 								<goals>
-									<goal>jar-no-fork</goal>
+									<goal>exec</goal>
 								</goals>
+								<configuration>
+									<executable>${user.home}/.cargo/bin/mdbook</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<arguments>
+										<argument>build</argument>
+										<argument>-d</argument>
+										<argument>${project.basedir}/src/main/webapp/VAADIN/help/</argument>
+										<argument>${project.basedir}/docs/online-help/</argument>
+									</arguments>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
+					<!-- the online help directory should be cleaned as well -->
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
+						<artifactId>maven-clean-plugin</artifactId>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>${project.basedir}/src/main/webapp/VAADIN/help/</directory>
+									<followSymlinks>false</followSymlinks>
+								</fileset>
+							</filesets>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 	</profiles>
-	<modules>
-		<module>annis-interfaces</module>
-		<module>annis-service</module>
-		<module>annis-kickstarter</module>
-		<module>annis-gui</module>
-		<module>annis-widgets</module>
-		<module>annis-visualizers</module>
-		<module>annis-libgui</module>
-	</modules>
 </project>

@@ -5,5 +5,9 @@
         "**/.project": true,
         "**/.settings": true,
         "**/.factorypath": true
-    }
+    },
+    "java.import.gradle.enabled": false,
+    "java.format.settings.url": "https://raw.githubusercontent.com/hexatomic/hexatomic/develop/releng/ide/eclipse-java-hexatomic-style.xml",
+    "java.import.gradle.wrapper.enabled": false,
+    "yaml.schemaStore.enable": false
 }

@@ -17,34 +17,30 @@ Otherwise the documentation can't be created.
 When the changelog is up-to-date, execute
 
 ~~~bash
-mvn -N keepachangelog:release
+mvn -N keepachangelog:release cff:create cff:third-party-folder
 ~~~
 and commit your changes.
-
+This will also update the citation file (`CITATION.cff`) and the contents of the `THIRD-PARTY` folder.
 
 ### Testing cycle
 
 1. **Build** the complete project *with* tests.
+
 ~~~bash
-mvn clean
-mvn -DskipTests=true install
-mvn test
+mvn clean install
 ~~~
+
 2. **Do manual tests.** If you have to fix any bug document it in the issue tracker, update the changelog and start over at step 1.
 If no known bugs are left to fix go to the next section. 
 
 ### Finish phase
 
-1. Update and commit  **license information**
 
-~~~bash
-mvn license:add-third-party license:download-licenses
-~~~
-2. **Finish** the release by executing either `mvn gitflow:release-finish` for regular releases or `mvn gitflow:hotfix-finish` for hotfixes.
-3. **Release** the staging repository to Maven Central with the Nexus interface: [https://oss.sonatype.org/](https://oss.sonatype.org/)
-4. Create a new **release on GitHub** including the changelog. Upload the binaries from Maven repository to GitHub release as well.
+1. **Finish** the release by executing either `mvn gitflow:release-finish` for regular releases or `mvn gitflow:hotfix-finish` for hotfixes.
+2. **Release** the staging repository to Maven Central with the Nexus interface: [https://oss.sonatype.org/](https://oss.sonatype.org/)
+3. Create a new **release on GitHub** including the changelog. Upload the binaries from Maven repository to GitHub release as well.
 
-A new version of the User and Developer Guide will be deployed by Travis CI.
+A new version of the User and Developer Guide will be deployed by the GitHub Actions CI.
 
 
 

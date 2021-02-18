@@ -1,9 +1,0 @@
-{
-    "visualizers": [
-        {
-          "type"  : "raw_text",
-          "displayName" :  "full text",
-          "mappings" : "vertical:true"
-        }
-    ]
-}

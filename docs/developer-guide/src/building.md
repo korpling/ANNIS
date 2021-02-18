@@ -33,19 +33,23 @@ invoked on `mvn install`.
 While you can use any text editor of your choice to change ANNIS and compile
 it completely on the command line using Maven, a proper IDE will be a huge help
 for you. You can use any IDE which has a good support for Maven. The ANNIS
-main developers currently recommend Eclipse Proton or the Netbeans 9 IDE for development.
+main developers currently recommend Eclipse or Visual Studio Code for devlopment.
 
-## Running an embedded Jetty instance for local access
+## Running the service
 
-This way of running the front-end is very useful, if you want to access Annis on
-you local machine as a single user.
+The `annis-gui` project contains two build artifacts: 
 
-You don't need to install Jetty or Tomcat by yourself using this method.
+- `annis-gui-<version>-server.jar` and
+- `annis-gui-<version>-desktop.jar`
 
-~~~bash
+
+You can execute both JAR-files to run the front-end and the embedded REST service.
+
+```bash
 cd <unzipped source>/annis-gui/
-mvn jetty:run
-~~~
+java -jar target/annis-gui-<version>-server.jar
+```
+The desktop variant will open a simple window with a link to the URL on which the service is listening.
 
-Now you can access the site under [http://localhost:8080/annis-gui/](http://localhost:8080/annis-gui/). The Jetty
-server might be stopped by pressing "CTRL-C".
+After starting the service, you can access the site under [http://localhost:5711/](http://localhost:5711). 
+The service can be stopped by pressing <kbd>CTRL</kbd>+<kbd>C</kbd>.
