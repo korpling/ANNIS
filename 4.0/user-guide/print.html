@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js">
+<html lang="en" class="sidebar-visible no-js light">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -34,11 +34,11 @@
 
         
     </head>
-    <body class="light">
+    <body>
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -62,8 +62,11 @@
             var theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
-            document.body.className = theme;
-            document.querySelector('html').className = theme + ' js';
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
         </script>
 
         <!-- Hide / unhide sidebar before it is displayed -->
@@ -79,8 +82,8 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <div class="sidebar-scrollbox">
-                <ol class="chapter"><li><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li><a href="installation-server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li><a href="installation-migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li><a href="aql-compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li><a href="import-and-config-instances.html"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li><a href="import-and-config-user.html"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.1.</strong> Error Codes of the administration tools</a></li><li><a href="advanced-custom-login.html"><strong aria-hidden="true">7.2.</strong> Provide your own login-system</a></li><li><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.3.</strong> Links to queries</a></li><li><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.4.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="expanded "><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li class="expanded "><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li class="expanded "><a href="installation-server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li class="expanded "><a href="installation-migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li class="expanded "><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="expanded "><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li class="expanded "><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li class="expanded "><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li class="expanded "><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="expanded "><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li class="expanded "><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li class="expanded "><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li class="expanded "><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li class="expanded "><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li class="expanded "><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li class="expanded "><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li class="expanded "><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li class="expanded "><a href="aql-compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li class="expanded "><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li class="expanded "><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li class="expanded "><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li class="expanded "><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li class="expanded "><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li class="expanded "><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li class="expanded "><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li class="expanded "><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li class="expanded "><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li class="expanded "><a href="import-and-config-instances.html"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li class="expanded "><a href="import-and-config-user.html"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li class="expanded "><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li class="expanded "><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li class="expanded "><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.1.</strong> Error Codes of the administration tools</a></li><li class="expanded "><a href="advanced-custom-login.html"><strong aria-hidden="true">7.2.</strong> Provide your own login-system</a></li><li class="expanded "><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.3.</strong> Links to queries</a></li><li class="expanded "><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.4.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -741,7 +744,7 @@ example:</p>
     3. - &quot; Scarne on Card [Tricks] &quot; and &quot; Scarne on 
     4. and &quot; Scarne on Magic [Tricks] &quot; . That started me 
 </code></pre>
-<p>The TextExporter adds all annotations of each token separated by slashes
+<p>The TokenExporter adds all annotations of each token separated by slashes
 (e.g. dogs/NNS/dog for a token dogs annotated with a part-of-speech NNS
 and a lemma dog).</p>
 <p>The GridExporter adds all annotations available for the span of
@@ -1189,14 +1192,14 @@ In the Kickstarter version, both components are combined into one application.
 The behavior of these components can be customized changing their configuration.</p>
 <h2><a class="header" href="#back-end-service" id="back-end-service">Back-end service</a></h2>
 <p>There is a configuration folder <code>conf/</code> in the installation directory with the main configuration file <code>annis-service.properties</code>.
-In addition, there is the <code>shiro.info</code> file to change the location of the <a href="import-and-config-user.html">user configuration</a>.
+Besides, there is the <code>shiro.info</code> file to change the location of the <a href="import-and-config-user.html">user configuration</a>.
 You should not need to change any of the other files in this directory.</p>
 <h2><a class="header" href="#front-end-web-application" id="front-end-web-application">Front-end web-application</a></h2>
-<p>The ANNIS front-end will search in different folders for it's configuration.</p>
+<p>The ANNIS front-end will search in different folders for its configuration.</p>
 <table><thead><tr><th>Folder</th><th>Description</th></tr></thead><tbody>
 <tr><td><code>&lt;Installation&gt;/WEB-INF/conf/</code></td><td>Default configuration inside the deployed web application folder. Should not be changed.</td></tr>
 <tr><td><code>$ANNIS_CFG</code> or <code>/etc/annis/</code></td><td>The global configuration folder defined by the environment variable <code>ANNIS_CFG</code> or a default path if not set.</td></tr>
-<tr><td><code>~/.annis/</code></td><td>User specific configuration inside the <code>.annis</code> sub-folder inside the home folder of the user who is running the frontend.</td></tr>
+<tr><td><code>~/.annis/</code></td><td>User-specific configuration inside the <code>.annis</code> sub-folder inside the home folder of the user who is running the frontend.</td></tr>
 </tbody></table>
 <p>Configuration files can be either in the <a href="http://en.wikipedia.org/w/index.php?title=.properties&amp;oldid=521500688">Java Properties</a>
 or <a href="http://www.json.org/">JSON</a> format. Configuration files from the user directory can
@@ -1233,6 +1236,13 @@ list of paths to relANNIS folders after the import command:</p>
 <p>You can also use the <code>-o</code> flag to overwrite existing corpora:</p>
 <pre><code class="language-bash">bin/annis-admin.sh import -o path1 ...
 </code></pre>
+<h3><a class="header" href="#disk-based-corpus-representation" id="disk-based-corpus-representation">Disk-based corpus representation</a></h3>
+<p><em><strong>Warning!</strong></em> This is functionality is beta-quality at best. It is not possible to store the corpora completely on-disk, yet.</p>
+<p>It is possible to select if a corpus should be imported as in-memory corpus or if it should prefer disk-based storage
+with the <code>--disk-based</code> parameter, which can be either <code>true</code> or <code>false</code>.</p>
+<pre><code class="language-bash">bin/annis-admin.sh import --disk-based true path1 ...
+</code></pre>
+<p>You can also set the default value using the <code>prefer-disk-based</code> setting in the <code>annis-service.properties</code> configuration file.</p>
 <h1><a class="header" href="#configuring-settings-for-a-corpus" id="configuring-settings-for-a-corpus">Configuring Settings for a Corpus</a></h1>
 <h2><a class="header" href="#generating-example-queries" id="generating-example-queries">Generating Example Queries</a></h2>
 <p>User created example queries are stored in the file <code>example_queries.annis</code> within the
@@ -1616,6 +1626,14 @@ The additional parameter <code>config</code> is a mapping parameter of the <code
 
         
 
+        
+
+        
+        
+        
+        <script type="text/javascript">
+            window.playpen_copyable = true;
+        </script>
         
 
         
