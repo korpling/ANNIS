@@ -116,6 +116,9 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
   protected File getServiceConfig() throws IOException {
     TomlParseResult tomlConfig = Toml.parse(super.getServiceConfig().toPath());
     Map<String, Object> config = unpackToml(tomlConfig);
+    if (config == null) {
+      config = new LinkedHashMap<>();
+    }
 
     // Add it to the configuration
     Map<String, Object> tokenVerification = new LinkedHashMap<>();
