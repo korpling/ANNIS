@@ -216,7 +216,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     // Open the application in the browser
     String webURL = "http://localhost:" + serverPort;
     boolean isRunningHeadless =
-        Arrays.stream(env.getActiveProfiles()).anyMatch(profile -> "headless".equals(profile));
+        Arrays.stream(env.getActiveProfiles()).anyMatch("headless"::equals);
     Desktop desktop =
         !isRunningHeadless && Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
     if (desktop == null) {
