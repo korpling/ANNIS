@@ -5,13 +5,24 @@
         <meta charset="UTF-8">
         <title>Architecture - ANNIS Developer Guide</title>
         
+        
+
+
+        <!-- Custom HTML head -->
+        
+
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
         <link rel="shortcut icon" href="favicon.png">
+        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
@@ -19,8 +30,9 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
-        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -36,7 +48,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -80,8 +92,8 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
-                <ol class="chapter"><li class="expanded "><a href="architecture.html"><strong aria-hidden="true">1.</strong> Architecture</a></li><li class="expanded "><a href="building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li class="expanded "><a href="release.html"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li class="expanded "><a href="annisimportformat.html"><strong aria-hidden="true">4.</strong> ANNIS import format version 3.3</a></li><li class="expanded "><a href="querybuilder.html"><strong aria-hidden="true">5.</strong> Create new query builder</a></li><li class="expanded "><a href="rest-api/index.html"><strong aria-hidden="true">6.</strong> Public REST API</a></li><li><ol class="section"><li class="expanded "><a href="rest-api/query.html"><strong aria-hidden="true">6.1.</strong> Corpus queries</a></li><li class="expanded "><a href="rest-api/admin.html"><strong aria-hidden="true">6.2.</strong> Administrative tasks</a></li></ol></li></ol>
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">1.</strong> Architecture</a></li><li class="chapter-item expanded "><a href="building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li class="chapter-item expanded "><a href="release.html"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li class="chapter-item expanded "><a href="querybuilder.html"><strong aria-hidden="true">4.</strong> Create new query builder</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -90,37 +102,36 @@
 
             <div class="page">
                 
-                <div id="menu-bar" class="menu-bar">
-                    <div id="menu-bar-sticky-container">
-                        <div class="left-buttons">
-                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
-                                <i class="fa fa-bars"></i>
-                            </button>
-                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
-                                <i class="fa fa-paint-brush"></i>
-                            </button>
-                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
-                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
-                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
-                            </ul>
-                            
-                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
-                                <i class="fa fa-search"></i>
-                            </button>
-                            
-                        </div>
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
 
-                        <h1 class="menu-title">ANNIS Developer Guide</h1>
+                    <h1 class="menu-title">ANNIS Developer Guide</h1>
 
-                        <div class="right-buttons">
-                            <a href="print.html" title="Print this book" aria-label="Print this book">
-                                <i id="print-button" class="fa fa-print"></i>
-                            </a>
-                            
-                        </div>
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
                     </div>
                 </div>
 
@@ -151,23 +162,16 @@
                         <h1><a class="header" href="#architecture" id="architecture">Architecture</a></h1>
 <p>ANNIS is a web-based search and visualization architecture for
 multi-layer corpora. ANNIS consists of two major components: a backend
-service and a web front-end. There is also a local version, ANNIS
-Kickstarter, which is a simple starting point for new users who want
-to try out the system without installing a full server.</p>
+service and a web front-end.</p>
 <h2><a class="header" href="#backend-service" id="backend-service">Backend Service</a></h2>
-<p>The service runs on a web server such as Tomcat or Jetty and
-communicates with a relational database, using the open source DB
-PostgreSQL. PostgreSQL (Version 9.4 or larger) must be installed for ANNIS to work. For
-more information on installing and managing the backend service, see
-the Administration Guide in the documentation.</p>
+<p>The service is part of the graphANNIS project and provides a REST API to query and manage corpora.
+GraphANNIS directly implements all needed functionality without the need of an external database.
+See the <a href="https://korpling.github.io/graphANNIS/docs/v0.30/">graphANNIS documentation</a> for more information about the <a href="https://korpling.github.io/graphANNIS/docs/v0.30/rest.html">REST service</a>.</p>
 <h2><a class="header" href="#web-front-end" id="web-front-end">Web Front-end</a></h2>
 <p>The ANNIS front-end is a web application implemented in Java and the <a href="https://vaadin.com/">Vaadin</a> framework and runs in a normal browser (we recommend Mozilla Firefox). 
-The server running the web-application communicates with the backend service via a REST interface.</p>
-<h2><a class="header" href="#annis-kickstarter" id="annis-kickstarter">ANNIS Kickstarter</a></h2>
-<p>ANNIS Kickstarter is a cross-platform local version which requires
-nothing but a PostgreSQL installation to run. It will run under LINUX,
-Windows and Mac. For a quick tutorial to get started with Kickstarter,
-see the ANNIS User Guide.</p>
+The server running the web-application communicates with the backend service via a REST interface.
+Per default, the web front-end includes a released version of the backend service and starts an instance of it.
+The front-end uses Spring Boot internally and bundles it own server, so you don't need a Tomcat or Jetty installation to run it.</p>
 
                     </main>
 
@@ -190,7 +194,7 @@ see the ANNIS User Guide.</p>
                 
 
                 
-                    <a href="building.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="building.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -203,10 +207,10 @@ see the ANNIS User Guide.</p>
         
 
         
-        
+
         
         <script type="text/javascript">
-            window.playpen_copyable = true;
+            window.playground_copyable = true;
         </script>
         
 

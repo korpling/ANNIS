@@ -1,0 +1,263 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Migrating from ANNIS 3 - ANNIS User Guide</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../installation/index.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../installation/desktop.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Desktop)</a></li><li class="chapter-item expanded "><a href="../installation/server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li class="chapter-item expanded "><a href="../installation/migrate-annis3.html" class="active"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li class="chapter-item expanded "><a href="../interface/index.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../interface/search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="../interface/result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="../interface/query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li><li class="chapter-item expanded "><a href="../interface/admin-web.html"><strong aria-hidden="true">3.4.</strong> Administration Interface</a></li></ol></li><li class="chapter-item expanded "><a href="../aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="../aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="../aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="../aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="../aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="../aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="../aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="../aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="../aql-compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li class="chapter-item expanded "><a href="../import-and-config/index.html"><strong aria-hidden="true">5.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../import-and-config/convert.html"><strong aria-hidden="true">5.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li class="chapter-item expanded "><a href="../import-and-config/import.html"><strong aria-hidden="true">5.2.</strong> Importing Corpora in the relANNIS format</a></li><li class="chapter-item expanded "><a href="../import-and-config/corpus-config.html"><strong aria-hidden="true">5.3.</strong> Configuring Settings for a Corpus</a></li><li class="chapter-item expanded "><a href="../import-and-config/visualizations.html"><strong aria-hidden="true">5.4.</strong> Configuring Visualizations</a></li><li class="chapter-item expanded "><a href="../import-and-config/visualizations-list.html"><strong aria-hidden="true">5.5.</strong> List of Visualizations</a></li><li class="chapter-item expanded "><a href="../import-and-config/documentbrowser.html"><strong aria-hidden="true">5.6.</strong> Document Browser</a></li></ol></li><li class="chapter-item expanded "><a href="../configuration/index.html"><strong aria-hidden="true">6.</strong> Configuration of ANNIS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../configuration/user.html"><strong aria-hidden="true">6.1.</strong> User Configuration on Server</a></li><li class="chapter-item expanded "><a href="../configuration/instances.html"><strong aria-hidden="true">6.2.</strong> Multiple Instances of the Interface</a></li><li class="chapter-item expanded "><a href="../configuration/rtl.html"><strong aria-hidden="true">6.3.</strong> Right-to-Left Visualizations</a></li></ol></li><li class="chapter-item expanded "><a href="../advanced/index.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../advanced/links-to-queries.html"><strong aria-hidden="true">7.1.</strong> Links to queries</a></li><li class="chapter-item expanded "><a href="../advanced/embed-vis.html"><strong aria-hidden="true">7.2.</strong> Embed ANNIS visualizations</a></li><li class="chapter-item expanded "><a href="../advanced/backend-frontend-separation.html"><strong aria-hidden="true">7.3.</strong> Install backend and front-end on different servers</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">ANNIS User Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#migrating-from-annis-3" id="migrating-from-annis-3">Migrating from ANNIS 3</a></h1>
+<p>These instructions are a guideline for upgrading the installation of ANNIS on a UNIX-like server. 
+If you use the <a href="desktop.html">ANNIS Desktop version</a> 
+just download the new version and (re-) import the corpora you need.
+Please read <a href="server.html">the installation instructions</a> first if you
+haven't done so yet.</p>
+<p>It is currently not possible to migrate user accounts and groups automatically.
+You should however be able to import all existing corpora in the relANNIS format and migrate the reference links.</p>
+<h3><a class="header" href="#download-and-install-the-new-service" id="download-and-install-the-new-service">Download and install the new service</a></h3>
+<p>Follow the <a href="server.html">installation instructions</a> to get the new service running.
+You should configure a new port for the ANNIS service if both old and new version run on the same server.
+The old service must still be available while migrating the reference links (but not after).</p>
+<h3><a class="header" href="#import-old-corpora" id="import-old-corpora">Import old corpora</a></h3>
+<p>You should export a list of all existing corpora from the old service and use the new <a href="../import-and-config/import.html#importing-a-corpus-using-the-command-line">ANNIS command line tool to import</a> them again.</p>
+<p>This can take a long time, so if you use SSH you might want use a program like e.g. <a href="http://byobu.org/">Byobu</a> to start a terminal that continues to run process in the background even if the connection is interrupted.</p>
+<h3><a class="header" href="#migrate-reference-links" id="migrate-reference-links">Migrate reference links</a></h3>
+<p>ANNIS aims to be as backward-compatible as possible, but we need to make sure the reference links actually point not only to the same queries and corpora, but show exactly the same result <sup class="footnote-reference"><a href="#sameresult">1</a></sup>.</p>
+<p>If you want to migrate the reference links, you have to export them as CSV files from ANNIS 3 using its command line interface.</p>
+<pre><code class="language-.sh">annis-admin.sh dump url_shortener url_shortener.csv
+</code></pre>
+<p>You can select any output file in a location of your choice.</p>
+<p>In the &quot;Administration&quot; user interface, there is a tab that allows to migrate reference links.
+To do so, ANNIS will execute each query in the given CSV file both on the old ANNIS service and on the new one.
+This is why you need to give the server URL and adminstration account information as parameters.</p>
+<p><img src="migrate-reference-urls.png" alt="Example configuration for the user interface to migrate reference links" /></p>
+<p>After filling out all necessary information and clicking on &quot;Start migration&quot;, ANNIS will compare the results by executing the queries both on the old and the new ANNIS service.
+If both results are exactly the same, it migrates the reference link to the new system.
+The command will give a summary how many reference links have been migrated successfully and which kind of errors occurred on the other ones.
+If you think a specific query triggers a bug in the new version of ANNIS, please check if there is already a bug report on <a href="https://github.com/korpling/ANNIS/issues">https://github.com/korpling/ANNIS/issues</a> or open a new one.</p>
+<p>Some queries only work in the same way in <a href="./aql-compatibility-mode.html">compatibility query mode</a>, these will be rewritten automatically.
+The user will be able to execute this query normally, but sees a warning that its using deprecated functions of the query language.</p>
+<p>For queries where both the normal and the compatibility mode don't return the same results, they are still migrated but a clear warning is shown to the user before execution, that this query is known to give different results compared to the previous version of ANNIS.</p>
+<p><sup class="footnote-reference"><a href="#sameresult:">2</a></sup> Same result means, that the overall count is correct, that the matches have the same Salt IDs and that they are presented in the same order.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../installation/server.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../interface/index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../installation/server.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../interface/index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
