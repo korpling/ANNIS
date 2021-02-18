@@ -563,6 +563,12 @@
 			<artifactId>toml4j</artifactId>
 			<version>0.7.2</version>
 		</dependency>
+		
+		<dependency>
+		  <groupId>org.tomlj</groupId>
+		  <artifactId>tomlj</artifactId>
+		  <version>1.0.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
