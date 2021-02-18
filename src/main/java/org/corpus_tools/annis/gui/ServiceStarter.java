@@ -13,7 +13,6 @@
  */
 package org.corpus_tools.annis.gui;
 
-import com.moandjiezana.toml.Toml;
 import com.moandjiezana.toml.TomlWriter;
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,6 +38,9 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;
+import org.tomlj.Toml;
+import org.tomlj.TomlParseResult;
+import org.tomlj.TomlTable;
 
 @Component
 @Profile("!desktop")
@@ -143,7 +145,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
                         tReaderErr.start();
 
                         // Use the provided service configuration to get the correct port
-                        Toml parsedServiceConfig = new Toml().read(serviceConfigFile);
+                        TomlParseResult parsedServiceConfig =
+                            Toml.parse(serviceConfigFile.toPath());
                         config.setWebserviceUrl(getServiceURL(parsedServiceConfig));
                     }
                 }
@@ -155,17 +158,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         }
     }
 
-    private long getServicePort(Toml config) {
-        long port = 5711l;
-        Toml bindTable = config.getTable("bind");
-        if (bindTable != null) {
-            port = bindTable.getLong("port", 5711l);
-        }
-        return port;
-    }
 
-    protected String getServiceURL(Toml config) {
-        return "http://localhost:" + getServicePort(config) + "/v0";
+    protected String getServiceURL(TomlParseResult config) {
+      return "http://localhost:" + config.getLong("bind.port", () -> 5711l) + "/v0";
     }
 
     protected File getServiceConfig() throws IOException {
@@ -180,9 +175,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
             }
         }
         // Set to a default data folder and SQLite file
-        Toml configToml = new Toml().read(result);
+        TomlParseResult configToml = Toml.parse(result.toPath());
         Map<String, Object> config = configToml.toMap();
-        Toml databaseTable = configToml.getTable("database");
+        TomlTable databaseTable = configToml.getTable("database");
         Map<String, Object> databaseConfig;
         if (databaseTable == null) {
             // Create a new map instead of re-using the existing one
