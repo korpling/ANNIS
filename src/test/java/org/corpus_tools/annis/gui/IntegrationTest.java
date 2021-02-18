@@ -36,8 +36,6 @@ import java.util.stream.Collectors;
 import net.jcip.annotations.NotThreadSafe;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.EmbeddedVisUI;
 import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
 import org.corpus_tools.annis.gui.components.medialement.MediaElementPlayer;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserPanel;
@@ -384,7 +382,7 @@ class IntegrationTest {
     awaitCondition(30, () -> ui.getQueryState().getSelectedCorpora().isEmpty(),
         () -> "Selecting no corpus failed");
 
-    // Set and emppty query and submit query
+    // Set and empty query and submit query
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
     MockVaadin.INSTANCE.clientRoundtrip();
     awaitCondition(5, () -> "tok".equals(ui.getQueryState().getAql().getValue()));
@@ -399,8 +397,10 @@ class IntegrationTest {
             .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
         () -> "Waited for status \"" + expectedStatus + "\" but was \""
             + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
-    assertEquals(1,
-        _find(com.vaadin.ui.TextArea.class, spec -> spec.withValue(expectedStatus)).size());
+    awaitCondition(60,
+        () -> _find(com.vaadin.ui.TextArea.class, spec -> spec.withValue(expectedStatus))
+            .size() == 1,
+        () -> "Waited for text area to show status \"" + expectedStatus + "\"");
   }
 
 }
