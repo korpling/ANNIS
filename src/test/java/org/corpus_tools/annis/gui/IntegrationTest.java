@@ -386,11 +386,13 @@ class IntegrationTest {
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
     MockVaadin.INSTANCE.clientRoundtrip();
     awaitCondition(5, () -> "tok".equals(ui.getQueryState().getAql().getValue()));
+    awaitCondition(10, () -> "Please select a corpus from the list below, then click on \"Search\"."
+        .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
 
     Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
     _click(searchButton);
 
-    // Wait until the status is displayed
+    // Wait until the message is displayed
     String expectedStatus = "No corpus selected";
     awaitCondition(60,
         () -> expectedStatus
