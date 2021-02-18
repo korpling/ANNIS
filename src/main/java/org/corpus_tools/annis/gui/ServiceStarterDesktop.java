@@ -66,10 +66,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
   @Autowired
   private Environment env;
 
-  private List<Object> unpackToml(TomlArray orig) {
-    if (orig == null) {
-      return null;
-    }
+  protected static List<Object> unpackToml(TomlArray orig) {
     ArrayList<Object> result = new ArrayList<>(orig.size());
 
     for (Object o : orig.toList()) {
@@ -87,11 +84,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     return result;
   }
 
-  private Map<String, Object> unpackToml(TomlTable orig) {
-    if (orig == null) {
-      return null;
-    }
-
+  protected static Map<String, Object> unpackToml(TomlTable orig) {
     LinkedHashMap<String, Object> result = new LinkedHashMap<>();
 
     for (Map.Entry<String, Object> e : orig.toMap().entrySet()) {
@@ -116,9 +109,6 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
   protected File getServiceConfig() throws IOException {
     TomlParseResult tomlConfig = Toml.parse(super.getServiceConfig().toPath());
     Map<String, Object> config = unpackToml(tomlConfig);
-    if (config == null) {
-      config = new LinkedHashMap<>();
-    }
 
     // Add it to the configuration
     Map<String, Object> tokenVerification = new LinkedHashMap<>();
