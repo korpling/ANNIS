@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.mvysny.kaributesting.v8.MockVaadin;
+import com.github.mvysny.kaributesting.v8.NotificationsKt;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.spring.internal.UIScopeImpl;
@@ -33,6 +34,7 @@ import java.util.Optional;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import kotlin.Pair;
 import net.jcip.annotations.NotThreadSafe;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -352,7 +354,7 @@ class IntegrationTest {
   void emptyQueryStatus() throws Exception {
     selectCorpus("pcc2");
 
-    // Set and emppty query and submit query
+    // Set and empty query and submit query
     _get(AqlCodeEditor.class).getPropertyDataSource().setValue("");
     MockVaadin.INSTANCE.clientRoundtrip();
     awaitCondition(5, () -> "".equals(ui.getQueryState().getAql().getValue()));
@@ -401,6 +403,40 @@ class IntegrationTest {
             + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
     assertEquals(1,
         _find(com.vaadin.ui.TextArea.class, spec -> spec.withValue(expectedStatus)).size());
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void testAqlError() throws Exception {
+    NotificationsKt.clearNotifications();
+    selectCorpus("pcc2");
+
+    // Set the query and check that a the syntax error is reported as status, not as error dialog
+    _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok &");
+    MockVaadin.INSTANCE.clientRoundtrip();
+
+    awaitCondition(5, () -> "tok &".equals(ui.getQueryState().getAql().getValue()));
+    awaitCondition(5, () -> "Unexpected end of query."
+        .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
+
+    NotificationsKt.expectNoNotifications();
+
+    // Also check that executing the query show a notification
+    _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok & tok");
+    MockVaadin.INSTANCE.clientRoundtrip();
+    Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
+    _click(searchButton);
+    String expectedStatus = "Variable \"2\" not bound (use linguistic operators)";
+    awaitCondition(60,
+        () -> expectedStatus
+            .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
+        () -> "Waited for status \"" + expectedStatus + "\" but was \""
+            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+    assertEquals(1,
+        _find(com.vaadin.ui.TextArea.class, spec -> spec.withValue(expectedStatus)).size());
+
+    NotificationsKt.expectNotifications(new Pair<String, String>("Parsing error", expectedStatus));
+
   }
 
 }

@@ -175,7 +175,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GraphAnnisError"
+                $ref: "#/components/schemas/BadRequestError"
 
   /search/find:
     post:
@@ -207,7 +207,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GraphAnnisError"
+                $ref: "#/components/schemas/BadRequestError"
 
   /search/frequency:
     post:
@@ -234,7 +234,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GraphAnnisError"
+                $ref: "#/components/schemas/BadRequestError"
 
   /search/node-descriptions:
     get:
@@ -277,7 +277,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GraphAnnisError"
+                $ref: "#/components/schemas/BadRequestError"
 
   /corpora/{corpus}/subgraph:
     post:
@@ -676,39 +676,6 @@ paths:
         403:
           description: Access is forbidden if the requesting client does not have administrator privileges.
 
-  /local-login:
-    post:
-      summary: Create JWT token for credentials of a locally configured account.
-      operationId: localLogin
-      tags:
-        - authentification
-      requestBody:
-        description: Object with the user ID and password to login with
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - user_id
-                - password
-              properties:
-                user_id:
-                  type: string
-                password:
-                  type: string
-      responses:
-        "200":
-          description: Returns a JSON Web Token (JWT), valid until its expiration time is reached.
-          content:
-            text/plain:
-              schema:
-                type: string
-                description: JSON Web Token (JWT)
-                example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwiZXhwIjoiMTU5MjE0NzE5NiIsImNvcnB1c19ncm91cHMiOlsiYWNhZGVtaWMiLCJpbnRlcm5hbCJdLCJhZG1pbiI6ZmFsc2V9._eVf-gPknBlqobOOB83p2bFjf0ws9-mkqb1UkM4rMRg"
-
-        "401":
-          description: Unauthorized
 components:
   securitySchemes:
     bearerAuth:
@@ -937,7 +904,7 @@ components:
       required:
         - start
 
-    GraphAnnisError:
+    BadRequestError:
       type: object
       properties:
         AQLSyntaxError:
@@ -960,14 +927,9 @@ components:
             - desc
         ImpossibleSearch:
           type: string
-        LoadingGraphFailed:
-          type: object
-          properties:
-            name:
-              type: string
-        NoSuchCorpus:
+        UUID:
           type: string
-        CorpusExists:
+        IllegalNodePath:
           type: string
 
     FrequencyTable:
