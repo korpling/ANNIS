@@ -483,6 +483,14 @@
 			<artifactId>jsr311-api</artifactId>
 			<version>1.1.1</version>
 		</dependency>
+		
+		<!-- Add this dependency because otherwise JavaDoc will fail when parsing @javax.transactional.Transactional annotations -->
+		<dependency>
+		    <groupId>javax.interceptor</groupId>
+		    <artifactId>javax.interceptor-api</artifactId>
+		    <version>1.2.2</version>
+		</dependency>
+				
 
 		<dependency>
 			<groupId>com.github.vaadin4qbanos</groupId>
