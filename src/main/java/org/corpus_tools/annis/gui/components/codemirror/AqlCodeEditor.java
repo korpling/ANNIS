@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import org.corpus_tools.annis.api.model.GraphAnnisError;
+import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditorState.ParseError;
 import org.json.JSONException;
@@ -155,7 +155,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
                 listener);
     }
 
-    public void setError(GraphAnnisError error) {
+    public void setError(BadRequestError error) {
         getState().errors.clear();
         if (error != null) {
             if (error.getAqLSyntaxError() != null) {

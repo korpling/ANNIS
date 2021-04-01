@@ -40,9 +40,9 @@ import okhttp3.Call;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.JSON;
 import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.CountQuery;
-import org.corpus_tools.annis.api.model.GraphAnnisError;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.controller.CountCallback;
@@ -495,8 +495,8 @@ public class QueryController implements Serializable {
     if (!ui.handleCommonError(ex, "execute query")) {
       switch (ex.getCode()) {
         case 400:
-          GraphAnnisError error =
-              JSON.createGson().create().fromJson(ex.getResponseBody(), GraphAnnisError.class);
+          BadRequestError error =
+              JSON.createGson().create().fromJson(ex.getResponseBody(), BadRequestError.class);
 
           caption = "Parsing error";
           if (error.getAqLSyntaxError() != null) {

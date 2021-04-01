@@ -30,8 +30,8 @@ import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.JSON;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.FindQuery;
-import org.corpus_tools.annis.api.model.GraphAnnisError;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
@@ -166,7 +166,7 @@ public class ResultFetchJob implements Runnable {
 
           if (ex.getCode() == 400) {
             JSON json = new JSON();
-            GraphAnnisError error = json.deserialize(ex.getResponseBody(), GraphAnnisError.class);
+            BadRequestError error = json.deserialize(ex.getResponseBody(), BadRequestError.class);
 
             String errMsg = "";
             if (error.getAqLSyntaxError() != null) {
