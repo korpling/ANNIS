@@ -38,7 +38,7 @@
 		<java.version>1.8</java.version>
 		<vaadin.version>8.12.0</vaadin.version>
 		<start-class>org.corpus_tools.annis.gui.AnnisUiApplication</start-class>
-		<graphannis.version>0.31.0</graphannis.version>
+		<graphannis.version>0.31.2</graphannis.version>
 		<antlr4.version>4.7.2</antlr4.version>
 		<spring.profiles.active>server</spring.profiles.active>
 		<swagger-core-version>1.5.24</swagger-core-version>
@@ -258,7 +258,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice</url>
 							<outputDirectory>${project.build.directory}/native/linux-x86-64/</outputDirectory>
-							<sha256>ca16ed0c6a1831929614b763c4d107d304e34eb74d817023437b44164e7fb57e</sha256>
+							<sha256>bd36176bb22679f237cc7dfda9fea9c64479b8ef9c70dcf3b33d755674acf20f</sha256>
 						</configuration>
 					</execution>
 					<execution>

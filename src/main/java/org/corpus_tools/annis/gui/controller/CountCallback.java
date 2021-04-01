@@ -44,7 +44,7 @@ public class CountCallback implements ApiCallback<CountExtra> {
             Map<String, List<String>> responseHeaders) {
         ui.access(() -> {
           ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
-          ui.getQueryController().reportServiceException(e, false);
+          ui.getQueryController().reportServiceException(e, true);
         });
 
     }
