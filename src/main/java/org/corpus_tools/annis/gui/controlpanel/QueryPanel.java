@@ -39,7 +39,7 @@ import com.vaadin.v7.data.Property.ValueChangeListener;
 import com.vaadin.v7.data.util.BeanItemContainer;
 import com.vaadin.v7.ui.ListSelect;
 import java.util.List;
-import org.corpus_tools.annis.api.model.GraphAnnisError;
+import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.ExportPanel;
@@ -490,7 +490,7 @@ public class QueryPanel extends GridLayout implements ValueChangeListener {
         }
     }
 
-    public void setError(GraphAnnisError error) {
+    public void setError(BadRequestError error) {
         txtQuery.setError(error);
     }
 
