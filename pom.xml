@@ -13,7 +13,7 @@
 
 	<groupId>org.corpus-tools</groupId>
 	<artifactId>annis</artifactId>
-	<version>4.0.0-SNAPSHOT</version>
+	<version>4.0.0-beta.6</version>
 	<name>ANNIS user interface</name>
 	<packaging>jar</packaging>
 	<scm>
@@ -45,6 +45,17 @@
 		<gson-fire-version>1.8.4</gson-fire-version>
 		<kotlin.version>1.4.0</kotlin.version>
 	</properties>
+	
+    <distributionManagement>
+            <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            </snapshotRepository>
+            <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            </repository>
+    </distributionManagement>
 
 	<repositories>
 		<repository>
@@ -149,11 +160,11 @@
 			<plugin>
 				<groupId>com.amashchenko.maven.plugin</groupId>
 				<artifactId>gitflow-maven-plugin</artifactId>
-				<version>1.15.1</version>
+				<version>1.16.0</version>
 				<configuration>
 					<pushRemote>true</pushRemote>
-					<postReleaseGoals>-Prelease,mdbook install javadoc:jar deploy</postReleaseGoals>
-					<postHotfixGoals>-Prelease,mdbook install javadoc:jar deploy</postHotfixGoals>
+					<postReleaseGoals>-Pmdbook install javadoc:jar deploy</postReleaseGoals>
+					<postHotfixGoals>-Pmdbook install javadoc:jar deploy</postHotfixGoals>
 					<verbose>true</verbose>
 					<gitFlowConfig>
 						<productionBranch>master</productionBranch>
@@ -483,6 +494,14 @@
 			<artifactId>jsr311-api</artifactId>
 			<version>1.1.1</version>
 		</dependency>
+		
+		<!-- Add this dependency because otherwise JavaDoc will fail when parsing @javax.transactional.Transactional annotations -->
+		<dependency>
+		    <groupId>javax.interceptor</groupId>
+		    <artifactId>javax.interceptor-api</artifactId>
+		    <version>1.2.2</version>
+		</dependency>
+				
 
 		<dependency>
 			<groupId>com.github.vaadin4qbanos</groupId>
