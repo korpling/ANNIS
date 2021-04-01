@@ -45,6 +45,17 @@
 		<gson-fire-version>1.8.4</gson-fire-version>
 		<kotlin.version>1.4.0</kotlin.version>
 	</properties>
+	
+    <distributionManagement>
+            <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            </snapshotRepository>
+            <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            </repository>
+    </distributionManagement>
 
 	<repositories>
 		<repository>
@@ -149,11 +160,11 @@
 			<plugin>
 				<groupId>com.amashchenko.maven.plugin</groupId>
 				<artifactId>gitflow-maven-plugin</artifactId>
-				<version>1.15.1</version>
+				<version>1.16.0</version>
 				<configuration>
 					<pushRemote>true</pushRemote>
-					<postReleaseGoals>-Prelease,mdbook install javadoc:jar deploy</postReleaseGoals>
-					<postHotfixGoals>-Prelease,mdbook install javadoc:jar deploy</postHotfixGoals>
+					<postReleaseGoals>-Pmdbook install javadoc:jar deploy</postReleaseGoals>
+					<postHotfixGoals>-Pmdbook install javadoc:jar deploy</postHotfixGoals>
 					<verbose>true</verbose>
 					<gitFlowConfig>
 						<productionBranch>master</productionBranch>
