@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.TreeMap;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.corpus_tools.annis.api.model.GraphAnnisErrorAQLSyntaxError;
+import org.corpus_tools.annis.api.model.BadRequestErrorAQLSyntaxError;
 
 /**
  *
@@ -46,7 +46,7 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
 
         public String message;
 
-        public ParseError(GraphAnnisErrorAQLSyntaxError orig) {
+        public ParseError(BadRequestErrorAQLSyntaxError orig) {
             if (orig.getLocation() != null) {
                 if (orig.getLocation().getStart() != null) {
                     this.startLine = orig.getLocation().getStart().getLine();

@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Validating or executing erroneous AQL queries triggered fallback 
+  dialog for unexpected errors instead of providing user-friendly feedback.
+
 ## [4.0.0-beta.5] - 2021-02-18
 
 ### Changed
