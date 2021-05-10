@@ -292,13 +292,11 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       SRelation<?, ?> rel = null;
       switch (component.getType()) {
         case DOMINANCE:
-          if (component.getName() == null || component.getName().isEmpty()) {
+          if ((component.getName() == null || component.getName().isEmpty()) && hasNonEmptyDominanceEdge.contains(Pair.of(sourceId, targetId))) {
             // We don't include edges that have no type if there is an edge
             // between the same nodes which has a type.
-            if (hasNonEmptyDominanceEdge.contains(Pair.of(sourceId, targetId))) {
-              // exclude this relation
-              return;
-            }
+            // In this case, exclude this relation
+            return;
           } // end mirror check
           rel = graph.createRelation(source, target, SALT_TYPE.SDOMINANCE_RELATION, null);
 
