@@ -88,10 +88,10 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
                 hasOutgoingDominanceEdge.add(source.getValue());
               }
-            }
-            if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
-                && !c.getName().isEmpty()) {
-              hasNonEmptyDominanceEdge.add(Pair.of(source.getValue(), target.getValue()));
+              if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
+                  && !c.getName().isEmpty()) {
+                hasNonEmptyDominanceEdge.add(Pair.of(source.getValue(), target.getValue()));
+              }
             }
           }
 
