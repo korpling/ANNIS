@@ -22,6 +22,7 @@ import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+import org.apache.commons.lang3.tuple.Pair;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.salt.SALT_TYPE;
@@ -52,14 +53,14 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
   private final Set<String> hasOutgoingCoverageEdge;
   private final Set<String> hasOutgoingDominanceEdge;
-  private final Set<String> hasNonEmptyIncomingDominanceEdge;
+  private final Set<Pair<String, String>> hasNonEmptyDominanceEdge;
 
 
   protected DocumentGraphMapper() {
     this.graph = SaltFactory.createSDocumentGraph();
     this.hasOutgoingCoverageEdge = new HashSet<>();
     this.hasOutgoingDominanceEdge = new HashSet<>();
-    this.hasNonEmptyIncomingDominanceEdge = new HashSet<>();
+    this.hasNonEmptyDominanceEdge = new HashSet<>();
   }
 
 
@@ -90,7 +91,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
             }
             if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
                 && !c.getName().isEmpty()) {
-              hasNonEmptyIncomingDominanceEdge.add(target.getValue());
+              hasNonEmptyDominanceEdge.add(Pair.of(source.getValue(), target.getValue()));
             }
           }
 
@@ -294,7 +295,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
           if (component.getName() == null || component.getName().isEmpty()) {
             // We don't include edges that have no type if there is an edge
             // between the same nodes which has a type.
-            if (hasNonEmptyIncomingDominanceEdge.contains(sourceId)) {
+            if (hasNonEmptyDominanceEdge.contains(Pair.of(sourceId, targetId))) {
               // exclude this relation
               return;
             }
