@@ -390,14 +390,13 @@ public class DocBrowserTable extends Table {
       String doc = d.getName();
       String docId = d.getId();
 
-      // reverse path and delete the brackets and set a new separator:
-      // corpus > ... > subcorpus > document
       List<String> pathList = Helper.getCorpusPath(d.getId());
       if (pathList == null) {
         pathList = new LinkedList<>();
       }
 
-      Collections.reverse(pathList);
+      // Set a new separator:
+      // corpus > ... > subcorpus > document
       String path = StringUtils.join(pathList, " > ");
 
       // use corpus path for row id, since it should be unique by annis db schema
