@@ -19,9 +19,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.CorpusBrowserPanel;
-import org.corpus_tools.annis.gui.ExampleTable;
 import org.corpus_tools.annis.gui.beans.CorpusBrowserEntry;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
 import org.junit.jupiter.api.AfterEach;
@@ -53,8 +50,6 @@ class CorpusBrowserPanelTest {
     ui = beanFactory.getBean(AnnisUI.class);
 
     MockVaadin.setup(() -> ui);
-
-
   }
 
   @AfterEach
