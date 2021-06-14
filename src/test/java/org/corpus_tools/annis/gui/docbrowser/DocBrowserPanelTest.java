@@ -92,4 +92,17 @@ class DocBrowserPanelTest {
     assertEquals("shenoute.a22 > a22.ZC301-308", ids.get(3));
   }
 
+  @Test
+  void testMetadata() throws Exception {
+    openDocBrowser("shenoute.a22");
+
+    DocBrowserTable table = _get(DocBrowserTable.class);
+
+    assertEquals("MONB.YA", table.getContainerProperty("shenoute.a22 > a22.YA421-428", "msName"));
+    assertEquals("MONB.YA", table.getContainerProperty("shenoute.a22 > a22.YA517-518", "msName"));
+
+    assertEquals("MONB.YB", table.getContainerProperty("shenoute.a22 > a22.YB307-320", "msName"));
+    assertEquals("MONB.ZC", table.getContainerProperty("shenoute.a22 > a22.ZC301-308", "msName"));
+  }
+
 }
