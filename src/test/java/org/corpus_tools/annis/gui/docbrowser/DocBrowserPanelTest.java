@@ -98,11 +98,15 @@ class DocBrowserPanelTest {
 
     DocBrowserTable table = _get(DocBrowserTable.class);
 
-    assertEquals("MONB.YA", table.getContainerProperty("shenoute.a22 > a22.YA421-428", "msName"));
-    assertEquals("MONB.YA", table.getContainerProperty("shenoute.a22 > a22.YA517-518", "msName"));
+    assertEquals("MONB.YA",
+        table.getContainerProperty("shenoute.a22 > a22.YA421-428", "msName").getValue());
+    assertEquals("MONB.YA",
+        table.getContainerProperty("shenoute.a22 > a22.YA517-518", "msName").getValue());
 
-    assertEquals("MONB.YB", table.getContainerProperty("shenoute.a22 > a22.YB307-320", "msName"));
-    assertEquals("MONB.ZC", table.getContainerProperty("shenoute.a22 > a22.ZC301-308", "msName"));
+    assertEquals("MONB.YB",
+        table.getContainerProperty("shenoute.a22 > a22.YB307-320", "msName").getValue());
+    assertEquals("MONB.ZC",
+        table.getContainerProperty("shenoute.a22 > a22.ZC301-308", "msName").getValue());
   }
 
 }
