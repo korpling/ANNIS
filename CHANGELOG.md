@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Do not discard dominance edge, when only the target node has an incoming unnamed incoming edge.
   For the GUM corpus with mixed dominance for syntax and RST trees, this caused some segments to
   have no connection to any token. (#696)
+- Fix display of document meta annotations in the document browser 
 
 ## [4.0.0-beta.6] - 2021-04-01
 
