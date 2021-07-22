@@ -50,7 +50,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -461,10 +461,10 @@ class MigrationPanelTest {
   void testLoggedOut() {
     // Test that the test environment provides us with a logged in administrator user first
     Authentication oldAuth = ui.getSecurityContext().getAuthentication();
-    Optional<OidcUser> user = Helper.getUser(ui);
+    Optional<OAuth2User> user = Helper.getUser(ui);
     assertTrue(user.isPresent());
-    OidcUser adminUser = user.get();
-    assertTrue(adminUser.getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM).contains("admin"));
+    OAuth2User adminUser = user.get();
+    assertTrue(Helper.getUserRoles(adminUser).contains("admin"));
 
     // Logout the current user
     ui.getSecurityContext().setAuthentication(null);

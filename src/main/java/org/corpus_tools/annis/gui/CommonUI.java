@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
  *
@@ -168,14 +168,16 @@ public abstract class CommonUI extends AnnisBaseUI {
     }
 
     public ApiClient getClient() {
+      
       final ApiClient client = Configuration.getDefaultApiClient();
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(getConfig().getWebserviceUrl());
 
-      final Optional<OidcUser> user = Helper.getUser(getSecurityContext());
+      final Optional<OAuth2User> user = Helper.getUser(getSecurityContext());
       String bearerToken = null;
       if (user.isPresent()) {
-        bearerToken = user.get().getIdToken().getTokenValue();
+        // TODO implement bearer token extraction or switch to a different client implementation
+        throw new UnsupportedOperationException("Bearer token extraction not implemented yet");
       }
       final org.corpus_tools.annis.auth.Authentication auth =
           client.getAuthentication("bearerAuth");
@@ -244,10 +246,11 @@ public abstract class CommonUI extends AnnisBaseUI {
     public abstract OAuth2ClientProperties getOauth2ClientProperties();
 
     public abstract UIConfig getConfig();
-
+    
     public void redirectToLogin() {
+     
       OAuth2ClientProperties oauth2Clients = getOauth2ClientProperties();
-      if (getOauth2ClientProperties() != null) {
+      if (oauth2Clients != null) {
 
         // Store the current fragment so it can be restored after login was successful
         String oldFragment = Page.getCurrent().getUriFragment();
@@ -256,7 +259,6 @@ public abstract class CommonUI extends AnnisBaseUI {
 
         VaadinRequest currentRequest = VaadinRequest.getCurrent();
         final String contextPath = currentRequest == null ? "" : currentRequest.getContextPath();
-
         // Determine if there is only one or several clients
         Collection<String> providers = oauth2Clients.getProvider().keySet();
         if (providers.size() == 1) {

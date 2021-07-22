@@ -15,17 +15,17 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
-import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 public class ReferenceLinkEditor extends Panel {
 
@@ -171,10 +171,10 @@ public class ReferenceLinkEditor extends Panel {
 
     }
 
-    Optional<OidcUser> user = Helper.getUser(getUI());
+    Optional<OAuth2User> user = Helper.getUser(getUI());
     if (user.isPresent()) {
-      List<String> roles = user.get().getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM);
-      if (roles != null && roles.contains("admin")) {
+      Set<String> roles = Helper.getUserRoles(user.get());
+      if (roles.contains("admin")) {
         setContent(grid);
       }
     }

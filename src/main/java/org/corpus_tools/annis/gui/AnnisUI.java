@@ -319,5 +319,4 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   public OAuth2ClientProperties getOauth2ClientProperties() {
     return this.oauth2Clients;
   }
-
 }
