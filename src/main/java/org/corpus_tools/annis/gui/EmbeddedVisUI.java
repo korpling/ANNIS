@@ -58,6 +58,7 @@ import org.corpus_tools.annis.gui.docbrowser.DocBrowserController;
 import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.annis.gui.objects.Match;
 import org.corpus_tools.annis.gui.objects.RawTextWrapper;
+import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
 import org.corpus_tools.annis.gui.util.ANNISFontIcon;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
@@ -74,6 +75,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 /**
  *
@@ -169,6 +171,8 @@ public class EmbeddedVisUI extends CommonUI {
   @Autowired
   private UIConfig config;
 
+  @Autowired
+  private AuthenticationSuccessListener authListener;
 
   public EmbeddedVisUI() {
     super(URL_PREFIX);
@@ -490,6 +494,11 @@ public class EmbeddedVisUI extends CommonUI {
               + "<li><code>config</code>: the internal config file to use (same as <a href=\"http://korpling.github.io/ANNIS/doc/classannis_1_1visualizers_1_1htmlvis_1_1HTMLVis.html\">\"config\" mapping parameter)</a></li>"
               + "</ul>");
     }
+  }
+  
+  @Override
+  protected OAuth2AccessToken getLastAccessToken() {
+      return authListener.getToken();
   }
 
   @Override
