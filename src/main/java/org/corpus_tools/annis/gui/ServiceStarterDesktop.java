@@ -230,6 +230,11 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
         desktop.browse(new URI(webURL));
       } catch (IOException | URISyntaxException ex) {
         log.error("Could not open " + webURL + " in browser.", ex);
+      } catch(UnsupportedOperationException ex) {
+    	  log.warn(
+    	          "Opening the browser is unsupported on this platform. "
+    	          + "Please open {} in your browser manually manually.",
+    	          webURL);
       }
     }
   }
