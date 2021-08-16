@@ -316,16 +316,6 @@
  */
 
 @font-face {
-	font-family: "Vaadin-Icons";
-	src: url(../valo/fonts/vaadin-icons/Vaadin-Icons.eot);
-	src: url(../valo/fonts/vaadin-icons/Vaadin-Icons.eot?#iefix) format("embedded-opentype"), url(../valo/fonts/vaadin-icons/Vaadin-Icons.woff) format("woff"), url(../valo/fonts/vaadin-icons/Vaadin-Icons.ttf) format("truetype"), url(../valo/fonts/vaadin-icons/Vaadin-Icons.svg#icomoon) format("svg");
-}
-
-.Vaadin-Icons {
-	font-family: "Vaadin-Icons";
-}
-
-@font-face {
 	font-family: ThemeIcons;
 	font-weight: normal;
 	font-style: normal;
@@ -341,6 +331,16 @@
 	-moz-osx-font-smoothing: grayscale;
 	display: inline-block;
 	text-align: center;
+}
+
+@font-face {
+	font-family: "Vaadin-Icons";
+	src: url(../valo/fonts/vaadin-icons/Vaadin-Icons.eot);
+	src: url(../valo/fonts/vaadin-icons/Vaadin-Icons.eot?#iefix) format("embedded-opentype"), url(../valo/fonts/vaadin-icons/Vaadin-Icons.woff) format("woff"), url(../valo/fonts/vaadin-icons/Vaadin-Icons.ttf) format("truetype"), url(../valo/fonts/vaadin-icons/Vaadin-Icons.svg#icomoon) format("svg");
+}
+
+.Vaadin-Icons {
+	font-family: "Vaadin-Icons";
 }
 
 @font-face {
@@ -1077,7 +1077,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "8.12.0";
+	content: "8.13.2";
 }
 
 .v-widget {
@@ -4879,7 +4879,7 @@ div.v-layout.v-horizontal.v-widget {
 	padding-right: 9px;
 }
 
-.annis-visualizer-theme .v-grid-editor-cells  > div input[type="checkbox"] {
+.annis-visualizer-theme .v-grid-editor-cells  > div :not(.v-assistive-device-only-label).v-widget > input[type="checkbox"] {
 	margin-left: 18px;
 }
 
@@ -5127,15 +5127,15 @@ div.v-layout.v-horizontal.v-widget {
 	padding-right: 9px;
 }
 
-.annis-visualizer-theme .v-grid-editor-cells > div .v-checkbox {
+.annis-visualizer-theme .v-grid-editor-cells > div .v-checkbox.v-widget {
 	margin: 0 9px 0 18px;
 }
 
-.annis-visualizer-theme .v-grid-editor-cells > div .v-checkbox  > input[type="checkbox"] {
+.annis-visualizer-theme .v-grid-editor-cells > div .v-checkbox.v-widget  > input[type="checkbox"] {
 	margin-left: 0;
 }
 
-.annis-visualizer-theme .v-grid-editor-cells > div .v-checkbox  > label {
+.annis-visualizer-theme .v-grid-editor-cells > div .v-checkbox.v-widget  > label {
 	white-space: nowrap;
 }
 
@@ -9646,7 +9646,7 @@ div.v-layout.v-horizontal.v-widget {
 	padding-right: 9px;
 }
 
-.annis-visualizer-theme .v-tree8-editor-cells  > div input[type="checkbox"] {
+.annis-visualizer-theme .v-tree8-editor-cells  > div :not(.v-assistive-device-only-label).v-widget > input[type="checkbox"] {
 	margin-left: 18px;
 }
 
@@ -9894,15 +9894,15 @@ div.v-layout.v-horizontal.v-widget {
 	padding-right: 9px;
 }
 
-.annis-visualizer-theme .v-tree8-editor-cells > div .v-checkbox {
+.annis-visualizer-theme .v-tree8-editor-cells > div .v-checkbox.v-widget {
 	margin: 0 9px 0 18px;
 }
 
-.annis-visualizer-theme .v-tree8-editor-cells > div .v-checkbox  > input[type="checkbox"] {
+.annis-visualizer-theme .v-tree8-editor-cells > div .v-checkbox.v-widget  > input[type="checkbox"] {
 	margin-left: 0;
 }
 
-.annis-visualizer-theme .v-tree8-editor-cells > div .v-checkbox  > label {
+.annis-visualizer-theme .v-tree8-editor-cells > div .v-checkbox.v-widget  > label {
 	white-space: nowrap;
 }
 
@@ -10792,7 +10792,7 @@ div.v-layout.v-horizontal.v-widget {
 	padding-right: 9px;
 }
 
-.annis-visualizer-theme .v-treegrid-editor-cells  > div input[type="checkbox"] {
+.annis-visualizer-theme .v-treegrid-editor-cells  > div :not(.v-assistive-device-only-label).v-widget > input[type="checkbox"] {
 	margin-left: 18px;
 }
 
@@ -11040,15 +11040,15 @@ div.v-layout.v-horizontal.v-widget {
 	padding-right: 9px;
 }
 
-.annis-visualizer-theme .v-treegrid-editor-cells > div .v-checkbox {
+.annis-visualizer-theme .v-treegrid-editor-cells > div .v-checkbox.v-widget {
 	margin: 0 9px 0 18px;
 }
 
-.annis-visualizer-theme .v-treegrid-editor-cells > div .v-checkbox  > input[type="checkbox"] {
+.annis-visualizer-theme .v-treegrid-editor-cells > div .v-checkbox.v-widget  > input[type="checkbox"] {
 	margin-left: 0;
 }
 
-.annis-visualizer-theme .v-treegrid-editor-cells > div .v-checkbox  > label {
+.annis-visualizer-theme .v-treegrid-editor-cells > div .v-checkbox.v-widget  > label {
 	white-space: nowrap;
 }
 
