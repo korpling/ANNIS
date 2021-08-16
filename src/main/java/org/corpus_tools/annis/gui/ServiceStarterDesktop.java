@@ -233,7 +233,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
       } catch(UnsupportedOperationException ex) {
     	  log.warn(
     	          "Opening the browser is unsupported on this platform. "
-    	          + "Please open {} in your browser manually manually.",
+    	          + "Please open {} in your browser manually.",
     	          webURL);
       }
     }
