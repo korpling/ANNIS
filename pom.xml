@@ -269,7 +269,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice</url>
 							<outputDirectory>${project.build.directory}/native/linux-x86-64/</outputDirectory>
-							<sha256>67642a42f6df9b6f1238806eeca2d2a956c71949464d1ce16634e8d5e552ef12</sha256>
+							<sha256>5ed98f601c0bd3867dc79b8b3ca849c05b3109ef9daf9216a1c90aade12b4cc8</sha256>
 						</configuration>
 					</execution>
 					<execution>
@@ -281,7 +281,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice.exe</url>
 							<outputDirectory>${project.build.directory}/native/win32-x86-64/</outputDirectory>
-							<sha256>9729f305cafadd1f45372fe54d43f5d047f5b53885e5bb8222a813a886e2fd9a</sha256>
+							<sha256>171799a8280389ce6a93bf6cff166c8efaeeedf82e027ff040fcdafb729242ea</sha256>
 						</configuration>
 					</execution>
 					<execution>
@@ -293,7 +293,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice.osx</url>
 							<outputDirectory>${project.build.directory}/native/darwin/</outputDirectory>
-							<sha256>72d6e3a6471aab014f3787012b607ba43fb58ecb576fa42dba24f2c53c04ab7a</sha256>
+							<sha256>1a339d624a89054b206c3d4ba77ab2ecf99bbdf56a29fbc42fc90351edf9330e</sha256>
 						</configuration>
 					</execution>
 				</executions>
