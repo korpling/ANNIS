@@ -5,24 +5,13 @@
         <meta charset="UTF-8">
         <title>Making a new ANNIS release - ANNIS Developer Guide</title>
         
-        
-
-
-        <!-- Custom HTML head -->
-        
-
 
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        
-        <link rel="icon" href="favicon.svg">
-        
-        
         <link rel="shortcut icon" href="favicon.png">
-        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
@@ -30,9 +19,8 @@
 
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        
-        <link rel="stylesheet" href="fonts/fonts.css">
-        
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
 
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
@@ -48,7 +36,7 @@
         <!-- Provide site root to javascript -->
         <script type="text/javascript">
             var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "light";
         </script>
 
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
@@ -92,8 +80,8 @@
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="architecture.html"><strong aria-hidden="true">1.</strong> Architecture</a></li><li class="chapter-item expanded "><a href="building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li class="chapter-item expanded "><a href="release.html" class="active"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li class="chapter-item expanded "><a href="querybuilder.html"><strong aria-hidden="true">4.</strong> Create new query builder</a></li></ol>
+            <div id="sidebar-scrollbox" class="sidebar-scrollbox">
+                <ol class="chapter"><li class="expanded "><a href="architecture.html"><strong aria-hidden="true">1.</strong> Architecture</a></li><li class="expanded "><a href="building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li class="expanded "><a href="release.html" class="active"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li class="expanded "><a href="querybuilder.html"><strong aria-hidden="true">4.</strong> Create new query builder</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -161,8 +149,6 @@
                     <main>
                         <h1><a class="header" href="#making-a-new-annis-release" id="making-a-new-annis-release">Making a new ANNIS release</a></h1>
 <h2><a class="header" href="#introduction" id="introduction">Introduction</a></h2>
-<p>The release process, including all necessary tests, might take several days and includes fixing bugs that are only discovered in the release testing process. 
-<strong>Never ever add new features in this release process</strong>, there is the separate &quot;develop&quot; branch which you can use for this purposes.</p>
 <p>You must have <a href="https://github.com/rust-lang-nursery/mdBook">mdBook</a> installed to make a release.
 Otherwise the documentation can't be created.</p>
 <h2><a class="header" href="#release-process" id="release-process">Release Process</a></h2>
@@ -236,10 +222,10 @@ If no known bugs are left to fix go to the next section. </li>
         
 
         
-
+        
         
         <script type="text/javascript">
-            window.playground_copyable = true;
+            window.playpen_copyable = true;
         </script>
         
 
