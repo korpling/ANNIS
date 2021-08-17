@@ -27,6 +27,7 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
@@ -59,7 +60,6 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
   private final String secret = RandomStringUtils.randomAlphanumeric(50);
   private Optional<UsernamePasswordAuthenticationToken> desktopUserCredentials = Optional.empty();
 
-
   @Value("${server.port}")
   private String serverPort;
 
@@ -88,7 +88,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     LinkedHashMap<String, Object> result = new LinkedHashMap<>();
 
     for (Map.Entry<String, Object> e : orig.toMap().entrySet()) {
-      if(e.getValue() instanceof TomlArray) {
+      if (e.getValue() instanceof TomlArray) {
         TomlArray tomlArray = (TomlArray) e.getValue();
         result.put(e.getKey(), unpackToml(tomlArray));
       } else if (e.getValue() instanceof TomlTable) {
@@ -98,7 +98,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
         result.put(e.getKey(), e.getValue());
       }
     }
-    
+
     return result;
   }
 
@@ -120,20 +120,18 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     auth.put("token_verification", tokenVerification);
     config.put("auth", auth);
 
-
     File temporaryFile = File.createTempFile("annis-service-config-desktop-", ".toml");
     TomlWriter writer = new TomlWriter();
     writer.write(config, temporaryFile);
     return temporaryFile;
   }
 
-  private void showApplicationWindow(Desktop desktop) {
+  private void showApplicationWindow() {
     try {
       UIManager.setLookAndFeel(new NimbusLookAndFeel());
     } catch (UnsupportedLookAndFeelException ex) {
       log.warn("Look and feel not supported", ex);
     }
-
 
     // Create a window where log messages and a link to the UI can be shown
     // This also allows to exit the application when no terminal is shown.
@@ -143,7 +141,6 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     mainFrame.setLocationByPlatform(true);
 
-
     final String webURL = "http://localhost:" + serverPort;
     JButton btLaunch = new JButton();
 
@@ -152,13 +149,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     btLaunch.setText("<html><u>Open " + webURL + " in browser</u></html>");
     btLaunch.setEnabled(true);
     btLaunch.setName("btLaunch");
-    btLaunch.addActionListener((evt) -> {
-      try {
-        desktop.browse(new URI(webURL));
-      } catch (IOException | URISyntaxException ex) {
-        log.error("Could not open browser", ex);
-      }
-    });
+    btLaunch.addActionListener(evt -> openBrowser(webURL));
     btLaunch.setPreferredSize(new Dimension(300, 60));
     mainFrame.getContentPane().add(btLaunch, BorderLayout.CENTER);
 
@@ -201,7 +192,8 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
         .withClaim(SecurityConfiguration.ROLES_CLAIM, roles).withExpiresAt(Date.from(expiresAt))
         .withIssuedAt(Date.from(issuedAt)).sign(Algorithm.HMAC256(this.secret));
 
-    // Create the needed information for to represent this token as OIDC token in Spring
+    // Create the needed information for to represent this token as OIDC token in
+    // Spring
     // security
     List<? extends GrantedAuthority> grantedAuthorities =
         Arrays.asList(new SimpleGrantedAuthority("admin"));
@@ -215,8 +207,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
 
     // Open the application in the browser
     String webURL = "http://localhost:" + serverPort;
-    boolean isRunningHeadless =
-        Arrays.stream(env.getActiveProfiles()).anyMatch("headless"::equals);
+    boolean isRunningHeadless = Arrays.stream(env.getActiveProfiles()).anyMatch("headless"::equals);
     Desktop desktop =
         !isRunningHeadless && Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
     if (desktop == null) {
@@ -224,13 +215,28 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
           "ANNIS is running in desktop mode, but no desktop has been detected. You can open {} manually.",
           webURL);
     } else {
-      showApplicationWindow(desktop);
-      log.info("Opening {} in browser", webURL);
-      try {
-        desktop.browse(new URI(webURL));
-      } catch (IOException | URISyntaxException ex) {
-        log.error("Could not open " + webURL + " in browser.", ex);
-      }
+      showApplicationWindow();
+      openBrowser(webURL);
+    }
+  }
+
+  private void openBrowser(String webURL) {
+    log.info("Opening {} in browser", webURL);
+    boolean supported = true;
+    try {
+      supported = com.github.jjYBdx4IL.utils.awt.Desktop.browse(new URI(webURL));
+    } catch (URISyntaxException ex) {
+      log.error("Could not open " + webURL + " in browser.", ex);
+      supported = false;
+    } catch (UnsupportedOperationException ex) {
+      supported = false;
+    }
+    if (!supported) {
+      log.warn("Opening the browser is unsupported on this platform. "
+          + "Please open {} in your browser manually.", webURL);
+      JOptionPane.showMessageDialog(null,
+          "Cannot open the browser automatically. You can manually browse to " + webURL
+              + " top open the ANNIS interface.");
     }
   }
 

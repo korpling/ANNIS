@@ -37,8 +37,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.0.0-beta.6
-date-released: 2021-04-01
+version: 4.0.0
+date-released: 2021-08-17
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -71,7 +71,7 @@ references:
   title: ANTLR 4 Runtime
   version: 4.7.2
   abbreviation: org.antlr:antlr4-runtime
-  license: NOASSERTION
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/ANTLR_4_Runtime
     directory.
   authors:
@@ -370,6 +370,14 @@ references:
   - name: Thomas Neidhart
   repository-code: http://svn.apache.org/viewvc/commons/proper/email/trunk
 - type: software
+  title: Env Utils
+  version: '1.0'
+  abbreviation: com.github.jjYBdx4IL.utils:env-utils
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Env_Utils directory.
+  authors: []
+  repository-code: https://github.com/jjYBdx4IL/misc/env-utils
+- type: software
   title: FindBugs-jsr305
   version: 3.0.2
   abbreviation: com.google.code.findbugs:jsr305
@@ -508,7 +516,7 @@ references:
   title: JAXB Runtime
   version: 2.3.3
   abbreviation: org.glassfish.jaxb:jaxb-runtime
-  license: NOASSERTION
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/JAXB_Runtime directory.
   authors:
   - name: Roman Grigoriadi
@@ -900,6 +908,14 @@ references:
   authors: []
   repository-code: https://github.com/square/okio/okio/
 - type: software
+  title: Process Utils
+  version: '1.0'
+  abbreviation: com.github.jjYBdx4IL.utils:proc-utils
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Process_Utils directory.
+  authors: []
+  repository-code: https://github.com/jjYBdx4IL/misc/proc-utils
+- type: software
   title: SLF4J API Module
   version: 1.7.30
   abbreviation: org.slf4j:slf4j-api
@@ -1088,10 +1104,18 @@ references:
   authors: []
   repository-code: https://github.com/antlr/stringtemplate4/tree/master
 - type: software
+  title: Swing Utils
+  version: '1.0'
+  abbreviation: com.github.jjYBdx4IL.utils:swing-utils
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Swing_Utils directory.
+  authors: []
+  repository-code: https://github.com/jjYBdx4IL/misc/swing-utils
+- type: software
   title: TXW2 Runtime
   version: 2.3.3
   abbreviation: org.glassfish.jaxb:txw2
-  license: NOASSERTION
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/TXW2_Runtime directory.
   authors:
   - name: Roman Grigoriadi
@@ -1116,6 +1140,15 @@ references:
   - name: Tatu Saloranta
   repository-code: https://github.com/FasterXML/woodstox
 - type: software
+  title: XML Commons External Components XML APIs
+  version: 1.0.b2
+  abbreviation: xml-apis:xml-apis
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/XML_Commons_External_Components_XML_APIs
+    directory.
+  authors: []
+  repository-code: http://svn.apache.org/viewvc/xml/commons/tags/xml-commons-1_0_b2
+- type: software
   title: abego TreeLayout Core
   version: 1.0.3
   abbreviation: org.abego.treelayout:org.abego.treelayout.core
@@ -1127,7 +1160,7 @@ references:
   repository-code: https://github.com/abego/treelayout
 - type: software
   title: atmosphere-runtime
-  version: 2.4.30.vaadin1
+  version: 2.4.30.vaadin4
   abbreviation: com.vaadin.external.atmosphere:atmosphere-runtime
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/atmosphere_runtime
@@ -1202,6 +1235,16 @@ references:
   - name: Hernan Zalazar
   - name: Luciano Balmaceda
   repository-code: https://github.com/auth0/java-jwt
+- type: software
+  title: javax.interceptor API
+  version: 1.2.2
+  abbreviation: javax.interceptor:javax.interceptor-api
+  license: NOASSERTION
+  notes: More license information can be found in the THIRD-PARTY/javax.interceptor_API
+    directory.
+  authors:
+  - name: Marina Vatkina
+  repository-code: https://github.com/javaee/javax.interceptor
 - type: software
   title: javax.transaction API
   version: 1.3.3
@@ -1561,23 +1604,23 @@ references:
   title: tomlj
   version: 1.0.0
   abbreviation: org.tomlj:tomlj
-  license-url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/tomlj directory.
   authors:
   - name: Chris Leishman
   repository-code: https://github.com/tomlj/tomlj
 - type: software
   title: vaadin-client
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-client
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_client directory.
   authors:
   - name: Henri Sara
   repository-code: https://github.com/vaadin/framework/vaadin-client
 - type: software
   title: vaadin-client-compiled
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-client-compiled
   license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_client_compiled
@@ -1587,7 +1630,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-client-compiled
 - type: software
   title: vaadin-compatibility-client
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-compatibility-client
   license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_client
@@ -1597,7 +1640,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-client
 - type: software
   title: vaadin-compatibility-client-compiled
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-compatibility-client-compiled
   license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_client_compiled
@@ -1607,7 +1650,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-client-compiled
 - type: software
   title: vaadin-compatibility-server
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-compatibility-server
   license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_server
@@ -1617,9 +1660,9 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-server
 - type: software
   title: vaadin-compatibility-shared
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-compatibility-shared
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_shared
     directory.
   authors:
@@ -1627,7 +1670,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-shared
 - type: software
   title: vaadin-compatibility-themes
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-compatibility-themes
   license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_themes
@@ -1637,27 +1680,27 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-themes
 - type: software
   title: vaadin-push
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-push
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_push directory.
   authors:
   - name: Henri Sara
   repository-code: https://github.com/vaadin/framework/vaadin-push
 - type: software
   title: vaadin-server
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-server
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_server directory.
   authors:
   - name: Henri Sara
   repository-code: https://github.com/vaadin/framework/vaadin-server
 - type: software
   title: vaadin-shared
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-shared
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_shared directory.
   authors:
   - name: Henri Sara
@@ -1724,9 +1767,9 @@ references:
   repository-code: https://github.com/vaadin/spring/vaadin-spring-boot-starter
 - type: software
   title: vaadin-themes
-  version: 8.12.0
+  version: 8.13.2
   abbreviation: com.vaadin:vaadin-themes
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_themes directory.
   authors:
   - name: Henri Sara

@@ -8,7 +8,7 @@ jobs:
         uses: actions/checkout@v1
       - name: Get the release version from the GITHUB_REF variable as new SHORT_VERSION variable
         run: echo "SHORT_VERSION=$(echo ${GITHUB_REF} | sed -E 's/^refs\/heads\/.*/develop/' | sed -E 's/^(refs\/tags\/v)?(.*)(\.[0-9]+)$/\2/')" >> $GITHUB_ENV
-      - run: misc/download-mdbook.sh 0.3.5
+      - run: misc/download-mdbook.sh 0.4.2
         env:
           OS_NAME: linux
       - name: Generate the user documentation

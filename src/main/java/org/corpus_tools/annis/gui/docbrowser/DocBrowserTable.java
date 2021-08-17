@@ -336,25 +336,29 @@ public class DocBrowserTable extends Table {
    * @return The a list of meta data. Can be empty but never null.
    */
   private Set<SMetaAnnotation> getDocMetaData(String document) {
-    // lookup up meta data in the cache
-    Map<String, Set<SMetaAnnotation>> cachedMetaMap =
+    // Check if the corpus already has a cached map
+    Map<String, Set<SMetaAnnotation>> metaDataMap =
         docMetaDataCache.get(docBrowserPanel.getCorpus());
 
-    if (cachedMetaMap == null) {
-      // get the metadata for the corpus
-      Map<String, Set<SMetaAnnotation>> metaDataMap = new HashMap<>();
-
-      // Search for the document node, map it to Salt and return the attached annotations
-      List<SMetaAnnotation> annos =
-          Helper.getMetaDataDoc(docBrowserPanel.getCorpus(), document, UI.getCurrent());
-      metaDataMap.put(document, Collections.unmodifiableSet(new LinkedHashSet<>(annos)));
-
+    if (metaDataMap == null) {
+      // Create a new cached map for this corpus
+      metaDataMap = new HashMap<>();
       docMetaDataCache.put(docBrowserPanel.getCorpus(), metaDataMap);
-      return metaDataMap.get(document);
-
-    } else {
-      return cachedMetaMap.get(document);
     }
+
+    // Check if the cached map for this corpus already contains this document and directly return if when found
+    Set<SMetaAnnotation> metaAnnos = metaDataMap.get(document);
+    if (metaAnnos != null) {
+      return metaAnnos;
+    }
+
+    // Retrieve the meta data annotations as list
+    List<SMetaAnnotation> annos =
+        Helper.getMetaDataDoc(docBrowserPanel.getCorpus(), document, UI.getCurrent());
+    // Cache the documentation annotations for later use and return them
+    metaAnnos = Collections.unmodifiableSet(new LinkedHashSet<>(annos));
+    metaDataMap.put(document, metaAnnos);
+    return metaAnnos;
   }
 
   public void setContainerFilter(Filter filter) {
@@ -390,14 +394,13 @@ public class DocBrowserTable extends Table {
       String doc = d.getName();
       String docId = d.getId();
 
-      // reverse path and delete the brackets and set a new separator:
-      // corpus > ... > subcorpus > document
       List<String> pathList = Helper.getCorpusPath(d.getId());
       if (pathList == null) {
         pathList = new LinkedList<>();
       }
 
-      Collections.reverse(pathList);
+      // Set a new separator:
+      // corpus > ... > subcorpus > document
       String path = StringUtils.join(pathList, " > ");
 
       // use corpus path for row id, since it should be unique by annis db schema
