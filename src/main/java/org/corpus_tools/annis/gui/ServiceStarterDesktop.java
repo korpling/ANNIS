@@ -152,13 +152,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     btLaunch.setText("<html><u>Open " + webURL + " in browser</u></html>");
     btLaunch.setEnabled(true);
     btLaunch.setName("btLaunch");
-    btLaunch.addActionListener((evt) -> {
-      try {
-        desktop.browse(new URI(webURL));
-      } catch (IOException | URISyntaxException ex) {
-        log.error("Could not open browser", ex);
-      }
-    });
+    btLaunch.addActionListener(evt -> openBrowser(desktop, webURL));
     btLaunch.setPreferredSize(new Dimension(300, 60));
     mainFrame.getContentPane().add(btLaunch, BorderLayout.CENTER);
 
@@ -225,7 +219,12 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
           webURL);
     } else {
       showApplicationWindow(desktop);
-      log.info("Opening {} in browser", webURL);
+      openBrowser(desktop, webURL);
+    }
+  }
+  
+  private void openBrowser(Desktop desktop, String webURL) {
+	  log.info("Opening {} in browser", webURL);
       try {
         desktop.browse(new URI(webURL));
       } catch (IOException | URISyntaxException ex) {
@@ -236,7 +235,6 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     	          + "Please open {} in your browser manually.",
     	          webURL);
       }
-    }
   }
 
   @Override
