@@ -37,7 +37,7 @@ between the first and the second element. Once the Query Result tab is
 shown you may open the "constituents" annotation layer to see the
 corresponding tree.
 
-![](images/tree_expanded.png)
+![](../images/tree_expanded.png)
 
 Note that since the context is set to a number of tokens left and right
 of the search term, the tree for the whole sentence may not be
