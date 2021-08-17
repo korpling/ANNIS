@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.0.0] - 2021-08-17
+
 ### Fixed
 
 - Do not discard dominance edge, when only the target node has an incoming unnamed incoming edge.
@@ -893,7 +895,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.6...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.6...v4.0.0
 [4.0.0-beta.6]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.5...v4.0.0-beta.6
 [4.0.0-beta.5]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.4...v4.0.0-beta.5
 [4.0.0-beta.4]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.3...v4.0.0-beta.4
