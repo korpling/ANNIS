@@ -38,7 +38,7 @@
 		<java.version>1.8</java.version>
 		<vaadin.version>8.13.2</vaadin.version>
 		<start-class>org.corpus_tools.annis.gui.AnnisUiApplication</start-class>
-		<graphannis.version>0.32.0</graphannis.version>
+		<graphannis.version>1.0.0</graphannis.version>
 		<antlr4.version>4.7.2</antlr4.version>
 		<spring.profiles.active>server</spring.profiles.active>
 		<swagger-core-version>1.5.24</swagger-core-version>
@@ -269,7 +269,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice</url>
 							<outputDirectory>${project.build.directory}/native/linux-x86-64/</outputDirectory>
-							<sha256>5ed98f601c0bd3867dc79b8b3ca849c05b3109ef9daf9216a1c90aade12b4cc8</sha256>
+							<sha256>91af0d32c9e8e0ccf4d7e8a0da75046baaf726d6b3a8059669e4cf1890854681</sha256>
 						</configuration>
 					</execution>
 					<execution>
@@ -281,7 +281,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice.exe</url>
 							<outputDirectory>${project.build.directory}/native/win32-x86-64/</outputDirectory>
-							<sha256>171799a8280389ce6a93bf6cff166c8efaeeedf82e027ff040fcdafb729242ea</sha256>
+							<sha256>d65d35bfe21fd632f7b938c2176fff193c97dfc61455e3d804b1dce66fd126ef</sha256>
 						</configuration>
 					</execution>
 					<execution>
@@ -293,7 +293,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice.osx</url>
 							<outputDirectory>${project.build.directory}/native/darwin/</outputDirectory>
-							<sha256>1a339d624a89054b206c3d4ba77ab2ecf99bbdf56a29fbc42fc90351edf9330e</sha256>
+							<sha256>ddc180e1442894e50304a43e56864c782acc5f13d8b8ad1c66eabe3ab8ce31d5</sha256>
 						</configuration>
 					</execution>
 				</executions>
