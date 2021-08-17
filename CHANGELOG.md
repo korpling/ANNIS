@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   For the GUM corpus with mixed dominance for syntax and RST trees, this caused some segments to
   have no connection to any token. (#696)
 - Fix display of document meta annotations in the document browser 
+- Desktop UI aborted execution on KDE when trying to open the browser (#702)
 
 ## [4.0.0-beta.6] - 2021-04-01
 
