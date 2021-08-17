@@ -244,6 +244,9 @@ the edge.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="annis-query-language-aql"><a class="header" href="#annis-query-language-aql">ANNIS Query Language (AQL)</a></h1>
 <p>ANNIS comes with its own query language called ANNIS Query Language (AQL).
 AQL is based on the concept of searching for annotation attributes and relations between them.</p>
+<p>A search is formulated by defining each token, non-terminal node or annotation being searched for as an element. An element can be a token (simply text between quotes: <code>&quot;dogs&quot;</code> or else <code>tok=&quot;dogs&quot;</code>) or an attribute-value pair (such as <code>tok=&quot;dogs&quot;</code>, or optionally with a namespace: <code>tiger:cat=&quot;PP&quot;</code>). Note that different corpora can have completely different annotation names and values - these are not specified by ANNIS. Underspecified tokens or nodes in general may be specified using <code>tok</code> and <code>node</code> respectively.</p>
+<p>Once all elements are declared, relations between the elements (or edges) are specified which must hold between them. The elements are referred back to serially using variable numbers, and linguistic operators bind them together, e.g. <code>#1 &gt; #2</code> meaning the first element dominates the second in a tree or graph. 
+Operators define the possible overlap and adjacency relations between annotation spans, as well as recursive hierarchical relations between nodes. Some operators also allow specific labes to be specified in addition to the operator (see the <a href="aql-operators.html">operator list</a>). </p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="searching-for-word-forms"><a class="header" href="#searching-for-word-forms">Searching for Word Forms</a></h1>
 <p>To search for word forms in ANNIS, simply select a corpus (in this
 example the freely available <a href="https://corpling.uis.georgetown.edu/gum/">GUM corpus</a>) and enter a search string
@@ -371,7 +374,7 @@ annotation (the <em>i</em> stands for 'includes'):</p>
 <p>When searching for word forms and annotation values, it is possible to
 employ wildcards as placeholders for a variety of characters, using
 Regular Expression syntax (see e.g.
-<a href="http://www.regular-expressions.info/">http://www.regular-expressions.info/</a> for detailed information).
+<a href="http://www.regular-expressions.info/">http://www.regular-expressions.info/</a> for detailed information).<sup class="footnote-reference"><a href="#regex-engine">1</a></sup>
 To search for wildcards use slashes instead of quotation marks to
 surround your search term. For example, you can use the <strong>period (<code>.</code>)</strong>
 to replace any single character:</p>
@@ -426,6 +429,10 @@ all non-object dependants of lexical verbs:</p>
 <p>OR (using a shortcut):</p>
 <pre><code>pos=/VV.*/ -&gt;dep[func!=/.*obj.*/] tok
 </code></pre>
+<div class="footnote-definition" id="regex-engine"><sup class="footnote-definition-label">1</sup>
+<p>While there is the POSIX-standard for regular expressions, different search engines might use slightly different syntax and support different types of search constraints, e.g. when searching for Unicode characters.
+ANNIS used to rely on the <a href="https://www.postgresql.org/docs/9.4/functions-matching.html">PostgreSQL regular expression implementation</a> but now uses the Rust library <code>regex</code>. See <a href="https://docs.rs/regex#syntax">https://docs.rs/regex#syntax</a> for the currently supported regular expresssion syntax, as provided by this library.</p>
+</div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="searching-for-trees"><a class="header" href="#searching-for-trees">Searching for Trees</a></h1>
 <p>In corpora containing hierarchical structures, annotations such as
 syntax trees can be searched for by defining terminal or none-terminal
