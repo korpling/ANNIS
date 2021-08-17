@@ -138,7 +138,7 @@
 <p>When searching for word forms and annotation values, it is possible to
 employ wildcards as placeholders for a variety of characters, using
 Regular Expression syntax (see e.g.
-<a href="http://www.regular-expressions.info/">http://www.regular-expressions.info/</a> for detailed information).
+<a href="http://www.regular-expressions.info/">http://www.regular-expressions.info/</a> for detailed information).<sup class="footnote-reference"><a href="#regex-engine">1</a></sup>
 To search for wildcards use slashes instead of quotation marks to
 surround your search term. For example, you can use the <strong>period (<code>.</code>)</strong>
 to replace any single character:</p>
@@ -193,6 +193,10 @@ all non-object dependants of lexical verbs:</p>
 <p>OR (using a shortcut):</p>
 <pre><code>pos=/VV.*/ -&gt;dep[func!=/.*obj.*/] tok
 </code></pre>
+<div class="footnote-definition" id="regex-engine"><sup class="footnote-definition-label">1</sup>
+<p>While there is the POSIX-standard for regular expressions, different search engines might use slightly different syntax and support different types of search constraints, e.g. when searching for Unicode characters.
+ANNIS used to rely on the <a href="https://www.postgresql.org/docs/9.4/functions-matching.html">PostgreSQL regular expression implementation</a> but now uses the Rust library <code>regex</code>. See <a href="https://docs.rs/regex#syntax">https://docs.rs/regex#syntax</a> for the currently supported regular expresssion syntax, as provided by this library.</p>
+</div>
 
                     </main>
 

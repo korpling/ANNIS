@@ -137,6 +137,9 @@
                         <h1 id="annis-query-language-aql"><a class="header" href="#annis-query-language-aql">ANNIS Query Language (AQL)</a></h1>
 <p>ANNIS comes with its own query language called ANNIS Query Language (AQL).
 AQL is based on the concept of searching for annotation attributes and relations between them.</p>
+<p>A search is formulated by defining each token, non-terminal node or annotation being searched for as an element. An element can be a token (simply text between quotes: <code>&quot;dogs&quot;</code> or else <code>tok=&quot;dogs&quot;</code>) or an attribute-value pair (such as <code>tok=&quot;dogs&quot;</code>, or optionally with a namespace: <code>tiger:cat=&quot;PP&quot;</code>). Note that different corpora can have completely different annotation names and values - these are not specified by ANNIS. Underspecified tokens or nodes in general may be specified using <code>tok</code> and <code>node</code> respectively.</p>
+<p>Once all elements are declared, relations between the elements (or edges) are specified which must hold between them. The elements are referred back to serially using variable numbers, and linguistic operators bind them together, e.g. <code>#1 &gt; #2</code> meaning the first element dominates the second in a tree or graph. 
+Operators define the possible overlap and adjacency relations between annotation spans, as well as recursive hierarchical relations between nodes. Some operators also allow specific labes to be specified in addition to the operator (see the <a href="aql-operators.html">operator list</a>). </p>
 
                     </main>
 
