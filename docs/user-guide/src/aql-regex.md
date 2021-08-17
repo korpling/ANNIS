@@ -3,7 +3,7 @@
 When searching for word forms and annotation values, it is possible to
 employ wildcards as placeholders for a variety of characters, using
 Regular Expression syntax (see e.g.
-[http://www.regular-expressions.info/](http://www.regular-expressions.info/) for detailed information).
+[http://www.regular-expressions.info/](http://www.regular-expressions.info/) for detailed information).[^regex-engine]
 To search for wildcards use slashes instead of quotation marks to
 surround your search term. For example, you can use the **period (`.`)**
 to replace any single character:
@@ -84,3 +84,7 @@ OR (using a shortcut):
 ```
 pos=/VV.*/ ->dep[func!=/.*obj.*/] tok
 ```
+
+
+[^regex-engine]: While there is the POSIX-standard for regular expressions, different search engines might use slightly different syntax and support different types of search constraints, e.g. when searching for Unicode characters.
+ANNIS used to rely on the [PostgreSQL regular expression implementation](https://www.postgresql.org/docs/9.4/functions-matching.html) but now uses the Rust library `regex`. See <https://docs.rs/regex#syntax> for the currently supported regular expresssion syntax, as provided by this library.
