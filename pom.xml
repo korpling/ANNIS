@@ -436,6 +436,12 @@
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
+		
+		<dependency>
+		  <groupId>com.github.jjYBdx4IL.utils</groupId>
+		  <artifactId>swing-utils</artifactId>
+		  <version>1.0</version>
+		</dependency>
 
 
 		<dependency>
