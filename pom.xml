@@ -46,17 +46,6 @@
 		<kotlin.version>1.4.0</kotlin.version>
 	</properties>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
 	<repositories>
 		<repository>
 			<id>vaadin-snapshots</id>
