@@ -1,6 +1,26 @@
 on: release
 name: Deploy ANNIS release documentation
 jobs:
+  deploy_release_binaries:
+    name: Deploy release Windows and Linux binaries
+    runs-on: ubuntu-20.04
+    steps:
+        - name: Checkout
+          uses: actions/checkout@v2
+        - name: Set JAVA_HOME to OpenJDK 8
+          run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
+        - name: Build server binary
+          run: mvn clean install
+        - name: Build desktop binary
+          run: mvn -Pdesktop install
+        - name: Release assets on GitHub
+          uses: softprops/action-gh-release@v0.1.5
+          with:
+            files: |
+              target/annis-*-server.jar
+              target/annis-*-desktop.jar
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy_documentation:
     runs-on: ubuntu-20.04
     steps:
