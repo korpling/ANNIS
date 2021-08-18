@@ -4,15 +4,16 @@ import java.util.Collection;
 import java.util.LinkedList;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 public class DesktopAuthentication implements Authentication {
 
-  private OAuth2User principal;
+  private static final long serialVersionUID = -7671167490817088267L;
+  private DefaultOAuth2User principal;
   private String token;
   private boolean isAuthenticated;
 
-  public DesktopAuthentication(OAuth2User principal, String token) {
+  public DesktopAuthentication(DefaultOAuth2User principal, String token) {
     super();
     this.principal = principal;
     this.token = token;

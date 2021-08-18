@@ -717,7 +717,7 @@ public class Helper {
   }
 
   public static Set<String> getUserRoles(OAuth2User user) {
-    final Set<String> result = new LinkedHashSet<String>();
+    final Set<String> result = new LinkedHashSet<>();
     Object rolesRaw = user.getAttributes().get(SecurityConfiguration.ROLES_CLAIM);
     if (rolesRaw instanceof List<?>) {
       List<?> roles = (List<?>) rolesRaw;

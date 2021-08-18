@@ -45,7 +45,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 import org.tomlj.Toml;
 import org.tomlj.TomlArray;
@@ -201,7 +200,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     LinkedHashMap<String, Object> claims = new LinkedHashMap<>();
     claims.put(SecurityConfiguration.ROLES_CLAIM, roles);
     claims.put("sub", USER_NAME);
-    OAuth2User user = new DefaultOAuth2User(grantedAuthorities, claims, "sub");
+    DefaultOAuth2User user = new DefaultOAuth2User(grantedAuthorities, claims, "sub");
 
     this.desktopUserCredentials =
         Optional.of(new DesktopAuthentication(user, signedToken));

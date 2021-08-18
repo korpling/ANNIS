@@ -1,5 +1,6 @@
 package org.corpus_tools.annis.gui.security;
 
+import java.io.Serializable;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.oauth2.client.authentication.OAuth2LoginAuthenticationToken;
@@ -7,8 +8,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class AuthenticationSuccessListener implements 
-ApplicationListener<AuthenticationSuccessEvent> {
+    ApplicationListener<AuthenticationSuccessEvent>, Serializable {
 
+  private static final long serialVersionUID = 108867628342416834L;
   private String token;
 	
 	@Override
