@@ -1,7 +1,7 @@
 package org.corpus_tools.annis.gui.security;
 
+import com.google.common.base.Preconditions;
 import java.util.Collection;
-import java.util.LinkedList;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -9,25 +9,27 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 public class DesktopAuthentication implements Authentication {
 
   private static final long serialVersionUID = -7671167490817088267L;
-  private DefaultOAuth2User principal;
-  private String token;
+  private final DefaultOAuth2User principal;
+  private final String token;
   private boolean isAuthenticated;
 
   public DesktopAuthentication(DefaultOAuth2User principal, String token) {
     super();
+    Preconditions.checkNotNull(principal);
+    Preconditions.checkNotNull(token);
     this.principal = principal;
     this.token = token;
-    this.isAuthenticated = principal != null && token != null;
+    this.isAuthenticated = true;
   }
 
   @Override
   public String getName() {
-    return principal == null ? null : principal.getName();
+    return principal.getName();
   }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return principal == null ? new LinkedList<>() : principal.getAuthorities();
+    return principal.getAuthorities();
   }
 
   @Override
