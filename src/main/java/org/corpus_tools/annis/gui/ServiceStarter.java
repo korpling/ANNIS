@@ -18,7 +18,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
@@ -46,10 +45,8 @@ import org.tomlj.TomlTable;
 @Component
 @Profile("!desktop")
 public class ServiceStarter
-    implements ApplicationListener<ApplicationReadyEvent>, DisposableBean, Serializable {
+    implements ApplicationListener<ApplicationReadyEvent>, DisposableBean {
 
-
-  private static final long serialVersionUID = 2832844349867850712L;
 
   private final static Logger log = LoggerFactory.getLogger(ServiceStarter.class);
 

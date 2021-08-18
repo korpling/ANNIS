@@ -73,7 +73,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.security.core.Authentication;
 
 /**
  *
@@ -156,8 +155,6 @@ public class EmbeddedVisUI extends CommonUI {
   @Autowired
   private List<VisualizerPlugin> visualizers;
 
-  @Autowired
-  private ServiceStarter serviceStarter;
 
   @Autowired
   private transient ServletContext servletContext;
@@ -169,11 +166,12 @@ public class EmbeddedVisUI extends CommonUI {
   @Autowired
   private UIConfig config;
 
-  @Autowired
-  private AuthenticationSuccessListener authListener;
+  private final AuthenticationSuccessListener authListener;
 
-  public EmbeddedVisUI() {
-    super(URL_PREFIX);
+  @Autowired
+  public EmbeddedVisUI(ServiceStarter serviceStarter, AuthenticationSuccessListener authListener) {
+    super(URL_PREFIX, serviceStarter, authListener);
+    this.authListener = authListener;
   }
 
   private void displayGeneralHelp() {
@@ -406,13 +404,6 @@ public class EmbeddedVisUI extends CommonUI {
   @Override
   protected void init(VaadinRequest request) {
     super.init(request);
-
-    Optional<Authentication> desktopAuth = serviceStarter.getDesktopUserToken();
-    if (desktopAuth.isPresent()) {
-      // Login the provided desktop user
-      getSecurityContext().setAuthentication(desktopAuth.get());
-      authListener.setToken(desktopAuth.get().getCredentials().toString());
-    }
 
     String rawPath = request.getPathInfo();
     attachToPath(rawPath, request);

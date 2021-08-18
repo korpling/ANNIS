@@ -51,7 +51,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
-import org.springframework.security.core.Authentication;
 
 /**
  * GUI for searching in corpora.
@@ -91,8 +90,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired
   private UIConfig config;
 
-  @Autowired
-  private AuthenticationSuccessListener authListener;
+  private final AuthenticationSuccessListener authListener;
 
   private AdminView adminView;
 
@@ -101,8 +99,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired
   private Environment environment;
 
-  @Autowired
-  private ServiceStarter serviceStarter;
 
   @Autowired(required = false)
   private OAuth2ClientProperties oauth2Clients;
@@ -115,8 +111,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
    */
   private MainToolbar toolbar;
 
-  public AnnisUI() {
-    super("");
+  @Autowired
+  public AnnisUI(ServiceStarter serviceStarter, AuthenticationSuccessListener authListener) {
+    super("", serviceStarter, authListener);
+    this.authListener = authListener;
     initTransients();
   }
 
@@ -246,15 +244,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     loadInstanceFonts();
 
-    Optional<Authentication> desktopAuth =
-        serviceStarter.getDesktopUserToken();
-    if (desktopAuth.isPresent()) {
-      // Login the provided desktop user
-      getSecurityContext().setAuthentication(desktopAuth.get());
-      authListener.setToken(desktopAuth.get().getCredentials().toString());
+    if (Helper.getUser(this).isPresent()) {
       getToolbar().onLogin();
     }
-
+    
     Object fragmentToRestore =
         VaadinSession.getCurrent().getAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE);
     if (fragmentToRestore instanceof String) {
