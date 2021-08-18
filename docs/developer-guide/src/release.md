@@ -2,9 +2,6 @@
 
 ## Introduction
 
-The release process, including all necessary tests, might take several days and includes fixing bugs that are only discovered in the release testing process. 
-**Never ever add new features in this release process**, there is the separate "develop" branch which you can use for this purposes.
-
 You must have [mdBook](https://github.com/rust-lang-nursery/mdBook) installed to make a release.
 Otherwise the documentation can't be created.
 
@@ -41,8 +38,4 @@ If no known bugs are left to fix go to the next section.
 3. Create a new **release on GitHub** including the changelog. Upload the binaries from Maven repository to GitHub release as well.
 
 A new version of the User and Developer Guide will be deployed by the GitHub Actions CI.
-
-
-
-
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MDBOOK_VERSION=${1:-0.3.1}
+MDBOOK_VERSION=${1:-0.4.2}
 
 install_mdbook=false
 
