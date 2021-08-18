@@ -34,6 +34,5 @@ If no known bugs are left to fix go to the next section.
 
 
 1. **Finish** the release by executing either `mvn gitflow:release-finish` for regular releases or `mvn gitflow:hotfix-finish` for hotfixes.
-2. **Release** the staging repository to Maven Central with the Nexus interface: [https://oss.sonatype.org/](https://oss.sonatype.org/)
-3. Create a new **release on GitHub** including the changelog. The release binaries and a new version of the User and Developer Guide will be deployed by the GitHub Actions CI.
+2. Create a new **release on GitHub** including the changelog. The release binaries and a new version of the User and Developer Guide will be deployed by the GitHub Actions CI.
 
