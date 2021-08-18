@@ -49,15 +49,9 @@ import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.event.AbstractAuthenticationEvent;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
 
 /**
  * GUI for searching in corpora.
@@ -252,13 +246,12 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     loadInstanceFonts();
 
-    Optional<UsernamePasswordAuthenticationToken> desktopUser =
+    Optional<Authentication> desktopAuth =
         serviceStarter.getDesktopUserToken();
-    if (desktopUser.isPresent()) {
+    if (desktopAuth.isPresent()) {
       // Login the provided desktop user
-      UsernamePasswordAuthenticationToken token = desktopUser.get();
-      getSecurityContext().setAuthentication(token);
-
+      getSecurityContext().setAuthentication(desktopAuth.get());
+      authListener.setToken(desktopAuth.get().getCredentials().toString());
       getToolbar().onLogin();
     }
 
@@ -272,7 +265,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   }
 
   @Override
-  protected OAuth2AccessToken getLastAccessToken() {
+  protected String getLastAccessToken() {
     return authListener.getToken();
   }
 

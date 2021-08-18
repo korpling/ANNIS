@@ -33,8 +33,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
@@ -169,7 +167,7 @@ public abstract class CommonUI extends AnnisBaseUI {
         return urlPrefix;
     }
     
-    protected abstract OAuth2AccessToken getLastAccessToken();
+    protected abstract String getLastAccessToken();
 
     public ApiClient getClient() {
       
@@ -179,9 +177,8 @@ public abstract class CommonUI extends AnnisBaseUI {
 
       final Optional<OAuth2User> user = Helper.getUser(getSecurityContext());
       String bearerToken = null;
-      OAuth2AccessToken lastToken = getLastAccessToken();
-      if (user.isPresent() && lastToken != null) {
-    	  bearerToken = lastToken.getTokenValue();
+      if (user.isPresent()) {
+        bearerToken = getLastAccessToken();
       }
       final org.corpus_tools.annis.auth.Authentication auth =
           client.getAuthentication("bearerAuth");

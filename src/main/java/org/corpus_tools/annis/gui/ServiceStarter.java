@@ -36,7 +36,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.tomlj.Toml;
 import org.tomlj.TomlParseResult;
@@ -229,7 +229,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         }
     }
 
-    public Optional<UsernamePasswordAuthenticationToken> getDesktopUserToken() {
+    public Optional<Authentication> getDesktopUserToken() {
         return Optional.empty();
     }
 }

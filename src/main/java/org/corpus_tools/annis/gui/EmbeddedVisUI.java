@@ -73,9 +73,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.core.Authentication;
 
 /**
  *
@@ -409,11 +407,11 @@ public class EmbeddedVisUI extends CommonUI {
   protected void init(VaadinRequest request) {
     super.init(request);
 
-    Optional<UsernamePasswordAuthenticationToken> desktopUser = serviceStarter.getDesktopUserToken();
-    if(desktopUser.isPresent()) {
+    Optional<Authentication> desktopAuth = serviceStarter.getDesktopUserToken();
+    if (desktopAuth.isPresent()) {
       // Login the provided desktop user
-      UsernamePasswordAuthenticationToken token = desktopUser.get();
-      SecurityContextHolder.getContext().setAuthentication(token);
+      getSecurityContext().setAuthentication(desktopAuth.get());
+      authListener.setToken(desktopAuth.get().getCredentials().toString());
     }
 
     String rawPath = request.getPathInfo();
@@ -497,7 +495,7 @@ public class EmbeddedVisUI extends CommonUI {
   }
   
   @Override
-  protected OAuth2AccessToken getLastAccessToken() {
+  protected String getLastAccessToken() {
       return authListener.getToken();
   }
 

@@ -20,12 +20,12 @@ import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.declarative.Design;
+import java.util.Optional;
 import javax.servlet.ServletContext;
-
 import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.core.Authentication;
 
 @SpringUI(path = "/unsupported-query")
 @Widgetset("org.corpus_tools.annis.gui.widgets.gwt.AnnisWidgetSet")
@@ -80,6 +80,8 @@ public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
   @Autowired
   private AuthenticationSuccessListener authListener;
 
+  @Autowired
+  private ServiceStarter serviceStarter;
 
   private UnsupportedQueryPanel panel;
 
@@ -95,6 +97,13 @@ public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
     panel = new UnsupportedQueryPanel();
     panel.setUrl(request.getParameter("url"));
     setContent(panel);
+
+    Optional<Authentication> desktopAuth = serviceStarter.getDesktopUserToken();
+    if (desktopAuth.isPresent()) {
+      // Login the provided desktop user
+      getSecurityContext().setAuthentication(desktopAuth.get());
+      authListener.setToken(desktopAuth.get().getCredentials().toString());
+    }
   }
 
 
@@ -128,7 +137,7 @@ public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
   }
   
   @Override
-  protected OAuth2AccessToken getLastAccessToken() {
+  protected String getLastAccessToken() {
       return authListener.getToken();
   }
 }
