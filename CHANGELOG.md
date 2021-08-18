@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Support for Oauth2 authorization services like https://github.com/korpling/shibboleth-oauth2-forwarding instead of only OpenID Connect
+
 ## [4.0.0] - 2021-08-17
 
 ### Fixed
