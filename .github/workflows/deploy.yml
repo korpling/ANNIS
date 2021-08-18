@@ -2,7 +2,7 @@ on: release
 name: Deploy ANNIS release documentation
 jobs:
   deploy_release_binaries:
-    name: Deploy release Windows and Linux binaries
+    name: Deploy release binaries
     runs-on: ubuntu-20.04
     steps:
         - name: Checkout
