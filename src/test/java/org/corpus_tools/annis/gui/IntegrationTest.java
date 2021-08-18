@@ -5,6 +5,7 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._setValue;
 import static org.corpus_tools.annis.gui.TestHelper.awaitCondition;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -38,6 +39,7 @@ import kotlin.Pair;
 import net.jcip.annotations.NotThreadSafe;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
 import org.corpus_tools.annis.gui.components.medialement.MediaElementPlayer;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserPanel;
@@ -279,8 +281,16 @@ class IntegrationTest {
 
     _click(_get(Button.class, spec -> spec.withCaption("About ANNIS")));
 
-    // Check that the windows has opened
-    assertNotNull(_get(Window.class, spec -> spec.withCaption("About ANNIS")));
+    // Check that the windows has opened and no error message is shown
+    Window window = _get(Window.class, spec -> spec.withCaption("About ANNIS"));
+    assertNotNull(window);
+    assertEquals(0, _find(ExceptionDialog.class).size());
+
+    // Check the CITATION.cff file has been included
+    com.vaadin.ui.TextArea txt = _get(window, com.vaadin.ui.TextArea.class);
+    assertNotNull(txt);
+    assertNotNull(txt.getValue());
+    assertNotEquals("", txt.getValue());
 
     // Close the window again
     Button btClose = _get(Button.class, spec -> spec.withCaption("Close"));
