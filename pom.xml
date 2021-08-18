@@ -162,17 +162,17 @@
 				<artifactId>gitflow-maven-plugin</artifactId>
 				<version>1.16.0</version>
 				<configuration>
-					<pushRemote>true</pushRemote>
+					<gpgSignTag>true</gpgSignTag>
+					<gpgSignCommit>true</gpgSignCommit>
 					<verbose>true</verbose>
+					<skipFeatureVersion>true</skipFeatureVersion>
+					<versionDigitToIncrement>1</versionDigitToIncrement>
+					<pushRemote>true</pushRemote>
+					<keepBranch>false</keepBranch>
+					<digitsOnlyDevVersion>true</digitsOnlyDevVersion>
+					<versionsForceUpdate>true</versionsForceUpdate>
 					<gitFlowConfig>
-						<productionBranch>master</productionBranch>
-						<developmentBranch>develop</developmentBranch>
-						<featureBranchPrefix>feature/</featureBranchPrefix>
-						<releaseBranchPrefix>release/</releaseBranchPrefix>
-						<hotfixBranchPrefix>hotfix/</hotfixBranchPrefix>
-						<supportBranchPrefix>support/</supportBranchPrefix>
-						<versionTagPrefix>annis-</versionTagPrefix>
-						<origin>origin</origin>
+						<versionTagPrefix>v</versionTagPrefix>
 					</gitFlowConfig>
 				</configuration>
 			</plugin>
