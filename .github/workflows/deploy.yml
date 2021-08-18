@@ -1,5 +1,5 @@
 on: release
-name: Deploy ANNIS release documentation
+name: Deploy ANNIS
 jobs:
   deploy_release_binaries:
     name: Deploy release binaries
