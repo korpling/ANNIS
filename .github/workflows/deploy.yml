@@ -7,7 +7,7 @@ jobs:
     steps:
         - name: Checkout
           uses: actions/checkout@v2
-        - name: Set JAVA_HOME to OpenJDK 8
+        - name: Set JAVA_HOME to included JDK 8
           run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
         - name: Build server binary
           run: mvn clean install
