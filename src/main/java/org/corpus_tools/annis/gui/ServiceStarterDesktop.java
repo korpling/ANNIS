@@ -32,6 +32,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.corpus_tools.annis.gui.security.DesktopAuthentication;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +41,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.core.oidc.OidcIdToken;
-import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 import org.tomlj.Toml;
 import org.tomlj.TomlArray;
@@ -58,7 +58,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
   private static final String USER_NAME = "desktop";
   private static final Logger log = LoggerFactory.getLogger(ServiceStarterDesktop.class);
   private final String secret = RandomStringUtils.randomAlphanumeric(50);
-  private Optional<UsernamePasswordAuthenticationToken> desktopUserCredentials = Optional.empty();
+  private Optional<Authentication> desktopUserCredentials = Optional.empty();
 
   @Value("${server.port}")
   private String serverPort;
@@ -200,10 +200,10 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     LinkedHashMap<String, Object> claims = new LinkedHashMap<>();
     claims.put(SecurityConfiguration.ROLES_CLAIM, roles);
     claims.put("sub", USER_NAME);
-    OidcIdToken token = new OidcIdToken(signedToken, issuedAt, expiresAt, claims);
-    DefaultOidcUser user = new DefaultOidcUser(grantedAuthorities, token);
+    DefaultOAuth2User user = new DefaultOAuth2User(grantedAuthorities, claims, "sub");
+
     this.desktopUserCredentials =
-        Optional.of(new UsernamePasswordAuthenticationToken(user, signedToken, grantedAuthorities));
+        Optional.of(new DesktopAuthentication(user, signedToken));
 
     // Open the application in the browser
     String webURL = "http://localhost:" + serverPort;
@@ -241,7 +241,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
   }
 
   @Override
-  public Optional<UsernamePasswordAuthenticationToken> getDesktopUserToken() {
+  public Optional<Authentication> getDesktopUserToken() {
     return desktopUserCredentials;
   }
 

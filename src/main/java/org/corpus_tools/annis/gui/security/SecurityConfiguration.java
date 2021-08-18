@@ -46,10 +46,12 @@ public class SecurityConfiguration {
           .and().oauth2Login();
     }
 
+
     @Override
     public void configure(WebSecurity web) {
       ignoreVaadinWebSecurity(web);
     }
+    
   }
 
   @EnableWebSecurity
