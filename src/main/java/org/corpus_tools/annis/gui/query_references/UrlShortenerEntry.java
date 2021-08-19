@@ -22,7 +22,7 @@ public class UrlShortenerEntry {
   @Column
   private Date created;
 
-  @Column(nullable = false)
+  @Column(nullable = false, unique = true)
   private URI url;
 
   @Column
