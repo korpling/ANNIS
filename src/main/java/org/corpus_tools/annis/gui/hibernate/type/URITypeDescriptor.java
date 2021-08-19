@@ -36,9 +36,7 @@ public class URITypeDescriptor extends AbstractTypeDescriptor<URI>
     if (value == null) {
       return null;
     }
-    if (String.class.isAssignableFrom(type)) {
-      return (X) toString(value);
-    } else if(CharacterStream.class.isAssignableFrom(type)) {
+    if (CharacterStream.class.isAssignableFrom(type)) {
       return (X) new CharacterStreamImpl(toString(value));
     }
     throw unknownUnwrap(type);
@@ -49,11 +47,7 @@ public class URITypeDescriptor extends AbstractTypeDescriptor<URI>
     if (value == null) {
       return null;
     }
-    if (String.class.isInstance(value)) {
-      return fromString((String) value);
-    } else if (CharacterStream.class.isInstance(value)) {
-      return fromString(((CharacterStream) value).asString());
-    } else if (Clob.class.isInstance(value)) {
+    if (value instanceof Clob) {
       Clob c = (Clob) value;
       try {
         return fromString(CharStreams.toString(c.getCharacterStream()));
