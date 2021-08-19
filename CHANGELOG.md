@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Editing a group shows an error message about a missing
   `PopupTwinColumnSelectMultiline` class.
+- Default server configuration now creates the needed SQL tables for the reference
+  links. This fixes an error message in the administrator view.
 
 
 ## [4.0.0] - 2021-08-17
