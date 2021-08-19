@@ -22,10 +22,10 @@ public class UrlShortenerEntry {
   @Column
   private Date created;
 
-  @Column(nullable = false, unique = true)
+  @Column(nullable = false, unique = true, length = 16 * 1024 * 1024)
   private URI url;
 
-  @Column
+  @Column(length = 16 * 1024 * 1024)
   private URI temporaryUrl;
 
   public UUID getId() {
