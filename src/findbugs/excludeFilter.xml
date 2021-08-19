@@ -24,7 +24,6 @@
       </Or>
       <Or>
         <Class name="org.corpus_tools.annis.gui.admin.EditSingleGroup"/>
-        <Class name="org.corpus_tools.annis.gui.admin.EditSingleUser"/>
         <Class name="org.corpus_tools.annis.gui.HistoryPanel"/>
         <Class name="org.corpus_tools.annis.gui.CorpusBrowserPanel"/>  
       </Or>
