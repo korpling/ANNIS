@@ -36,7 +36,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.tomlj.Toml;
 import org.tomlj.TomlParseResult;
@@ -44,192 +44,189 @@ import org.tomlj.TomlTable;
 
 @Component
 @Profile("!desktop")
-public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent>, DisposableBean {
-
-    private final static Logger log = LoggerFactory.getLogger(ServiceStarter.class);
-
-    @Autowired
-    private UIConfig config;
-
-    @Autowired
-    private ResourceLoader resourceLoader;
-    private final AtomicBoolean abortThread = new AtomicBoolean();
-
-    private Process backgroundProcess;
-
-    private Thread tReaderOut;
-
-    private Thread tReaderErr;
-
-    @Override
-    public void onApplicationEvent(final ApplicationReadyEvent event) {
-        if (config.getWebserviceUrl() == null || config.getWebserviceUrl().isEmpty()) {
-            // start the bundled web service
-            try {
-                // Extract the bundled resource to a temporary file
-                Optional<String> execPath = Optional.empty();
-                if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
-                    if (SystemUtils.IS_OS_LINUX) {
-                        execPath = Optional.of("linux-x86-64/graphannis-webservice");
-                    } else if (SystemUtils.IS_OS_MAC_OSX) {
-                        execPath = Optional.of("darwin/graphannis-webservice.osx");
-                    } else if (SystemUtils.IS_OS_WINDOWS) {
-                        execPath = Optional.of("win32-x86-64/graphannis-webservice.exe");
-                    }
-                } else {
-                  log.error(
-                      "GraphANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\"), but this is reported as architecture {}!",
-                      SystemUtils.OS_ARCH);
-                }
-
-                if (execPath.isPresent()) {
-                    File tmpExec = File.createTempFile("graphannis-webservice-", "");
-                    Resource resource = resourceLoader.getResource("classpath:" + execPath.get());
-                    if (resource.exists()) {
-                        log.info("Extracting the bundled graphANNIS service to {}",
-                                tmpExec.getAbsolutePath());
-                        FileUtils.copyInputStreamToFile(resource.getInputStream(), tmpExec);
-                        if (!tmpExec.setExecutable(true)) {
-                          log.warn("Could not mark the bundled graphANNIS service as executable");
-                        }
-
-                        // If the configuration does not exist, create an empty file
-                        File serviceConfigFile = getServiceConfig();
-
-                        // Start the process and read output/error stream in background threads
-                        log.info(
-                                "Starting the bundled graphANNIS service with configuration file {}",
-                                serviceConfigFile.getAbsolutePath());
-                        backgroundProcess = new ProcessBuilder(tmpExec.getAbsolutePath(),
-                                "--config", serviceConfigFile.getAbsolutePath()).start();
-                        final BufferedReader outputStream = new BufferedReader(
-                                new InputStreamReader(backgroundProcess.getInputStream(),
-                                        StandardCharsets.UTF_8));
-
-                        final BufferedReader errorStream = new BufferedReader(new InputStreamReader(
-                                backgroundProcess.getErrorStream(), StandardCharsets.UTF_8));
-
-                        tReaderOut = new Thread(() -> {
-                            while (!this.abortThread.get() && backgroundProcess.isAlive()) {
-                                String line;
-                                try {
-                                    line = outputStream.readLine();
-                                    if (line != null) {
-                                        log.info(line);
-                                    }
-                                } catch (IOException ex) {
-                                    if (!this.abortThread.get()) {
-                                        log.error("Could not read service output", ex);
-                                    }
-                                    break;
-                                }
-                                Thread.yield();
-                            }
-                        });
-                        tReaderOut.start();
-                        tReaderErr = new Thread(() -> {
-                            while (!this.abortThread.get() && backgroundProcess.isAlive()) {
-                                String line;
-                                try {
-                                    line = errorStream.readLine();
-                                    if (line != null) {
-                                        log.error(line);
-                                    }
-                                } catch (IOException ex) {
-                                    if (!this.abortThread.get()) {
-                                        log.error("Could not read service error output", ex);
-                                    }
-                                    break;
-                                }
-                                Thread.yield();
-                            }
-                        });
-                        tReaderErr.start();
-
-                        // Use the provided service configuration to get the correct port
-                        TomlParseResult parsedServiceConfig =
-                            Toml.parse(serviceConfigFile.toPath());
-                        config.setWebserviceUrl(getServiceURL(parsedServiceConfig));
-                    }
-                }
-            } catch (final IOException ex) {
-                log.error(
-                    "Could not start integrated graphANNIS service, configure \"annis.webservice-url\" to set an existing service.",
-                        ex);
-            }
-        }
-    }
+public class ServiceStarter
+    implements ApplicationListener<ApplicationReadyEvent>, DisposableBean {
 
 
-    protected String getServiceURL(TomlParseResult config) {
-      return "http://localhost:" + config.getLong("bind.port", () -> 5711l) + "/v1";
-    }
+  private final static Logger log = LoggerFactory.getLogger(ServiceStarter.class);
 
-    protected File getServiceConfig() throws IOException {
-        File result = new File(config.getWebserviceConfig());
-        if (!result.exists()) {
-            File parentDir = result.getParentFile();
-            if (!parentDir.mkdirs()) {
-              log.error("Could not create directory {}", parentDir.getAbsolutePath());
-            }
-            if (!result.createNewFile()) {
-              log.error("Could not create new file {}", result.getAbsolutePath());
-            }
-        }
-        // Set to a default data folder and SQLite file
-        TomlParseResult configToml = Toml.parse(result.toPath());
-        Map<String, Object> config = configToml.toMap();
-        TomlTable databaseTable = configToml.getTable("database");
-        Map<String, Object> databaseConfig;
-        if (databaseTable == null) {
-            // Create a new map instead of re-using the existing one
-            databaseConfig = new LinkedHashMap<>();
-            config.put("database", databaseConfig);
+  @Autowired
+  private UIConfig config;
+
+  @Autowired
+  private ResourceLoader resourceLoader;
+  private final AtomicBoolean abortThread = new AtomicBoolean();
+
+  private Process backgroundProcess;
+
+  private Thread tReaderOut;
+
+  private Thread tReaderErr;
+
+  @Override
+  public void onApplicationEvent(final ApplicationReadyEvent event) {
+    if (config.getWebserviceUrl() == null || config.getWebserviceUrl().isEmpty()) {
+      // start the bundled web service
+      try {
+        // Extract the bundled resource to a temporary file
+        Optional<String> execPath = Optional.empty();
+        if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
+          if (SystemUtils.IS_OS_LINUX) {
+            execPath = Optional.of("linux-x86-64/graphannis-webservice");
+          } else if (SystemUtils.IS_OS_MAC_OSX) {
+            execPath = Optional.of("darwin/graphannis-webservice.osx");
+          } else if (SystemUtils.IS_OS_WINDOWS) {
+            execPath = Optional.of("win32-x86-64/graphannis-webservice.exe");
+          }
         } else {
-            databaseConfig = databaseTable.toMap();
-        }
-        // Add the graphannis data and sqlite location of not existing yet
-        Object previousDatabase = databaseConfig.putIfAbsent("graphannis", Paths
-            .get(System.getProperty("user.home"), ".annis", "v4").toAbsolutePath().toString());
-        Object previousSqlite = databaseConfig.putIfAbsent("sqlite",
-            Paths.get(System.getProperty("user.home"), ".annis", "v4", "service_data.sqlite3")
-                        .toAbsolutePath().toString());
-
-        if (previousDatabase == null || previousSqlite == null) {
-            // Write updated configuration to file
-            TomlWriter writer = new TomlWriter();
-            writer.write(config, result);
+          log.error(
+              "GraphANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\"), but this is reported as architecture {}!",
+              SystemUtils.OS_ARCH);
         }
 
-        return result;
-    }
-
-    @Override
-    public void destroy() throws Exception {
-        this.abortThread.set(true);
-
-        if (this.tReaderOut != null) {
-            this.tReaderOut.interrupt();
-        }
-
-        if (this.tReaderErr != null) {
-            this.tReaderErr.interrupt();
-        }
-
-        if (this.backgroundProcess != null) {
-            this.backgroundProcess.destroy();
-            if (!this.backgroundProcess.waitFor(5, TimeUnit.SECONDS)) {
-                // Destroy the process by force after 5 seconds
-                log.warn(
-                        "GraphANNIS process did not stop after 5 seconds, stopping it forcefully");
-                this.backgroundProcess.destroyForcibly();
-            } else {
-                log.info("Stopped graphANNIS process");
+        if (execPath.isPresent()) {
+          File tmpExec = File.createTempFile("graphannis-webservice-", "");
+          Resource resource = resourceLoader.getResource("classpath:" + execPath.get());
+          if (resource.exists()) {
+            log.info("Extracting the bundled graphANNIS service to {}", tmpExec.getAbsolutePath());
+            FileUtils.copyInputStreamToFile(resource.getInputStream(), tmpExec);
+            if (!tmpExec.setExecutable(true)) {
+              log.warn("Could not mark the bundled graphANNIS service as executable");
             }
+
+            // If the configuration does not exist, create an empty file
+            File serviceConfigFile = getServiceConfig();
+
+            // Start the process and read output/error stream in background threads
+            log.info("Starting the bundled graphANNIS service with configuration file {}",
+                serviceConfigFile.getAbsolutePath());
+            backgroundProcess = new ProcessBuilder(tmpExec.getAbsolutePath(), "--config",
+                serviceConfigFile.getAbsolutePath()).start();
+            final BufferedReader outputStream = new BufferedReader(
+                new InputStreamReader(backgroundProcess.getInputStream(), StandardCharsets.UTF_8));
+
+            final BufferedReader errorStream = new BufferedReader(
+                new InputStreamReader(backgroundProcess.getErrorStream(), StandardCharsets.UTF_8));
+
+            tReaderOut = new Thread(() -> {
+              while (!this.abortThread.get() && backgroundProcess.isAlive()) {
+                String line;
+                try {
+                  line = outputStream.readLine();
+                  if (line != null) {
+                    log.info(line);
+                  }
+                } catch (IOException ex) {
+                  if (!this.abortThread.get()) {
+                    log.error("Could not read service output", ex);
+                  }
+                  break;
+                }
+                Thread.yield();
+              }
+            });
+            tReaderOut.start();
+            tReaderErr = new Thread(() -> {
+              while (!this.abortThread.get() && backgroundProcess.isAlive()) {
+                String line;
+                try {
+                  line = errorStream.readLine();
+                  if (line != null) {
+                    log.error(line);
+                  }
+                } catch (IOException ex) {
+                  if (!this.abortThread.get()) {
+                    log.error("Could not read service error output", ex);
+                  }
+                  break;
+                }
+                Thread.yield();
+              }
+            });
+            tReaderErr.start();
+
+            // Use the provided service configuration to get the correct port
+            TomlParseResult parsedServiceConfig = Toml.parse(serviceConfigFile.toPath());
+            config.setWebserviceUrl(getServiceURL(parsedServiceConfig));
+          }
         }
+      } catch (final IOException ex) {
+        log.error(
+            "Could not start integrated graphANNIS service, configure \"annis.webservice-url\" to set an existing service.",
+            ex);
+      }
+    }
+  }
+
+
+  protected String getServiceURL(TomlParseResult config) {
+    return "http://localhost:" + config.getLong("bind.port", () -> 5711l) + "/v1";
+  }
+
+  protected File getServiceConfig() throws IOException {
+    File result = new File(config.getWebserviceConfig());
+    if (!result.exists()) {
+      File parentDir = result.getParentFile();
+      if (!parentDir.mkdirs()) {
+        log.error("Could not create directory {}", parentDir.getAbsolutePath());
+      }
+      if (!result.createNewFile()) {
+        log.error("Could not create new file {}", result.getAbsolutePath());
+      }
+    }
+    // Set to a default data folder and SQLite file
+    TomlParseResult configToml = Toml.parse(result.toPath());
+    Map<String, Object> config = configToml.toMap();
+    TomlTable databaseTable = configToml.getTable("database");
+    Map<String, Object> databaseConfig;
+    if (databaseTable == null) {
+      // Create a new map instead of re-using the existing one
+      databaseConfig = new LinkedHashMap<>();
+      config.put("database", databaseConfig);
+    } else {
+      databaseConfig = databaseTable.toMap();
+    }
+    // Add the graphannis data and sqlite location of not existing yet
+    Object previousDatabase = databaseConfig.putIfAbsent("graphannis",
+        Paths.get(System.getProperty("user.home"), ".annis", "v4").toAbsolutePath().toString());
+    Object previousSqlite = databaseConfig.putIfAbsent("sqlite",
+        Paths.get(System.getProperty("user.home"), ".annis", "v4", "service_data.sqlite3")
+            .toAbsolutePath().toString());
+
+    if (previousDatabase == null || previousSqlite == null) {
+      // Write updated configuration to file
+      TomlWriter writer = new TomlWriter();
+      writer.write(config, result);
     }
 
-    public Optional<UsernamePasswordAuthenticationToken> getDesktopUserToken() {
-        return Optional.empty();
+    return result;
+  }
+
+  @Override
+  public void destroy() throws Exception {
+    this.abortThread.set(true);
+
+    if (this.tReaderOut != null) {
+      this.tReaderOut.interrupt();
     }
+
+    if (this.tReaderErr != null) {
+      this.tReaderErr.interrupt();
+    }
+
+    if (this.backgroundProcess != null) {
+      this.backgroundProcess.destroy();
+      if (!this.backgroundProcess.waitFor(5, TimeUnit.SECONDS)) {
+        // Destroy the process by force after 5 seconds
+        log.warn("GraphANNIS process did not stop after 5 seconds, stopping it forcefully");
+        this.backgroundProcess.destroyForcibly();
+      } else {
+        log.info("Stopped graphANNIS process");
+      }
+    }
+  }
+
+  public Optional<Authentication> getDesktopUserToken() {
+    return Optional.empty();
+  }
 }

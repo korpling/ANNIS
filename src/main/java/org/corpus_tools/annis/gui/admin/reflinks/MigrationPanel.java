@@ -47,8 +47,7 @@ import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
-import org.corpus_tools.annis.gui.security.SecurityConfiguration;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class MigrationPanel extends Panel
@@ -148,10 +147,10 @@ public class MigrationPanel extends Panel
     migrateButton.setDisableOnClick(true);
 
 
-    Optional<OidcUser> user = Helper.getUser(getUI());
+    Optional<OAuth2User> user = Helper.getUser(getUI());
     if (user.isPresent()) {
-      List<String> roles = user.get().getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM);
-      if (roles != null && roles.contains("admin")) {
+      Set<String> roles = Helper.getUserRoles(user.get());
+      if (roles.contains("admin")) {
         setContent(layout);
       }
     }

@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @SpringBootApplication
-@PropertySource(value = "classpath:preconfigured-profile.properties")
 @ComponentScan(basePackages = {"org.corpus_tools.annis.gui", "org.corpus_tools.annis.visualizers",
     "org.corpus_tools.annis.gui.exporter"})
 @ServletComponentScan

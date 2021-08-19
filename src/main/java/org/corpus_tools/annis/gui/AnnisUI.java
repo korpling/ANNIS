@@ -43,6 +43,7 @@ import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.querybuilder.QueryBuilderPlugin;
 import org.corpus_tools.annis.gui.requesthandler.BinaryRequestHandler;
+import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 /**
  * GUI for searching in corpora.
@@ -78,7 +78,6 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired
   private List<VisualizerPlugin> visualizerPlugins;
 
-
   @Autowired
   private List<QueryBuilderPlugin<com.vaadin.ui.Component>> queryBuilderPlugins;
 
@@ -91,6 +90,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired
   private UIConfig config;
 
+  private final AuthenticationSuccessListener authListener;
+
   private AdminView adminView;
 
   private Navigator nav;
@@ -98,12 +99,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired
   private Environment environment;
 
-  @Autowired
-  private ServiceStarter serviceStarter;
 
   @Autowired(required = false)
   private OAuth2ClientProperties oauth2Clients;
-
 
   @Autowired
   private transient ServletContext servletContext;
@@ -113,8 +111,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
    */
   private MainToolbar toolbar;
 
-  public AnnisUI() {
-    super("");
+  @Autowired
+  public AnnisUI(ServiceStarter serviceStarter, AuthenticationSuccessListener authListener) {
+    super("", serviceStarter, authListener);
+    this.authListener = authListener;
     initTransients();
   }
 
@@ -224,12 +224,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     setErrorHandler(this);
 
-
     adminView = new AdminView(AnnisUI.this);
 
     toolbar = new MainToolbar(getConfig(), oauth2Clients);
     toolbar.setQueryController(queryController);
-
 
     this.searchView = new SearchView(this);
     this.queryController = new QueryController(this, searchView, queryState);
@@ -246,23 +244,24 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     loadInstanceFonts();
 
-    Optional<UsernamePasswordAuthenticationToken> desktopUser = serviceStarter.getDesktopUserToken();
-    if(desktopUser.isPresent()) {
-      // Login the provided desktop user
-      UsernamePasswordAuthenticationToken token = desktopUser.get();
-      getSecurityContext().setAuthentication(token);
-
+    if (Helper.getUser(this).isPresent()) {
       getToolbar().onLogin();
     }
-
-
-    Object fragmentToRestore = VaadinSession.getCurrent().getAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE);
-    if(fragmentToRestore instanceof String) {
+    
+    Object fragmentToRestore =
+        VaadinSession.getCurrent().getAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE);
+    if (fragmentToRestore instanceof String) {
       request.getWrappedSession().setAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE, null);
       Page.getCurrent().setUriFragment((String) fragmentToRestore);
     }
 
   }
+
+  @Override
+  protected String getLastAccessToken() {
+    return authListener.getToken();
+  }
+
   public UIConfig getConfig() {
     return config;
   }
@@ -308,16 +307,13 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     this.urlShortener = urlShortener;
   }
 
-
   @Override
   public ServletContext getServletContext() {
     return servletContext;
   }
 
-
   @Override
   public OAuth2ClientProperties getOauth2ClientProperties() {
     return this.oauth2Clients;
   }
-
 }

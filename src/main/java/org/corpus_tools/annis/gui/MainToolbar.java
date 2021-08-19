@@ -33,10 +33,9 @@ import java.util.Optional;
 import org.corpus_tools.annis.gui.admin.AdminView;
 import org.corpus_tools.annis.gui.components.ScreenshotMaker;
 import org.corpus_tools.annis.gui.components.SettingsStorage;
-import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
  * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists), the screenshot making
@@ -63,7 +62,7 @@ public class MainToolbar extends HorizontalLayout
       w.setModal(true);
       w.setResizable(true);
       w.setWidth("500px");
-      w.setHeight("500px");
+      w.setHeight("350px");
       UI.getCurrent().addWindow(w);
 
     }
@@ -481,11 +480,11 @@ public class MainToolbar extends HorizontalLayout
     }
   }
 
-  private void updateAdministratorButtonVisibility(Optional<OidcUser> user) {
+  private void updateAdministratorButtonVisibility(Optional<OAuth2User> user) {
+
     // We don't verify the provided token, this is the job of the backend.
     // This only decides if the Administrator button is visible
-    if (user.isPresent() && user.get().containsClaim(SecurityConfiguration.ROLES_CLAIM)
-        && user.get().getClaimAsStringList(SecurityConfiguration.ROLES_CLAIM).contains("admin")) {
+    if (user.isPresent() && Helper.getUserRoles(user.get()).contains("admin")) {
       // make the administration button visible
       btNavigate.setCaption(NavigationTarget.ADMIN.caption);
       btNavigate.setIcon(NavigationTarget.ADMIN.icon);
@@ -504,7 +503,7 @@ public class MainToolbar extends HorizontalLayout
       btNavigate.setVisible(false);
     }
 
-    Optional<OidcUser> user = Helper.getUser(UI.getCurrent());
+    Optional<OAuth2User> user = Helper.getUser(UI.getCurrent());
     if (user.isPresent()) {
       // logged in
       String displayName = Helper.getDisplayName(user.get());

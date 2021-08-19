@@ -78,6 +78,7 @@ import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.graphml.CorpusGraphMapper;
 import org.corpus_tools.annis.gui.objects.AnnisConstants;
 import org.corpus_tools.annis.gui.objects.Match;
+import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpus;
@@ -108,7 +109,8 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
  *
@@ -683,7 +685,7 @@ public class Helper {
     return "";
   }
 
-  public static Optional<OidcUser> getUser(UI ui) {
+  public static Optional<OAuth2User> getUser(UI ui) {
     if(ui instanceof AnnisUI) {
       return Helper.getUser(((AnnisUI) ui).getSecurityContext());
     } else {
@@ -691,27 +693,41 @@ public class Helper {
     }
   }
 
-  public static Optional<OidcUser> getUser(SecurityContext context) {
+  public static Optional<OAuth2User> getUser(SecurityContext context) {
     Authentication auth = context.getAuthentication();
     if (auth != null && !(auth instanceof AnonymousAuthenticationToken) && auth.isAuthenticated()) {
       Object principalRaw = auth.getPrincipal();
-      if (principalRaw instanceof OidcUser) {
-        return Optional.of((OidcUser) principalRaw);
+      if (principalRaw instanceof OAuth2User) {
+        return Optional.of((OAuth2User) principalRaw);
       }
     }
     return Optional.empty();
   }
 
-  public static String getDisplayName(OidcUser user) {
-    if(user.getPreferredUsername() != null) {
-      return user.getPreferredUsername();
-    } else if(user.getNickName() != null) {
-      return user.getNickName();
-    } else if(user.getEmail() != null) {
-      return user.getEmail();
+  public static String getDisplayName(OAuth2User user) {
+    if (user.getAttribute(StandardClaimNames.PREFERRED_USERNAME) != null) {
+      return user.getAttribute(StandardClaimNames.PREFERRED_USERNAME);
+    } else if (user.getAttribute(StandardClaimNames.NICKNAME) != null) {
+      return user.getAttribute(StandardClaimNames.NICKNAME);
+    } else if (user.getAttribute(StandardClaimNames.EMAIL) != null) {
+      return user.getAttribute(StandardClaimNames.EMAIL);
     } else {
-      return user.getSubject();
+      return user.getAttribute(StandardClaimNames.SUB);
     }
+  }
+
+  public static Set<String> getUserRoles(OAuth2User user) {
+    final Set<String> result = new LinkedHashSet<>();
+    Object rolesRaw = user.getAttributes().get(SecurityConfiguration.ROLES_CLAIM);
+    if (rolesRaw instanceof List<?>) {
+      List<?> roles = (List<?>) rolesRaw;
+      for(Object o : roles) {
+        if(o instanceof String) {
+          result.add((String) o);
+        }
+      }
+    }
+    return result;
   }
 
   public static void addMatchToDocumentGraph(final Match match,

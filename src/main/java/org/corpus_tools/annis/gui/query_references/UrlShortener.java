@@ -10,7 +10,7 @@ import javax.transaction.Transactional;
 import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -46,7 +46,7 @@ public class UrlShortener {
       UrlShortenerEntry entry = new UrlShortenerEntry();
       entry.setId(UUID.randomUUID());
       entry.setUrl(localURL);
-      Optional<OidcUser> user = Helper.getUser(ui);
+      Optional<OAuth2User> user = Helper.getUser(ui);
       if (user.isPresent()) {
         entry.setOwner(Helper.getDisplayName(user.get()));
       } else {

@@ -21,6 +21,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.declarative.Design;
 import javax.servlet.ServletContext;
+import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 
@@ -73,15 +74,19 @@ public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
 
   @Autowired
   private UIConfig config;
+  
+  private final AuthenticationSuccessListener authListener;
 
 
   private UnsupportedQueryPanel panel;
 
   protected Page overwrittenPage;
 
-  public UnsupportedQueryUI() {
-    super(URL_PREFIX);
-
+  @Autowired
+  public UnsupportedQueryUI(ServiceStarter serviceStarter,
+      AuthenticationSuccessListener authListener) {
+    super(URL_PREFIX, serviceStarter, authListener);
+    this.authListener = authListener;
   }
 
   @Override
@@ -119,5 +124,10 @@ public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
     } else {
       return overwrittenPage;
     }
+  }
+  
+  @Override
+  protected String getLastAccessToken() {
+      return authListener.getToken();
   }
 }
