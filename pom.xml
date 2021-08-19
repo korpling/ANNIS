@@ -37,6 +37,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 		<vaadin.version>8.13.2</vaadin.version>
+		<vaadin.productionMode>true</vaadin.productionMode>
 		<start-class>org.corpus_tools.annis.gui.AnnisUiApplication</start-class>
 		<graphannis.version>1.0.0</graphannis.version>
 		<antlr4.version>4.7.2</antlr4.version>
