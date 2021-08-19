@@ -62,7 +62,7 @@ public class MainToolbar extends HorizontalLayout
       w.setModal(true);
       w.setResizable(true);
       w.setWidth("500px");
-      w.setHeight("500px");
+      w.setHeight("350px");
       UI.getCurrent().addWindow(w);
 
     }

@@ -286,12 +286,6 @@ class IntegrationTest {
     assertNotNull(window);
     assertEquals(0, _find(ExceptionDialog.class).size());
 
-    // Check the CITATION.cff file has been included
-    com.vaadin.ui.TextArea txt = _get(window, com.vaadin.ui.TextArea.class);
-    assertNotNull(txt);
-    assertNotNull(txt.getValue());
-    assertNotEquals("", txt.getValue());
-
     // Close the window again
     Button btClose = _get(Button.class, spec -> spec.withCaption("Close"));
     assertNotNull(btClose);

@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `PopupTwinColumnSelectMultiline` class.
 - Default server configuration now creates the needed SQL tables for the reference
   links. This fixes an error message in the administrator view.
+- Removed instable inclusion of CITATION.cff file in "About ANNIS" window.
 
 
 ## [4.0.0] - 2021-08-17
