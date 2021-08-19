@@ -26,17 +26,11 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Image;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
-import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import java.io.File;
-import java.io.IOException;
-import org.apache.commons.io.FileUtils;
-import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.ClassPathResource;
 
 /**
  *
@@ -66,8 +60,6 @@ public class AboutWindow extends Window {
     private VerticalLayout layout;
 
     private Button btClose;
-
-    private TextArea txtThirdParty;
 
     public AboutWindow() {
         setSizeFull();
@@ -109,35 +101,19 @@ public class AboutWindow extends Window {
         layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
         layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
 
-        txtThirdParty = new TextArea();
-        txtThirdParty.setSizeFull();
-        txtThirdParty.setReadOnly(true);
-        txtThirdParty.addStyleName("shared-text");
-        txtThirdParty.setWordWrap(false);
-
-        layout.addComponent(txtThirdParty);
-
         btClose = new Button("Close");
         final AboutWindow finalThis = this;
         btClose.addClickListener(new OkClickListener(finalThis));
         layout.addComponent(btClose);
 
         layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
-        layout.setComponentAlignment(btClose, Alignment.MIDDLE_CENTER);
-        layout.setExpandRatio(txtThirdParty, 1.0f);
-
+        layout.setComponentAlignment(btClose, Alignment.BOTTOM_CENTER);
+        layout.setExpandRatio(btClose, 1.0f);
       }
 
       @Override
       public void attach() {
         super.attach();
         IDGenerator.assignIDForFields(AboutWindow.this, btClose);
-
-        try {
-          File citationFile = new ClassPathResource("CITATION.cff").getFile();
-          txtThirdParty.setValue(FileUtils.readFileToString(citationFile));
-        } catch (IOException ex) {
-          ExceptionDialog.show(ex, getUI());
-        }
     }
 }

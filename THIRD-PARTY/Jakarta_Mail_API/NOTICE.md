@@ -1,13 +1,12 @@
-# Notices for Jakarta Expression Language
+# Notices for Jakarta Mail
 
-This content is produced and maintained by the Jakarta Expression Language project.
+This content is produced and maintained by the Jakarta Mail project.
 
-* Project home: https://projects.eclipse.org/projects/ee4j.el
+* Project home: https://projects.eclipse.org/projects/ee4j.mail
 
 ## Trademarks
 
-Jakarta Expression Language is a trademark of the Eclipse
-Foundation.
+Jakarta Mail is a trademark of the Eclipse Foundation.
 
 ## Copyright
 
@@ -31,9 +30,13 @@ SPDX-License-Identifier: EPL-2.0 OR GPL-2.0 WITH Classpath-exception-2.0
 
 The project maintains the following source code repositories:
 
-* https://github.com/eclipse-ee4j/el-ri
+* https://github.com/eclipse-ee4j/mail
 
 ## Third-party Content
+
+This project leverages the following third party content.
+
+None
 
 ## Cryptography
 
@@ -43,3 +46,4 @@ another country, of encryption software. BEFORE using any encryption software,
 please check the country's laws, regulations and policies concerning the import,
 possession, or use, and re-export of encryption software, to see if this is
 permitted.
+

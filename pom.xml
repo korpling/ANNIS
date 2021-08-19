@@ -13,7 +13,7 @@
 
 	<groupId>org.corpus-tools</groupId>
 	<artifactId>annis</artifactId>
-	<version>4.0.1-SNAPSHOT</version>
+	<version>4.1.0</version>
 	<name>ANNIS user interface</name>
 	<packaging>jar</packaging>
 	<scm>
@@ -282,30 +282,6 @@
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice.osx</url>
 							<outputDirectory>${project.build.directory}/native/darwin/</outputDirectory>
 							<sha256>ddc180e1442894e50304a43e56864c782acc5f13d8b8ad1c66eabe3ab8ce31d5</sha256>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-citation-cff</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}</directory>
-									<includes>
-										<include>CITATION.cff</include>
-									</includes>
-								</resource>
-							</resources>
 						</configuration>
 					</execution>
 				</executions>
