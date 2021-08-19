@@ -7,9 +7,11 @@ import java.util.UUID;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
+import org.corpus_tools.annis.gui.hibernate.type.URIType;
+import org.hibernate.annotations.TypeDef;
 
 @Entity
+@TypeDef(name = "uri", defaultForType = URI.class, typeClass = URIType.class)
 public class UrlShortenerEntry {
 
   @Id
@@ -21,10 +23,9 @@ public class UrlShortenerEntry {
   private Date created;
 
   @Column(nullable = false, unique = true)
-  @Lob
   private URI url;
+
   @Column
-  @Lob
   private URI temporaryUrl;
 
   public UUID getId() {
