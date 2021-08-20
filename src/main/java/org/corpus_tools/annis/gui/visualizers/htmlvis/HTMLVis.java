@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.google.common.base.Joiner;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -375,6 +376,7 @@ public class HTMLVis extends AbstractVisualizer {
 
   private JsonMapper createJsonMapper() {
     JsonMapper jsonMapper = new JsonMapper();
+    jsonMapper.registerModule(new JaxbAnnotationModule());
     // the json should be human readable
     jsonMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
     jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
