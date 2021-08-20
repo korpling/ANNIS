@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -91,10 +92,6 @@ public class CorpusListPanel extends VerticalLayout {
           tblCorpora.setDataProvider(availableCorpora);
           // reset the selected items
           tblCorpora.asMultiSelect().setValue(oldSelectedItems);
-          List<CorpusSet> corpusSets = new LinkedList<>();
-          if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
-            corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
-          }
 
           if (showLoginMessage) {
             if (corpora.isEmpty()) {
@@ -161,14 +158,13 @@ public class CorpusListPanel extends VerticalLayout {
 
     cbSelection = new ComboBox<>();
     cbSelection.setDescription("Choose corpus selection set");
-    cbSelection.setEmptySelectionCaption(ALL_CORPORA);
     cbSelection.setWidth("100%");
     cbSelection.setHeight("-1px");
     cbSelection.addStyleName(ValoTheme.COMBOBOX_SMALL);
     cbSelection.setPlaceholder("Select corpus selection set");
     cbSelection.setEmptySelectionAllowed(true);
+    cbSelection.setEmptySelectionCaption(ALL_CORPORA);
     cbSelection.addValueChangeListener(cs -> updateCorpusSetList(true));
-
 
     selectionLayout.addComponent(cbSelection);
     selectionLayout.setExpandRatio(cbSelection, 1.0f);
@@ -284,14 +280,17 @@ public class CorpusListPanel extends VerticalLayout {
       ListDataProvider<String> availableCorpora = new ListDataProvider<>(corpora);
       availableCorpora.setFilter(filter);
       tblCorpora.setDataProvider(availableCorpora);
-      List<CorpusSet> corpusSets = new LinkedList<>();
       if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
-        corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
+        TreeSet<String> corpusSetNames = new TreeSet<String>(ui.getInstanceConfig().getCorpusSets()
+            .stream().map(CorpusSet::getName).collect(Collectors.toList()));
+        cbSelection.setItems(corpusSetNames);
+        if (ui.getInstanceConfig().getDefaultCorpusSet() != null
+            && !ui.getInstanceConfig().getDefaultCorpusSet().isEmpty()) {
+          cbSelection.setSelectedItem(ui.getInstanceConfig().getDefaultCorpusSet());
+        }
       }
 
-      cbSelection
-          .setItems(corpusSets.stream().map(cs -> cs.getName()).collect(Collectors.toSet()));
-
+      
       if (corpora.isEmpty() && Helper.getUser(ui.getSecurityContext()).isPresent()) {
         Notification.show(
             "No corpora found. Please login "
@@ -311,8 +310,8 @@ public class CorpusListPanel extends VerticalLayout {
     binder.setBean(ui.getQueryState());
 
     binder.addValueChangeListener(event -> {
-      Set<String> corpora = new HashSet<>(ui.getQueryState().getSelectedCorpora());
-      autoGenQueries.setSelectedCorpusInBackground(corpora);
+      Set<String> selectedCorpora = new HashSet<>(ui.getQueryState().getSelectedCorpora());
+      autoGenQueries.setSelectedCorpusInBackground(selectedCorpora);
       ui.getQueryController().corpusSelectionChangedInBackground();
     });
 
