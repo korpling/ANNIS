@@ -42,237 +42,244 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public abstract class CommonUI extends AnnisBaseUI {
-  private static final long serialVersionUID = -1304604048896817844L;
+    private static final long serialVersionUID = -1304604048896817844L;
 
-  private static final Logger log = LoggerFactory.getLogger(CommonUI.class);
+    private static final Logger log = LoggerFactory.getLogger(CommonUI.class);
 
-  private SettingsStorage settings;
+    private SettingsStorage settings;
 
-  private final String urlPrefix;
+    private final String urlPrefix;
 
-  private InstanceConfig instanceConfig;
+    private InstanceConfig instanceConfig;
 
-  private SecurityContext securityContext;
+    private SecurityContext securityContext;
 
-  protected CommonUI(String urlPrefix, ServiceStarter serviceStarter,
-      AuthenticationSuccessListener authListener) {
-    this.urlPrefix = urlPrefix;
-    Optional<Authentication> desktopAuth = serviceStarter.getDesktopUserToken();
-    if (desktopAuth.isPresent()) {
-      // Login the provided desktop user
-      getSecurityContext().setAuthentication(desktopAuth.get());
-      authListener.setToken(desktopAuth.get().getCredentials().toString());
-    }
-  }
-
-
-  public InstanceConfig getInstanceConfig() {
-    return instanceConfig;
-  }
-
-  private InstanceConfig getInstanceConfig(VaadinRequest request) {
-    String instance = null;
-    String pathInfo = request.getPathInfo();
-
-    if (pathInfo != null && pathInfo.startsWith("/")) {
-      pathInfo = pathInfo.substring(1);
-    }
-    if (pathInfo != null && pathInfo.endsWith("/")) {
-      pathInfo = pathInfo.substring(0, pathInfo.length() - 1);
+    protected CommonUI(String urlPrefix, ServiceStarter serviceStarter,
+        AuthenticationSuccessListener authListener) {
+        this.urlPrefix = urlPrefix;
+        Optional<Authentication> desktopAuth = serviceStarter.getDesktopUserToken();
+        if (desktopAuth.isPresent()) {
+          // Login the provided desktop user
+          getSecurityContext().setAuthentication(desktopAuth.get());
+          authListener.setToken(desktopAuth.get().getCredentials().toString());
+        }
     }
 
-    Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
 
-    if (pathInfo != null && !pathInfo.isEmpty()) {
-      instance = pathInfo;
+    public InstanceConfig getInstanceConfig() {
+        return instanceConfig;
     }
 
-    if (instance != null && allConfigs.containsKey(instance)) {
-      // return the config that matches the parsed name
-      return allConfigs.get(instance);
-    } else if (allConfigs.containsKey("default")) {
-      // return the default config
-      return allConfigs.get("default");
-    } else if (allConfigs.size() > 0) {
-      // just return any existing config as a fallback
-      log.warn("Instance config {} not found or null and default config is not available.",
-          instance);
-      return allConfigs.values().iterator().next();
+    private InstanceConfig getInstanceConfig(VaadinRequest request) {
+        String instance = null;
+        String pathInfo = request.getPathInfo();
+
+        if (pathInfo != null && pathInfo.startsWith("/")) {
+            pathInfo = pathInfo.substring(1);
+        }
+        if (pathInfo != null && pathInfo.endsWith("/")) {
+            pathInfo = pathInfo.substring(0, pathInfo.length() - 1);
+        }
+
+        Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
+
+        if (pathInfo != null && !pathInfo.isEmpty()) {
+            instance = pathInfo;
+        }
+
+        if (instance != null && allConfigs.containsKey(instance)) {
+            // return the config that matches the parsed name
+            return allConfigs.get(instance);
+        } else if (allConfigs.containsKey("default")) {
+            // return the default config
+            return allConfigs.get("default");
+        } else if (allConfigs.size() > 0) {
+            // just return any existing config as a fallback
+            log.warn("Instance config {} not found or null and default config is not available.",
+                    instance);
+            return allConfigs.values().iterator().next();
+        }
+
+        // default to an empty instance config
+        return new InstanceConfig();
     }
 
-    // default to an empty instance config
-    return new InstanceConfig();
-  }
-
-  public FontConfig getInstanceFont() {
-    if (instanceConfig != null && instanceConfig.getFont() != null) {
-      return instanceConfig.getFont();
+    public FontConfig getInstanceFont() {
+        if (instanceConfig != null && instanceConfig.getFont() != null) {
+            return instanceConfig.getFont();
+        }
+        return null;
     }
-    return null;
-  }
 
-  public SettingsStorage getSettings() {
-    if (settings == null) {
-      settings = new SettingsStorage(this);
+    public SettingsStorage getSettings() {
+        if (settings == null) {
+            settings = new SettingsStorage(this);
+        }
+        return settings;
     }
-    return settings;
-  }
 
-  @Override
-  protected void init(VaadinRequest request) {
-    super.init(request);
+    @Override
+    protected void init(VaadinRequest request) {
+        super.init(request);
 
-    getSession().addRequestHandler(new ResourceRequestHandler(urlPrefix));
+        getSession().addRequestHandler(new ResourceRequestHandler(urlPrefix));
 
-    settings = new SettingsStorage(this);
+        settings = new SettingsStorage(this);
 
-    this.instanceConfig = getInstanceConfig(request);
-  }
+        this.instanceConfig = getInstanceConfig(request);
+    }
 
-  protected void loadInstanceFonts() {
-    if (getInstanceConfig() != null && getInstanceConfig().getFont() != null) {
-      FontConfig cfg = getInstanceConfig().getFont();
-      String url = cfg.getUrl() == null || cfg.getUrl().isEmpty() ? ""
-          : "@import url(" + cfg.getUrl() + ");\n";
-      if (cfg.getSize() == null || cfg.getSize().isEmpty()) {
-        injectUniqueCSS( // this one is for the virtual keyboard
-            url + "." + Helper.CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName()
-                + "', monospace !important; }\n" + "." + Helper.CORPUS_FONT + " {font-family: '"
-                + cfg.getName() + "', monospace; }\n" + "div." + Helper.CORPUS_FONT
-                + " .CodeMirror pre {font-family: '" + cfg.getName() + "', monospace; }\n"
-                + "#keyboardInputMaster tbody tr td table tbody tr td {\n" + "  font-family: '"
-                + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; " + "}");
-      } else {
-        injectUniqueCSS( // this one is for the virtual keyboard
-            url + "." + Helper.CORPUS_FONT_FORCE + " {\n" + "  font-family: '" + cfg.getName()
-                + "', monospace !important;\n" + "  font-size: " + cfg.getSize() + " !important;\n"
-                + "}\n" + "." + Helper.CORPUS_FONT + " {\n" + "  font-family: '" + cfg.getName()
-                + "', monospace;\n" + "  font-size: " + cfg.getSize() + ";\n" + "}\n" + "div."
-                + Helper.CORPUS_FONT + " .CodeMirror pre" + " {\n" + "  font-family: '"
-                + cfg.getName() + "', monospace;\n" + "  font-size: " + cfg.getSize() + ";\n"
-                + "}\n" + "." + Helper.CORPUS_FONT + " .v-table-table {\n" + "    font-size: "
-                + cfg.getSize() + ";\n" + "}\n"
-                + "#keyboardInputMaster tbody tr td table tbody tr td {\n" + "  font-family: '"
-                + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; " + "}");
+    protected void loadInstanceFonts() {
+        if (getInstanceConfig() != null && getInstanceConfig().getFont() != null) {
+            FontConfig cfg = getInstanceConfig().getFont();
+            String url = cfg.getUrl() == null || cfg.getUrl().isEmpty() ? ""
+                    : "@import url(" + cfg.getUrl() + ");\n";
+            if (cfg.getSize() == null || cfg.getSize().isEmpty()) {
+                injectUniqueCSS( // this one is for the virtual keyboard
+                        url + "." + Helper.CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName()
+                                + "', monospace !important; }\n" + "." + Helper.CORPUS_FONT
+                                + " {font-family: '" + cfg.getName() + "', monospace; }\n" + "div."
+                                + Helper.CORPUS_FONT + " .CodeMirror pre {font-family: '"
+                                + cfg.getName() + "', monospace; }\n"
+                                + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+                                + "  font-family: '" + cfg.getName()
+                                + "', 'Lucida Console','Arial Unicode MS',monospace; " + "}");
+            } else {
+                injectUniqueCSS( // this one is for the virtual keyboard
+                        url + "." + Helper.CORPUS_FONT_FORCE + " {\n" + "  font-family: '"
+                                + cfg.getName() + "', monospace !important;\n" + "  font-size: "
+                                + cfg.getSize() + " !important;\n" + "}\n" + "."
+                                + Helper.CORPUS_FONT + " {\n" + "  font-family: '" + cfg.getName()
+                                + "', monospace;\n" + "  font-size: " + cfg.getSize() + ";\n"
+                                + "}\n" + "div." + Helper.CORPUS_FONT + " .CodeMirror pre" + " {\n"
+                                + "  font-family: '" + cfg.getName() + "', monospace;\n"
+                                + "  font-size: " + cfg.getSize() + ";\n" + "}\n" + "."
+                                + Helper.CORPUS_FONT + " .v-table-table {\n" + "    font-size: "
+                                + cfg.getSize() + ";\n" + "}\n"
+                                + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+                                + "  font-family: '" + cfg.getName()
+                                + "', 'Lucida Console','Arial Unicode MS',monospace; " + "}");
+            }
+        } else {
+            injectUniqueCSS( // use original font definition from keyboard.css if no font given
+                    "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+                            + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;"
+                            + "}");
+        }
+    }
+
+    public void setInstanceConfig(InstanceConfig instanceConfig) {
+        this.instanceConfig = instanceConfig;
+    }
+
+    public String getUrlPrefix() {
+        return urlPrefix;
+    }
+    
+    protected abstract String getLastAccessToken();
+
+    public ApiClient getClient() {
+      
+      final ApiClient client = Configuration.getDefaultApiClient().setReadTimeout(0);
+      // Use the configuration to allow changing the path to the web-service
+      client.setBasePath(getConfig().getWebserviceUrl());
+
+      final Optional<OAuth2User> user = Helper.getUser(getSecurityContext());
+      String bearerToken = null;
+      if (user.isPresent()) {
+        bearerToken = getLastAccessToken();
       }
-    } else {
-      injectUniqueCSS( // use original font definition from keyboard.css if no font given
-          "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-              + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;" + "}");
-    }
-  }
-
-  public void setInstanceConfig(InstanceConfig instanceConfig) {
-    this.instanceConfig = instanceConfig;
-  }
-
-  public String getUrlPrefix() {
-    return urlPrefix;
-  }
-
-  protected abstract String getLastAccessToken();
-
-  public ApiClient getClient() {
-
-    final ApiClient client = Configuration.getDefaultApiClient().setReadTimeout(0);
-    // Use the configuration to allow changing the path to the web-service
-    client.setBasePath(getConfig().getWebserviceUrl());
-
-    final Optional<OAuth2User> user = Helper.getUser(getSecurityContext());
-    String bearerToken = null;
-    if (user.isPresent()) {
-      bearerToken = getLastAccessToken();
-    }
-    final org.corpus_tools.annis.auth.Authentication auth = client.getAuthentication("bearerAuth");
-    if (auth instanceof HttpBearerAuth) {
-      final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
-      bearerAuth.setBearerToken(bearerToken);
-    }
-    return client;
-  }
-
-  /**
-   * Handle common errors like database/service connection problems and display a unified error
-   * message.
-   * 
-   * This will not log the exception, only display information to the user.
-   * 
-   * @param ex exception to handle
-   * @return True if error was handled, false otherwise.
-   */
-  public boolean handleCommonError(Throwable ex, String action) {
-
-    if (ex != null) {
-      Throwable rootCause = ex;
-      while (rootCause.getCause() != null) {
-        rootCause = rootCause.getCause();
+      final org.corpus_tools.annis.auth.Authentication auth =
+          client.getAuthentication("bearerAuth");
+      if (auth instanceof HttpBearerAuth) {
+        final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
+        bearerAuth.setBearerToken(bearerToken);
       }
+      return client;
+    }
 
-      if (rootCause instanceof ApiException) {
-        ApiException apiEx = (ApiException) rootCause;
+    /**
+     * Handle common errors like database/service connection problems and display a unified error
+     * message.
+     * 
+     * This will not log the exception, only display information to the user.
+     * 
+     * @param ex exception to handle
+     * @return True if error was handled, false otherwise.
+     */
+    public boolean handleCommonError(Throwable ex, String action) {
 
-        if (apiEx.getCode() == 503) {
-          // database connection error
-          Notification n = new Notification(
-              "Can't execute " + (action == null ? "" : "\"" + action + "\"")
-                  + " action because database server is not responding.<br/>"
-                  + "There might be too many users using this service right now.",
-              Notification.Type.WARNING_MESSAGE);
-          n.setDescription(
-              "<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
-                  + "<p>Click on this message to close it.</p>"
-                  + "<p style=\"font-size:9pt;color:gray;\">Pinguin picture by Polar Cruises [CC BY 2.0 (http://creativecommons.org/licenses/by/2.0)], via Wikimedia Commons</p>");
-          n.setIcon(AnnisBaseUI.PINGUIN_IMAGE);
-          n.setHtmlContentAllowed(true);
-          n.setDelayMsec(15000);
+      if (ex != null) {
+        Throwable rootCause = ex;
+        while (rootCause.getCause() != null) {
+          rootCause = rootCause.getCause();
+        }
 
-          n.show(this.getPage());
-          return true;
-        } else if (apiEx.getCode() == 401) {
-          redirectToLogin();
-          return true;
+        if (rootCause instanceof ApiException) {
+          ApiException apiEx = (ApiException) rootCause;
+
+          if (apiEx.getCode() == 503) {
+            // database connection error
+            Notification n = new Notification(
+                "Can't execute " + (action == null ? "" : "\"" + action + "\"")
+                    + " action because database server is not responding.<br/>"
+                    + "There might be too many users using this service right now.",
+                Notification.Type.WARNING_MESSAGE);
+            n.setDescription(
+                "<p><strong>Please try again later.</strong> If the error persists inform the administrator of this server.</p>"
+                    + "<p>Click on this message to close it.</p>"
+                    + "<p style=\"font-size:9pt;color:gray;\">Pinguin picture by Polar Cruises [CC BY 2.0 (http://creativecommons.org/licenses/by/2.0)], via Wikimedia Commons</p>");
+            n.setIcon(AnnisBaseUI.PINGUIN_IMAGE);
+            n.setHtmlContentAllowed(true);
+            n.setDelayMsec(15000);
+
+            n.show(this.getPage());
+            return true;
+          } else if (apiEx.getCode() == 401) {
+            redirectToLogin();
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    public abstract ServletContext getServletContext();
+
+    public SecurityContext getSecurityContext() {
+      if (this.securityContext == null) {
+        this.securityContext = SecurityContextHolder.getContext();
+      }
+      return securityContext;
+    }
+
+    public abstract OAuth2ClientProperties getOauth2ClientProperties();
+
+    public abstract UIConfig getConfig();
+    
+    public void redirectToLogin() {
+     
+      OAuth2ClientProperties oauth2Clients = getOauth2ClientProperties();
+      if (oauth2Clients != null) {
+
+        // Store the current fragment so it can be restored after login was successful
+        String oldFragment = Page.getCurrent().getUriFragment();
+        VaadinSession.getCurrent().setAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE,
+            oldFragment);
+
+        VaadinRequest currentRequest = VaadinRequest.getCurrent();
+        final String contextPath = currentRequest == null ? "" : currentRequest.getContextPath();
+        // Determine if there is only one or several clients
+        Collection<String> providers = oauth2Clients.getProvider().keySet();
+        if (providers.size() == 1) {
+          // Directly login with the single provider
+          Page.getCurrent()
+              .setLocation(contextPath + "/oauth2/authorization/" + providers.iterator().next());
+        } else {
+          // Show general login selection page
+          Page.getCurrent().setLocation(contextPath + "/login");
         }
       }
     }
-    return false;
-  }
-
-  public abstract ServletContext getServletContext();
-
-  public SecurityContext getSecurityContext() {
-    if (this.securityContext == null) {
-      this.securityContext = SecurityContextHolder.getContext();
-    }
-    return securityContext;
-  }
-
-  public abstract OAuth2ClientProperties getOauth2ClientProperties();
-
-  public abstract UIConfig getConfig();
-
-  public void redirectToLogin() {
-
-    OAuth2ClientProperties oauth2Clients = getOauth2ClientProperties();
-    if (oauth2Clients != null) {
-
-      // Store the current fragment so it can be restored after login was successful
-      String oldFragment = Page.getCurrent().getUriFragment();
-      VaadinSession.getCurrent().setAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE,
-          oldFragment);
-
-      VaadinRequest currentRequest = VaadinRequest.getCurrent();
-      final String contextPath = currentRequest == null ? "" : currentRequest.getContextPath();
-      // Determine if there is only one or several clients
-      Collection<String> providers = oauth2Clients.getProvider().keySet();
-      if (providers.size() == 1) {
-        // Directly login with the single provider
-        Page.getCurrent()
-            .setLocation(contextPath + "/oauth2/authorization/" + providers.iterator().next());
-      } else {
-        // Show general login selection page
-        Page.getCurrent().setLocation(contextPath + "/login");
-      }
-    }
-  }
 
 }
