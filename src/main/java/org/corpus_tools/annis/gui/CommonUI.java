@@ -180,7 +180,7 @@ public abstract class CommonUI extends AnnisBaseUI {
 
     public ApiClient getClient() {
       
-      final ApiClient client = Configuration.getDefaultApiClient();
+      final ApiClient client = Configuration.getDefaultApiClient().setReadTimeout(0);
       // Use the configuration to allow changing the path to the web-service
       client.setBasePath(getConfig().getWebserviceUrl());
 
