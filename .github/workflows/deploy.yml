@@ -1,4 +1,7 @@
-on: release
+on: 
+  release:
+    types:
+      - published
 name: Deploy ANNIS
 jobs:
   deploy_release_binaries:
