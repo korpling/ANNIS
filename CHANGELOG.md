@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Use updated graphANNIS version 1.0.2 to fix issues in performance of subgraph extraction
+- Instance configurations where not loaded (including the default one)
 
 ## [4.1.1] - 2021-08-20
 

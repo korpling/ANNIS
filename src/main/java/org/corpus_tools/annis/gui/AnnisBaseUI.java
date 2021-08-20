@@ -15,6 +15,7 @@ package org.corpus_tools.annis.gui;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.google.common.base.Charsets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
@@ -162,6 +163,7 @@ public class AnnisBaseUI extends UI implements Serializable {
     TreeMap<String, InstanceConfig> result = new TreeMap<>();
 
     JsonMapper mapper = new JsonMapper();
+    mapper.registerModule(new JaxbAnnotationModule());
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     // get a list of all directories that contain instance informations
