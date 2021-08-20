@@ -281,7 +281,7 @@ public class CorpusListPanel extends VerticalLayout {
       availableCorpora.setFilter(filter);
       tblCorpora.setDataProvider(availableCorpora);
       if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
-        TreeSet<String> corpusSetNames = new TreeSet<String>(ui.getInstanceConfig().getCorpusSets()
+        TreeSet<String> corpusSetNames = new TreeSet<>(ui.getInstanceConfig().getCorpusSets()
             .stream().map(CorpusSet::getName).collect(Collectors.toList()));
         cbSelection.setItems(corpusSetNames);
         if (ui.getInstanceConfig().getDefaultCorpusSet() != null
