@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Use an GitHub Action that only uploads the release files instead of creating a new release
+- Download the test corpora before building the release artifacts
+
 ## [4.1.0] - 2021-08-19
 
 ### Added
