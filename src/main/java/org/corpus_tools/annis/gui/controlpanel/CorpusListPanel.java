@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisUI;
@@ -160,11 +161,13 @@ public class CorpusListPanel extends VerticalLayout {
 
     cbSelection = new ComboBox<>();
     cbSelection.setDescription("Choose corpus selection set");
+    cbSelection.setEmptySelectionCaption(ALL_CORPORA);
     cbSelection.setWidth("100%");
     cbSelection.setHeight("-1px");
     cbSelection.addStyleName(ValoTheme.COMBOBOX_SMALL);
     cbSelection.setPlaceholder("Select corpus selection set");
-    cbSelection.setEmptySelectionAllowed(false);
+    cbSelection.setEmptySelectionAllowed(true);
+    cbSelection.addValueChangeListener(cs -> updateCorpusSetList(true));
 
 
     selectionLayout.addComponent(cbSelection);
@@ -286,6 +289,9 @@ public class CorpusListPanel extends VerticalLayout {
         corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
       }
 
+      cbSelection
+          .setItems(corpusSets.stream().map(cs -> cs.getName()).collect(Collectors.toSet()));
+
       if (corpora.isEmpty() && Helper.getUser(ui.getSecurityContext()).isPresent()) {
         Notification.show(
             "No corpora found. Please login "
@@ -363,15 +369,6 @@ public class CorpusListPanel extends VerticalLayout {
         tblCorpora.select(firstCorpusName);
       }
     }
-  }
-
-  /**
-   * Set the currently displayed corpus set.
-   *
-   * @param corpusSet
-   */
-  public void setCorpusSet(String corpusSet) {
-    cbSelection.setValue(corpusSet);
   }
 
   public void selectedCorpusChanged(boolean scrollToSelected) {

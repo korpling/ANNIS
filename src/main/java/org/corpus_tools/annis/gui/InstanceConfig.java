@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -61,7 +60,7 @@ public class InstanceConfig implements Serializable {
    * 
    * @return
    */
-  @XmlElementWrapper(name = "corpus-sets")
+  @XmlElement(name = "corpus-sets")
   public List<CorpusSet> getCorpusSets() {
     return corpusSets;
   }
