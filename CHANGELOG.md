@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.1] - 2021-08-20
+
 ### Fixed
 
 - Do not use the default read timeout in the HTTP REST client (#712)
@@ -921,7 +923,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.1.1...HEAD
+[4.1.1]: https://github.com/korpling/ANNIS/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/korpling/ANNIS/compare/v4.0.0...v4.1.0
 [4.0.0]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.6...v4.0.0
 [4.0.0-beta.6]: https://github.com/korpling/ANNIS/compare/v4.0.0-beta.5...v4.0.0-beta.6
