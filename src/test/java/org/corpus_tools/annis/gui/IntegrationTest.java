@@ -17,9 +17,11 @@ import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -38,9 +40,13 @@ import kotlin.Pair;
 import net.jcip.annotations.NotThreadSafe;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
 import org.corpus_tools.annis.gui.components.medialement.MediaElementPlayer;
+import org.corpus_tools.annis.gui.controlpanel.ControlPanel;
+import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
+import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserTable;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
@@ -176,6 +182,58 @@ class IntegrationTest {
     resultPanel.setVisibleTokenAnnosVisible(visibleAnnos);
     assertNull(kwicGrid.getRowsByAnnotation().get("tiger:pos"));
     assertNotNull(kwicGrid.getRowsByAnnotation().get("tiger::lemma"));
+  }
+
+  @Test
+  void searchPcc2InverseOrder() throws Exception {
+
+    selectCorpus("pcc2");
+
+
+    // Set inverse order in search options
+    TabSheet optionTabSheet = _get(_get(ControlPanel.class), TabSheet.class);
+    optionTabSheet.setSelectedTab(_get(SearchOptionsPanel.class));
+    
+    awaitCondition(10,
+        () -> !_find(optionTabSheet, ComboBox.class, spec -> spec.withCaption("Order")).isEmpty());
+
+    @SuppressWarnings("unchecked")
+    ComboBox<OrderEnum> orderComboBox =
+        _get(optionTabSheet, ComboBox.class, spec -> spec.withCaption("Order"));
+    _setValue(orderComboBox, OrderEnum.INVERTED);
+
+    // Set the query and submit query
+    _get(AqlCodeEditor.class).getPropertyDataSource().setValue("\"Die\"");
+    MockVaadin.INSTANCE.clientRoundtrip();
+    awaitCondition(5, () -> "\"Die\"".equals(ui.getQueryState().getAql().getValue()));
+    awaitCondition(5, () -> "Valid query, click on \"Search\" to start searching."
+        .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
+
+    Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
+    _click(searchButton);
+
+    // Wait until the count is displayed
+    String expectedStatus = "4 matches\nin 2 documents";
+    awaitCondition(60,
+        () -> expectedStatus
+            .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
+        () -> "Waited for status \"" + expectedStatus + "\" but was \""
+            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+
+    ResultViewPanel resultView = _get(ResultViewPanel.class);
+
+    awaitCondition(30, () -> !_find(resultView, SingleResultPanel.class).isEmpty());
+
+    // Test that the cell values have the correct token value
+    SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
+    KWICComponent kwicVis = _get(resultPanel, KWICComponent.class);
+    AnnotationGrid kwicGrid = _get(kwicVis, AnnotationGrid.class);
+    ArrayList<Row> tokens = kwicGrid.getRowsByAnnotation().get("tok");
+    assertEquals(1, tokens.size());
+    assertEquals(
+        Arrays.asList("fürs", "Dallgower", "Tor", "gab", ".", "Die", "Seeburger", "und", "einige",
+            "Groß-Glienicker", "haben"),
+        tokens.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
   }
 
   @Test
@@ -378,9 +436,10 @@ class IntegrationTest {
   @Test
   void emptyCorpusStatus() throws Exception {
 
+
+
     @SuppressWarnings("unchecked")
-    Grid<String> grid = _get(Grid.class,
-        spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
+    Grid<String> grid = _get(_get(CorpusListPanel.class), Grid.class);
     grid.getSelectionModel().deselectAll();
 
     // Wait until the (refreshed) corpus list is shown
