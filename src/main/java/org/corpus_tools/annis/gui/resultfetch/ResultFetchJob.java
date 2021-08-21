@@ -99,6 +99,7 @@ public class ResultFetchJob implements Runnable {
       q.setOffset((int) query.getOffset());
       q.setLimit(query.getLimit());
       q.setQueryLanguage(query.getApiQueryLanguage());
+      q.setOrder(query.getOrder());
       File findResult = search.find(q);
       try (Stream<String> findResultLines =
           Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
