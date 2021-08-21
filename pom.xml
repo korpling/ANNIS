@@ -13,7 +13,7 @@
 
 	<groupId>org.corpus-tools</groupId>
 	<artifactId>annis</artifactId>
-	<version>4.1.3</version>
+	<version>4.2.0-SNAPSHOT</version>
 	<name>ANNIS user interface</name>
 	<packaging>jar</packaging>
 	<scm>
