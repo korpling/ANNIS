@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Query result order was not considered in result view
+
 ## [4.1.2] - 2021-08-20
 
 ### Fixed
