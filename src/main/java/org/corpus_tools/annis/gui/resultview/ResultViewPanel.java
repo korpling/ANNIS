@@ -13,7 +13,6 @@
  */
 package org.corpus_tools.annis.gui.resultview;
 
-import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Component;
@@ -40,14 +39,12 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.BlockingQueue;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.QueryController;
-import org.corpus_tools.annis.gui.components.OnLoadCallbackExtension;
 import org.corpus_tools.annis.gui.controlpanel.QueryPanel;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
 import org.corpus_tools.annis.gui.objects.Match;
@@ -64,11 +61,7 @@ import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- * @author thomas
- */
-public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExtension.Callback {
+public class ResultViewPanel extends VerticalLayout {
 
   /**
    * Listens to events on the base text menu and updates the segmentation layer.
@@ -144,12 +137,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
   private String segmentationName;
 
   private int currentResults;
-  private int numberOfResults;
 
-  private ArrayList<Match> allMatches;
 
-  private transient BlockingQueue<SaltProject> projectQueue;
-  private PagedResultQuery currentQuery;
   private final DisplayedResultQuery initialQuery;
 
   private final AnnisUI sui;
@@ -167,6 +156,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
     resultLayout = new CssLayout();
     resultLayout.addStyleName("result-view-css");
+
     Panel resultPanel = new Panel(resultLayout);
     resultPanel.setSizeFull();
     resultPanel.addStyleName(ValoTheme.PANEL_BORDERLESS);
@@ -189,6 +179,9 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
     setExpandRatio(resultPanel, 1.0f);
 
     paging = new PagingComponent();
+    paging.setPageSize(initialQuery.getLimit(), false);
+    paging.setInfo(initialQuery.getQuery());
+
 
     addComponent(paging, 1);
 
@@ -196,7 +189,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
     setExpandRatio(paging, 0.0f);
   }
 
-  private void addQueryResult(PagedResultQuery q, SaltProject p) {
+  public void addQueryResult(PagedResultQuery q, SaltProject p, ArrayList<Match> allMatches) {
 
     if (q == null) {
       return;
@@ -209,17 +202,14 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
       }
       SCorpusGraph corpusGraph = p.getCorpusGraphs().get(0);
       AbstractComponent newPanel =
-          createSingleResultPanel(corpusGraph, currentResults, q.getOffset());
+          createSingleResultPanel(corpusGraph, currentResults, q.getOffset(), allMatches);
       currentResults += 1;
 
+      int numberOfResults = allMatches.size();
       String strResults = numberOfResults > 1 ? "results" : "result";
       sui.getSearchView().getControlPanel().getQueryPanel().setStatus(
           sui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus(),
           " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");
-
-      if (currentResults == numberOfResults) {
-        resetQueryResultQueue();
-      }
 
       resultPanelList.add(newPanel);
       resultLayout.addComponent(newPanel);
@@ -231,19 +221,14 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
 
       if (currentResults == numberOfResults) {
+        this.currentResults = 0;
+
         showFinishedSubgraphSearch();
         if (!initialQuery.getSelectedMatches().isEmpty()) {
           // scroll to the first selected match
           JavaScript.eval(
               "$(\".v-panel-content-result-view-panel\").animate({scrollTop: $(\".selected-match\").offset().top - $(\".result-view-panel\").offset().top}, 1000);");
         }
-      }
-
-      if (projectQueue != null && currentResults < numberOfResults) {
-        log.debug("adding callback for result " + currentResults);
-        // add a callback so we can load the next single result
-        OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
-        ext.extend(newPanel);
       }
 
     } catch (Throwable ex) {
@@ -261,7 +246,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
 
 
   private AbstractComponent createSingleResultPanel(SCorpusGraph corpusGraph, int localMatchIndex,
-      long globalOffset) {
+      long globalOffset, ArrayList<Match> allMatches) {
     Match m = new Match();
     if (allMatches != null && localMatchIndex >= 0 && localMatchIndex < allMatches.size()) {
       m = allMatches.get(localMatchIndex);
@@ -335,73 +320,12 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
     return result;
   }
 
-  @Override
-  public boolean onCompononentLoaded(AbstractClientConnector source) {
-    if (source != null) {
-      if (projectQueue != null && currentQuery != null) {
-        LinkedList<SaltProject> subgraphs = new LinkedList<>();
-        SaltProject projectInQueue;
-        while ((projectInQueue = projectQueue.poll()) != null) {
-          log.debug("Polling queue for SaltProject graph");
-          subgraphs.add(projectInQueue);
-        }
-        if (subgraphs.isEmpty()) {
-          log.debug("no SaltProject graph in queue");
-          return false;
-        }
-
-        log.debug("taken {} SaltProject graph(s) from queue", subgraphs.size());
-        for (SaltProject p : subgraphs) {
-          addQueryResult(currentQuery, p);
-        }
-        return true;
-
-      }
-    }
-
-    return true;
-  }
-
-  private void resetQueryResultQueue() {
-    this.projectQueue = null;
-    this.currentQuery = null;
-    this.currentResults = 0;
-    this.numberOfResults = 0;
-  }
 
   public void setCount(long count) {
     paging.setCount(count, false);
     paging.setStartNumber(initialQuery.getOffset());
   }
 
-  /**
-   * Set a new querys in result panel.
-   *
-   * @param queue holds the salt graph
-   * @param q holds the ordinary query
-   * @param allMatches All matches.
-   */
-  public void setQueryResultQueue(BlockingQueue<SaltProject> queue, PagedResultQuery q,
-      ArrayList<Match> allMatches) {
-    this.projectQueue = queue;
-    this.currentQuery = q;
-    this.numberOfResults = allMatches.size();
-    this.allMatches = allMatches;
-
-    paging.setPageSize(q.getLimit(), false);
-    paging.setInfo(q.getQuery());
-
-    resultLayout.removeAllComponents();
-    resultPanelList.clear();
-
-    // get the first query result
-    SaltProject first = queue.poll();
-    if (first == null) {
-      throw new IllegalStateException("There must be already an element in the queue");
-    }
-
-    addQueryResult(q, first);
-  }
 
   private void setSegmentationLayer(String segmentationLayer) {
     for (Component p : resultPanelList) {

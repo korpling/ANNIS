@@ -21,8 +21,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
@@ -126,10 +124,6 @@ public class ResultFetchJob implements Runnable {
         // since graphANNIS found something, inform the user that subgraphs are created
         ui.access(() -> resultPanel.showSubgraphSearchInProgress(query, 0.0f));
 
-        // prepare fetching subgraphs
-
-        final BlockingQueue<SaltProject> queue =
-            new ArrayBlockingQueue<>(result.getMatches().size());
         int current = 0;
         final ArrayList<Match> matchList = new ArrayList<>(result.getMatches());
 
@@ -144,11 +138,9 @@ public class ResultFetchJob implements Runnable {
           arg.setSegmentation(query.getSegmentation());
           arg.setNodeIds(m.getSaltIDs().stream().collect(Collectors.toList()));
 
-          createSaltFromMatch(m, arg, current, corpora, queue);
+          SaltProject p = createSaltFromMatch(m, arg, current, corpora);
+          ui.access(() -> resultPanel.addQueryResult(query, p, matchList));
 
-          if (current == 0) {
-            ui.access(() -> resultPanel.setQueryResultQueue(queue, query, matchList));
-          }
 
           if (Thread.interrupted()) {
             return;
@@ -194,14 +186,15 @@ public class ResultFetchJob implements Runnable {
     }
   }
 
-  private void createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber,
-      CorporaApi api, BlockingQueue<SaltProject> queue) throws InterruptedException, ApiException {
+  private SaltProject createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber,
+      CorporaApi api) throws InterruptedException, ApiException {
     List<String> corpusPath = Helper.getCorpusPath(m.getSaltIDs().get(0));
+    final SaltProject p = SaltFactory.createSaltProject();
 
     if (!corpusPath.isEmpty()) {
       File graphML = api.subgraphForNodes(corpusPath.get(0), arg);
       try {
-        final SaltProject p = SaltFactory.createSaltProject();
+
         final SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
         if (corpusPath.size() > 1) {
@@ -212,12 +205,12 @@ public class ResultFetchJob implements Runnable {
         } else if (corpusPath.size() == 1) {
           cg.createCorpus(null, corpusPath.get(0));
         }
-        queue.put(p);
         log.debug("added match {} to queue", currentMatchNumber + 1);
       } catch (XMLStreamException | IOException ex) {
         log.error("Could not map GraphML to Salt", ex);
         ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
       }
     }
+    return p;
   }
 }

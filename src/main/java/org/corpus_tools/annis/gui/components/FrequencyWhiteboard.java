@@ -18,7 +18,6 @@ package org.corpus_tools.annis.gui.components;
 import static org.corpus_tools.annis.gui.Helper.encodeGeneric;
 
 import com.vaadin.annotations.JavaScript;
-import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +30,7 @@ import org.corpus_tools.annis.gui.frequency.FrequencyResultPanel;
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 @JavaScript(value = { "flotr2.js", "vaadin://jquery.js", "frequencychart.js" })
-public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements OnLoadCallbackExtension.Callback {
+public class FrequencyWhiteboard extends AbstractJavaScriptComponent {
     /**
      * 
      */
@@ -63,10 +62,6 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
         addStyleName("frequency-chart");
 
         addFunction("selectRow", arguments -> freqPanel.selectRow((int) arguments.getNumber(0)));
-
-        OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this);
-        ext.extend(this);
-
     }
 
     @Override
@@ -77,16 +72,6 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
                     lastFontSize);
         }
     }
-
-    @Override
-    public boolean onCompononentLoaded(AbstractClientConnector source) {
-        if (labels != null && values != null && lastScale != null && lastFont != null) {
-            callFunction("showData", encodeGeneric(labels), encodeGeneric(values), lastScale.desc, lastFont,
-                    lastFontSize);
-        }
-        return true;
-    }
-
     public void setFrequencyData(List<FrequencyTableRow> table, Scale scale, String font,
         float fontSize) {
         labels = new LinkedList<>();
