@@ -137,7 +137,7 @@
 				<plugin>
 					<groupId>org.corpus-tools</groupId>
 					<artifactId>cff-maven-plugin</artifactId>
-					<version>0.4.0</version>
+					<version>0.5.0</version>
 					<configuration>
 						<input>${project.basedir}/misc/cff-templates/CITATION_input.yml</input>
 						<includeEmail>false</includeEmail>

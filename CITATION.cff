@@ -1,4 +1,5 @@
-cff-version: 1.0.3
+cff-version: 1.2.0
+type: software
 message: If you use this software, please cite it using these metadata.
 title: ANNIS
 doi: 10.5281/zenodo.1212548
@@ -37,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.1.0
-date-released: 2021-08-19
+version: 4.2.0-SNAPSHOT
+date-released: 2021-08-24
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -60,7 +61,7 @@ references:
   title: ANTLR 3 Runtime
   version: 3.5.2
   abbreviation: org.antlr:antlr-runtime
-  license-url: http://antlr.org/license.html
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/ANTLR_3_Runtime
     directory.
   authors:
@@ -87,7 +88,7 @@ references:
   title: ANTLR 4 Tool
   version: 4.7.2
   abbreviation: org.antlr:antlr4
-  license-url: http://www.antlr.org/license.html
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/ANTLR_4_Tool directory.
   authors:
   - name: Terence Parr
@@ -112,10 +113,11 @@ references:
   title: AntLR Parser Generator
   version: 2.7.7
   abbreviation: antlr:antlr
-  license-url: http://www.antlr.org/license.html
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/AntLR_Parser_Generator
     directory.
-  authors: []
+  authors:
+  - name: The AntLR Parser Generator 2.7.7 Team
 - type: software
   title: Apache Commons Codec
   version: '1.15'
@@ -312,7 +314,6 @@ references:
     directory.
   authors:
   - name: Emmanuel Bernard
-  - name: Emmanuel Bernard
   - name: Hardy Ferentschik
   - name: Gunnar Morling
   - name: Guillaume Smet
@@ -364,7 +365,8 @@ references:
   abbreviation: com.github.jjYBdx4IL.utils:env-utils
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Env_Utils directory.
-  authors: []
+  authors:
+  - name: The Env Utils 1.0 Team
   repository-code: https://github.com/jjYBdx4IL/misc/env-utils
 - type: software
   title: FindBugs-jsr305
@@ -373,7 +375,8 @@ references:
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/FindBugs_jsr305
     directory.
-  authors: []
+  authors:
+  - name: The FindBugs-jsr305 3.0.2 Team
   repository-code: https://code.google.com/p/jsr-305/
 - type: software
   title: Flute
@@ -388,7 +391,7 @@ references:
   title: GAGAWA
   version: 1.0.1
   abbreviation: com.hp.gagawa:gagawa
-  license-url: http://opensource.org/licenses/mit-license.php
+  license: MIT
   notes: More license information can be found in the THIRD-PARTY/GAGAWA directory.
   authors:
   - name: Mark S. Kolich
@@ -408,7 +411,8 @@ references:
   abbreviation: com.google.code.gson:gson
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Gson directory.
-  authors: []
+  authors:
+  - name: The Gson 2.8.7 Team
   repository-code: https://github.com/google/gson/gson/
 - type: software
   title: Gson on Fire!
@@ -442,7 +446,7 @@ references:
   title: H2 Database Engine
   version: 1.4.200
   abbreviation: com.h2database:h2
-  license-url: https://h2database.com/html/license.html
+  license: MPL-2.0 OR EPL-1.0
   notes: More license information can be found in the THIRD-PARTY/H2_Database_Engine
     directory.
   authors:
@@ -452,7 +456,7 @@ references:
   title: Hibernate Commons Annotations
   version: 5.1.2.Final
   abbreviation: org.hibernate.common:hibernate-commons-annotations
-  license-url: http://www.opensource.org/licenses/LGPL-2.1
+  license: LGPL-2.1
   notes: More license information can be found in the THIRD-PARTY/Hibernate_Commons_Annotations
     directory.
   authors:
@@ -462,7 +466,7 @@ references:
   title: Hibernate ORM - hibernate-core
   version: 5.4.32.Final
   abbreviation: org.hibernate:hibernate-core
-  license-url: http://www.opensource.org/licenses/LGPL-2.1
+  license: LGPL-2.1
   notes: More license information can be found in the THIRD-PARTY/Hibernate_ORM_hibernate_core
     directory.
   authors:
@@ -480,7 +484,7 @@ references:
   title: ICU4J
   version: '61.1'
   abbreviation: com.ibm.icu:icu4j
-  license-url: http://source.icu-project.org/repos/icu/trunk/icu4j/main/shared/licenses/LICENSE
+  license: Unicode-DFS-2016
   notes: More license information can be found in the THIRD-PARTY/ICU4J directory.
   authors:
   - name: Mark Davis
@@ -499,13 +503,14 @@ references:
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/J2ObjC_Annotations
     directory.
-  authors: []
+  authors:
+  - name: The J2ObjC Annotations 1.1 Team
   repository-code: http://svn.sonatype.org/spice/tags/oss-parent-7/j2objc-annotations
 - type: software
   title: JAXB Runtime
   version: 2.3.4
   abbreviation: org.glassfish.jaxb:jaxb-runtime
-  license-url: http://www.eclipse.org/org/documents/edl-v10.php
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/JAXB_Runtime directory.
   authors:
   - name: Roman Grigoriadi
@@ -565,7 +570,7 @@ references:
   title: JSR 353 (JSON Processing) Default Provider
   version: 1.0.4
   abbreviation: org.glassfish:javax.json
-  license-url: https://glassfish.java.net/public/CDDL+GPL_1_1.html
+  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
   notes: More license information can be found in the THIRD-PARTY/JSR_353_JSON_Processing_Default_Provider
     directory.
   authors:
@@ -654,7 +659,7 @@ references:
   title: Jakarta Activation
   version: 1.2.2
   abbreviation: com.sun.activation:jakarta.activation
-  license-url: http://www.eclipse.org/org/documents/edl-v10.php
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/Jakarta_Activation
     directory.
   authors:
@@ -664,7 +669,7 @@ references:
   title: Jakarta Activation API jar
   version: 1.2.2
   abbreviation: jakarta.activation:jakarta.activation-api
-  license-url: http://www.eclipse.org/org/documents/edl-v10.php
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/Jakarta_Activation_API_jar
     directory.
   authors:
@@ -674,7 +679,7 @@ references:
   title: Jakarta Annotations API
   version: 1.3.5
   abbreviation: jakarta.annotation:jakarta.annotation-api
-  license-url: http://www.eclipse.org/legal/epl-2.0
+  license: EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
   notes: More license information can be found in the THIRD-PARTY/Jakarta_Annotations_API
     directory.
   authors:
@@ -684,7 +689,7 @@ references:
   title: Jakarta Mail API
   version: 1.6.7
   abbreviation: com.sun.mail:jakarta.mail
-  license-url: http://www.eclipse.org/legal/epl-2.0
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/Jakarta_Mail_API
     directory.
   authors:
@@ -694,7 +699,7 @@ references:
   title: Jakarta Persistence API
   version: 2.2.3
   abbreviation: jakarta.persistence:jakarta.persistence-api
-  license-url: http://www.eclipse.org/legal/epl-2.0
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/Jakarta_Persistence_API
     directory.
   authors:
@@ -704,7 +709,7 @@ references:
   title: Jakarta XML Binding API
   version: 2.3.3
   abbreviation: jakarta.xml.bind:jakarta.xml.bind-api
-  license-url: http://www.eclipse.org/org/documents/edl-v10.php
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/Jakarta_XML_Binding_API
     directory.
   authors:
@@ -724,7 +729,7 @@ references:
   title: Java Servlet API
   version: 4.0.1
   abbreviation: javax.servlet:javax.servlet-api
-  license-url: https://oss.oracle.com/licenses/CDDL+GPL-1.1
+  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
   notes: More license information can be found in the THIRD-PARTY/Java_Servlet_API
     directory.
   authors:
@@ -735,7 +740,7 @@ references:
   title: Java Text Categorizing Library
   version: 1.0.1
   abbreviation: org.knallgrau.utils:textcat
-  license-url: http://www.gnu.org/licenses/lgpl.txt
+  license: LGPL-3.0
   notes: More license information can be found in the THIRD-PARTY/Java_Text_Categorizing_Library
     directory.
   authors:
@@ -748,12 +753,13 @@ references:
   license: CDDL-1.0
   notes: More license information can be found in the THIRD-PARTY/JavaBeans_TM_Activation_Framework
     directory.
-  authors: []
+  authors:
+  - name: The JavaBeans(TM) Activation Framework 1.1.1 Team
 - type: software
   title: JavaMail API (compat)
   version: 1.4.5
   abbreviation: javax.mail:mail
-  license-url: http://www.sun.com/cddl
+  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
   notes: More license information can be found in the THIRD-PARTY/JavaMail_API_compat_
     directory.
   authors:
@@ -763,7 +769,7 @@ references:
   title: Javassist
   version: 3.27.0-GA
   abbreviation: org.javassist:javassist
-  license-url: http://www.mozilla.org/MPL/MPL-1.1.html
+  license: MPL-1.1 OR LGPL-2.1-or-later OR Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Javassist directory.
   authors:
   - name: Shigeru Chiba
@@ -795,7 +801,7 @@ references:
   title: Logback Core Module
   version: 1.2.3
   abbreviation: ch.qos.logback:logback-core
-  license-url: http://www.eclipse.org/legal/epl-v10.html
+  license: EPL-1.0 OR LGPL-2.1-only
   notes: More license information can be found in the THIRD-PARTY/Logback_Core_Module
     directory.
   authors:
@@ -865,7 +871,8 @@ references:
   abbreviation: com.squareup.okhttp3:okhttp
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/OkHttp directory.
-  authors: []
+  authors:
+  - name: The OkHttp 3.14.9 Team
   repository-code: https://github.com/square/okhttp/okhttp/
 - type: software
   title: OkHttp Logging Interceptor
@@ -874,7 +881,8 @@ references:
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/OkHttp_Logging_Interceptor
     directory.
-  authors: []
+  authors:
+  - name: The OkHttp Logging Interceptor 3.14.9 Team
   repository-code: https://github.com/square/okhttp/logging-interceptor/
 - type: software
   title: Okio
@@ -882,7 +890,8 @@ references:
   abbreviation: com.squareup.okio:okio
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Okio directory.
-  authors: []
+  authors:
+  - name: The Okio 1.17.2 Team
   repository-code: https://github.com/square/okio/okio/
 - type: software
   title: Process Utils
@@ -890,7 +899,8 @@ references:
   abbreviation: com.github.jjYBdx4IL.utils:proc-utils
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Process_Utils directory.
-  authors: []
+  authors:
+  - name: The Process Utils 1.0 Team
   repository-code: https://github.com/jjYBdx4IL/misc/proc-utils
 - type: software
   title: SLF4J API Module
@@ -906,10 +916,11 @@ references:
   title: Simple API for CSS
   version: '1.3'
   abbreviation: org.w3c.css:sac
-  license-url: http://www.w3.org/Consortium/Legal/copyright-software-19980720
+  license: W3C
   notes: More license information can be found in the THIRD-PARTY/Simple_API_for_CSS
     directory.
-  authors: []
+  authors:
+  - name: The Simple API for CSS 1.3 Team
 - type: software
   title: SnakeYAML
   version: '1.28'
@@ -1069,7 +1080,7 @@ references:
   title: Stax2 API
   version: 4.2.1
   abbreviation: org.codehaus.woodstox:stax2-api
-  license-url: http://www.opensource.org/licenses/bsd-license.php
+  license: BSD-2-Clause
   notes: More license information can be found in the THIRD-PARTY/Stax2_API directory.
   authors:
   - name: Tatu Saloranta
@@ -1078,7 +1089,8 @@ references:
   title: StringTemplate 4
   version: '4.1'
   abbreviation: org.antlr:ST4
-  authors: []
+  authors:
+  - name: The StringTemplate 4 4.1 Team
   repository-code: https://github.com/antlr/stringtemplate4/tree/master
 - type: software
   title: Swing Utils
@@ -1086,13 +1098,14 @@ references:
   abbreviation: com.github.jjYBdx4IL.utils:swing-utils
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Swing_Utils directory.
-  authors: []
+  authors:
+  - name: The Swing Utils 1.0 Team
   repository-code: https://github.com/jjYBdx4IL/misc/swing-utils
 - type: software
   title: TXW2 Runtime
   version: 2.3.4
   abbreviation: org.glassfish.jaxb:txw2
-  license-url: http://www.eclipse.org/org/documents/edl-v10.php
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/TXW2_Runtime directory.
   authors:
   - name: Roman Grigoriadi
@@ -1123,7 +1136,8 @@ references:
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/XML_Commons_External_Components_XML_APIs
     directory.
-  authors: []
+  authors:
+  - name: The XML Commons External Components XML APIs 1.0.b2 Team
   repository-code: http://svn.apache.org/viewvc/xml/commons/tags/xml-commons-1_0_b2
 - type: software
   title: abego TreeLayout Core
@@ -1139,7 +1153,7 @@ references:
   title: asm
   version: '9.1'
   abbreviation: org.ow2.asm:asm
-  license-url: https://asm.ow2.io/license.html
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/asm directory.
   authors:
   - name: Eric Bruneton
@@ -1150,7 +1164,7 @@ references:
   title: atmosphere-runtime
   version: 2.4.30.vaadin4
   abbreviation: com.vaadin.external.atmosphere:atmosphere-runtime
-  license-url: https://glassfish.dev.java.net/public/CDDLv1.0.html
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/atmosphere_runtime
     directory.
   authors:
@@ -1163,7 +1177,7 @@ references:
   title: dom4j
   version: 2.1.3
   abbreviation: org.dom4j:dom4j
-  license-url: https://github.com/dom4j/dom4j/blob/master/LICENSE
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/dom4j directory.
   authors:
   - name: Filip Jirsák
@@ -1174,15 +1188,17 @@ references:
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/error_prone_annotations
     directory.
-  authors: []
+  authors:
+  - name: The error-prone annotations 2.0.12 Team
   repository-code: https://github.com/google/error-prone/error_prone_annotations
 - type: software
   title: gwt-elemental
   version: 2.8.2
   abbreviation: com.google.gwt:gwt-elemental
-  license-url: http://www.gwtproject.org/terms.html
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/gwt_elemental directory.
-  authors: []
+  authors:
+  - name: The gwt-elemental 2.8.2 Team
   repository-code: http://svn.sonatype.org/spice/tags/oss-parent-4/gwt/gwt-elemental
 - type: software
   title: gwt-user
@@ -1190,13 +1206,14 @@ references:
   abbreviation: com.google.gwt:gwt-user
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/gwt_user directory.
-  authors: []
+  authors:
+  - name: The gwt-user 2.8.2 Team
   repository-code: http://svn.sonatype.org/spice/tags/oss-parent-4/gwt/gwt-user
 - type: software
   title: istack common utility code runtime
   version: 3.0.12
   abbreviation: com.sun.istack:istack-commons-runtime
-  license-url: http://www.eclipse.org/org/documents/edl-v10.php
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/istack_common_utility_code_runtime
     directory.
   authors:
@@ -1216,7 +1233,7 @@ references:
   title: java jwt
   version: 3.10.3
   abbreviation: com.auth0:java-jwt
-  license-url: https://raw.githubusercontent.com/auth0/java-jwt/master/LICENSE
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/java_jwt directory.
   authors:
   - name: Auth0
@@ -1227,7 +1244,7 @@ references:
   title: javax.interceptor API
   version: 1.2.2
   abbreviation: javax.interceptor:javax.interceptor-api
-  license-url: https://oss.oracle.com/licenses/CDDL+GPL-1.1
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/javax.interceptor_API
     directory.
   authors:
@@ -1237,7 +1254,7 @@ references:
   title: javax.transaction API
   version: 1.3.3
   abbreviation: jakarta.transaction:jakarta.transaction-api
-  license-url: http://www.eclipse.org/legal/epl-2.0
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/javax.transaction_API
     directory.
   authors:
@@ -1247,16 +1264,17 @@ references:
   title: jsinterop-annotations
   version: 1.0.2
   abbreviation: com.google.jsinterop:jsinterop-annotations
-  license-url: http://www.gwtproject.org/terms.html
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/jsinterop_annotations
     directory.
-  authors: []
+  authors:
+  - name: The jsinterop-annotations 1.0.2 Team
   repository-code: http://svn.sonatype.org/spice/tags/oss-parent-4/jsinterop/jsinterop-annotations
 - type: software
   title: jsoup Java HTML Parser
-  version: 1.11.2
+  version: 1.14.2
   abbreviation: org.jsoup:jsoup
-  license-url: https://jsoup.org/license
+  license: MIT
   notes: More license information can be found in the THIRD-PARTY/jsoup_Java_HTML_Parser
     directory.
   authors:
@@ -1266,14 +1284,15 @@ references:
   title: jsr311-api
   version: 1.1.1
   abbreviation: javax.ws.rs:jsr311-api
-  license: NOASSERTION
+  license: CDDL-1.0
   notes: More license information can be found in the THIRD-PARTY/jsr311_api directory.
-  authors: []
+  authors:
+  - name: The jsr311-api 1.1.1 Team
 - type: software
   title: jung-api
   version: 2.0.1
   abbreviation: net.sf.jung:jung-api
-  license-url: http://jung.sourceforge.net/license.txt
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/jung_api directory.
   authors:
   - name: Joshua
@@ -1284,7 +1303,7 @@ references:
   title: jung-graph-impl
   version: 2.0.1
   abbreviation: net.sf.jung:jung-graph-impl
-  license-url: http://jung.sourceforge.net/license.txt
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/jung_graph_impl
     directory.
   authors:
@@ -1296,10 +1315,11 @@ references:
   title: larvalabs collections
   version: '4.01'
   abbreviation: net.sourceforge.collections:collections-generic
-  license-url: http://www.apache.org/licenses/LICENSE-2.0.html
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/larvalabs_collections
     directory.
-  authors: []
+  authors:
+  - name: The larvalabs collections 4.01 Team
   repository-code: http://collections.svn.sourceforge.net/viewvc/collections/
 - type: software
   title: opencsv
@@ -1316,7 +1336,7 @@ references:
   title: org.eclipse.emf
   version: 2.9.1-v20130827-0309
   abbreviation: org.eclipse.emf:org.eclipse.emf.common
-  license-url: http://www.eclipse.org/legal/epl-v10.html
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/org.eclipse.emf
     directory.
   authors:
@@ -1326,7 +1346,7 @@ references:
   title: org.eclipse.emf.ecore
   version: 2.9.1-v20130827-0309
   abbreviation: org.eclipse.emf:org.eclipse.emf.ecore
-  license-url: http://www.eclipse.org/legal/epl-v10.html
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/org.eclipse.emf.ecore
     directory.
   authors:
@@ -1336,7 +1356,7 @@ references:
   title: org.eclipse.emf.ecore.xmi
   version: 2.9.1-v20130827-0309
   abbreviation: org.eclipse.emf:org.eclipse.emf.ecore.xmi
-  license-url: http://www.eclipse.org/legal/epl-v10.html
+  license: NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/org.eclipse.emf.ecore.xmi
     directory.
   authors:
@@ -1346,7 +1366,8 @@ references:
   title: popupbutton
   version: 3.0.0
   abbreviation: org.vaadin.addons:popupbutton
-  authors: []
+  authors:
+  - name: The popupbutton 3.0.0 Team
 - type: software
   title: salt-api
   version: 3.4.2
@@ -1563,7 +1584,8 @@ references:
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/tomcat_embed_core
     directory.
-  authors: []
+  authors:
+  - name: The tomcat-embed-core 9.0.48 Team
 - type: software
   title: tomcat-embed-el
   version: 9.0.48
@@ -1571,7 +1593,8 @@ references:
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/tomcat_embed_el
     directory.
-  authors: []
+  authors:
+  - name: The tomcat-embed-el 9.0.48 Team
 - type: software
   title: tomcat-embed-websocket
   version: 9.0.48
@@ -1579,12 +1602,13 @@ references:
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/tomcat_embed_websocket
     directory.
-  authors: []
+  authors:
+  - name: The tomcat-embed-websocket 9.0.48 Team
 - type: software
   title: toml4j
   version: 0.7.2
   abbreviation: com.moandjiezana.toml:toml4j
-  license-url: http://www.opensource.org/licenses/mit-license.php
+  license: MIT
   notes: More license information can be found in the THIRD-PARTY/toml4j directory.
   authors:
   - name: Moandji Ezana
@@ -1593,7 +1617,7 @@ references:
   title: tomlj
   version: 1.0.0
   abbreviation: org.tomlj:tomlj
-  license-url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/tomlj directory.
   authors:
   - name: Chris Leishman
@@ -1651,7 +1675,7 @@ references:
   title: vaadin-compatibility-shared
   version: 8.13.2
   abbreviation: com.vaadin:vaadin-compatibility-shared
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_shared
     directory.
   authors:
@@ -1671,7 +1695,7 @@ references:
   title: vaadin-push
   version: 8.13.2
   abbreviation: com.vaadin:vaadin-push
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_push directory.
   authors:
   - name: Henri Sara
@@ -1680,7 +1704,7 @@ references:
   title: vaadin-server
   version: 8.13.2
   abbreviation: com.vaadin:vaadin-server
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_server directory.
   authors:
   - name: Henri Sara
@@ -1698,7 +1722,7 @@ references:
   title: vaadin-slf4j-jdk14
   version: 1.6.1
   abbreviation: com.vaadin.external.slf4j:vaadin-slf4j-jdk14
-  license-url: http://opensource.org/licenses/MIT
+  license: MIT
   notes: More license information can be found in the THIRD-PARTY/vaadin_slf4j_jdk14
     directory.
   authors:
