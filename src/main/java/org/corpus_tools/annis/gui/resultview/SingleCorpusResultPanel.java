@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
@@ -41,8 +40,7 @@ public class SingleCorpusResultPanel extends CssLayout {
 
 
   public SingleCorpusResultPanel(final Collection<String> matchedPaths,
-      long resultNumber,
-      AnnisUI ui, DisplayedResultQuery query) {
+      long resultNumber, DisplayedResultQuery query) {
 
     setWidth("100%");
     setHeight("-1px");
