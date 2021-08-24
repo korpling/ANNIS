@@ -147,7 +147,7 @@ public class SingleResultPanel extends CssLayout
   private Map<String, String> markedExactMap;
 
   private final AnnisUI ui;
-  private List<VisualizerPanel> visualizers;
+  private final List<VisualizerPanel> visualizers = new LinkedList<>();
 
   private List<VisualizerRule> resolverEntries;
 
@@ -359,7 +359,7 @@ public class SingleResultPanel extends CssLayout
     try {
       resolverEntries = resolverProvider == null ? new LinkedList<>()
           : resolverProvider.getResolverEntries(result, UI.getCurrent());
-      visualizers = new LinkedList<>();
+      visualizers.clear();;
 
       List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
