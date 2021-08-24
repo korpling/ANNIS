@@ -217,33 +217,17 @@ java -jar target/annis-gui-&lt;version&gt;-server.jar
 <p>After starting the service, you can access the site under <a href="http://localhost:5711">http://localhost:5711/</a>. 
 The service can be stopped by pressing <kbd>CTRL</kbd>+<kbd>C</kbd>.</p>
 <h1><a class="header" href="#making-a-new-annis-release" id="making-a-new-annis-release">Making a new ANNIS release</a></h1>
-<h2><a class="header" href="#introduction" id="introduction">Introduction</a></h2>
 <p>You must have <a href="https://github.com/rust-lang-nursery/mdBook">mdBook</a> installed to make a release.
 Otherwise the documentation can't be created.</p>
-<h2><a class="header" href="#release-process" id="release-process">Release Process</a></h2>
-<h3><a class="header" href="#initialization-phase" id="initialization-phase">Initialization phase</a></h3>
 <ol>
-<li><strong>Start</strong> the release process by executing <code>mvn gitflow:release-start</code> for a regular release (branched from <code>develop</code>) or <code>mvn gitflow:hotfix-start</code> for a hotfix that is branched from <code>master</code>. The command will ask you for the new version number, use <a href="https://semver.org/">semantic versioning</a>.</li>
-<li><strong>Add new changelog entries</strong>, if some important information is missing add an entry to the changelog.
-When the changelog is up-to-date, execute</li>
+<li>Check the changelog (<code>CHANGELOG.md</code>): note the last release version number and which kind of changes have been made since the last release.
+Determine if this is a major, minor or patch release according to <a href="https://semver.org/">semantic versioning</a>. </li>
+<li>Release the <strong>source code</strong> using Maven.  The command will ask you for the new version number use the most appropriate with respect to the previous version number and the changes made.</li>
 </ol>
-<pre><code class="language-bash">mvn -N keepachangelog:release cff:create cff:third-party-folder
+<pre><code>mvn release:clean release:prepare release:perform
 </code></pre>
-<p>and commit your changes.
-This will also update the citation file (<code>CITATION.cff</code>) and the contents of the <code>THIRD-PARTY</code> folder.</p>
-<h3><a class="header" href="#testing-cycle" id="testing-cycle">Testing cycle</a></h3>
-<ol>
-<li><strong>Build</strong> the complete project <em>with</em> tests.</li>
-</ol>
-<pre><code class="language-bash">mvn clean install
-</code></pre>
-<ol start="2">
-<li><strong>Do manual tests.</strong> If you have to fix any bug document it in the issue tracker, update the changelog and start over at step 1.
-If no known bugs are left to fix go to the next section. </li>
-</ol>
-<h3><a class="header" href="#finish-phase" id="finish-phase">Finish phase</a></h3>
-<ol>
-<li><strong>Finish</strong> the release by executing either <code>mvn gitflow:release-finish</code> for regular releases or <code>mvn gitflow:hotfix-finish</code> for hotfixes.</li>
+<p>This will update versions, the changelog, our citation file (<code>CITATION.cff</code>) and the contents of the <code>THIRD-PARTY</code> folder.</p>
+<ol start="3">
 <li>Create a new <strong>release on GitHub</strong> including the changelog. The release binaries and a new version of the User and Developer Guide will be deployed by the GitHub Actions CI.</li>
 </ol>
 <h1><a class="header" href="#create-new-query-builder" id="create-new-query-builder">Create new query builder</a></h1>
