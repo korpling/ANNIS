@@ -144,8 +144,6 @@ public class SingleResultPanel extends CssLayout
 
   private SDocument result;
 
-  private Map<String, String> markedExactMap;
-
   private final AnnisUI ui;
   private final List<VisualizerPanel> visualizers = new LinkedList<>();
 
@@ -193,8 +191,6 @@ public class SingleResultPanel extends CssLayout
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.query = query;
     this.match = match;
-
-    calculateHelperVariables();
 
     setWidth("100%");
     setHeight("-1px");
@@ -340,10 +336,6 @@ public class SingleResultPanel extends CssLayout
 
       UI.getCurrent().addWindow(infoWindow);
     }
-  }
-
-  private void calculateHelperVariables() {
-    markedExactMap = new HashMap<>();
   }
 
   @Override
