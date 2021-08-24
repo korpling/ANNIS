@@ -5,8 +5,9 @@ You must have [mdBook](https://github.com/rust-lang-nursery/mdBook) installed to
 Otherwise the documentation can't be created.
 
 
-1. Check which changes have been made since the last release in the `CHANGELOG.md` file.
-2. Release the **source code** using Maven.  The command will ask you for the new version number, use [semantic versioning](https://semver.org/).
+1. Check the changelog (`CHANGELOG.md`): note the last release version number and which kind of changes have been made since the last release.
+   Determine if this is a major, minor or patch release according to [semantic versioning](https://semver.org/). 
+2. Release the **source code** using Maven.  The command will ask you for the new version number use the most appropriate with respect to the previous version number and the changes made.
 ```
 mvn release:clean release:prepare release:perform
 ```
