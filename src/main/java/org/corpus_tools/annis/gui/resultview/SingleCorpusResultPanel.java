@@ -31,7 +31,6 @@ import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
-import org.corpus_tools.annis.gui.objects.Match;
 
 public class SingleCorpusResultPanel extends CssLayout {
   private static final long serialVersionUID = 3L;
@@ -41,7 +40,7 @@ public class SingleCorpusResultPanel extends CssLayout {
   private final HorizontalLayout infoBar;
 
 
-  public SingleCorpusResultPanel(final Collection<String> matchedPaths, Match match,
+  public SingleCorpusResultPanel(final Collection<String> matchedPaths,
       long resultNumber,
       AnnisUI ui, DisplayedResultQuery query) {
 
