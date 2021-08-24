@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.1.4] - 2021-08-24
+
 ### Fixed
 
 - Matches for documents or (sub-) corpora where not shown. There is a special SingleCorpusResultPanel which should have been used, but was not triggered.
@@ -942,7 +944,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.1.3...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.1.4...HEAD
+[4.1.4]: https://github.com/korpling/ANNIS/compare/v4.1.3...v4.1.4
 [4.1.3]: https://github.com/korpling/ANNIS/compare/v4.1.2...v4.1.3
 [4.1.2]: https://github.com/korpling/ANNIS/compare/v4.1.1...v4.1.2
 [4.1.1]: https://github.com/korpling/ANNIS/compare/v4.1.0...v4.1.1
