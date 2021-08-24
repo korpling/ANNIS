@@ -284,7 +284,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
           matchedCorpora.add(n.getId());
         }
       }
-      panel = new SingleCorpusResultPanel(matchedCorpora, m, localMatchIndex + globalOffset, sui,
+      panel = new SingleCorpusResultPanel(matchedCorpora, localMatchIndex + globalOffset, sui,
           initialQuery);
     }
     panel.setWidth("100%");
