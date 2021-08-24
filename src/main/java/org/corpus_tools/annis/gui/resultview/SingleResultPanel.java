@@ -349,7 +349,7 @@ public class SingleResultPanel extends CssLayout
     try {
       resolverEntries = resolverProvider == null ? new LinkedList<>()
           : resolverProvider.getResolverEntries(result, UI.getCurrent());
-      visualizers.clear();;
+      visualizers.clear();
 
       List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
