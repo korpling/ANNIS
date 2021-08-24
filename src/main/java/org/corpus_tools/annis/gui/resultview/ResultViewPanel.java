@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -276,26 +277,27 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
             }
 
             AbstractComponent panel;
-            if (corpusGraph.getDocuments().isEmpty()) {
+            Optional<SDocument> doc = corpusGraph.getDocuments().stream()
+                .filter(
+                    d -> d.getDocumentGraph() != null && !d.getDocumentGraph().getNodes().isEmpty())
+                .findFirst();
+            if (doc.isEmpty()) {
 
-                Set<SCorpus> matchedCorpora = new LinkedHashSet<>();
-                for (String id : m.getSaltIDs()) {
-                    SNode n = corpusGraph.getNode(id);
-                    if (n instanceof SCorpus) {
-                        matchedCorpora.add((SCorpus) n);
-                    }
+              Set<String> matchedCorpora = new LinkedHashSet<>();
+              for (String id : m.getSaltIDs()) {
+                SNode n = corpusGraph.getNode("salt:/" + id);
+                if (n instanceof SCorpus || n instanceof SDocument) {
+                  matchedCorpora.add(n.getId());
                 }
+              }
 
-                panel = new SingleCorpusResultPanel(matchedCorpora, m, i + globalOffset, sui,
-                        initialQuery);
+              panel = new SingleCorpusResultPanel(matchedCorpora, m, i + globalOffset, sui,
+                  initialQuery);
 
             } else {
-                SDocument doc = corpusGraph.getDocuments().get(0);
-
-                panel = new SingleResultPanel(doc, m, i + globalOffset,
-                        new ResolverProviderImpl(cacheResolver), sui, getVisibleTokenAnnos(),
-                        segmentationName, controller, initialQuery);
-
+              panel = new SingleResultPanel(doc.get(), m, i + globalOffset,
+                  new ResolverProviderImpl(cacheResolver), sui, getVisibleTokenAnnos(),
+                  segmentationName, controller, initialQuery);
             }
 
             i++;

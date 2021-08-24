@@ -16,6 +16,7 @@ import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.github.mvysny.kaributesting.v8.NotificationsKt;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -50,6 +51,7 @@ import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserTable;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
+import org.corpus_tools.annis.gui.resultview.SingleCorpusResultPanel;
 import org.corpus_tools.annis.gui.resultview.SingleResultPanel;
 import org.corpus_tools.annis.gui.visualizers.component.grid.GridComponent;
 import org.corpus_tools.annis.gui.visualizers.component.kwic.KWICComponent;
@@ -268,6 +270,77 @@ class AnnisUITest {
             "Groß-Glienicker", "haben"),
         tokens.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
   }
+
+  @Test
+  void searchPccDocumentMatches() throws Exception {
+
+    selectCorpus("pcc2");
+
+    // Set the query and submit query
+    _get(AqlCodeEditor.class).getPropertyDataSource().setValue("Genre");
+    MockVaadin.INSTANCE.clientRoundtrip();
+    awaitCondition(5, () -> "Genre".equals(ui.getQueryState().getAql().getValue()));
+    awaitCondition(5, () -> "Valid query, click on \"Search\" to start searching."
+        .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
+
+    Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
+    _click(searchButton);
+
+    // Wait until the count is displayed
+    String expectedStatus = "2 matches\nin 2 documents";
+    awaitCondition(60,
+        () -> expectedStatus
+            .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
+        () -> "Waited for status \"" + expectedStatus + "\" but was \""
+            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+
+    // Test that the special corpus result panel visualizer is shown
+    awaitCondition(30, () -> !_find(SingleCorpusResultPanel.class).isEmpty());
+    List<SingleCorpusResultPanel> results = _find(SingleCorpusResultPanel.class);
+    assertNotNull(_get(results.get(0), Label.class, spec -> spec.withValue("Path: pcc2 > 11299")));
+    assertNotNull(_get(results.get(0), Button.class,
+        spec -> spec.withPredicate(b -> b.getIcon() == VaadinIcons.INFO_CIRCLE)));
+
+    // The standard SingleResult panel should not be visible
+    assertEquals(0, _find(SingleResultPanel.class).size());
+    
+    
+  }
+
+  @Test
+  void searchPccCorpusMatches() throws Exception {
+
+    selectCorpus("pcc2");
+
+    // Set the query and submit query
+    _get(AqlCodeEditor.class).getPropertyDataSource().setValue("URL");
+    MockVaadin.INSTANCE.clientRoundtrip();
+    awaitCondition(5, () -> "URL".equals(ui.getQueryState().getAql().getValue()));
+    awaitCondition(5, () -> "Valid query, click on \"Search\" to start searching."
+        .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
+
+    Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
+    _click(searchButton);
+
+    // Wait until the count is displayed
+    String expectedStatus = "1 match\nin 1 document";
+    awaitCondition(60,
+        () -> expectedStatus
+            .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
+        () -> "Waited for status \"" + expectedStatus + "\" but was \""
+            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+
+    // Test that the special corpus result panel visualizer is shown
+    awaitCondition(30, () -> !_find(SingleCorpusResultPanel.class).isEmpty());
+    List<SingleCorpusResultPanel> results = _find(SingleCorpusResultPanel.class);
+    assertNotNull(_get(results.get(0), Label.class, spec -> spec.withValue("Path: pcc2")));
+    assertNotNull(_get(results.get(0), Button.class,
+        spec -> spec.withPredicate(b -> b.getIcon() == VaadinIcons.INFO_CIRCLE)));
+
+    /// The standard SingleResult panel should not be visible
+    assertEquals(0, _find(SingleResultPanel.class).size());
+  }
+
 
   @Test
   void openVisualizerPcc2() throws Exception {
