@@ -150,8 +150,6 @@ public class ResultFetchJob implements Runnable {
         }
       } // end if no results
 
-    } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
     } catch (final ApiException ex) {
       ui.access(() -> {
         if (resultPanel != null && resultPanel.getPaging() != null) {
