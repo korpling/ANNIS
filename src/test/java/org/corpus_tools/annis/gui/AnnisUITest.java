@@ -181,7 +181,7 @@ class AnnisUITest {
 
     ResultViewPanel resultView = _get(ResultViewPanel.class);
 
-    awaitCondition(30, () -> !_find(resultView, SingleResultPanel.class).isEmpty());
+    awaitCondition(30, () -> _find(resultView, SingleResultPanel.class).size() == 10);
   }
 
   @Test
@@ -257,7 +257,7 @@ class AnnisUITest {
 
     ResultViewPanel resultView = _get(ResultViewPanel.class);
 
-    awaitCondition(30, () -> !_find(resultView, SingleResultPanel.class).isEmpty());
+    awaitCondition(30, () -> _find(resultView, SingleResultPanel.class).size() == 4);
 
     // Test that the cell values have the correct token value
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
@@ -295,7 +295,7 @@ class AnnisUITest {
             + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
 
     // Test that the special corpus result panel visualizer is shown
-    awaitCondition(30, () -> !_find(SingleCorpusResultPanel.class).isEmpty());
+    awaitCondition(30, () -> _find(SingleCorpusResultPanel.class).size() == 2);
     List<SingleCorpusResultPanel> results = _find(SingleCorpusResultPanel.class);
     assertNotNull(_get(results.get(0), Label.class, spec -> spec.withValue("Path: pcc2 > 11299")));
     assertNotNull(_get(results.get(0), Button.class,
@@ -331,7 +331,7 @@ class AnnisUITest {
             + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
 
     // Test that the special corpus result panel visualizer is shown
-    awaitCondition(30, () -> !_find(SingleCorpusResultPanel.class).isEmpty());
+    awaitCondition(30, () -> _find(SingleCorpusResultPanel.class).size() == 1);
     List<SingleCorpusResultPanel> results = _find(SingleCorpusResultPanel.class);
     assertNotNull(_get(results.get(0), Label.class, spec -> spec.withValue("Path: pcc2")));
     assertNotNull(_get(results.get(0), Button.class,
