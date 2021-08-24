@@ -281,8 +281,11 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                 .filter(
                     d -> d.getDocumentGraph() != null && !d.getDocumentGraph().getNodes().isEmpty())
                 .findFirst();
-            if (doc.isEmpty()) {
-
+            if (doc.isPresent()) {
+              panel = new SingleResultPanel(doc.get(), m, i + globalOffset,
+                  new ResolverProviderImpl(cacheResolver), sui, getVisibleTokenAnnos(),
+                  segmentationName, controller, initialQuery);
+            } else {
               Set<String> matchedCorpora = new LinkedHashSet<>();
               for (String id : m.getSaltIDs()) {
                 SNode n = corpusGraph.getNode("salt:/" + id);
@@ -290,14 +293,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
                   matchedCorpora.add(n.getId());
                 }
               }
-
               panel = new SingleCorpusResultPanel(matchedCorpora, m, i + globalOffset, sui,
                   initialQuery);
-
-            } else {
-              panel = new SingleResultPanel(doc.get(), m, i + globalOffset,
-                  new ResolverProviderImpl(cacheResolver), sui, getVisibleTokenAnnos(),
-                  segmentationName, controller, initialQuery);
             }
 
             i++;
