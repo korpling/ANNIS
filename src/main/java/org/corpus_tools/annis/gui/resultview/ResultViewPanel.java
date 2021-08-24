@@ -25,7 +25,6 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -189,7 +188,7 @@ public class ResultViewPanel extends VerticalLayout {
     setExpandRatio(paging, 0.0f);
   }
 
-  public void addQueryResult(PagedResultQuery q, SaltProject p, ArrayList<Match> allMatches) {
+  public void addQueryResult(PagedResultQuery q, SaltProject p, List<Match> allMatches) {
 
     if (q == null) {
       return;
@@ -246,7 +245,7 @@ public class ResultViewPanel extends VerticalLayout {
 
 
   private AbstractComponent createSingleResultPanel(SCorpusGraph corpusGraph, int localMatchIndex,
-      long globalOffset, ArrayList<Match> allMatches) {
+      long globalOffset, List<Match> allMatches) {
     Match m = new Match();
     if (allMatches != null && localMatchIndex >= 0 && localMatchIndex < allMatches.size()) {
       m = allMatches.get(localMatchIndex);

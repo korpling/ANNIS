@@ -85,9 +85,11 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent {
         lastScale = scale;
         lastFont = font;
         lastFontSize = fontSize;
+    }
 
-        // callFunction("showData", labels, values, lastScale.desc, lastFont,
-        // lastFontSize);
+    @Override
+    public boolean equals(Object obj) {
+      return super.equals(obj);
     }
 
 }
