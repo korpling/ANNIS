@@ -239,7 +239,7 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
         }
       }
 
-      if (projectQueue != null && newPanel != null && currentResults < numberOfResults) {
+      if (projectQueue != null && currentResults < numberOfResults) {
         log.debug("adding callback for result " + currentResults);
         // add a callback so we can load the next single result
         OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
@@ -284,8 +284,8 @@ public class ResultViewPanel extends VerticalLayout implements OnLoadCallbackExt
           matchedCorpora.add(n.getId());
         }
       }
-      panel = new SingleCorpusResultPanel(matchedCorpora, localMatchIndex + globalOffset, sui,
-          initialQuery);
+      panel =
+          new SingleCorpusResultPanel(matchedCorpora, localMatchIndex + globalOffset, initialQuery);
     }
     panel.setWidth("100%");
     panel.setHeight("-1px");
