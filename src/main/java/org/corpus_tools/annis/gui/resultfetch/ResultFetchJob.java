@@ -187,7 +187,7 @@ public class ResultFetchJob implements Runnable {
   }
 
   private SaltProject createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber,
-      CorporaApi api) throws InterruptedException, ApiException {
+      CorporaApi api) throws ApiException {
     List<String> corpusPath = Helper.getCorpusPath(m.getSaltIDs().get(0));
     final SaltProject p = SaltFactory.createSaltProject();
 
