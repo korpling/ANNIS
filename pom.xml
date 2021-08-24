@@ -148,30 +148,17 @@
 
 		<plugins>
 			<plugin>
-				<groupId>com.amashchenko.maven.plugin</groupId>
-				<artifactId>gitflow-maven-plugin</artifactId>
-				<version>1.16.0</version>
-				<configuration>
-					<gpgSignTag>true</gpgSignTag>
-					<gpgSignCommit>true</gpgSignCommit>
-					<verbose>true</verbose>
-					<skipFeatureVersion>true</skipFeatureVersion>
-					<versionDigitToIncrement>1</versionDigitToIncrement>
-					<pushRemote>true</pushRemote>
-					<keepBranch>false</keepBranch>
-					<digitsOnlyDevVersion>true</digitsOnlyDevVersion>
-					<versionsForceUpdate>true</versionsForceUpdate>
-					<gitFlowConfig>
-						<versionTagPrefix>v</versionTagPrefix>
-					</gitFlowConfig>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>co.enear.maven.plugins</groupId>
 				<artifactId>keepachangelog-maven-plugin</artifactId>
-				<version>1.2.2</version>
-				<inherited>false</inherited>
+				<version>2.1.1</version>
 			</plugin>
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-release-plugin</artifactId>
+		        <configuration>
+		            <preparationGoals>clean verify keepachangelog:release cff:create cff:third-party-folder scm:add -Dincludes=""CHANGELOG.md,CITATION.cff,THIRD-PARTY/*,src/main/webapp/VAADIN/help/*"</preparationGoals>
+		        </configuration>
+		    </plugin>
 			<plugin>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
