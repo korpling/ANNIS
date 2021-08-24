@@ -202,7 +202,7 @@ public class ResultFetchJob implements Runnable {
       File graphML = api.subgraphForNodes(corpusPath.get(0), arg);
       try {
         final SaltProject p = SaltFactory.createSaltProject();
-        SCorpusGraph cg = p.createCorpusGraph();
+        final SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
         if (corpusPath.size() > 1) {
           SDocument doc = cg.createDocument(docURI);
