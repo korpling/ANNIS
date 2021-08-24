@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Matches for documents or (sub-) corpora where not shown. There is a special SingleCorpusResultPanel which should have been used, but was not triggered.
 - Security update in dependency jsoup (from 1.11.2 to 1.14.2)
 
 ## [4.1.3] - 2021-08-21

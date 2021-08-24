@@ -204,11 +204,15 @@ public class ResultFetchJob implements Runnable {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
-        SDocument doc = cg.createDocument(docURI);
-        SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+        if (corpusPath.size() > 1) {
+          SDocument doc = cg.createDocument(docURI);
+          SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+          doc.setDocumentGraph(docGraph);
+          Helper.addMatchToDocumentGraph(m, doc.getDocumentGraph());
+        } else if (corpusPath.size() == 1) {
+          cg.createCorpus(null, corpusPath.get(0));
+        }
         queue.put(p);
-        doc.setDocumentGraph(docGraph);
-        Helper.addMatchToDocumentGraph(m, doc.getDocumentGraph());
         log.debug("added match {} to queue", currentMatchNumber + 1);
       } catch (XMLStreamException | IOException ex) {
         log.error("Could not map GraphML to Salt", ex);
