@@ -65,10 +65,8 @@ public class SingleResultPanel extends CssLayout
     implements Button.ClickListener, VisualizerContextChanger {
   private static class AddNewItemHandler implements AbstractSelect.NewItemHandler {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -8372467324750771745L;
+
+    private static final long serialVersionUID = 4430061493600489058L;
     final private ComboBox combobox;
 
     public AddNewItemHandler(ComboBox comboBox) {
