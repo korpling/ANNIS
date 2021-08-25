@@ -246,8 +246,6 @@ public class QueryController implements Serializable {
   }
 
   public void corpusSelectionChangedInBackground() {
-    searchView.getControlPanel()
-        .getCorpusList().selectedCorpusChanged(true);
     searchView.getControlPanel().getSearchOptions()
         .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora());
   }

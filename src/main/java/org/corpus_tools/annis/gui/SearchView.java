@@ -392,9 +392,6 @@ public class SearchView extends GridLayout
                     ui.getQueryController().setQuery(new Query(args.get("q"), ql, corpora));
                     ui.getQueryController().executeSearch(true, true);
                 }
-
-                getControlPanel().getCorpusList().scrollToSelectedCorpus();
-
             } // end if corpus list from server was non-empty
         } // end if there is a corpus definition
     }
