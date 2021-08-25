@@ -1,4 +1,4 @@
-# ANNIS changelog
+ # ANNIS changelog
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Info and browse document buttons where not always visible without scrolling
 - Removed internal usage of the `clone()` function which has been reported
   as "blocker" code smell by the sonarcloud static code analysis.
 
