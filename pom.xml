@@ -155,8 +155,8 @@
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-release-plugin</artifactId>
 		        <configuration>
-		          <preparationGoals>clean verify keepachangelog:release cff:create cff:third-party-folder scm:add</preparationGoals>
-		           <tagNameFormat>v@{project.version}</tagNameFormat>   
+		          <preparationGoals>clean verify keepachangelog:release cff:create cff:third-party-folder scm:add scm:checkin</preparationGoals>
+		          <tagNameFormat>v@{project.version}</tagNameFormat>   
 		        </configuration>
 		    </plugin>
 		    <plugin>
@@ -165,6 +165,7 @@
               <version>1.11.3</version>
               <configuration>
                 <includes>CHANGELOG.md,CITATION.cff,THIRD-PARTY/*,src/main/webapp/VAADIN/help/*</includes>
+                <message>Files updated in release process</message>
               </configuration>
 		    </plugin>
 			<plugin>
