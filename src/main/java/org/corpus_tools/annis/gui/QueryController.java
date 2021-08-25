@@ -155,8 +155,6 @@ public class QueryController implements Serializable {
     Query queryCopy;
     if (q instanceof DisplayedResultQuery) {
       queryCopy = new DisplayedResultQuery((DisplayedResultQuery) q);
-    } else if (q instanceof PagedResultQuery) {
-      queryCopy = new PagedResultQuery((PagedResultQuery) q);
     } else if (q instanceof ContextualizedQuery) {
       queryCopy = new ContextualizedQuery((ContextualizedQuery) q);
     }
