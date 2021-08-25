@@ -40,7 +40,7 @@ public class DisplayedResultQuery extends PagedResultQuery {
   private String baseText;
 
   public DisplayedResultQuery() {
-
+    super();
   }
 
   public DisplayedResultQuery(DisplayedResultQuery orig) {

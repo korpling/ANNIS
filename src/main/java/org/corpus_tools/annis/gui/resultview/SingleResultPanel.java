@@ -50,7 +50,6 @@ import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
 import org.corpus_tools.annis.gui.objects.Match;
-import org.corpus_tools.annis.gui.objects.PagedResultQuery;
 import org.corpus_tools.annis.gui.query_references.ShareSingleMatchGenerator;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SaltProject;
@@ -124,9 +123,6 @@ public class SingleResultPanel extends CssLayout
 
     @Override
     public void valueChange(Property.ValueChangeEvent event) {
-      showReloadingProgress();
-      lftCtxCombo.setEnabled(false);
-      rghtCtxCombo.setEnabled(false);
       int ctx = Integer.parseInt(event.getProperty().getValue().toString());
       changeContext(resultNumber, ctx, left);
     }
@@ -173,7 +169,7 @@ public class SingleResultPanel extends CssLayout
 
   private final Map<Integer, Boolean> visualizerState;
 
-  private PagedResultQuery query;
+  private DisplayedResultQuery query;
 
   private final Match match;
 
@@ -245,7 +241,7 @@ public class SingleResultPanel extends CssLayout
     // init context combox
     lftCtxCombo = new ComboBox();
     rghtCtxCombo = new ComboBox();
-
+    
     lftCtxCombo.setWidth(50, Unit.PIXELS);
     rghtCtxCombo.setWidth(50, Unit.PIXELS);
 
@@ -338,8 +334,11 @@ public class SingleResultPanel extends CssLayout
 
   @Override
   public void changeContext(long resultNumber, int context, boolean left) {
-    // delegates the task to the query controller.
+    lftCtxCombo.setEnabled(false);
+    rghtCtxCombo.setEnabled(false);
+    showReloadingProgress();
 
+    // delegates the task to the query controller.
     queryController.changeContext(query, match, resultNumber, context, this, left);
   }
 
@@ -460,7 +459,7 @@ public class SingleResultPanel extends CssLayout
   }
 
   @Override
-  public void updateResult(SaltProject p, PagedResultQuery query) {
+  public void updateResult(SaltProject p, DisplayedResultQuery query) {
     this.query = query;
     if (p != null && p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
         && p.getCorpusGraphs().get(0) != null && p.getCorpusGraphs().get(0).getDocuments() != null
