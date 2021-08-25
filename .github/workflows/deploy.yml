@@ -1,7 +1,7 @@
 on: 
-  release:
-    types:
-      - published
+  push:
+    tags:
+      - v*
 name: Deploy ANNIS
 jobs:
   deploy_release_binaries:
