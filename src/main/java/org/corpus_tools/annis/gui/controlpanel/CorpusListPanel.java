@@ -268,10 +268,10 @@ public class CorpusListPanel extends VerticalLayout {
     Column<String, String> nameColumn = tblCorpora.addColumn(corpus -> corpus);
     nameColumn.setCaption("Corpus");
     nameColumn.setId("corpus");
+    nameColumn.setExpandRatio(10);
 
     tblCorpora.setSortOrder(new GridSortOrderBuilder<String>().thenAsc(nameColumn).build());
     addComponent(tblCorpora);
-
 
     tblCorporaScrollExt.addGridScrolledListener(event -> tblCorpora.recalculateColumnWidths());
 
