@@ -28,7 +28,7 @@ jobs:
           with:
             files: |
               target/annis-*-desktop.jar
-              annis-*-server.jar
+              target/annis-*-server.jar
             body: ${{ steps.extract-release-notes.outputs.release_notes }}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
