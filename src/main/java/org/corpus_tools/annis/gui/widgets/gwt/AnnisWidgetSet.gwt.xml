@@ -30,4 +30,6 @@
     <inherits name="org.corpus_tools.annis.gui.widgets.gwt.AnnisWidgetSet" />
 
     
+
+    <inherits name="org.vaadin.extension.gridscroll.WidgetSet" />
 </module>

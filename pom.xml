@@ -633,6 +633,11 @@
 		</dependency>
 
 
+		<dependency>
+			<groupId>org.vaadin.extension</groupId>
+			<artifactId>GridScrollExtension</artifactId>
+			<version>2.5.1</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>

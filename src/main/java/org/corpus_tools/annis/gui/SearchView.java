@@ -319,8 +319,11 @@ public class SearchView extends GridLayout
                 if (args.containsKey("c") && args.size() == 1) {
                     // special case: we were called from outside and should only select,
                     // but not query, the selected corpora
-                    ui.getQueryState().getSelectedCorpora().clear();
-                    ui.getQueryState().getSelectedCorpora().addAll(corpora);
+                    Query q = new Query();
+                    q.setCorpora(corpora);
+                    q.setQuery("");
+                    ui.getQueryController().setQuery(q);
+                    ui.getQueryController().corpusSelectionChangedInBackground();
                 } else if (args.get("cl") != null && args.get("cr") != null) {
                     // make sure the properties are not overwritten by the background process
                     getControlPanel().getSearchOptions().setUpdateStateFromConfig(false);
@@ -392,9 +395,6 @@ public class SearchView extends GridLayout
                     ui.getQueryController().setQuery(new Query(args.get("q"), ql, corpora));
                     ui.getQueryController().executeSearch(true, true);
                 }
-
-                getControlPanel().getCorpusList().scrollToSelectedCorpus();
-
             } // end if corpus list from server was non-empty
         } // end if there is a corpus definition
     }
