@@ -30,7 +30,6 @@ jobs:
               target/annis-*-desktop.jar
               annis-*-server.jar
             body: ${{ steps.extract-release-notes.outputs.release_notes }}
-            draft: true
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy_documentation:
