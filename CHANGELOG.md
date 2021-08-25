@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.2.0] - 2021-08-25
+
 ### Changed
 
 - Always show the selected corpora at the beginning of the grid, even when not included in the 
