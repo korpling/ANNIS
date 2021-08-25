@@ -82,7 +82,7 @@ class AnnisUITest {
   public void setup() {
     UIScopeImpl.setBeanStoreRetrievalStrategy(new SingletonBeanStoreRetrievalStrategy());
     ui = beanFactory.getBean(AnnisUI.class);
-   
+
 
     MockVaadin.setup(() -> ui);
 
@@ -90,7 +90,7 @@ class AnnisUITest {
     testCorpusSet.setName("test");
     testCorpusSet.getCorpora().add("pcc2");
     ui.getInstanceConfig().getCorpusSets().add(testCorpusSet);
-    
+
   }
 
   @AfterEach
@@ -106,10 +106,10 @@ class AnnisUITest {
   @Test
   void testChangeCorpusSet() {
     CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
-    
+
     @SuppressWarnings("unchecked")
     Grid<String> corpusList = _get(corpusListPanel, Grid.class);
-    
+
     @SuppressWarnings("unchecked")
     ComboBox<String> corpusSetChooser = _get(corpusListPanel, ComboBox.class);
     assertEquals(null, corpusSetChooser.getValue());
@@ -217,6 +217,32 @@ class AnnisUITest {
     resultPanel.setVisibleTokenAnnosVisible(visibleAnnos);
     assertNull(kwicGrid.getRowsByAnnotation().get("tiger:pos"));
     assertNotNull(kwicGrid.getRowsByAnnotation().get("tiger::lemma"));
+
+    // Change the context and test that the KWIC displayed also changed
+    resultPanel.changeContext(1, 6, false);
+
+    // Since the action will replace the whole result panel, we have to get all
+    // variables again.
+    List<String> expectedTokens =
+        Arrays.asList("Feigenblatt", "Die", "Jugendlichen", "in", "Zossen", "wollen", "ein");
+    awaitCondition(10, () -> {
+      List<SingleResultPanel> allResults = _find(SingleResultPanel.class);
+      if (allResults.isEmpty()) {
+        return false;
+      }
+      List<AnnotationGrid> annoGrids = _find(allResults.get(0), AnnotationGrid.class);
+      if (annoGrids.isEmpty()) {
+        return false;
+      }
+      ArrayList<Row> tokensUpdatedContext = annoGrids.get(0).getRowsByAnnotation().get("tok");
+      if (tokensUpdatedContext.isEmpty()) {
+        return false;
+      }
+      List<String> actualTokens = tokensUpdatedContext.get(0).getEvents().stream()
+          .map(GridEvent::getValue).collect(Collectors.toList());
+      return expectedTokens.equals(actualTokens);
+    });
+
   }
 
   @Test
@@ -303,8 +329,8 @@ class AnnisUITest {
 
     // The standard SingleResult panel should not be visible
     assertEquals(0, _find(SingleResultPanel.class).size());
-    
-    
+
+
   }
 
   @Test

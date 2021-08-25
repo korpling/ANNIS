@@ -124,9 +124,6 @@ public class SingleResultPanel extends CssLayout
 
     @Override
     public void valueChange(Property.ValueChangeEvent event) {
-      showReloadingProgress();
-      lftCtxCombo.setEnabled(false);
-      rghtCtxCombo.setEnabled(false);
       int ctx = Integer.parseInt(event.getProperty().getValue().toString());
       changeContext(resultNumber, ctx, left);
     }
@@ -245,7 +242,7 @@ public class SingleResultPanel extends CssLayout
     // init context combox
     lftCtxCombo = new ComboBox();
     rghtCtxCombo = new ComboBox();
-
+    
     lftCtxCombo.setWidth(50, Unit.PIXELS);
     rghtCtxCombo.setWidth(50, Unit.PIXELS);
 
@@ -338,8 +335,11 @@ public class SingleResultPanel extends CssLayout
 
   @Override
   public void changeContext(long resultNumber, int context, boolean left) {
-    // delegates the task to the query controller.
+    lftCtxCombo.setEnabled(false);
+    rghtCtxCombo.setEnabled(false);
+    showReloadingProgress();
 
+    // delegates the task to the query controller.
     queryController.changeContext(query, match, resultNumber, context, this, left);
   }
 
