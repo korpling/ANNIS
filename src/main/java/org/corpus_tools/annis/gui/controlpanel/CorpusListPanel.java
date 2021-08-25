@@ -59,8 +59,9 @@ import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author thomas
+ * Displays a filterable list of corpora.
+ * 
+ * @author Thomas Krause
  */
 public class CorpusListPanel extends VerticalLayout {
 
@@ -229,10 +230,8 @@ public class CorpusListPanel extends VerticalLayout {
     tblCorpora.setHeightFull();
 
     tblCorpora.setSelectionMode(SelectionMode.MULTI);
-    Column<String, String> nameColumn = tblCorpora.addColumn(corpus -> corpus);
-    nameColumn.setCaption("Corpus");
-    nameColumn.setId("corpus");
-    nameColumn.setExpandRatio(10);
+    tblCorpora.addStyleName("corpus-list");
+
 
     Column<?, ?> infoColumn = tblCorpora.addComponentColumn(corpus -> {
       final Button l = new Button();
@@ -245,11 +244,13 @@ public class CorpusListPanel extends VerticalLayout {
         }
       });
       l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY);
+      l.setWidthUndefined();
       return l;
     });
     infoColumn.setExpandRatio(0);
+    infoColumn.setStyleGenerator(item -> "compact-column");
 
-    tblCorpora.addComponentColumn(corpus -> {
+    Column<String, Button> docBrowserColumn = tblCorpora.addComponentColumn(corpus -> {
       final Button l = new Button();
       l.setIcon(DOC_ICON);
       l.setDescription("opens the document browser for " + corpus);
@@ -259,7 +260,16 @@ public class CorpusListPanel extends VerticalLayout {
       l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY);
       return l;
     });
-    infoColumn.setExpandRatio(0);
+    docBrowserColumn.setExpandRatio(0);
+    docBrowserColumn.setStyleGenerator(item -> "compact-column");
+
+    Column<String, String> nameColumn = tblCorpora.addColumn(corpus -> corpus);
+    nameColumn.setCaption("Corpus");
+    nameColumn.setId("corpus");
+    nameColumn.setExpandRatio(10);
+
+
+
     tblCorpora.setSortOrder(new GridSortOrderBuilder<String>().thenAsc(nameColumn).build());
     addComponent(tblCorpora);
 

@@ -14964,6 +14964,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-right-color: #a3adb9;
 }
 
+.annis .corpus-list table td.compact-column {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
 .annis .CodeMirror-placeholder {
 	color: #ABABAB;
 }

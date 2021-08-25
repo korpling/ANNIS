@@ -16130,6 +16130,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-right-color: #a3adb9;
 }
 
+.annis_embeddedvis .corpus-list table td.compact-column {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
 .annis_embeddedvis .CodeMirror-placeholder {
 	color: #ABABAB;
 }
