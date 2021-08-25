@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Removed internal usage of the `clone()` function which has been reported
+  as "blocker" code smell by the sonarcloud static code analysis.
+
 ## [4.1.4] - 2021-08-24
 
 ### Fixed

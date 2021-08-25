@@ -204,15 +204,11 @@ public class QueryController implements Serializable {
 
   }
 
-  public void changeContext(PagedResultQuery originalQuery, Match match, long offset,
+  public void changeContext(DisplayedResultQuery originalQuery, Match match, long offset,
       int newContext, final VisualizerContextChanger visCtxChange, boolean left) {
 
-    final PagedResultQuery newQuery;
-    if(originalQuery instanceof DisplayedResultQuery) {
-      newQuery = new DisplayedResultQuery((DisplayedResultQuery) originalQuery);
-    } else {
-      newQuery = new PagedResultQuery(originalQuery);
-    }
+    final DisplayedResultQuery newQuery =
+        new DisplayedResultQuery((DisplayedResultQuery) originalQuery);
 
     if (left) {
       newQuery.setLeftContext(newContext);
