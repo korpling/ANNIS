@@ -298,7 +298,7 @@ public class CorpusListPanel extends VerticalLayout {
 
     try {
       List<String> corpora = api.listCorpora();
-      ListDataProvider<String> availableCorpora = new ListDataProvider<>(corpora);
+      availableCorpora = new ListDataProvider<>(corpora);
       availableCorpora.setFilter(filter);
       tblCorpora.setDataProvider(availableCorpora);
       if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
