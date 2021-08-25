@@ -20,10 +20,17 @@ jobs:
           run: mvn clean install
         - name: Build desktop binary
           run: mvn -Pdesktop install
+        - name: Extract release notes
+          id: extract-release-notes
+          uses: ffurrer2/extract-release-notes@v1
         - name: Release assets on GitHub
-          uses: alexellis/upload-assets@0.3.0
+          uses: softprops/action-gh-release@v0.1.12
           with:
-            asset_paths: '["./target/annis-*-server.jar", "./target/annis-*-desktop.jar"]'
+            files: |
+              target/annis-*-desktop.jar
+              annis-*-server.jar
+            body: ${{ steps.extract-release-notes.outputs.release_notes }}
+            draft: true
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   deploy_documentation:
