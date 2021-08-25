@@ -17,6 +17,7 @@ import com.github.mvysny.kaributesting.v8.NotificationsKt;
 import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
+import com.vaadin.server.Page;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
@@ -631,6 +632,19 @@ class AnnisUITest {
         _find(com.vaadin.ui.TextArea.class, spec -> spec.withValue(expectedStatus)).size());
 
     NotificationsKt.expectNotifications(new Pair<String, String>("Parsing error", expectedStatus));
+
+  }
+
+  @Test
+  void testCorpusFragment() throws Exception {
+    
+    assertTrue(ui.getQueryState().getSelectedCorpora().isEmpty());
+
+    Page.getCurrent().setUriFragment("c=pcc2");
+    awaitCondition(15,
+        () -> ui.getQueryState().getSelectedCorpora().size() == 1
+            && ui.getQueryState().getSelectedCorpora().contains("pcc2"));
+
 
   }
 
