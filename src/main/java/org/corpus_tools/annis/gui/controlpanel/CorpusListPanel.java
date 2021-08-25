@@ -201,6 +201,12 @@ public class CorpusListPanel extends VerticalLayout {
     addComponent(txtFilter);
 
     this.filter = corpus -> {
+      // Always show selected corpora
+      if (tblCorpora.getSelectedItems().contains(corpus)) {
+        return true;
+      }
+
+      // Check if the corpus is included in the corpus set or filtered by the name
       String selectedCorpusSetName = cbSelection.getValue();
 
       String corpusNameFilter =

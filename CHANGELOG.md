@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Info and browse document buttons were not always visible without scrolling
 - Fix width of the corpus list columns when scrolling to long corpus names
+- Always show a selected corpus (even when not included in the filter)
+- Info and browse document buttons were not always visible without scrolling
 - Removed internal usage of the `clone()` function which has been reported
   as "blocker" code smell by the sonarcloud static code analysis.
 
