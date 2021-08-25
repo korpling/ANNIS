@@ -57,6 +57,7 @@ import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.LoggerFactory;
+import org.vaadin.extension.gridscroll.GridScrollExtension;
 
 /**
  * Displays a filterable list of corpora.
@@ -129,7 +130,9 @@ public class CorpusListPanel extends VerticalLayout {
   private final ExampleQueriesPanel autoGenQueries;
 
 
-  private Grid<String> tblCorpora;
+  private final Grid<String> tblCorpora = new Grid<>();
+  private final GridScrollExtension<String> tblCorporaScrollExt =
+      new GridScrollExtension<>(tblCorpora);
 
   private final HorizontalLayout selectionLayout;
 
@@ -225,7 +228,6 @@ public class CorpusListPanel extends VerticalLayout {
       return true;
     };
 
-    tblCorpora = new Grid<>();
     tblCorpora.setWidthFull();
     tblCorpora.setHeightFull();
 
@@ -266,12 +268,12 @@ public class CorpusListPanel extends VerticalLayout {
     Column<String, String> nameColumn = tblCorpora.addColumn(corpus -> corpus);
     nameColumn.setCaption("Corpus");
     nameColumn.setId("corpus");
-    nameColumn.setExpandRatio(10);
-
-
 
     tblCorpora.setSortOrder(new GridSortOrderBuilder<String>().thenAsc(nameColumn).build());
     addComponent(tblCorpora);
+
+
+    tblCorporaScrollExt.addGridScrolledListener(event -> tblCorpora.recalculateColumnWidths());
 
     setExpandRatio(tblCorpora, 1.0f);
 
