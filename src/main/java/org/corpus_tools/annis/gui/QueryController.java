@@ -152,15 +152,21 @@ public class QueryController implements Serializable {
    * @see HistoryPanel
    */
   public void addHistoryEntry(Query q) {
-    try {
-      Query queryCopy = q.clone();
-      // remove it first in order to let it appear on the beginning of the list
-      state.getHistory().removeItem(queryCopy);
-      state.getHistory().addItemAt(0, queryCopy);
-      searchView.getControlPanel().getQueryPanel().updateShortHistory();
-    } catch (CloneNotSupportedException ex) {
-      log.error("Can't clone the query", ex);
+    Query queryCopy;
+    if (q instanceof DisplayedResultQuery) {
+      queryCopy = new DisplayedResultQuery((DisplayedResultQuery) q);
+    } else if (q instanceof ContextualizedQuery) {
+      queryCopy = new ContextualizedQuery((ContextualizedQuery) q);
     }
+    else {
+      queryCopy = new Query(q);
+    }
+
+    // remove it first in order to let it appear on the beginning of the list
+    state.getHistory().removeItem(queryCopy);
+    state.getHistory().addItemAt(0, queryCopy);
+    searchView.getControlPanel().getQueryPanel().updateShortHistory();
+
   }
 
   public void cancelExport() {
@@ -198,36 +204,34 @@ public class QueryController implements Serializable {
 
   }
 
-  public void changeContext(PagedResultQuery originalQuery, Match match, long offset,
+  public void changeContext(DisplayedResultQuery originalQuery, Match match, long offset,
       int newContext, final VisualizerContextChanger visCtxChange, boolean left) {
 
-    try {
-      final PagedResultQuery newQuery = (PagedResultQuery) originalQuery.clone();
-      if (left) {
-        newQuery.setLeftContext(newContext);
-      } else {
-        newQuery.setRightContext(newContext);
-      }
+    final DisplayedResultQuery newQuery = new DisplayedResultQuery(originalQuery);
 
-      newQuery.setOffset(offset);
-
-      UI ui = UI.getCurrent();
-      Background.runWithCallback(new SingleResultFetchJob(match, newQuery, ui),
-          new FutureCallback<SaltProject>() {
-
-            @Override
-            public void onFailure(Throwable t) {
-              ExceptionDialog.show(t, "Could not extend context.", ui);
-            }
-
-            @Override
-            public void onSuccess(SaltProject result) {
-              visCtxChange.updateResult(result, newQuery);
-            }
-          });
-    } catch (CloneNotSupportedException ex) {
-      log.error("Can't clone the query", ex);
+    if (left) {
+      newQuery.setLeftContext(newContext);
+    } else {
+      newQuery.setRightContext(newContext);
     }
+
+    newQuery.setOffset(offset);
+
+    UI ui = UI.getCurrent();
+    Background.runWithCallback(new SingleResultFetchJob(match, newQuery, ui),
+        new FutureCallback<SaltProject>() {
+
+          @Override
+          public void onFailure(Throwable t) {
+            ExceptionDialog.show(t, "Could not extend context.", ui);
+          }
+
+          @Override
+          public void onSuccess(SaltProject result) {
+            visCtxChange.updateResult(result, newQuery);
+          }
+        });
+
   }
 
   private void checkQuirksMode(Query query) {

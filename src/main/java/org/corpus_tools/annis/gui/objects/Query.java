@@ -37,7 +37,7 @@ import org.corpus_tools.annis.gui.Helper;
  * 
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class Query implements Serializable, Cloneable {
+public class Query implements Serializable {
   /**
    * 
    */
@@ -62,10 +62,6 @@ public class Query implements Serializable, Cloneable {
     this.queryLanguage = queryLanguage;
   }
 
-  @Override
-  public Query clone() throws CloneNotSupportedException {
-    return (Query) super.clone();
-  }
 
   @Override
   public boolean equals(Object obj) {

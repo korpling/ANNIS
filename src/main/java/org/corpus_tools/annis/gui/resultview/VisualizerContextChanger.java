@@ -14,7 +14,7 @@
 package org.corpus_tools.annis.gui.resultview;
 
 import java.io.Serializable;
-import org.corpus_tools.annis.gui.objects.PagedResultQuery;
+import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
 import org.corpus_tools.salt.common.SaltProject;
 
 /**
@@ -55,5 +55,5 @@ public interface VisualizerContextChanger extends Serializable {
      * @param p the project, all visualizer are updated with.
      * @param q originally query, for determine the current context
      */
-    public void updateResult(SaltProject p, PagedResultQuery q);
+    public void updateResult(SaltProject p, DisplayedResultQuery q);
 }
