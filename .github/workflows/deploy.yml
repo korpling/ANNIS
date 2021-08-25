@@ -24,14 +24,22 @@ jobs:
           id: extract-release-notes
           uses: ffurrer2/extract-release-notes@v1
         - name: Release assets on GitHub
+          id: create-release
           uses: softprops/action-gh-release@v0.1.12
           with:
             files: |
               target/annis-*-desktop.jar
-              annis-*-server.jar
+              target/annis-*-server.jar
             body: ${{ steps.extract-release-notes.outputs.release_notes }}
           env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        - name: Notify corpus-tools.org repository about the new release
+          uses: peter-evans/repository-dispatch@v1.1.3
+          with:
+            repository: corpus-tools/corpus-tools.github.io
+            token: ${{ secrets.CORPUS_TOOLS_TOKEN}}
+            event-type: annis-release
+            client-payload: '{"version": "${{ steps.create-release.outputs.id }}"}'
   deploy_documentation:
     runs-on: ubuntu-20.04
     steps:
