@@ -805,10 +805,6 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
 
         String prevSpeakerName = "";
 
-        if (graph == null) {
-          return;
-        }
-
         List<SToken> orderedToken = graph.getSortedTokenByText();
         if (orderedToken == null) {
           return;

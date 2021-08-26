@@ -49,6 +49,7 @@ class TextColumnExporterTest {
     MockVaadin.tearDown();
   }
 
+
   @Test
   void exportFeigenblattQuery() throws IOException {
     EventBus eventBus = mock(EventBus.class);
@@ -69,6 +70,30 @@ class TextColumnExporterTest {
         "2\t\tJugendlichen wurden somit zum bloßen\tFeigenblatt\tdegradiert . Nicht über sondern",
         lines[2]);
   }
+
+  @Test
+  void exportAlignMiddleContext() throws IOException {
+    EventBus eventBus = mock(EventBus.class);
+    Writer out = new StringWriter();
+
+    Exception ex = exporter.convertText("tok=\"Feigenblatt\" . tok", QueryLanguage.AQL, 5, 5,
+        Sets.newSet("pcc2"), null, "", true, out, eventBus, new HashMap<>(), ui);
+
+    assertNull(ex);
+
+    // Compare the generated CSV file with the ground truth
+    out.close();
+    String[] lines = out.toString().split("\n");
+    assertEquals(3, lines.length);
+    assertEquals(
+        "match_number\tspeaker\tleft_context\tmatch_1\tmiddle_context_1\tmatch_2\tright_context",
+        lines[0]);
+    assertEquals("1\t\t\tFeigenblatt\t\tDie\tJugendlichen in Zossen wollen ein", lines[1]);
+    assertEquals(
+        "2\t\tJugendlichen wurden somit zum bloßen\tFeigenblatt\t\tdegradiert\t. Nicht über sondern mit",
+        lines[2]);
+  }
+
 
   @Test
   void exportMetadata() throws IOException {
