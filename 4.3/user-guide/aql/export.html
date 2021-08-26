@@ -1,0 +1,297 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Exporting Results - ANNIS User Guide</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../installation/index.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../installation/desktop.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Desktop)</a></li><li class="chapter-item expanded "><a href="../installation/server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li class="chapter-item expanded "><a href="../installation/migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li class="chapter-item expanded "><a href="../interface/index.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../interface/search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="../interface/result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="../interface/query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li><li class="chapter-item expanded "><a href="../interface/admin-web.html"><strong aria-hidden="true">3.4.</strong> Administration Interface</a></li></ol></li><li class="chapter-item expanded "><a href="../aql/index.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../aql/word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="../aql/annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="../aql/regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="../aql/trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="../aql/pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="../aql/export.html" class="active"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="../aql/frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="../aql/operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="../aql/compatibility-mode.html"><strong aria-hidden="true">4.9.</strong> Differences in Compatibility Mode</a></li></ol></li><li class="chapter-item expanded "><a href="../import-and-config/index.html"><strong aria-hidden="true">5.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../import-and-config/convert.html"><strong aria-hidden="true">5.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li class="chapter-item expanded "><a href="../import-and-config/import.html"><strong aria-hidden="true">5.2.</strong> Importing Corpora in the relANNIS format</a></li><li class="chapter-item expanded "><a href="../import-and-config/corpus-config.html"><strong aria-hidden="true">5.3.</strong> Configuring Settings for a Corpus</a></li><li class="chapter-item expanded "><a href="../import-and-config/visualizations.html"><strong aria-hidden="true">5.4.</strong> Configuring Visualizations</a></li><li class="chapter-item expanded "><a href="../import-and-config/visualizations-list.html"><strong aria-hidden="true">5.5.</strong> List of Visualizations</a></li><li class="chapter-item expanded "><a href="../import-and-config/documentbrowser.html"><strong aria-hidden="true">5.6.</strong> Document Browser</a></li></ol></li><li class="chapter-item expanded "><a href="../configuration/index.html"><strong aria-hidden="true">6.</strong> Configuration of ANNIS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../configuration/user.html"><strong aria-hidden="true">6.1.</strong> User Configuration on Server</a></li><li class="chapter-item expanded "><a href="../configuration/instances.html"><strong aria-hidden="true">6.2.</strong> Multiple Instances of the Interface</a></li><li class="chapter-item expanded "><a href="../configuration/rtl.html"><strong aria-hidden="true">6.3.</strong> Right-to-Left Visualizations</a></li></ol></li><li class="chapter-item expanded "><a href="../advanced/index.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../advanced/links-to-queries.html"><strong aria-hidden="true">7.1.</strong> Links to queries</a></li><li class="chapter-item expanded "><a href="../advanced/embed-vis.html"><strong aria-hidden="true">7.2.</strong> Embed ANNIS visualizations</a></li><li class="chapter-item expanded "><a href="../advanced/backend-frontend-separation.html"><strong aria-hidden="true">7.3.</strong> Install backend and front-end on different servers</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">ANNIS User Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#exporting-results" id="exporting-results">Exporting Results</a></h1>
+<p>To export search results, open the menu &quot;More&quot; between the Search and
+History buttons and select &quot;Export&quot;:</p>
+<p><img src="../images/export.png" alt="" /></p>
+<p>Enter the query whose results you want to export as usual in the AQL
+box. Note that you <strong>do not need to carry out the query first</strong>. You can
+enter the query and export without pressing Search before. Several
+exporter modules can be selected from the Export tab shown below.</p>
+<p><img src="../images/export2.png" alt="" /></p>
+<p>The <strong>SimpleTextExporter</strong> simply gives the text for all tokens in each
+search result, including context, in a one-row-per-hit format. The
+tokens covered by the match area are marked with square brackets and the
+results are numbered, as in the following
+example:</p>
+<pre><code>    0. of the International Brotherhood of [Magicians] Wednesday , October 9 , 
+    1. Magic Month in the United [States] . Wikinews spoke with William 
+    2. of the International Brotherhood of [Magicians] , about the current state 
+    3. - &quot; Scarne on Card [Tricks] &quot; and &quot; Scarne on 
+    4. and &quot; Scarne on Magic [Tricks] &quot; . That started me 
+</code></pre>
+<p>The <strong>TokenExporter</strong> adds all annotations of each token separated by slashes
+(e.g. dogs/NNS/dog for a token dogs annotated with a part-of-speech NNS
+and a lemma dog).</p>
+<p>The <strong>GridExporter</strong> adds all annotations available for the span of
+retrieved tokens, with each annotation layer in a separate line.
+Annotations are separated by spaces and the hierarchical order of
+annotations is lost, though the span of tokens covered by each
+annotation may optionally be given in square brackets (to turn this off
+use the optional parameter <code>numbers=false</code> in the ‘Parameters’ box). The
+user can specify annotation layers to be exported in the additional
+‘Annotation Keys’ box, and annotation names should be separated by
+comas, as in the image above. Metadata annotations can also be exported
+by entering “metakeys=” and a list of comma separated metadata names in
+the Parameters box. If nothing is specified, all available annotations
+and no metadata will be exported. Multiple options are separated by a
+semicolon, e.g. the Parameters <code>metakeys=type,docname;numbers=false</code>. An
+example output with token numbers and the part of speech (pos) and
+syntactic category annotations looks as follows.</p>
+<pre><code>0.   tok  of the International Brotherhood of Magicians Wednesday 
+    pos  IN[1-1] DT[2-2] NP[3-3] NP[4-4] IN[5-5] NPS[6-6] NP[7-7] 
+    cat  S[1-6] VP[1-6] NP[1-6] PP[1-6] NP[2-4] PP[5-6] NP[6-6] NP[7-12] 
+</code></pre>
+<p>Meaning that the annotation cat=&quot;NP&quot; applies to tokens 1-6 in the search
+result, and so on. Note that when specifying annotation layers, if the
+reserved name 'tok' is not specified, the tokens themselves will not be
+exported (annotations only).</p>
+<p>The <strong>CSVExporter</strong> outputs the format usable by spreadsheet programs such as Excel or Calc.
+It is also easy to read CSV files in R- or Python-Scripts.
+Only the attributes of the search elements (#1, #2 etc. in AQL) are outputted, and are separated
+by tabs. The order and name of the attributes is declared in the first line of the export text, as in this example:</p>
+<pre><code>1_id	1_span	1_anno_const::cat	2_id	2_span	2_anno_GUM::claws5	2_anno_GUM::lemma	2_anno_GUM::penn_pos	2_anno_GUM::pos	2_anno_GUM::tok_func
+salt:/GUM/GUM_interview_ants#const_0_39	thee amazingg adaptations	NP	salt:/GUM/GUM_interview_ants#tok_40	amazing	AJ0	amazing	JJ	JJ	amod
+salt:/GUM/GUM_interview_ants#const_0_42	sociall insects	NP	salt:/GUM/GUM_interview_ants#tok_42	social	AJ0	social	JJ	JJ	amod
+salt:/GUM/GUM_interview_ants#const_0_50	thee extremee parasitee pressure	NP	salt:/GUM/GUM_interview_ants#tok_51	extreme	AJ0	extreme	JJ	JJ	amod
+</code></pre>
+<p>The export shows the properties of an NP node dominating a token with
+the part-of-speech JJ. Since the token also has other attributes, such
+as the lemma and part of speech tags, these are also retrieved.</p>
+<p>It is also possible to output metadata annotations per hit using the
+CSVExporter. To do so, use the parameter metakeys=meta1,meta2 etc. For
+example, if your documents have a metadata annotation called 'genre',
+you may export it for each search result as a further column using
+metakeys=genre in the parameters box.</p>
+<p>Most of these exporters do not work well when the corpus uses <em>multiple segmentations</em>, like in dialogues.
+If they extract the spanned text for a match, they might have no way of automatically knowing which segmentation is the right one and display an empty span.
+For the CSVExporter, you can set the <code>segmentation</code> parameter (e.g. <code>segmentation=dipl</code>) to the name of the segmentation, and it will be used as source for the spanned text.</p>
+<p>Note that exporting may be slow if the result set is large.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../aql/pointing.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="../aql/frequency.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../aql/pointing.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="../aql/frequency.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
