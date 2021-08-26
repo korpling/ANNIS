@@ -77,4 +77,8 @@ example, if your documents have a metadata annotation called 'genre',
 you may export it for each search result as a further column using
 metakeys=genre in the parameters box.
 
+Most of these exporters do not work well when the corpus uses *multiple segmentations*, like in dialogues.
+If they extract the spanned text for a match, they might have no way of automatically knowing which segmentation is the right one and display an empty span.
+For the CSVExporter, you can set the `segmentation` parameter (e.g. `segmentation=dipl`) to the name of the segmentation, and it will be used as source for the spanned text.
+
 Note that exporting may be slow if the result set is large.

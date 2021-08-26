@@ -110,7 +110,8 @@ public class CSVExporter extends BaseMatrixExporter {
                 + "The values for all annotations of each of the "
                 + "found nodes is given in a comma-separated table (CSV). <br/><br/>" + "Parameters: <br/>"
                 + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-                + "<code>metakeys=title,documentname</code>)";
+            + "<code>metakeys=title,documentname</code>)<br/>"
+            + "<em>segmentation</em> - For corpora with multiple segmentation (e.g. dialog corpora) use this segmentation for getting the span of the matched nodes.";
     }
 
     /**
@@ -263,7 +264,7 @@ public class CSVExporter extends BaseMatrixExporter {
 
          return segmentationNodes.stream().flatMap(n -> n.getAnnotations().stream())
              .filter(a -> segmentation.equals(a.getName()))
-             .map(a -> a.getValue_STEXT()).collect(Collectors.joining(" "));
+             .map(SAnnotation::getValue_STEXT).collect(Collectors.joining(" "));
        }
     }
 }
