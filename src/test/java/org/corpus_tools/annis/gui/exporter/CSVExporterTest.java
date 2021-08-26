@@ -14,7 +14,6 @@ import java.util.HashMap;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.SingletonBeanStoreRetrievalStrategy;
-import org.corpus_tools.annis.gui.exporter.CSVExporter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,6 +67,29 @@ class CSVExporterTest {
         lines[0]);
     assertEquals("salt:/pcc2/11299#tok_1\tFeigenblatt\tFeigenblatt\tNom.Sg.Neut\tNN", lines[1]);
     assertEquals("salt:/pcc2/11299#tok_143\tFeigenblatt\tFeigenblatt\tDat.Sg.Neut\tNN", lines[2]);
+  }
+
+  @Test
+  void exportWithSegmentation() throws IOException {
+    EventBus eventBus = mock(EventBus.class);
+    Writer out = new StringWriter();
+
+
+    Exception ex = exporter.convertText("utterance0=\"äh fang einfach ma an\"", QueryLanguage.AQL, 0, 0,
+        Sets.newSet("dialog.demo"), null, "segmentation=phon0", false, out, eventBus,
+        new HashMap<>(), ui);
+
+    assertNull(ex);
+
+    // Compare the generated CSV file with the ground truth
+    out.close();
+    String[] lines = out.toString().split("\n");
+    assertEquals(2, lines.length);
+    assertEquals("1_id\t1_span\t1_anno_default_ns::utterance0",
+        lines[0]);
+    assertEquals(
+        "salt:/dialog.demo/dialog.demo#sSpan98\täh ((lacht)) fang einfach ma anl\täh fang einfach ma an",
+        lines[1]);
   }
 
 }
