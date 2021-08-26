@@ -15,11 +15,14 @@
  */
 package org.corpus_tools.annis.gui.exporter;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.vaadin.ui.UI;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,7 +32,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.gui.Helper;
@@ -197,16 +199,18 @@ public class CSVExporter extends BaseMatrixExporter {
       // TODO is this the best way to get the corpus name?
       String corpusName = Helper.getCorpusPath(graph.getDocument().getId()).get(0);
       // TODO cache the metadata
-      Map<String, SMetaAnnotation> allMetaAnnos =
-          Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui).stream()
-              .collect(Collectors.toMap(SMetaAnnotation::getName, Function.identity()));
+      List<SMetaAnnotation> metaAnnos = Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui);
+      Multimap<String, SMetaAnnotation> metaAnnosByName = Multimaps.index(metaAnnos, SMetaAnnotation::getName);
+      ;
 
       for (String metaName : metakeys) {
-        SMetaAnnotation anno = allMetaAnnos.get(metaName);
-        if (anno == null) {
+        Collection<SMetaAnnotation> annos = metaAnnosByName.get(metaName);
+        if (annos == null || annos.isEmpty()) {
           out.append("\t");
         } else
-          out.append("\t" + anno.getValue());
+          out.append(
+              "\t" + annos.stream().map(SMetaAnnotation::getValue_STEXT)
+                  .collect(Collectors.joining(", ")));
       }
     }
 
