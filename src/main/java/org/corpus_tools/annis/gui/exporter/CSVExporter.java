@@ -201,7 +201,6 @@ public class CSVExporter extends BaseMatrixExporter {
       // TODO cache the metadata
       List<SMetaAnnotation> metaAnnos = Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui);
       Multimap<String, SMetaAnnotation> metaAnnosByName = Multimaps.index(metaAnnos, SMetaAnnotation::getName);
-      ;
 
       for (String metaName : metakeys) {
         Collection<SMetaAnnotation> annos = metaAnnosByName.get(metaName);
