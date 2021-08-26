@@ -143,7 +143,7 @@ box. Note that you <strong>do not need to carry out the query first</strong>. Yo
 enter the query and export without pressing Search before. Several
 exporter modules can be selected from the Export tab shown below.</p>
 <p><img src="../images/export2.png" alt="" /></p>
-<p>The SimpleTextExporter simply gives the text for all tokens in each
+<p>The <strong>SimpleTextExporter</strong> simply gives the text for all tokens in each
 search result, including context, in a one-row-per-hit format. The
 tokens covered by the match area are marked with square brackets and the
 results are numbered, as in the following
@@ -154,10 +154,10 @@ example:</p>
     3. - &quot; Scarne on Card [Tricks] &quot; and &quot; Scarne on 
     4. and &quot; Scarne on Magic [Tricks] &quot; . That started me 
 </code></pre>
-<p>The TokenExporter adds all annotations of each token separated by slashes
+<p>The <strong>TokenExporter</strong> adds all annotations of each token separated by slashes
 (e.g. dogs/NNS/dog for a token dogs annotated with a part-of-speech NNS
 and a lemma dog).</p>
-<p>The GridExporter adds all annotations available for the span of
+<p>The <strong>GridExporter</strong> adds all annotations available for the span of
 retrieved tokens, with each annotation layer in a separate line.
 Annotations are separated by spaces and the hierarchical order of
 annotations is lost, though the span of tokens covered by each
@@ -180,39 +180,26 @@ syntactic category annotations looks as follows.</p>
 result, and so on. Note that when specifying annotation layers, if the
 reserved name 'tok' is not specified, the tokens themselves will not be
 exported (annotations only).</p>
-<p>The WekaExporter outputs the format used by the <a href="http://www.cs.waikato.ac.nz/ml/weka/">WEKA machine learning
-tool</a>. Only the attributes of the
-search elements (#1, #2 etc. in AQL) are outputted, and are separated
-by commas. The order and name of the attributes is declared in the
-beginning of the export text, as in this example:</p>
-<pre><code>@relation name
-
-@attribute #1_id string
-@attribute #1_span string
-@attribute #1_anno_const:cat string
-@attribute #2_id string
-@attribute #2_span string
-@attribute #2_anno_GUM:claws5 string
-@attribute #2_anno_GUM:lemma string
-@attribute #2_anno_GUM:pos string
-
-@data
-
-'11318611','the current state','NP','11318616','current','AJ0','current','JJ'
-'11318686','magic','NP','11318688','magic','AJ0','magic','JJ'
-'11318757','some basic tricks','NP','11318760','basic','AJ0','basic','JJ'
+<p>The <strong>CSVExporter</strong> outputs the format usable by spreadsheet programs such as Excel or Calc.
+It is also easy to read CSV files in R- or Python-Scripts.
+Only the attributes of the search elements (#1, #2 etc. in AQL) are outputted, and are separated
+by tabs. The order and name of the attributes is declared in the first line of the export text, as in this example:</p>
+<pre><code>1_id	1_span	1_anno_const::cat	2_id	2_span	2_anno_GUM::claws5	2_anno_GUM::lemma	2_anno_GUM::penn_pos	2_anno_GUM::pos	2_anno_GUM::tok_func
+salt:/GUM/GUM_interview_ants#const_0_39	thee amazingg adaptations	NP	salt:/GUM/GUM_interview_ants#tok_40	amazing	AJ0	amazing	JJ	JJ	amod
+salt:/GUM/GUM_interview_ants#const_0_42	sociall insects	NP	salt:/GUM/GUM_interview_ants#tok_42	social	AJ0	social	JJ	JJ	amod
+salt:/GUM/GUM_interview_ants#const_0_50	thee extremee parasitee pressure	NP	salt:/GUM/GUM_interview_ants#tok_51	extreme	AJ0	extreme	JJ	JJ	amod
 </code></pre>
 <p>The export shows the properties of an NP node dominating a token with
 the part-of-speech JJ. Since the token also has other attributes, such
 as the lemma and part of speech tags, these are also retrieved.</p>
 <p>It is also possible to output metadata annotations per hit using the
-WekaExporter. To do so, use the parameter metakeys=meta1,meta2 etc. For
+CSVExporter. To do so, use the parameter metakeys=meta1,meta2 etc. For
 example, if your documents have a metadata annotation called 'genre',
 you may export it for each search result as a further column using
 metakeys=genre in the parameters box.</p>
-<p>The CSVExporter behaves much like the WekaExporter, except that the Weka
-header specifying the content of the columns is not used (useful for
-importing into spreadsheet programs such as Excel or Calc).</p>
+<p>Most of these exporters do not work well when the corpus uses <em>multiple segmentations</em>, like in dialogues.
+If they extract the spanned text for a match, they might have no way of automatically knowing which segmentation is the right one and display an empty span.
+For the CSVExporter, you can set the <code>segmentation</code> parameter (e.g. <code>segmentation=dipl</code>) to the name of the segmentation, and it will be used as source for the spanned text.</p>
 <p>Note that exporting may be slow if the result set is large.</p>
 
                     </main>
