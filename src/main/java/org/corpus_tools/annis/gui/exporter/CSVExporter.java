@@ -245,9 +245,8 @@ public class CSVExporter extends BaseMatrixExporter {
            } else {
              // Get covered token of both nodes and check if they overlap
              Set<SToken> coveredToken = new HashSet<>(graph.getOverlappedTokens(node));
-             boolean overlaps = graph.getOverlappedTokens(segNode).parallelStream()
-                 .anyMatch(t -> coveredToken.contains(t));
-             return overlaps;
+             return graph.getOverlappedTokens(segNode).parallelStream()
+                 .anyMatch(coveredToken::contains);
            }
          }).collect(Collectors.toList());
 
