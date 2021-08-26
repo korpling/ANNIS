@@ -518,6 +518,171 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
         return true;
     }
 
+    private Optional<String> createWarningMessage(boolean alignmc) {
+      String numbersString = "";
+      String warnMessage = "";
+      StringBuilder sb = new StringBuilder();
+
+      List<Integer> copyOfFilterNumbersSetByUser = new ArrayList<Integer>();
+
+      for (Long filterNumber : filterNumbersSetByUser) {
+        copyOfFilterNumbersSetByUser.add(Integer.parseInt(String.valueOf(filterNumber)));
+      }
+
+      for (Integer matchNumberGlobal : matchNumbersGlobal) {
+        copyOfFilterNumbersSetByUser.remove(matchNumberGlobal);
+      }
+
+      Collections.sort(copyOfFilterNumbersSetByUser);
+
+      if (!copyOfFilterNumbersSetByUser.isEmpty()) {
+        for (Integer filterNumber : copyOfFilterNumbersSetByUser) {
+          sb.append(filterNumber + ", ");
+        }
+
+        if (copyOfFilterNumbersSetByUser.size() == 1) {
+          numbersString = "number";
+        } else {
+          numbersString = "numbers";
+        }
+
+        warnMessage = "1. Filter " + numbersString + " "
+            + sb.toString().substring(0, sb.lastIndexOf(",")) + " couldn't be represented.";
+
+      }
+
+      if (alignmc && !dataIsAlignable) {
+        if (!warnMessage.isEmpty()) {
+          warnMessage += (NEWLINE + NEWLINE + "2. ");
+        } else {
+          warnMessage += "1. ";
+        }
+
+        warnMessage += "You have tried to align matches by node number via check box."
+            + "Unfortunately this option is not applicable for this data set, "
+            + "so the data couldn't be aligned.";
+
+      }
+      return warnMessage.isEmpty() ? Optional.empty() : Optional.of(warnMessage);
+    }
+
+    private void writeSpeakerHeader(SDocumentGraph graph, int recordNumber, Writer out,
+        boolean alignmc, UI ui, String currSpeakerName) throws IOException {
+
+        if (isFirstSpeakerWithMatch) {
+
+          out.append("match_number" + TAB_MARK);
+          out.append("speaker" + TAB_MARK);
+
+          // write header for meta data columns
+          if (!listOfMetakeys.isEmpty()) {
+            for (String metakey : listOfMetakeys) {
+              out.append(metakey + TAB_MARK);
+            }
+          }
+
+          out.append("left_context" + TAB_MARK);
+
+          String prefixAlignmc = "match_";
+          String prefix = "match_column";
+          String middle_context = "middle_context_";
+
+          if (alignmc && dataIsAlignable) {
+
+            for (int i = 0; i < orderedMatchNumbersGlobal.size(); i++) {
+              out.append(prefixAlignmc + orderedMatchNumbersGlobal.get(i) + TAB_MARK);
+
+              if (i < orderedMatchNumbersGlobal.size() - 1) {
+                out.append(middle_context + (i + 1) + TAB_MARK);
+              }
+            }
+          } else {
+
+            for (int i = 0; i < maxMatchesPerLine; i++) {
+              out.append(prefix + TAB_MARK);
+
+              if (i < (maxMatchesPerLine - 1)) {
+                out.append(middle_context + (i + 1) + TAB_MARK);
+              }
+            }
+
+          }
+
+          out.append("right_context");
+          out.append(NEWLINE);
+
+          isFirstSpeakerWithMatch = false;
+        } else {
+          out.append(NEWLINE);
+        }
+
+        out.append(String.valueOf(recordNumber + 1) + TAB_MARK);
+
+        String trimmedName = "";
+        if (currSpeakerName.indexOf("_") < currSpeakerName.length()) {
+          trimmedName = currSpeakerName.substring(currSpeakerName.indexOf("_") + 1);
+        }
+
+        out.append(trimmedName + TAB_MARK);
+
+        // write meta data
+        if (!listOfMetakeys.isEmpty()) {
+          // get metadata
+          String docName = graph.getDocument().getName();
+          List<String> corpusPath =
+              Helper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
+          String corpusName = corpusPath.get(corpusPath.size() - 1);
+          corpusName = urlPathEscape.escape(corpusName);
+          List<SMetaAnnotation> metadata =
+              Helper.getMetaData(corpusName, Optional.of(docName), ui);
+
+          Map<String, String> annosWithoutNamespace = new HashMap<String, String>();
+          Map<String, Map<String, String>> annosWithNamespace =
+              new HashMap<String, Map<String, String>>();
+
+          // put metadata annotations into hash maps for better access
+          for (SMetaAnnotation metaAnno : metadata) {
+            String ns;
+            Map<String, String> data = new HashMap<String, String>();
+            data.put(metaAnno.getName(), metaAnno.getValue_STEXT());
+
+            // a namespace is present
+            if ((ns = metaAnno.getNamespace()) != null && !ns.isEmpty()) {
+              Map<String, String> nsMetadata = new HashMap<String, String>();
+
+              if (annosWithNamespace.get(ns) != null) {
+                nsMetadata = annosWithNamespace.get(ns);
+              }
+              nsMetadata.putAll(data);
+              annosWithNamespace.put(ns, nsMetadata);
+            } else {
+              annosWithoutNamespace.putAll(data);
+            }
+
+          }
+
+          for (String metakey : listOfMetakeys) {
+            String metaValue = "";
+
+            // try to get meta value specific for current speaker
+            if (!trimmedName.isEmpty() && annosWithNamespace.containsKey(trimmedName)) {
+
+              Map<String, String> speakerAnnos = annosWithNamespace.get(trimmedName);
+              if (speakerAnnos.containsKey(metakey)) {
+                metaValue = speakerAnnos.get(metakey).trim();
+              }
+            }
+
+            // try to get meta value, if metaValue is not set
+            if (metaValue.isEmpty() && annosWithoutNamespace.containsKey(metakey)) {
+              metaValue = annosWithoutNamespace.get(metakey).trim();
+            }
+            out.append(metaValue + TAB_MARK);
+          }
+        } // metadata written
+     
+    }
+
     /**
      * Writes the specified record (if applicable, as multiple result lines) from query result set
      * to the output file.
@@ -533,332 +698,169 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
      * @throws IOException, if an I/O error occurs
      * 
      */
-
     @Override
     public void outputText(SDocumentGraph graph, Map<String, String> args, boolean alignmc,
         int recordNumber, Writer out, UI ui)
             throws IOException {
 
-        String currSpeakerName = "";
         String prevSpeakerName = "";
 
-        if (graph != null) {
-            List<SToken> orderedToken = graph.getSortedTokenByText();
+        if (graph == null) {
+          return;
+        }
 
-            if (orderedToken != null) {
+        List<SToken> orderedToken = graph.getSortedTokenByText();
+        if (orderedToken == null) {
+          return;
+        }
 
-                // iterate over token
-                ListIterator<SToken> it = orderedToken.listIterator();
-                long lastTokenWasMatched = -1;
-                boolean noPreviousTokenInLine = false;
+        // iterate over token
+        ListIterator<SToken> it = orderedToken.listIterator();
+        long lastTokenWasMatched = -1;
+        boolean noPreviousTokenInLine = false;
 
-                // if match number == 0, reset global variables and output warning, if necessary
-                if (recordNumber == 0) {
-                    isFirstSpeakerWithMatch = true;
-                    counterGlobal = 0;
+        // if match number == 0, reset global variables and output warning, if necessary
+        if (recordNumber == 0) {
+          isFirstSpeakerWithMatch = true;
+          counterGlobal = 0;
 
-                    // create warning message
-                    String numbersString = "";
-                    String warnMessage = "";
-                    StringBuilder sb = new StringBuilder();
+          // show warning message if necessary
+          Optional<String> warnMessage = createWarningMessage(alignmc);
 
-                    List<Integer> copyOfFilterNumbersSetByUser = new ArrayList<Integer>();
+          if (!warnMessage.isEmpty()) {
 
-                    for (Long filterNumber : filterNumbersSetByUser) {
-                        copyOfFilterNumbersSetByUser.add(Integer.parseInt(String.valueOf(filterNumber)));
+            String warnCaption = "Some export options couldn't be realized.";
+            Notification warn =
+                new Notification(warnCaption, warnMessage.get(), Notification.Type.WARNING_MESSAGE);
+            warn.setDelayMsec(20000);
+            warn.show(Page.getCurrent());
+          }
+        } // global variables reset; warning issued
+
+        int matchesWrittenForSpeaker = 0;
+
+        while (it.hasNext()) {
+          SToken tok = it.next();
+          counterGlobal++;
+          // get current speaker name
+          String name;
+          if ((name = Helper.getTextualDSForNode(tok, graph).getName()) == null) {
+            name = "";
+          }
+
+          final String currSpeakerName = (recordNumber + 1) + "_" + name;
+
+          // if speaker has no matches, skip token
+          if (speakerHasMatches.get(currSpeakerName) == false) {
+            prevSpeakerName = currSpeakerName;
+          }
+          // if speaker has matches
+          else {
+            // if the current speaker is new, write header and append his name
+            if (!currSpeakerName.equals(prevSpeakerName)) {
+              // reset the counter of matches, which were written for this speaker
+              matchesWrittenForSpeaker = 0;
+
+              writeSpeakerHeader(graph, recordNumber, out, alignmc, ui, currSpeakerName);
+
+              lastTokenWasMatched = -1;
+              noPreviousTokenInLine = true;
+            }
+
+            String separator = SPACE; // default to space as separator
+
+            Long matchedNode;
+            // token matched
+            if ((matchedNode = tokenToMatchNumber.get(counterGlobal)) != null) {
+              // is dominated by a (new) matched node, thus use tab to separate the
+              // non-matches from the matches
+              if (lastTokenWasMatched < 0) {
+                if (alignmc && dataIsAlignable) {
+                  int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
+                  if (orderInList >= matchesWrittenForSpeaker) {
+                    int diff = orderInList - matchesWrittenForSpeaker;
+                    matchesWrittenForSpeaker++;
+
+                    StringBuilder sb = new StringBuilder(TAB_MARK);
+                    for (int i = 0; i < diff; i++) {
+                      sb.append(TAB_MARK + TAB_MARK);
+                      matchesWrittenForSpeaker++;
                     }
-
-                    for (Integer matchNumberGlobal : matchNumbersGlobal) {
-                        copyOfFilterNumbersSetByUser.remove(matchNumberGlobal);
-                    }
-
-                    Collections.sort(copyOfFilterNumbersSetByUser);
-
-                    if (!copyOfFilterNumbersSetByUser.isEmpty()) {
-                        for (Integer filterNumber : copyOfFilterNumbersSetByUser) {
-                            sb.append(filterNumber + ", ");
-                        }
-
-                        if (copyOfFilterNumbersSetByUser.size() == 1) {
-                            numbersString = "number";
-                        } else {
-                            numbersString = "numbers";
-                        }
-
-                        warnMessage = "1. Filter " + numbersString + " "
-                                + sb.toString().substring(0, sb.lastIndexOf(",")) + " couldn't be represented.";
-
-                    }
-
-                    if (alignmc && !dataIsAlignable) {
-                        if (!warnMessage.isEmpty()) {
-                            warnMessage += (NEWLINE + NEWLINE + "2. ");
-                        } else {
-                            warnMessage += "1. ";
-                        }
-
-                        warnMessage += "You have tried to align matches by node number via check box."
-                                + "Unfortunately this option is not applicable for this data set, "
-                                + "so the data couldn't be aligned.";
-
-                    }
-
-                    if (!warnMessage.isEmpty()) {
-
-                        String warnCaption = "Some export options couldn't be realized.";
-                        Notification warn = new Notification(warnCaption, warnMessage,
-                                Notification.Type.WARNING_MESSAGE);
-                        warn.setDelayMsec(20000);
-                        warn.show(Page.getCurrent());
-                    }
-                } // global variables reset; warning issued
-
-                int matchesWrittenForSpeaker = 0;
-
-                while (it.hasNext()) {
-                    SToken tok = it.next();
-                    counterGlobal++;
-                    // get current speaker name
-                    String name;
-                    if ((name = Helper.getTextualDSForNode(tok, graph).getName()) == null) {
-                        name = "";
-                    }
-
-                    currSpeakerName = (recordNumber + 1) + "_" + name;
-
-                    // if speaker has no matches, skip token
-                    if (speakerHasMatches.get(currSpeakerName) == false) {
-                        prevSpeakerName = currSpeakerName;
-                        // continue;
-                    }
-
-                    // if speaker has matches
-                    else {
-
-                        // if the current speaker is new, write header and append his name
-                        if (!currSpeakerName.equals(prevSpeakerName)) {
-                            // reset the counter of matches, which were written for this speaker
-                            matchesWrittenForSpeaker = 0;
-
-                            if (isFirstSpeakerWithMatch) {
-
-                                out.append("match_number" + TAB_MARK);
-                                out.append("speaker" + TAB_MARK);
-
-                                // write header for meta data columns
-                                if (!listOfMetakeys.isEmpty()) {
-                                    for (String metakey : listOfMetakeys) {
-                                        out.append(metakey + TAB_MARK);
-                                    }
-                                }
-
-                                out.append("left_context" + TAB_MARK);
-
-                                String prefixAlignmc = "match_";
-                                String prefix = "match_column";
-                                String middle_context = "middle_context_";
-
-                                if (alignmc && dataIsAlignable) {
-
-                                    for (int i = 0; i < orderedMatchNumbersGlobal.size(); i++) {
-                                        out.append(prefixAlignmc + orderedMatchNumbersGlobal.get(i) + TAB_MARK);
-
-                                        if (i < orderedMatchNumbersGlobal.size() - 1) {
-                                            out.append(middle_context + (i + 1) + TAB_MARK);
-                                        }
-                                    }
-                                } else {
-
-                                    for (int i = 0; i < maxMatchesPerLine; i++) {
-                                        out.append(prefix + TAB_MARK);
-
-                                        if (i < (maxMatchesPerLine - 1)) {
-                                            out.append(middle_context + (i + 1) + TAB_MARK);
-                                        }
-                                    }
-
-                                }
-
-                                out.append("right_context");
-                                out.append(NEWLINE);
-
-                                isFirstSpeakerWithMatch = false;
-                            } else {
-                                out.append(NEWLINE);
-                            }
-
-                            out.append(String.valueOf(recordNumber + 1) + TAB_MARK);
-
-                            String trimmedName = "";
-                            if (currSpeakerName.indexOf("_") < currSpeakerName.length()) {
-                                trimmedName = currSpeakerName.substring(currSpeakerName.indexOf("_") + 1);
-                            }
-
-                            out.append(trimmedName + TAB_MARK);
-
-                            // write meta data
-                            if (!listOfMetakeys.isEmpty()) {
-                                // get metadata
-                                String docName = graph.getDocument().getName();
-                                List<String> corpusPath = Helper.getCorpusPath(
-                                    graph.getDocument().getGraph(),
-                                        graph.getDocument());
-                                String corpusName = corpusPath.get(corpusPath.size() - 1);
-                                corpusName = urlPathEscape.escape(corpusName);
-                                List<SMetaAnnotation> metadata =
-                                    Helper.getMetaData(corpusName, Optional.of(docName), ui);
-
-                                Map<String, String> annosWithoutNamespace = new HashMap<String, String>();
-                                Map<String, Map<String, String>> annosWithNamespace = new HashMap<String, Map<String, String>>();
-
-                                // put metadata annotations into hash maps for better access
-                                for (SMetaAnnotation metaAnno : metadata) {
-                                    String ns;
-                                    Map<String, String> data = new HashMap<String, String>();
-                                    data.put(metaAnno.getName(), metaAnno.getValue_STEXT());
-
-                                    // a namespace is present
-                                    if ((ns = metaAnno.getNamespace()) != null && !ns.isEmpty()) {
-                                        Map<String, String> nsMetadata = new HashMap<String, String>();
-
-                                        if (annosWithNamespace.get(ns) != null) {
-                                            nsMetadata = annosWithNamespace.get(ns);
-                                        }
-                                        nsMetadata.putAll(data);
-                                        annosWithNamespace.put(ns, nsMetadata);
-                                    } else {
-                                        annosWithoutNamespace.putAll(data);
-                                    }
-
-                                }
-
-                                for (String metakey : listOfMetakeys) {
-                                    String metaValue = "";
-
-                                    // try to get meta value specific for current speaker
-                                    if (!trimmedName.isEmpty() && annosWithNamespace.containsKey(trimmedName)) {
-
-                                        Map<String, String> speakerAnnos = annosWithNamespace.get(trimmedName);
-                                        if (speakerAnnos.containsKey(metakey)) {
-                                            metaValue = speakerAnnos.get(metakey).trim();
-                                        }
-                                    }
-
-                                    // try to get meta value, if metaValue is not set
-                                    if (metaValue.isEmpty() && annosWithoutNamespace.containsKey(metakey)) {
-                                        metaValue = annosWithoutNamespace.get(metakey).trim();
-                                    }
-                                    out.append(metaValue + TAB_MARK);
-                                }
-                            } // metadata written
-
-                            lastTokenWasMatched = -1;
-                            noPreviousTokenInLine = true;
-
-                        } // header, speaker name and metadata ready
-
-                        String separator = SPACE; // default to space as separator
-
-                        Long matchedNode;
-                        // token matched
-                        if ((matchedNode = tokenToMatchNumber.get(counterGlobal)) != null) {
-                            // is dominated by a (new) matched node, thus use tab to separate the
-                            // non-matches from the matches
-                            if (lastTokenWasMatched < 0) {
-                                if (alignmc && dataIsAlignable) {
-                                    int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
-                                    if (orderInList >= matchesWrittenForSpeaker) {
-                                        int diff = orderInList - matchesWrittenForSpeaker;
-                                        matchesWrittenForSpeaker++;
-
-                                        StringBuilder sb = new StringBuilder(TAB_MARK);
-                                        for (int i = 0; i < diff; i++) {
-                                            sb.append(TAB_MARK + TAB_MARK);
-                                            matchesWrittenForSpeaker++;
-                                        }
-                                        separator = sb.toString();
-                                    }
-
-                                } else {
-                                    separator = TAB_MARK;
-                                }
-
-                            } else if (lastTokenWasMatched != matchedNode) {
-                                // always leave an empty column between two matches, even if there is no actual
-                                // context
-                                if (alignmc && dataIsAlignable) {
-                                    int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
-                                    if (orderInList >= matchesWrittenForSpeaker) {
-                                        int diff = orderInList - matchesWrittenForSpeaker;
-                                        matchesWrittenForSpeaker++;
-
-                                        StringBuilder sb = new StringBuilder(TAB_MARK + TAB_MARK);
-                                        for (int i = 0; i < diff; i++) {
-                                            sb.append(TAB_MARK + TAB_MARK);
-                                            matchesWrittenForSpeaker++;
-                                        }
-
-                                        separator = sb.toString();
-
-                                    }
-
-                                } else {
-
-                                    separator = TAB_MARK + TAB_MARK;
-                                }
-
-                            }
-                            lastTokenWasMatched = matchedNode;
-                        }
-                        // token not matched, but last token matched
-                        else if (lastTokenWasMatched >= 0) {
-
-                            // handle crossing edges
-                            if (!tokenToMatchNumber.containsKey(counterGlobal)
-                                    && tokenToMatchNumber.containsKey(counterGlobal - 1)
-                                    && tokenToMatchNumber.containsKey(counterGlobal + 1)) {
-
-                                if (Objects.equals(tokenToMatchNumber.get(counterGlobal - 1),
-                                        tokenToMatchNumber.get(counterGlobal + 1))) {
-
-                                    separator = SPACE;
-                                    lastTokenWasMatched = tokenToMatchNumber.get(counterGlobal + 1);
-                                } else {
-
-                                    separator = TAB_MARK;
-                                    lastTokenWasMatched = -1;
-                                }
-
-                            }
-                            // mark the end of a match with the tab
-                            else {
-
-                                separator = TAB_MARK;
-                                lastTokenWasMatched = -1;
-                            }
-
-                        }
-
-                        // if tok is the first token in the line and not matched, set separator to empty
-                        // string
-                        if (noPreviousTokenInLine && separator.equals(SPACE)) {
-                            separator = "";
-                        }
-                        out.append(separator);
-
-                        // append the current token
-                        out.append(graph.getText(tok));
-                        noPreviousTokenInLine = false;
-                        prevSpeakerName = currSpeakerName;
-
-                    }
-
+                    separator = sb.toString();
+                  }
+
+                } else {
+                  separator = TAB_MARK;
                 }
+
+              } else if (lastTokenWasMatched != matchedNode) {
+                // always leave an empty column between two matches, even if there is no actual
+                // context
+                if (alignmc && dataIsAlignable) {
+                  int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
+                  if (orderInList >= matchesWrittenForSpeaker) {
+                    int diff = orderInList - matchesWrittenForSpeaker;
+                    matchesWrittenForSpeaker++;
+
+                    StringBuilder sb = new StringBuilder(TAB_MARK + TAB_MARK);
+                    for (int i = 0; i < diff; i++) {
+                      sb.append(TAB_MARK + TAB_MARK);
+                      matchesWrittenForSpeaker++;
+                    }
+
+                    separator = sb.toString();
+
+                  }
+
+                } else {
+
+                  separator = TAB_MARK + TAB_MARK;
+                }
+
+              }
+              lastTokenWasMatched = matchedNode;
+            }
+            // token not matched, but last token matched
+            else if (lastTokenWasMatched >= 0) {
+
+              // handle crossing edges
+              if (!tokenToMatchNumber.containsKey(counterGlobal)
+                  && tokenToMatchNumber.containsKey(counterGlobal - 1)
+                  && tokenToMatchNumber.containsKey(counterGlobal + 1)) {
+
+                if (Objects.equals(tokenToMatchNumber.get(counterGlobal - 1),
+                    tokenToMatchNumber.get(counterGlobal + 1))) {
+
+                  separator = SPACE;
+                  lastTokenWasMatched = tokenToMatchNumber.get(counterGlobal + 1);
+                } else {
+
+                  separator = TAB_MARK;
+                  lastTokenWasMatched = -1;
+                }
+
+              }
+              // mark the end of a match with the tab
+              else {
+
+                separator = TAB_MARK;
+                lastTokenWasMatched = -1;
+              }
 
             }
 
+            // if tok is the first token in the line and not matched, set separator to empty
+            // string
+            if (noPreviousTokenInLine && separator.equals(SPACE)) {
+              separator = "";
+            }
+            out.append(separator);
+
+            // append the current token
+            out.append(graph.getText(tok));
+            noPreviousTokenInLine = false;
+            prevSpeakerName = currSpeakerName;
+          }
         }
-
     }
-
 }
