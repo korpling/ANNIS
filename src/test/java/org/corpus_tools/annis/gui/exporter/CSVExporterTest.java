@@ -88,7 +88,7 @@ class CSVExporterTest {
     assertEquals("1_id\t1_span\t1_anno_default_ns::utterance0",
         lines[0]);
     assertEquals(
-        "salt:/dialog.demo/dialog.demo#sSpan98\täh ((lacht)) fang einfach ma anl\täh fang einfach ma an",
+        "salt:/dialog.demo/dialog.demo#sSpan98\täh ((lacht)) fang einfach ma an\täh fang einfach ma an",
         lines[1]);
   }
 

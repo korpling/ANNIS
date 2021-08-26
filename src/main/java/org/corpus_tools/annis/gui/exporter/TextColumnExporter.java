@@ -519,27 +519,24 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
     }
 
     /**
-     * Writes the specified record (if applicable, as multiple result lines) from
-     * query result set to the output file.
+     * Writes the specified record (if applicable, as multiple result lines) from query result set
+     * to the output file.
      * 
-     * @param graph
-     *            the org.corpus_tools.salt.common.SDocumentGraph representation of
-     *            a specified record
-     * @param alignmc
-     *            a boolean, which indicates, whether the data should be aligned by
-     *            match numbers or not
-     * @param recordNumber
-     *            the number of record within the record set
-     * @param out
-     *            the specified Writer
+     * @param graph the org.corpus_tools.salt.common.SDocumentGraph representation of a specified
+     *        record
+     * @param args
+     * @param alignmc a boolean, which indicates, whether the data should be aligned by match
+     *        numbers or not
+     * @param recordNumber the number of record within the record set
+     * @param out the specified Writer
      * 
-     * @throws IOException,
-     *             if an I/O error occurs
+     * @throws IOException, if an I/O error occurs
      * 
      */
 
     @Override
-    public void outputText(SDocumentGraph graph, boolean alignmc, int recordNumber, Writer out, UI ui)
+    public void outputText(SDocumentGraph graph, Map<String, String> args, boolean alignmc,
+        int recordNumber, Writer out, UI ui)
             throws IOException {
 
         String currSpeakerName = "";

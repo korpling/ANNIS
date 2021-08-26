@@ -22,6 +22,8 @@ import org.eclipse.emf.common.util.URI;
 
 public class ExportHelper {
 
+  public static final String SEGMENTATION_KEY = "segmentation";
+
   private ExportHelper() {
     // Class with static helper functions should not be instantiated
   }
@@ -53,8 +55,8 @@ public class ExportHelper {
       subgraphQuery.segmentation(null);
       subgraphQuery.setNodeIds(parsedMatch.getSaltIDs());
       
-      if (args.containsKey("segmentation")) {
-        subgraphQuery.setSegmentation(args.get("segmentation"));
+      if (args.containsKey(SEGMENTATION_KEY)) {
+        subgraphQuery.setSegmentation(args.get(SEGMENTATION_KEY));
       }
 
       File graphML = corporaApi.subgraphForNodes(corpusPath.get(0), subgraphQuery);

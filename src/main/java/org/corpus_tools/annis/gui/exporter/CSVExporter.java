@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.objects.AnnisConstants;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
@@ -151,6 +152,7 @@ public class CSVExporter extends BaseMatrixExporter {
      * Takes a match and outputs a csv-line
      *
      * @param graph
+     * @param args
      * @param alignmc
      * @param matchNumber
      * @param out
@@ -159,7 +161,8 @@ public class CSVExporter extends BaseMatrixExporter {
      *
      */
     @Override
-    public void outputText(SDocumentGraph graph, boolean alignmc, int matchNumber, Writer out, UI ui)
+    public void outputText(SDocumentGraph graph, Map<String, String> args, boolean alignmc,
+        int matchNumber, Writer out, UI ui)
             throws IOException, IllegalArgumentException {
 
         // first match
@@ -187,9 +190,9 @@ public class CSVExporter extends BaseMatrixExporter {
             List<String> nodeLine = new ArrayList<>();
             nodeLine.add(node.getId());
             // export spanned text
-            String span = graph.getText(node);
+            String span = getSpannedText(graph, node, args.get(ExportHelper.SEGMENTATION_KEY));
             if (span != null)
-                nodeLine.add(graph.getText(node));
+              nodeLine.add(span);
             else
                 nodeLine.add("");
             // export annotations
@@ -229,5 +232,28 @@ public class CSVExporter extends BaseMatrixExporter {
         }
 
         out.append("\n");
+    }
+
+    private String getSpannedText(SDocumentGraph graph, SNode node, String segmentation) {
+       if(segmentation == null || segmentation.isEmpty()) {
+         return graph.getText(node);
+       } else {
+         // Filter out the nodes that cover the same range as our matched node
+         List<SNode> segmentationNodes = Helper.getSortedSegmentationNodes(segmentation, graph).stream().filter(segNode -> {
+           if(segNode.equals(node)) {
+             return true;
+           } else {
+             // Get covered token of both nodes and check if they overlap
+             Set<SToken> coveredToken = new HashSet<>(graph.getOverlappedTokens(node));
+             boolean overlaps = graph.getOverlappedTokens(segNode).parallelStream()
+                 .anyMatch(t -> coveredToken.contains(t));
+             return overlaps;
+           }
+         }).collect(Collectors.toList());
+
+         return segmentationNodes.stream()
+             .map(n -> n.getAnnotation(segmentation).getValue_STEXT())
+             .collect(Collectors.joining(" "));
+       }
     }
 }
