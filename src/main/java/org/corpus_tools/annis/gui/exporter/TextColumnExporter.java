@@ -639,8 +639,7 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
               Helper.getMetaData(corpusName, Optional.of(docName), ui);
 
           Map<String, String> annosWithoutNamespace = new HashMap<String, String>();
-          Map<String, Map<String, String>> annosWithNamespace =
-              new HashMap<String, Map<String, String>>();
+          Map<String, Map<String, String>> annosWithNamespace = new HashMap<>();
 
           // put metadata annotations into hash maps for better access
           for (SMetaAnnotation metaAnno : metadata) {
@@ -673,6 +672,8 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
               if (speakerAnnos.containsKey(metakey)) {
                 metaValue = speakerAnnos.get(metakey).trim();
               }
+            } else {
+              metaValue = annosWithoutNamespace.get(metakey);
             }
 
             // try to get meta value, if metaValue is not set
@@ -826,7 +827,7 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
           // show warning message if necessary
           Optional<String> warnMessage = createWarningMessage(alignmc);
 
-          if (!warnMessage.isEmpty()) {
+          if (warnMessage.isPresent()) {
 
             String warnCaption = "Some export options couldn't be realized.";
             Notification warn =

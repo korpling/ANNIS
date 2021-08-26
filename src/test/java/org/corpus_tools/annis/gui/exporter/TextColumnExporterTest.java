@@ -14,7 +14,6 @@ import java.util.HashMap;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.SingletonBeanStoreRetrievalStrategy;
-import org.corpus_tools.annis.gui.exporter.TextColumnExporter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,6 +67,28 @@ class TextColumnExporterTest {
     assertEquals("1\t\t\tFeigenblatt\tDie Jugendlichen in Zossen wollen", lines[1]);
     assertEquals(
         "2\t\tJugendlichen wurden somit zum bloßen\tFeigenblatt\tdegradiert . Nicht über sondern",
+        lines[2]);
+  }
+
+  @Test
+  void exportMetadata() throws IOException {
+    EventBus eventBus = mock(EventBus.class);
+    Writer out = new StringWriter();
+
+    Exception ex = exporter.convertText("tok=\"Feigenblatt\"", QueryLanguage.AQL, 5, 5,
+        Sets.newSet("pcc2"), null, "metakeys=Genre", false, out, eventBus, new HashMap<>(), ui);
+
+    assertNull(ex);
+
+    // Compare the generated CSV file with the ground truth
+    out.close();
+    String[] lines = out.toString().split("\n");
+    assertEquals(3, lines.length);
+    assertEquals("match_number\tspeaker\tGenre\tleft_context\tmatch_column\tright_context",
+        lines[0]);
+    assertEquals("1\t\tPolitik\t\tFeigenblatt\tDie Jugendlichen in Zossen wollen", lines[1]);
+    assertEquals(
+        "2\t\tPolitik\tJugendlichen wurden somit zum bloßen\tFeigenblatt\tdegradiert . Nicht über sondern",
         lines[2]);
   }
 
