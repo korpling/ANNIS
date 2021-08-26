@@ -194,10 +194,10 @@ public class CSVExporter extends BaseMatrixExporter {
 
     private void appendMetaLine(SDocumentGraph graph, Writer out, UI ui) throws IOException {
       // TODO is this the best way to get the corpus name?
-      String corpus_name = Helper.getCorpusPath(graph.getDocument().getId().toString()).get(0);
+      String corpusName = Helper.getCorpusPath(graph.getDocument().getId()).get(0);
       // TODO cache the metadata
       Map<String, SMetaAnnotation> allMetaAnnos =
-          Helper.getMetaData(corpus_name, Optional.of(graph.getDocument().getName()), ui).stream()
+          Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui).stream()
               .collect(Collectors.toMap(SMetaAnnotation::getName, Function.identity()));
 
       for (String metaName : metakeys) {
