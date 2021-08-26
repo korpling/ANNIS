@@ -150,6 +150,8 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
     // counter over token, globally over all query results
     private long counterGlobal;
 
+    private int matchesWrittenForSpeaker = 0;
+
     /**
      * This method determine a valid order of match numbers and returns them as a
      * list. If the underlying result set is not alignable, it returns an empty
@@ -683,6 +685,103 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
      
     }
 
+    private long writeToken(SToken tok, SDocumentGraph graph, Writer out, boolean alignmc,
+        long lastTokenMatched, boolean noPreviousTokenInLine) throws IOException {
+      String separator = SPACE; // default to space as separator
+
+      Long matchedNode;
+      // token matched
+      if ((matchedNode = tokenToMatchNumber.get(counterGlobal)) != null) {
+        // is dominated by a (new) matched node, thus use tab to separate the
+        // non-matches from the matches
+        if (lastTokenMatched < 0) {
+          if (alignmc && dataIsAlignable) {
+            int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
+            if (orderInList >= matchesWrittenForSpeaker) {
+              int diff = orderInList - matchesWrittenForSpeaker;
+              matchesWrittenForSpeaker++;
+
+              StringBuilder sb = new StringBuilder(TAB_MARK);
+              for (int i = 0; i < diff; i++) {
+                sb.append(TAB_MARK + TAB_MARK);
+                matchesWrittenForSpeaker++;
+              }
+              separator = sb.toString();
+            }
+
+          } else {
+            separator = TAB_MARK;
+          }
+
+        } else if (lastTokenMatched != matchedNode) {
+          // always leave an empty column between two matches, even if there is no actual
+          // context
+          if (alignmc && dataIsAlignable) {
+            int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
+            if (orderInList >= matchesWrittenForSpeaker) {
+              int diff = orderInList - matchesWrittenForSpeaker;
+              matchesWrittenForSpeaker++;
+
+              StringBuilder sb = new StringBuilder(TAB_MARK + TAB_MARK);
+              for (int i = 0; i < diff; i++) {
+                sb.append(TAB_MARK + TAB_MARK);
+                matchesWrittenForSpeaker++;
+              }
+
+              separator = sb.toString();
+
+            }
+
+          } else {
+
+            separator = TAB_MARK + TAB_MARK;
+          }
+
+        }
+        lastTokenMatched = matchedNode;
+      }
+      // token not matched, but last token matched
+      else if (lastTokenMatched >= 0) {
+
+        // handle crossing edges
+        if (!tokenToMatchNumber.containsKey(counterGlobal)
+            && tokenToMatchNumber.containsKey(counterGlobal - 1)
+            && tokenToMatchNumber.containsKey(counterGlobal + 1)) {
+
+          if (Objects.equals(tokenToMatchNumber.get(counterGlobal - 1),
+              tokenToMatchNumber.get(counterGlobal + 1))) {
+
+            separator = SPACE;
+            lastTokenMatched = tokenToMatchNumber.get(counterGlobal + 1);
+          } else {
+
+            separator = TAB_MARK;
+            lastTokenMatched = -1;
+          }
+
+        }
+        // mark the end of a match with the tab
+        else {
+
+          separator = TAB_MARK;
+          lastTokenMatched = -1;
+        }
+
+      }
+
+      // if tok is the first token in the line and not matched, set separator to empty
+      // string
+      if (noPreviousTokenInLine && separator.equals(SPACE)) {
+        separator = "";
+      }
+      out.append(separator);
+
+      // append the current token
+      out.append(graph.getText(tok));
+
+      return lastTokenMatched;
+    }
+
     /**
      * Writes the specified record (if applicable, as multiple result lines) from query result set
      * to the output file.
@@ -737,7 +836,7 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
           }
         } // global variables reset; warning issued
 
-        int matchesWrittenForSpeaker = 0;
+        matchesWrittenForSpeaker = 0;
 
         while (it.hasNext()) {
           SToken tok = it.next();
@@ -767,97 +866,9 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
               noPreviousTokenInLine = true;
             }
 
-            String separator = SPACE; // default to space as separator
+            lastTokenWasMatched =
+                writeToken(tok, graph, out, alignmc, lastTokenWasMatched, noPreviousTokenInLine);
 
-            Long matchedNode;
-            // token matched
-            if ((matchedNode = tokenToMatchNumber.get(counterGlobal)) != null) {
-              // is dominated by a (new) matched node, thus use tab to separate the
-              // non-matches from the matches
-              if (lastTokenWasMatched < 0) {
-                if (alignmc && dataIsAlignable) {
-                  int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
-                  if (orderInList >= matchesWrittenForSpeaker) {
-                    int diff = orderInList - matchesWrittenForSpeaker;
-                    matchesWrittenForSpeaker++;
-
-                    StringBuilder sb = new StringBuilder(TAB_MARK);
-                    for (int i = 0; i < diff; i++) {
-                      sb.append(TAB_MARK + TAB_MARK);
-                      matchesWrittenForSpeaker++;
-                    }
-                    separator = sb.toString();
-                  }
-
-                } else {
-                  separator = TAB_MARK;
-                }
-
-              } else if (lastTokenWasMatched != matchedNode) {
-                // always leave an empty column between two matches, even if there is no actual
-                // context
-                if (alignmc && dataIsAlignable) {
-                  int orderInList = orderedMatchNumbersGlobal.indexOf(matchedNode);
-                  if (orderInList >= matchesWrittenForSpeaker) {
-                    int diff = orderInList - matchesWrittenForSpeaker;
-                    matchesWrittenForSpeaker++;
-
-                    StringBuilder sb = new StringBuilder(TAB_MARK + TAB_MARK);
-                    for (int i = 0; i < diff; i++) {
-                      sb.append(TAB_MARK + TAB_MARK);
-                      matchesWrittenForSpeaker++;
-                    }
-
-                    separator = sb.toString();
-
-                  }
-
-                } else {
-
-                  separator = TAB_MARK + TAB_MARK;
-                }
-
-              }
-              lastTokenWasMatched = matchedNode;
-            }
-            // token not matched, but last token matched
-            else if (lastTokenWasMatched >= 0) {
-
-              // handle crossing edges
-              if (!tokenToMatchNumber.containsKey(counterGlobal)
-                  && tokenToMatchNumber.containsKey(counterGlobal - 1)
-                  && tokenToMatchNumber.containsKey(counterGlobal + 1)) {
-
-                if (Objects.equals(tokenToMatchNumber.get(counterGlobal - 1),
-                    tokenToMatchNumber.get(counterGlobal + 1))) {
-
-                  separator = SPACE;
-                  lastTokenWasMatched = tokenToMatchNumber.get(counterGlobal + 1);
-                } else {
-
-                  separator = TAB_MARK;
-                  lastTokenWasMatched = -1;
-                }
-
-              }
-              // mark the end of a match with the tab
-              else {
-
-                separator = TAB_MARK;
-                lastTokenWasMatched = -1;
-              }
-
-            }
-
-            // if tok is the first token in the line and not matched, set separator to empty
-            // string
-            if (noPreviousTokenInLine && separator.equals(SPACE)) {
-              separator = "";
-            }
-            out.append(separator);
-
-            // append the current token
-            out.append(graph.getText(tok));
             noPreviousTokenInLine = false;
             prevSpeakerName = currSpeakerName;
           }
