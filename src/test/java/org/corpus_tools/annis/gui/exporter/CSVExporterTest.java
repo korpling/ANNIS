@@ -70,6 +70,29 @@ class CSVExporterTest {
   }
 
   @Test
+  void exportMetadata() throws IOException {
+    EventBus eventBus = mock(EventBus.class);
+    Writer out = new StringWriter();
+
+    Exception ex = exporter.convertText("tok=\"Feigenblatt\"", QueryLanguage.AQL, 5, 5,
+        Sets.newSet("pcc2"), null, "metakeys=Genre", false, out, eventBus, new HashMap<>(), ui);
+
+    assertNull(ex);
+
+    // Compare the generated CSV file with the ground truth
+    out.close();
+    String[] lines = out.toString().split("\n");
+    assertEquals(3, lines.length);
+    assertEquals(
+        "1_id\t1_span\t1_anno_tiger::lemma\t1_anno_tiger::morph\t1_anno_tiger::pos\tmeta_Genre",
+        lines[0]);
+    assertEquals("salt:/pcc2/11299#tok_1\tFeigenblatt\tFeigenblatt\tNom.Sg.Neut\tNN\tPolitik",
+        lines[1]);
+    assertEquals("salt:/pcc2/11299#tok_143\tFeigenblatt\tFeigenblatt\tDat.Sg.Neut\tNN\tPolitik",
+        lines[2]);
+  }
+
+  @Test
   void exportWithSegmentation() throws IOException {
     EventBus eventBus = mock(EventBus.class);
     Writer out = new StringWriter();
