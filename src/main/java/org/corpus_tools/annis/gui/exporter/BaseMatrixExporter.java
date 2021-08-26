@@ -158,7 +158,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
           if (p.isPresent()) {
             for (SCorpusGraph cg : p.get().getCorpusGraphs()) {
               for (SDocument doc : cg.getDocuments()) {
-                outputText(doc.getDocumentGraph(), alignmc, recordNumber++, out, ui);
+                outputText(doc.getDocumentGraph(), args, alignmc, recordNumber++, out, ui);
                 progress++;
                 if (eventBus != null && progress % 100 == 0) {
                   eventBus.post(progress / 2);
@@ -211,6 +211,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   }
 
 
-  public abstract void outputText(SDocumentGraph graph, boolean alignmc, int recordNumber,
+  public abstract void outputText(SDocumentGraph graph, Map<String, String> args, boolean alignmc,
+      int recordNumber,
       Writer out, UI ui) throws IOException;
 }

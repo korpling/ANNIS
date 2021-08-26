@@ -15,11 +15,14 @@
  */
 package org.corpus_tools.annis.gui.exporter;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.vaadin.ui.UI;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -29,12 +32,12 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.objects.AnnisConstants;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
@@ -109,7 +112,8 @@ public class CSVExporter extends BaseMatrixExporter {
                 + "The values for all annotations of each of the "
                 + "found nodes is given in a comma-separated table (CSV). <br/><br/>" + "Parameters: <br/>"
                 + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-                + "<code>metakeys=title,documentname</code>)";
+            + "<code>metakeys=title,documentname</code>)<br/>"
+            + "<em>segmentation</em> - For corpora with multiple segmentation (e.g. dialog corpora) use this segmentation for getting the span of the matched nodes.";
     }
 
     /**
@@ -147,10 +151,74 @@ public class CSVExporter extends BaseMatrixExporter {
         return false;
     }
 
+    private List<String> createHeaderLine() {
+      List<String> headerLine = new ArrayList<>();
+      for (Map.Entry<Integer, TreeSet<String>> match : annotationsForMatchedNodes.entrySet()) {
+        int node_id = match.getKey();
+        headerLine.add(String.valueOf(node_id) + "_id");
+        headerLine.add(String.valueOf(node_id) + "_span");
+        for (String annoName : match.getValue()) {
+          headerLine.add(String.valueOf(node_id) + "_anno_" + annoName);
+        }
+      }
+      for (String key : metakeys) {
+        headerLine.add("meta_" + key);
+      }
+      return headerLine;
+    }
+
+    private SortedMap<Integer, String> createLineForNodes(SDocumentGraph graph,
+        Map<String, String> args) {
+      SortedMap<Integer, String> contentLine = new TreeMap<>();
+      for (SNode node : this.getMatchedNodes(graph)) {
+          List<String> nodeLine = new ArrayList<>();
+          nodeLine.add(node.getId());
+          // export spanned text
+          String span = getSpannedText(graph, node, args.get(ExportHelper.SEGMENTATION_KEY));
+          if (span != null)
+            nodeLine.add(span);
+          else
+              nodeLine.add("");
+          // export annotations
+          int node_id = node.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE).getValue_SNUMERIC()
+                  .intValue();
+          for (String annoName : annotationsForMatchedNodes.get(node_id)) {
+              SAnnotation anno = node.getAnnotation(annoName);
+              if (anno != null) {
+                  nodeLine.add(anno.getValue_STEXT());
+              } else
+                  nodeLine.add("'NULL'");
+          }
+          // add everything to line
+          contentLine.put(node_id, StringUtils.join(nodeLine, "\t"));
+      }
+      return contentLine;
+    }
+
+    private void appendMetaLine(SDocumentGraph graph, Writer out, UI ui) throws IOException {
+      // TODO is this the best way to get the corpus name?
+      String corpusName = Helper.getCorpusPath(graph.getDocument().getId()).get(0);
+      // TODO cache the metadata
+      List<SMetaAnnotation> metaAnnos = Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui);
+      Multimap<String, SMetaAnnotation> metaAnnosByName = Multimaps.index(metaAnnos, SMetaAnnotation::getName);
+      ;
+
+      for (String metaName : metakeys) {
+        Collection<SMetaAnnotation> annos = metaAnnosByName.get(metaName);
+        if (annos == null || annos.isEmpty()) {
+          out.append("\t");
+        } else
+          out.append(
+              "\t" + annos.stream().map(SMetaAnnotation::getValue_STEXT)
+                  .collect(Collectors.joining(", ")));
+      }
+    }
+
     /**
      * Takes a match and outputs a csv-line
      *
      * @param graph
+     * @param args
      * @param alignmc
      * @param matchNumber
      * @param out
@@ -159,75 +227,48 @@ public class CSVExporter extends BaseMatrixExporter {
      *
      */
     @Override
-    public void outputText(SDocumentGraph graph, boolean alignmc, int matchNumber, Writer out, UI ui)
+    public void outputText(SDocumentGraph graph, Map<String, String> args, boolean alignmc,
+        int matchNumber, Writer out, UI ui)
             throws IOException, IllegalArgumentException {
 
         // first match
         if (matchNumber == 0) {
             // output header
-            List<String> headerLine = new ArrayList<>();
-            for (Map.Entry<Integer, TreeSet<String>> match : annotationsForMatchedNodes.entrySet()) {
-                int node_id = match.getKey();
-                headerLine.add(String.valueOf(node_id) + "_id");
-                headerLine.add(String.valueOf(node_id) + "_span");
-                for (String annoName : match.getValue()) {
-                    headerLine.add(String.valueOf(node_id) + "_anno_" + annoName);
-                }
-            }
-            for (String key : metakeys) {
-                headerLine.add("meta_" + key);
-            }
-            out.append(StringUtils.join(headerLine, "\t"));
+            out.append(StringUtils.join(createHeaderLine(), "\t"));
             out.append("\n");
         }
 
         // output nodes in the order of the matches
-        SortedMap<Integer, String> contentLine = new TreeMap<>();
-        for (SNode node : this.getMatchedNodes(graph)) {
-            List<String> nodeLine = new ArrayList<>();
-            nodeLine.add(node.getId());
-            // export spanned text
-            String span = graph.getText(node);
-            if (span != null)
-                nodeLine.add(graph.getText(node));
-            else
-                nodeLine.add("");
-            // export annotations
-            int node_id = node.getFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDNODE).getValue_SNUMERIC()
-                    .intValue();
-            for (String annoName : annotationsForMatchedNodes.get(node_id)) {
-                SAnnotation anno = node.getAnnotation(annoName);
-                if (anno != null) {
-                    nodeLine.add(anno.getValue_STEXT());
-                } else
-                    nodeLine.add("'NULL'");
-            }
-            // add everything to line
-            contentLine.put(node_id, StringUtils.join(nodeLine, "\t"));
-        }
-
+        SortedMap<Integer, String> contentLine = createLineForNodes(graph, args);
         out.append(StringUtils.join(contentLine.values(), "\t"));
 
         // export Metadata
-        // TODO cache the metadata
         if (!metakeys.isEmpty()) {
-            // TODO is this the best way to get the corpus name?
-            String corpus_name =
-                Helper.getCorpusPath(graph.getDocument().getId().toString()).get(0);
-            Map<String, SMetaAnnotation> allMetaAnnos =
-                Helper.getMetaData(corpus_name, Optional.of(graph.getDocument().getName()), ui)
-                    .stream()
-                    .collect(Collectors.toMap(SMetaAnnotation::getName, Function.identity()));
-
-            for (String metaName : metakeys) {
-              SMetaAnnotation anno = allMetaAnnos.get(metaName);
-                if (anno == null) {
-                    out.append("\t");
-                } else
-                    out.append("\t" + anno.getValue());
-            }
+          appendMetaLine(graph, out, ui);
         }
 
         out.append("\n");
+    }
+
+    private String getSpannedText(SDocumentGraph graph, SNode node, String segmentation) {
+       if(segmentation == null || segmentation.isEmpty()) {
+         return graph.getText(node);
+       } else {
+         // Filter out the nodes that cover the same range as our matched node
+         List<SNode> segmentationNodes = Helper.getSortedSegmentationNodes(segmentation, graph).stream().filter(segNode -> {
+           if(segNode.equals(node)) {
+             return true;
+           } else {
+             // Get covered token of both nodes and check if they overlap
+             Set<SToken> coveredToken = new HashSet<>(graph.getOverlappedTokens(node));
+             return graph.getOverlappedTokens(segNode).parallelStream()
+                 .anyMatch(coveredToken::contains);
+           }
+         }).collect(Collectors.toList());
+
+         return segmentationNodes.stream().flatMap(n -> n.getAnnotations().stream())
+             .filter(a -> segmentation.equals(a.getName()))
+             .map(SAnnotation::getValue_STEXT).collect(Collectors.joining(" "));
+       }
     }
 }
