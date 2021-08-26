@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.1.4
-date-released: 2021-08-24
+version: 4.3.0
+date-released: 2021-08-26
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -405,6 +405,16 @@ references:
   authors:
   - name: Wouter Coekaerts
   repository-code: https://github.com/vaadin/gentyref
+- type: software
+  title: GridScrollExtension Add-on
+  version: 2.5.1
+  abbreviation: org.vaadin.extension:GridScrollExtension
+  license-url: https://www.apache.org/licenses/LICENSE-2.0.txt
+  notes: More license information can be found in the THIRD-PARTY/GridScrollExtension_Add_on
+    directory.
+  authors:
+  - name: The GridScrollExtension Add-on 2.5.1 Team
+  repository-code: git://github.com/tatulund/grid-scroll-extension.git
 - type: software
   title: Gson
   version: 2.8.7
@@ -1177,7 +1187,7 @@ references:
   title: dom4j
   version: 2.1.3
   abbreviation: org.dom4j:dom4j
-  license: NOASSERTION
+  license: Plexus
   notes: More license information can be found in the THIRD-PARTY/dom4j directory.
   authors:
   - name: Filip Jirsák
