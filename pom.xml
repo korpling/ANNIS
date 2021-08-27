@@ -164,7 +164,7 @@
               <artifactId>maven-scm-plugin</artifactId>
               <version>1.11.3</version>
               <configuration>
-                <includes>CHANGELOG.md,CITATION.cff,THIRD-PARTY/*,src/main/webapp/VAADIN/help/*</includes>
+                <includes>CHANGELOG.md,CITATION.cff,THIRD-PARTY/**,src/main/webapp/VAADIN/help/**</includes>
                 <message>Files updated in release process</message>
               </configuration>
 		    </plugin>
