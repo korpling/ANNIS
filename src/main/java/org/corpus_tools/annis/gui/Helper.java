@@ -808,27 +808,30 @@ public class Helper {
       // get the very first node of the order relation chain
       final Set<SNode> startNodes = new LinkedHashSet<>();
       if (graph != null) {
-        final List<SNode> orderRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
+        List<SNode> orderRoots = graph.getRootsByRelation(SALT_TYPE.SORDER_RELATION);
         if (orderRoots == null) {
-          // No ordering relations in the graph, all spans with the matching annotation are roots
+          orderRoots = new LinkedList<>();
+        }
+        // collect the start nodes of a segmentation chain of length 1
+        for (final SNode n : orderRoots) {
+          for (final SRelation<?, ?> rel : n.getOutRelations()) {
+            if (rel instanceof SOrderRelation) {
+              // the type is the name of the relation
+              if (segName.equals(rel.getType())) {
+                startNodes.add(n);
+                break;
+              }
+            }
+          }
+        }
+        if (startNodes.isEmpty()) {
+          // No ordering relations with correct type in the graph, all spans with the matching
+          // annotation are roots
           List<SSpan> spansWithAnnos = graph.getSpans().stream()
               .filter(s -> s.getLabel("annis::tok") != null
                   && s.getLabels().stream().anyMatch(a -> segName.equals(a.getName())))
               .collect(Collectors.toList());
           startNodes.addAll(spansWithAnnos);
-        } else {
-          // collect the start nodes of a segmentation chain of length 1
-          for (final SNode n : orderRoots) {
-            for (final SRelation<?, ?> rel : n.getOutRelations()) {
-              if (rel instanceof SOrderRelation) {
-                // the type is the name of the relation
-                if (segName.equals(rel.getType())) {
-                  startNodes.add(n);
-                  break;
-                }
-              }
-            }
-          }
         }
       }
 
