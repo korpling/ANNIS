@@ -93,7 +93,7 @@ class CSVExporterTest {
   }
 
   @Test
-  void exportWithSegmentation() throws IOException {
+  void exportWithSegmentationMultipleToken() throws IOException {
     EventBus eventBus = mock(EventBus.class);
     Writer out = new StringWriter();
 
@@ -113,6 +113,26 @@ class CSVExporterTest {
     assertEquals(
         "salt:/dialog.demo/dialog.demo#sSpan98\täh ((lacht)) fang einfach ma an\täh fang einfach ma an",
         lines[1]);
+  }
+
+  @Test
+  void exportWithSegmentationSingleToken() throws IOException {
+    EventBus eventBus = mock(EventBus.class);
+    Writer out = new StringWriter();
+
+
+    Exception ex =
+        exporter.convertText("norm0=\"mal\"", QueryLanguage.AQL, 0, 0, Sets.newSet("dialog.demo"),
+            null, "segmentation=phon0", false, out, eventBus, new HashMap<>(), ui);
+
+    assertNull(ex);
+
+    // Compare the generated CSV file with the ground truth
+    out.close();
+    String[] lines = out.toString().split("\n");
+    assertEquals(2, lines.length);
+    assertEquals("1_id\t1_span\t1_anno_default_ns::norm0", lines[0]);
+    assertEquals("salt:/dialog.demo/dialog.demo#sSpan79\tma\tmal", lines[1]);
   }
 
 }
