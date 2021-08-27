@@ -265,8 +265,8 @@ public class CSVExporter extends BaseMatrixExporter {
            }
          }).collect(Collectors.toList());
 
-         return segmentationNodes.stream().flatMap(n -> n.getLabels().stream())
-             .filter(a -> segmentation.equals(a.getName()))
+         return segmentationNodes.stream().map(n -> n.getFeature("annis::tok"))
+             .filter(a -> a != null)
              .map(a -> a.getValue().toString()).collect(Collectors.joining(" "));
        }
     }

@@ -812,7 +812,8 @@ public class Helper {
         if (orderRoots == null) {
           // No ordering relations in the graph, all spans with the matching annotation are roots
           List<SSpan> spansWithAnnos = graph.getSpans().stream()
-              .filter(s -> s.getLabels().stream().anyMatch(a -> segName.equals(a.getName())))
+              .filter(s -> s.getLabel("annis::tok") != null
+                  && s.getLabels().stream().anyMatch(a -> segName.equals(a.getName())))
               .collect(Collectors.toList());
           startNodes.addAll(spansWithAnnos);
         } else {
