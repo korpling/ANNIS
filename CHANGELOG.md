@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fetching the segmentation span in CSVExporter could fail if only one token was covered.
+
 ## [4.3.0] - 2021-08-26
 
 ### Added

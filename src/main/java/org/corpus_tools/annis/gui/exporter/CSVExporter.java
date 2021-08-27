@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
@@ -265,9 +266,9 @@ public class CSVExporter extends BaseMatrixExporter {
            }
          }).collect(Collectors.toList());
 
-         return segmentationNodes.stream().flatMap(n -> n.getAnnotations().stream())
-             .filter(a -> segmentation.equals(a.getName()))
-             .map(SAnnotation::getValue_STEXT).collect(Collectors.joining(" "));
+         return segmentationNodes.stream().map(n -> n.getFeature("annis::tok"))
+             .filter(Objects::nonNull)
+             .map(a -> a.getValue().toString()).collect(Collectors.joining(" "));
        }
     }
 }
