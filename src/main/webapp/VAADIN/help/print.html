@@ -76,7 +76,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="interface/index.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="interface/search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="interface/result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="interface/query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li class="chapter-item expanded "><a href="aql/index.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="aql/word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="aql/annotations.html"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="aql/regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="aql/trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="aql/pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="aql/export.html"><strong aria-hidden="true">3.6.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="aql/frequency.html"><strong aria-hidden="true">3.7.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="aql/operators.html"><strong aria-hidden="true">3.8.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="aql/compatibility-mode.html"><strong aria-hidden="true">3.9.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="interface/index.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="interface/search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="interface/result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="interface/query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li class="chapter-item expanded "><a href="aql/index.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="aql/word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="aql/annotations.html"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="aql/regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="aql/trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="aql/pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="aql/negation.html"><strong aria-hidden="true">3.6.</strong> Operator Negation</a></li><li class="chapter-item expanded "><a href="aql/export.html"><strong aria-hidden="true">3.7.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="aql/frequency.html"><strong aria-hidden="true">3.8.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="aql/operators.html"><strong aria-hidden="true">3.9.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="aql/compatibility-mode.html"><strong aria-hidden="true">3.10.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -542,6 +542,28 @@ type 'dep' (for dependency) between the two, annotated with
 with the arch dependency visualizer, which shows the verb 'shows' and
 its object 'location'.</p>
 <p><img src="aql/../images/dep_vis.png" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="operator-negation"><a class="header" href="#operator-negation">Operator Negation</a></h1>
+<p>Sometimes, you need to find instances in a corpus where a relation is not true between to annotations.
+For example, you can search for sentences with a noun and a verb like this:</p>
+<pre><code>cat=&quot;ROOT&quot;
+&amp; pos=/N.*/ . pos=/V.*/ 
+&amp; #1 &gt;* #2 &amp; #1 &gt;* #3
+</code></pre>
+<p>We search for three nodes: the root node, a noun and a verb, and specify that both nodes should be dominated by the root node.
+If we now want to get all the instances, where both nodes form a conjunction, we could add another constraint on the noun and verb node using a dependency relation.</p>
+<pre><code>cat=&quot;ROOT&quot;
+&amp; pos=/N.*/ . pos=/V.*/ 
+&amp; #1 &gt;* #2 &amp; #1 &gt;* #3
+&amp; #2 -&gt;dep[func=&quot;conj&quot;] #3
+</code></pre>
+<p>If we instead want to get all instances where there is <strong>no such dependency relation between the two nodes</strong>, we can use the negated operator <code>!-&gt;</code>.</p>
+<pre><code>cat=&quot;ROOT&quot;
+&amp; pos=/N.*/ . pos=/V.*/ 
+&amp; #1 &gt;* #2 &amp; #1 &gt;* #3
+&amp; #2 !-&gt;dep[func=&quot;conj&quot;] #3
+</code></pre>
+<p>We can negate all binary operators by adding the <code>!</code> prefix to them.
+These operators only act as a filter mechanism, the annotations they refer to still have to exist and have to be bound by other non-negated operators.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="exporting-results"><a class="header" href="#exporting-results">Exporting Results</a></h1>
 <p>To export search results, open the menu &quot;More&quot; between the Search and
 History buttons and select &quot;Export&quot;:</p>

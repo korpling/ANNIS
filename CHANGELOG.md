@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.4.0] - 2021-09-10
+
 ### Added
 
 - Add operator negation with existance assumption to AQL
@@ -982,7 +984,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.3.1...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.4.0...HEAD
+[4.4.0]: https://github.com/korpling/ANNIS/compare/v4.3.1...v4.4.0
 [4.3.1]: https://github.com/korpling/ANNIS/compare/v4.3.0...v4.3.1
 [4.3.0]: https://github.com/korpling/ANNIS/compare/v4.2.0...v4.3.0
 [4.2.0]: https://github.com/korpling/ANNIS/compare/v4.1.4...v4.2.0
