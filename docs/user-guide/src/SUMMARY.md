@@ -15,6 +15,7 @@
     - [Searching using Regular Expressions](./aql/regex.md)
     - [Searching for Trees](./aql/trees.md)
     - [Searching for Pointing Relations](./aql/pointing.md)
+    - [Operator Negation](./aql/negation.md)
     - [Exporting Results](./aql/export.md)
     - [Frequency Analysis](./aql/frequency.md)
     - [Complete List of Operators](./aql/operators.md)
