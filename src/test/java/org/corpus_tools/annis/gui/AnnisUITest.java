@@ -622,7 +622,7 @@ class AnnisUITest {
     MockVaadin.INSTANCE.clientRoundtrip();
     Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
     _click(searchButton);
-    String expectedStatus = "Variable \"2\" not bound (use linguistic operators)";
+    String expectedStatus = "Variable \"#2\" not bound (use linguistic operators)";
     awaitCondition(60,
         () -> expectedStatus
             .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
