@@ -135,6 +135,7 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="operator-negation"><a class="header" href="#operator-negation">Operator Negation</a></h1>
+<h2 id="negation-with-assumption-that-all-annotations-exists"><a class="header" href="#negation-with-assumption-that-all-annotations-exists">Negation with assumption that all annotations exists</a></h2>
 <p>Sometimes, you need to find instances in a corpus where a relation is not true between to annotations.
 For example, you can search for sentences with a noun and a verb like this:</p>
 <pre><code>cat=&quot;ROOT&quot;
@@ -155,7 +156,19 @@ If we now want to get all the instances, where both nodes form a conjunction, we
 &amp; #2 !-&gt;dep[func=&quot;conj&quot;] #3
 </code></pre>
 <p>We can negate all binary operators by adding the <code>!</code> prefix to them.
-These operators only act as a filter mechanism, the annotations they refer to still have to exist and have to be bound by other non-negated operators.</p>
+Per default, these operators only act as a filter mechanism, the annotations they refer to still have to exist and have to be bound by other non-negated operators.
+In our example, both tokens (the noun defined by <code>pos/N.*/</code> and the verb defined by <code>pos=/V.*/</code>) have to exist.</p>
+<h2 id="negation-without-the-assumption-of-existence"><a class="header" href="#negation-without-the-assumption-of-existence">Negation without the assumption of existence</a></h2>
+<p>If we want to allow that e.g. the verb might not exist, we have to mark it as <strong>optional</strong> in the AQL query by adding a <code>?</code> after the annotation definition (<code>pos=/V.*/</code> becomes <code>pos=/V.*/?</code>).
+For example, to search for root segments without any verb, we can combine the negated dominance operator with an optional verb:</p>
+<pre><code>cat=&quot;ROOT&quot; !&gt;* pos=/V.*/?
+</code></pre>
+<p>Since optional annotations might not exist, they are not part of the match result, and they are also not highlighted.</p>
+<p>Negated operators must have at least one operand which is non-optional, so </p>
+<pre><code>pos=&quot;DT&quot;? &amp; &quot;amazing&quot; &amp; #1 !. #2
+</code></pre>
+<p>is fine and finds all occurrences of &quot;amazing&quot; without a determiner before it (even if &quot;amazing&quot; is at the beginning of the text), but <code>pos=&quot;DT&quot;? &amp; &quot;amazing&quot;? &amp; #1 !. #2</code> would be invalid because both operands are optional.
+Also, you can only use optional operands for negated operators.</p>
 
                     </main>
 
