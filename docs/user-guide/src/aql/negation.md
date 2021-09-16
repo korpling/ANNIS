@@ -49,3 +49,4 @@ Negated operators must have at least one operand which are non-optional, so
 pos="DT"? & "amazing" & #1 !. #2
 ```
 is fine and finds all occurrences of "amazing" without a determiner before it (even if "amazing" is at the beginning of the text), but `pos="DT"? & "amazing"? & #1 !. #2` would be invalid because both operands are optional.
+Also, you can only use optional operands for negated operators.
