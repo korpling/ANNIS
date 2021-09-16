@@ -44,7 +44,7 @@ cat="ROOT" !>* pos=/V.*/?
 
 Since optional annotations might not exist, they are not part of the match result, and they are also not highlighted.
 
-Negated operators must have at least one operand which are non-optional, so 
+Negated operators must have at least one operand which is non-optional, so 
 ```
 pos="DT"? & "amazing" & #1 !. #2
 ```
