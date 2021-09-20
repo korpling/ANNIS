@@ -41,7 +41,7 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
       return "def";
     }
     
-    
+    let mappedNode = state.numberOfOutputNodes;
     if (state.nodeMappings[state.numberOfOutputNodes])
     {
       mappedNode = state.nodeMappings[state.numberOfOutputNodes];

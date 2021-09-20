@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- AQL code editor: avoid undefined variable by defining a default value
+
 ## [4.5.1] - 2021-09-20
 
 ### Fixed
