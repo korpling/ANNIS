@@ -18,7 +18,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.TreeMap;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.corpus_tools.annis.api.model.BadRequestErrorAQLSyntaxError;
@@ -94,7 +93,7 @@ public class AqlCodeEditorState extends JavaScriptComponentState {
     public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator()); // NO_UCD
                                                                                                 // (use
                                                                                                 // default)
-    public final Set<Integer> optionalNodes = new HashSet<>(); // NO_UCD (use default)
+    public final HashSet<Integer> optionalNodes = new HashSet<>(); // NO_UCD (use default)
 
     public String textareaClass; // NO_UCD (use default)
 
