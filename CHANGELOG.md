@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix "java.io.IOException: unexpected end of stream" exception for some queries
+  with optional nodes by updating to graphANNIS 1.2.2
+
 ## [4.5.0] - 2021-09-16
 
 ### Added
