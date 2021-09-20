@@ -13,6 +13,7 @@
  */
 package org.corpus_tools.annis.gui.components.codemirror;
 
+import com.google.common.base.Objects;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
@@ -175,8 +176,16 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 
     public void setNodes(List<QueryAttributeDescription> nodes) {
         getState().nodeMappings.clear();
+        getState().optionalNodes.clear();
         if (nodes != null) {
             getState().nodeMappings.putAll(mapQueryNodes(nodes));
+            int i = 1;
+            for (QueryAttributeDescription d : nodes) {
+              if (Objects.equal(true, d.getOptional())) {
+                getState().optionalNodes.add(i);
+              }
+              i++;
+            }
         }
     }
 

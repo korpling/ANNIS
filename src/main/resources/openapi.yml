@@ -1,7 +1,7 @@
 openapi: "3.0.2"
 info:
   title: graphANNIS
-  version: "0"
+  version: "1"
   description: >
     Access the graphANNIS corpora and execute AQL queries with this service.
 servers:
@@ -885,6 +885,10 @@ components:
           type: string
           nullable: true
           description: Optional annotation name represented by this attribute.
+        optional:
+          type: boolean
+          nullable: true
+          description: States whether this attribute is optional.
 
     LineColumn:
       type: object

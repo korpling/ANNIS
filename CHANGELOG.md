@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix "java.io.IOException: unexpected end of stream" exception for some queries
-  with optional nodes by updating to graphANNIS 1.2.2
+  with optional nodes by updating to graphANNIS to 1.3.0
+- Do not highlight optional nodes with colors in query text editor
 
 ## [4.5.0] - 2021-09-16
 
