@@ -41,7 +41,8 @@ window.org_corpus_tools_annis_gui_components_codemirror_AqlCodeEditor = function
     {
       mode: {
         name : 'aql',
-        nodeMappings : {}
+        nodeMappings : {},
+        optionalNodes: new Set(),
       }, 
       lineNumbers: false,
       lineWrapping: true,
@@ -89,7 +90,8 @@ window.org_corpus_tools_annis_gui_components_codemirror_AqlCodeEditor = function
       
       var newMode = {
         name: 'aql',
-        nodeMappings : connector.getState().nodeMappings
+        nodeMappings : connector.getState().nodeMappings,
+        optionalNodes : new Set(connector.getState().optionalNodes)
       };
       
       cmTextArea.setOption('mode', newMode);

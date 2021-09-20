@@ -254,7 +254,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice</url>
 							<outputDirectory>${project.build.directory}/native/linux-x86-64/</outputDirectory>
-							<sha256>4273ca5423c6dd6e00ad6cfadb898c9f978ce2ff159f71d7309bb456293c1ba9</sha256>
+							<sha256>5f50d0277df651c97458492d03a998f8276dd4ad3e566c3ebbccaee89f0fe476</sha256>
 						</configuration>
 					</execution>
 					<execution>

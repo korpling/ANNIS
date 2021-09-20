@@ -36,18 +36,34 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
   }
   
   function getNodeClass(state) {
-    var mappedNode = state.numberOfNodes;
-    if (state.nodeMappings[mappedNode])
+    if(state.optionalNodes.has(state.numberOfNodes))
     {
-      mappedNode = state.nodeMappings[mappedNode];
+      return "def";
     }
-    return "node_" + mappedNode;
+    
+    
+    if (state.nodeMappings[state.numberOfOutputNodes])
+    {
+      mappedNode = state.nodeMappings[state.numberOfOutputNodes];
+    }
+
+    if(mappedNode >= 16)
+    {
+      return "node_16";
+    } 
+    else 
+    {
+      return "node_" + mappedNode;
+    }
   }
   
   function addNode(state) {
-    if (state.numberOfNodes < 16)
+    // Always count the nodes as nodes of the query
+    state.numberOfNodes++;
+    if (!state.optionalNodes.has(state.numberOfNodes))
     {
-      state.numberOfNodes++;
+      // Only nodes in the output get a color
+      state.numberOfOutputNodes++;
     }
     return getNodeClass(state);
   }
@@ -195,8 +211,10 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
       return {
         position : "def",       // Current position, "def" or "quote"
         behindAssignment: false, // if true we are behind an assignment
-        numberOfNodes : 0,  // number of nodes that have been detected yet
-        nodeMappings : parserConfig.nodeMappings // maps an absolute node number to a relative one (e.g. for OR queries)
+        numberOfNodes : 0,  // number of nodes that have been detected yet in the query
+        numberOfOutputNodes: 0, // number of non-optional nodes that are part of the result
+        nodeMappings : parserConfig.nodeMappings, // maps an absolute node number to a relative one (e.g. for OR queries)
+        optionalNodes: parserConfig.optionalNodes
       };
     }
 
