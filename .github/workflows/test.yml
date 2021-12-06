@@ -1,5 +1,9 @@
 name: Automated tests
-on: push
+on:
+  push:
+    branches: [main, staging, trying]
+  pull_request:
+    branches: [main]
 
 jobs:
   test_jdk8:
