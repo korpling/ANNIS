@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.5.2
-date-released: 2021-09-20
+version: 4.5.3
+date-released: 2021-12-06
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -1121,6 +1121,16 @@ references:
   - name: Roman Grigoriadi
   repository-code: https://github.com/eclipse-ee4j/jaxb-ri.git/jaxb-txw-parent/txw2
 - type: software
+  title: Vaadin Customized GWT Elemental Library
+  version: 2.8.2.vaadin2
+  abbreviation: com.vaadin.external.gwt:gwt-elemental
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Vaadin_Customized_GWT_Elemental_Library
+    directory.
+  authors:
+  - name: The Vaadin Customized GWT Elemental Library 2.8.2.vaadin2 Team
+  repository-code: https://github.com/vaadin/maven-integration/gwt-elemental
+- type: software
   title: Vaadin Sass Compiler
   version: 0.9.13
   abbreviation: com.vaadin:vaadin-sass-compiler
@@ -1634,7 +1644,7 @@ references:
   repository-code: https://github.com/tomlj/tomlj
 - type: software
   title: vaadin-client
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-client
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_client directory.
@@ -1643,9 +1653,9 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-client
 - type: software
   title: vaadin-client-compiled
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-client-compiled
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_client_compiled
     directory.
   authors:
@@ -1653,9 +1663,9 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-client-compiled
 - type: software
   title: vaadin-compatibility-client
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-compatibility-client
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_client
     directory.
   authors:
@@ -1663,7 +1673,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-client
 - type: software
   title: vaadin-compatibility-client-compiled
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-compatibility-client-compiled
   license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_client_compiled
@@ -1673,9 +1683,9 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-client-compiled
 - type: software
   title: vaadin-compatibility-server
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-compatibility-server
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_server
     directory.
   authors:
@@ -1683,7 +1693,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-server
 - type: software
   title: vaadin-compatibility-shared
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-compatibility-shared
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_shared
@@ -1693,7 +1703,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-shared
 - type: software
   title: vaadin-compatibility-themes
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-compatibility-themes
   license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_themes
@@ -1703,7 +1713,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-compatibility-themes
 - type: software
   title: vaadin-push
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-push
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_push directory.
@@ -1712,7 +1722,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-push
 - type: software
   title: vaadin-server
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-server
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_server directory.
@@ -1721,7 +1731,7 @@ references:
   repository-code: https://github.com/vaadin/framework/vaadin-server
 - type: software
   title: vaadin-shared
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-shared
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_shared directory.
@@ -1790,7 +1800,7 @@ references:
   repository-code: https://github.com/vaadin/spring/vaadin-spring-boot-starter
 - type: software
   title: vaadin-themes
-  version: 8.13.2
+  version: 8.14.3
   abbreviation: com.vaadin:vaadin-themes
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_themes directory.
