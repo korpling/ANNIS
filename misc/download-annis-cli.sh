@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GRAPHANNIS_VERSION=${1:-0.31.0}
+GRAPHANNIS_VERSION=${1:-1.4.0}
 
 install_graphannis_cli=false
 
@@ -9,7 +9,7 @@ if [[ -x $HOME/.cargo/bin/annis ]]; then
     EXISTING_GRAPHANNIS_VERSION=`$HOME/.cargo/bin/annis --version`
     echo "Existing: ${EXISTING_GRAPHANNIS_VERSION}"
     if [ "graphANNIS CLI ${GRAPHANNIS_VERSION}" != "${EXISTING_GRAPHANNIS_VERSION}" ]; then
-        install_mdbook=true
+        install_graphannis_cli=true
     else
         echo "Using cached ${EXISTING_GRAPHANNIS_VERSION}"
         install_graphannis_cli=false
