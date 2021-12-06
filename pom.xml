@@ -278,7 +278,7 @@
 						<configuration>
 							<url>https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice.osx</url>
 							<outputDirectory>${project.build.directory}/native/darwin/</outputDirectory>
-							<sha256>1ed0c0bf193fe12f3052986f8e9f9bbe0b5e9aca7244c6ad6d3ff8033847560bcd</sha256>
+							<sha256>1ed0c0bf193fe12f3052986f8e9f9bbe0b5e9aca7244c6ad6d3ff8033847560b</sha256>
 						</configuration>
 					</execution>
 				</executions>
