@@ -17,6 +17,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
@@ -41,7 +42,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
@@ -222,18 +225,36 @@ public class SingleResultPanel extends CssLayout
      */
     path = Helper.getCorpusPath(result.getGraph(), result);
     Collections.reverse(path);
+    // Escape all parts of the corpus path to make it safe to render as HTML
+    List<String> escapedPaths =
+        path.stream().map(p -> StringEscapeUtils.escapeHtml4(p)).collect(Collectors.toList());
 
-    // build label
-    StringBuilder sb = new StringBuilder("Path: ");
-    sb.append(StringUtils.join(path, " > "));
+    StringBuilder sb = new StringBuilder("");
+    
+    // use special formatting to highlight the corpus and document name
+    if (!escapedPaths.isEmpty()) {
+      String c = "<strong>" + escapedPaths.get(0) + "</strong>";
+      escapedPaths.set(0, c);
 
-    Label lblPath = new Label(sb.toString());
+      int documentIndex = escapedPaths.size() - 1;
+      if (documentIndex > 0) {
+        String d = "<em>" + escapedPaths.get(documentIndex) + "</em>";
+        escapedPaths.set(documentIndex, d);
+      }
+    }
+    sb.append(StringUtils.join(escapedPaths, " &gt; "));
+
+    Label lblPath = new Label(sb.toString(), ContentMode.HTML);
     lblPath.addStyleName("path-label");
+    lblPath.setDescription(
+        "Full path for matched document including corpus name (bold) and document name (italic)");
 
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
+    
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
+
     infoBar.setSpacing(false);
 
     this.visualizerState = new HashMap<>();
