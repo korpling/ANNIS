@@ -249,7 +249,8 @@ public class CorpusListPanel extends VerticalLayout {
           initCorpusBrowser(corpus, l);
         }
       });
-      l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY);
+      l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY,
+          ValoTheme.BUTTON_SMALL);
       l.setWidthUndefined();
       return l;
     });
@@ -263,7 +264,8 @@ public class CorpusListPanel extends VerticalLayout {
       l.addClickListener(event -> {
         ui.getSearchView().getDocBrowserController().openDocBrowser(corpus);
       });
-      l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY);
+      l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY,
+          ValoTheme.BUTTON_SMALL);
       return l;
     });
     docBrowserColumn.setExpandRatio(0);
