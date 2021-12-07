@@ -275,6 +275,7 @@ public class CorpusListPanel extends VerticalLayout {
     nameColumn.setCaption("Corpus");
     nameColumn.setId("corpus");
     nameColumn.setExpandRatio(10);
+    nameColumn.setStyleGenerator(item -> "compact-column");
     
     selectedColumn =
         tblCorpora.addColumn(corpus -> ui.getQueryState().getSelectedCorpora().contains(corpus));

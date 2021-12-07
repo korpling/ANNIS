@@ -98,9 +98,9 @@ $font-size: 10pt;
   }
   
   .corpus-list {
+    // Allow to mark columns explicitly as compact
     table td.compact-column  {
-        padding-left: 0px;
-        padding-right: 0px;
+        padding: 1px;
     }  
   }
 
