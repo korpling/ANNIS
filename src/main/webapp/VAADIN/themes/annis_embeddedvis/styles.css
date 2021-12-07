@@ -16133,8 +16133,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .annis_embeddedvis .corpus-list table td.compact-column {
-	padding-left: 0px;
-	padding-right: 0px;
+	padding: 1px;
 }
 
 .annis_embeddedvis .CodeMirror-placeholder {

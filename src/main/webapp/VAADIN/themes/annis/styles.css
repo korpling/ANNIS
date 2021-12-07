@@ -14967,8 +14967,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .annis .corpus-list table td.compact-column {
-	padding-left: 0px;
-	padding-right: 0px;
+	padding: 1px;
 }
 
 .annis .CodeMirror-placeholder {
