@@ -65,6 +65,8 @@ import org.vaadin.extension.gridscroll.GridScrollExtension;
  */
 public class CorpusListPanel extends VerticalLayout {
 
+  private static final String COMPACT_COLUMN_CLASS = "compact-column";
+
   private class CorpusListUpdater implements Runnable {
 
     private final boolean showLoginMessage;
@@ -255,7 +257,7 @@ public class CorpusListPanel extends VerticalLayout {
       return l;
     });
     infoColumn.setExpandRatio(0);
-    infoColumn.setStyleGenerator(item -> "compact-column");
+    infoColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
     infoColumn.setResizable(false);
 
     Column<String, Button> docBrowserColumn = tblCorpora.addComponentColumn(corpus -> {
@@ -270,14 +272,14 @@ public class CorpusListPanel extends VerticalLayout {
       return l;
     });
     docBrowserColumn.setExpandRatio(0);
-    docBrowserColumn.setStyleGenerator(item -> "compact-column");
+    docBrowserColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
     docBrowserColumn.setResizable(false);
 
     nameColumn = tblCorpora.addColumn(corpus -> corpus);
     nameColumn.setCaption("Corpus");
     nameColumn.setId("corpus");
     nameColumn.setExpandRatio(10);
-    nameColumn.setStyleGenerator(item -> "compact-column");
+    nameColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
     nameColumn.setResizable(false);
     
     selectedColumn =

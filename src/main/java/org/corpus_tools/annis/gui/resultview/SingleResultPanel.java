@@ -227,7 +227,7 @@ public class SingleResultPanel extends CssLayout
     Collections.reverse(path);
     // Escape all parts of the corpus path to make it safe to render as HTML
     List<String> escapedPaths =
-        path.stream().map(p -> StringEscapeUtils.escapeHtml4(p)).collect(Collectors.toList());
+        path.stream().map(StringEscapeUtils::escapeHtml4).collect(Collectors.toList());
 
     StringBuilder sb = new StringBuilder("");
     
