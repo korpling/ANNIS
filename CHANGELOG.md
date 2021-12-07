@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Improved available space for corpus names in corpus list table
+- More prominent highlight of corpus and document name in match list
+
 ## [4.5.3] - 2021-12-06
 
 ### Fixed
