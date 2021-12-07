@@ -256,6 +256,7 @@ public class CorpusListPanel extends VerticalLayout {
     });
     infoColumn.setExpandRatio(0);
     infoColumn.setStyleGenerator(item -> "compact-column");
+    infoColumn.setResizable(false);
 
     Column<String, Button> docBrowserColumn = tblCorpora.addComponentColumn(corpus -> {
       final Button l = new Button();
@@ -270,12 +271,14 @@ public class CorpusListPanel extends VerticalLayout {
     });
     docBrowserColumn.setExpandRatio(0);
     docBrowserColumn.setStyleGenerator(item -> "compact-column");
+    docBrowserColumn.setResizable(false);
 
     nameColumn = tblCorpora.addColumn(corpus -> corpus);
     nameColumn.setCaption("Corpus");
     nameColumn.setId("corpus");
     nameColumn.setExpandRatio(10);
     nameColumn.setStyleGenerator(item -> "compact-column");
+    nameColumn.setResizable(false);
     
     selectedColumn =
         tblCorpora.addColumn(corpus -> ui.getQueryState().getSelectedCorpora().contains(corpus));
