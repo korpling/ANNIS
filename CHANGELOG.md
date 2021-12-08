@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.6.0] - 2021-12-08
+
 ### Changed
 
 - Improved available space for corpus names in corpus list table
@@ -1025,7 +1027,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.5.3...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.6.0...HEAD
+[4.6.0]: https://github.com/korpling/ANNIS/compare/v4.5.3...v4.6.0
 [4.5.3]: https://github.com/korpling/ANNIS/compare/v4.5.2...v4.5.3
 [4.5.2]: https://github.com/korpling/ANNIS/compare/v4.5.1...v4.5.2
 [4.5.1]: https://github.com/korpling/ANNIS/compare/v4.5.0...v4.5.1

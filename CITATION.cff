@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.5.3
-date-released: 2021-12-06
+version: 4.6.0
+date-released: 2021-12-08
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -187,6 +187,20 @@ references:
   - name: Loic Guibert
   - name: Rob Tompkins
   repository-code: https://gitbox.apache.org/repos/asf?p=commons-lang.git
+- type: software
+  title: Apache Commons Text
+  version: '1.9'
+  abbreviation: org.apache.commons:commons-text
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Text
+    directory.
+  authors:
+  - name: Bruno P. Kinoshita
+  - name: Benedikt Ritter
+  - name: Rob Tompkins
+  - name: Gary Gregory
+  - name: Duncan Jones
+  repository-code: https://gitbox.apache.org/repos/asf?p=commons-text.git
 - type: software
   title: Apache HttpClient
   version: 4.5.13
@@ -494,7 +508,7 @@ references:
   title: ICU4J
   version: '61.1'
   abbreviation: com.ibm.icu:icu4j
-  license: Unicode-DFS-2016
+  license: OTHER
   notes: More license information can be found in the THIRD-PARTY/ICU4J directory.
   authors:
   - name: Mark Davis
