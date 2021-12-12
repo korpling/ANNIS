@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.6.0
-date-released: 2021-12-08
+version: 4.6.1
+date-released: 2021-12-12
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -251,7 +251,7 @@ references:
   repository-code: https://github.com/apache/httpcomponents-core/tree/4.4.14/httpcore
 - type: software
   title: Apache Log4j API
-  version: 2.14.1
+  version: 2.15.0
   abbreviation: org.apache.logging.log4j:log4j-api
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Log4j_API
@@ -266,10 +266,11 @@ references:
   - name: Bruce Brouwer
   - name: Mikael Ståldal
   - name: Carter Kozak
+  - name: Volkan Yazıcı
   repository-code: https://gitbox.apache.org/repos/asf?p=logging-log4j2.git/log4j-api
 - type: software
   title: Apache Log4j to SLF4J Adapter
-  version: 2.14.1
+  version: 2.15.0
   abbreviation: org.apache.logging.log4j:log4j-to-slf4j
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Log4j_to_SLF4J_Adapter
@@ -284,6 +285,7 @@ references:
   - name: Bruce Brouwer
   - name: Mikael Ståldal
   - name: Carter Kozak
+  - name: Volkan Yazıcı
   repository-code: https://gitbox.apache.org/repos/asf?p=logging-log4j2.git/log4j-to-slf4j
 - type: software
   title: Apache Tika core
@@ -1198,7 +1200,7 @@ references:
   title: atmosphere-runtime
   version: 2.4.30.vaadin4
   abbreviation: com.vaadin.external.atmosphere:atmosphere-runtime
-  license: Apache-2.0
+  license-url: https://glassfish.dev.java.net/public/CDDLv1.0.html
   notes: More license information can be found in the THIRD-PARTY/atmosphere_runtime
     directory.
   authors:
@@ -1756,7 +1758,7 @@ references:
   title: vaadin-slf4j-jdk14
   version: 1.6.1
   abbreviation: com.vaadin.external.slf4j:vaadin-slf4j-jdk14
-  license: MIT
+  license-url: http://opensource.org/licenses/MIT
   notes: More license information can be found in the THIRD-PARTY/vaadin_slf4j_jdk14
     directory.
   authors:
