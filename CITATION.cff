@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.6.1
-date-released: 2021-12-12
+version: 4.6.2
+date-released: 2022-01-06
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -1200,7 +1200,7 @@ references:
   title: atmosphere-runtime
   version: 2.4.30.vaadin4
   abbreviation: com.vaadin.external.atmosphere:atmosphere-runtime
-  license-url: https://glassfish.dev.java.net/public/CDDLv1.0.html
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/atmosphere_runtime
     directory.
   authors:
@@ -1758,7 +1758,7 @@ references:
   title: vaadin-slf4j-jdk14
   version: 1.6.1
   abbreviation: com.vaadin.external.slf4j:vaadin-slf4j-jdk14
-  license-url: http://opensource.org/licenses/MIT
+  license: MIT
   notes: More license information can be found in the THIRD-PARTY/vaadin_slf4j_jdk14
     directory.
   authors:
