@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>4.3.22.RELEASE</version>
+      <version>4.3.30.RELEASE</version>
       <!-- do not use commons logging -->
       <exclusions>
         <exclusion>
@@ -204,17 +204,17 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>9.4.18.v20190429</version>
+      <version>9.4.45.v20220203</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>9.4.18.v20190429</version>
+      <version>9.4.45.v20220203</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlets</artifactId>
-      <version>9.4.18.v20190429</version>
+      <version>9.4.45.v20220203</version>
     </dependency>
     
     
