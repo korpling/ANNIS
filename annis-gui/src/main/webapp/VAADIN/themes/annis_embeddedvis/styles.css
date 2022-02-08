@@ -999,7 +999,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.7.15";
+	content: "7.7.30";
 }
 
 .v-widget {
@@ -9766,7 +9766,7 @@ div.v-layout.v-horizontal.v-widget {
 .annis_embeddedvis .v-table-cell-content {
 	border-left: 1px solid #d4d4d4;
 	overflow: hidden;
-	height: 37px;
+	height: 38px;
 	vertical-align: middle;
 }
 
@@ -9817,9 +9817,11 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-table-table td {
 	border-top: 1px solid #d4d4d4;
+	box-sizing: border-box;
 }
 
 .annis_embeddedvis .v-table-table tr:first-child > td {
+	height: 37px;
 	border-top: none;
 }
 
@@ -10090,7 +10092,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-table-row-drag-bottom td.v-table-cell-content {
 	border-bottom: 2px solid #197de1;
-	height: 35px;
+	height: 36px;
 }
 
 .annis_embeddedvis .v-table-row-drag-bottom .v-table-cell-wrapper {
@@ -10099,7 +10101,7 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis_embeddedvis .v-table-row-drag-top td.v-table-cell-content {
 	border-top: 2px solid #197de1;
-	height: 36px;
+	height: 37px;
 }
 
 .annis_embeddedvis .v-table-row-drag-top .v-table-cell-wrapper {
@@ -10125,7 +10127,7 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .annis_embeddedvis .v-table-no-horizontal-lines .v-table-row-drag-top .v-table-cell-content, .annis_embeddedvis .v-table-no-horizontal-lines .v-table-row-drag-bottom .v-table-cell-content {
-	height: 36px;
+	height: 37px;
 }
 
 .annis_embeddedvis .v-table-no-header .v-table-header-wrap {

@@ -7,7 +7,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.6.0</version>
+    <version>3.7.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-core</artifactId>
-      <version>4.3.18.RELEASE</version>
+      <version>4.3.30.RELEASE</version>
       <!-- do not use commons logging -->
       <exclusions>
         <exclusion>
@@ -98,7 +98,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.1.4.jre7</version>
+      <version>42.3.2</version>
       <scope>compile</scope>
     </dependency>
     
@@ -204,17 +204,17 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>9.3.24.v20180605</version>
+      <version>9.4.45.v20220203</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>9.3.24.v20180605</version>
+      <version>9.4.45.v20220203</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlets</artifactId>
-      <version>9.3.24.v20180605</version>
+      <version>9.4.45.v20220203</version>
     </dependency>
     
     
