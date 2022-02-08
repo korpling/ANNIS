@@ -1,0 +1,306 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>PostgreSQL Server Configuration - ANNIS User Guide</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="installation.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="installation-kickstarter.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Kickstarter)</a></li><li class="chapter-item expanded "><a href="installation-server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li class="chapter-item expanded "><a href="installation-upgrade-server.html"><strong aria-hidden="true">2.3.</strong> Upgrading an ANNIS Server installation</a></li></ol></li><li class="chapter-item expanded "><a href="interface.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="interface-search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="interface-result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="interface-query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li></ol></li><li class="chapter-item expanded "><a href="aql.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="aql-word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="aql-annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="aql-regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="aql-trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="aql-pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="aql-export.html"><strong aria-hidden="true">4.6.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="aql-frequency.html"><strong aria-hidden="true">4.7.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="aql-operators.html"><strong aria-hidden="true">4.8.</strong> Complete List of Operators</a></li></ol></li><li class="chapter-item expanded "><a href="visualizations.html"><strong aria-hidden="true">5.</strong> Configuring Visualizations</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="visualizations-list.html"><strong aria-hidden="true">5.1.</strong> List of Visualizations</a></li><li class="chapter-item expanded "><a href="visualizations-context.html"><strong aria-hidden="true">5.2.</strong> Maximal Context Size, Context Steps and Result Page Sizes</a></li><li class="chapter-item expanded "><a href="visualizations-documentbrowser.html"><strong aria-hidden="true">5.3.</strong> Document Browser</a></li><li class="chapter-item expanded "><a href="visualizations-rtl.html"><strong aria-hidden="true">5.4.</strong> Right-to-Left Visualizations</a></li></ol></li><li class="chapter-item expanded "><a href="import-and-config.html"><strong aria-hidden="true">6.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="import-and-config-convert.html"><strong aria-hidden="true">6.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li class="chapter-item expanded "><a href="import-and-config-import.html"><strong aria-hidden="true">6.2.</strong> Importing Corpora in the relANNIS format</a></li><li class="chapter-item expanded "><a href="import-and-config-corpus-config.html"><strong aria-hidden="true">6.3.</strong> Configuring Settings for a Corpus</a></li><li class="chapter-item expanded "><a href="import-and-config-instances.html"><strong aria-hidden="true">6.4.</strong> Multiple Instances of the Interface</a></li><li class="chapter-item expanded "><a href="import-and-config-user.html"><strong aria-hidden="true">6.5.</strong> User Configuration</a></li><li class="chapter-item expanded "><a href="import-and-config-admin-web.html"><strong aria-hidden="true">6.6.</strong> The administration web interface</a></li></ol></li><li class="chapter-item expanded "><a href="advanced.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="advanced-postgresql.html" class="active"><strong aria-hidden="true">7.1.</strong> PostgreSQL Server Configuration</a></li><li class="chapter-item expanded "><a href="advanced-errorcodes.html"><strong aria-hidden="true">7.2.</strong> Error Codes of the administration tools</a></li><li class="chapter-item expanded "><a href="advanced-custom-login.html"><strong aria-hidden="true">7.3.</strong> Provide your own login-system</a></li><li class="chapter-item expanded "><a href="advanced-links-to-queries.html"><strong aria-hidden="true">7.4.</strong> Links to queries</a></li><li class="chapter-item expanded "><a href="advanced-embed-vis.html"><strong aria-hidden="true">7.5.</strong> Embed ANNIS visualizations</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">ANNIS User Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#postgresql-server-configuration" id="postgresql-server-configuration">PostgreSQL Server Configuration</a></h1>
+<p>See the <a href="https://www.postgresql.org/docs/9.6/runtime-config.html">PostgreSQL documentation</a> for more information about how to change the
+PostgreSQL configuration in general. </p>
+<h2><a class="header" href="#performance-tuning" id="performance-tuning">Performance tuning</a></h2>
+<p>The default configuration of PostgreSQL uses system resource very sparingly. To improve the performance of the ANNIS service it is necessary to change a few settings in the PostgreSQL configuration file <code>postgresql.conf</code> as shown in the excerpt below.</p>
+<p>Most of the options below are commented out in the <code>postgresql.conf</code> file. This means that PostgreSQL will use the default value, i.e. the value as it appears in the <code>postgresql.conf</code> file, for this option. To make your changes take effect you have to uncomment it.</p>
+<p>The values below are for machine with 2 GB RAM that is exclusively dedicated to running PostgreSQL. If you're running ANNIS on your local machine and don't have large corpora, you should use lower values as explained in the comments.</p>
+<p>Changes in <code>postgresql.conf</code>:</p>
+<pre><code>max_connections = 100        # expected maximum number of connections (users) at peak load
+
+shared_buffers = 512MB      # RAM cache shared across all sessions
+                            # 25% of available RAM
+                            # use lower value on a desktop system, i.e. 128MB or 256MB
+
+work_mem = 128MB            # RAM for *one* sort, aggregate or hash operation inside a query plan 
+                            # RAM / (2 x max_connections)
+                            # (many operations can run in parallel!)
+                            # increase for large corpora, i.e. 256MB, 512MB
+                            # decrease if you have many users
+
+maintenance_work_mem = 256MB    # RAM for maintenance operations during corpus import
+                                # CREATE INDEX, VACUUM etc.
+                                # increase for large corpora
+
+effective_cache_size = 1536MB   # estimated size of disk cached used by the OS
+                                # 75% of available RAM
+                                # use lower value on a desktop system, where other applications are running
+                                # e.g. 512MB for a desktop with 2 GB RAM
+
+default_statistics_target = 100     # size of value histogram for each table column
+                                    # use maximum value
+
+# The following only applies to versions of PostgreSQL prior to 9.5:
+checkpoint_segments = 20    # affects how quickly buffers are written
+                            # to disk inside a transaction
+# For version 9.5 and higher, you can set the parameter max_wal_size to
+# approx. 3 * checkpoint_segments * 16MB, but since the default for
+# max_wal_size is much higher than the default for checkpoint_segments
+# used to be, this may no longer be necessary.
+
+autovacuum = off        # VACUUM is done automatically during corpus import
+</code></pre>
+<p>More information on these settings can be found in the PostgreSQL manual:</p>
+<ul>
+<li><a href="http://www.postgresql.org/docs/9.6/interactive/runtime-config-resource.html">Resource Consumption</a></li>
+<li><a href="http://www.postgresql.org/docs/9.6/interactive/runtime-config-wal.html">Write Ahead Log</a></li>
+<li><a href="http://www.postgresql.org/docs/9.6/interactive/runtime-config-query.html">Query Planning</a></li>
+<li><a href="https://www.postgresql.org/docs/9.6/wal-configuration.html">WAL Configuration</a></li>
+<li><a href="http://wiki.postgresql.org/wiki/SlowQueryQuestions">PostgreSQL Wiki</a></li>
+</ul>
+<h2><a class="header" href="#logging" id="logging">Logging</a></h2>
+<p>If you want to log the duration of SQL statements you should also set the following options in <code>postgresql.conf</code>:</p>
+<pre><code>log_min_duration_statement = 0
+</code></pre>
+<h2><a class="header" href="#remote-access" id="remote-access">Remote access</a></h2>
+<p>If the PostgreSQL server runs on a separate machine, remote access has to be enabled.</p>
+<p>Changes in <code>postgresql.conf</code>:</p>
+<pre><code>listen_adresses = 'localhost,192.168.1.1'
+</code></pre>
+<p>Where 192.168.1.1 is the IP address of the machine running PostgreSQL.</p>
+<p>Changes in <code>pg_hba.conf</code>:</p>
+<pre><code>host annis_db annis_user 192.168.1.2/0 md5
+</code></pre>
+<p>Where 192.168.1.2 is the machine running the ANNIS service that is connecting to the remote PostgreSQL server.</p>
+<h2><a class="header" href="#configuration-of-system-resources" id="configuration-of-system-resources">Configuration of System Resources</a></h2>
+<p>PostgreSQL needs to access large areas of continuous RAM which can easily exceed the maximum size allowed by the operating system. PostgreSQL will check the OS resource settings during startup and exit with an error if they are not adequate.</p>
+<p>Reproduced below are the commands to change the resource settings on Linux and OS X. More information can be found in the PostgreSQL manual: [Managing Kernel Resources](http://www.postgresql.org/docs/8.3/interactive/kernel-resources.html 17.4.).</p>
+<h3><a class="header" href="#linux" id="linux">Linux</a></h3>
+<pre><code>sysctl -w kernel.shmmax=536870912   # bytes; corresponds to 512MB
+</code></pre>
+<p>This command takes effect immediately. To make the change permanent across system reboots, add it to the file <code>/etc/sysctl.conf</code>.</p>
+<h3><a class="header" href="#mac-os-x" id="mac-os-x">Mac OS X</a></h3>
+<pre><code>sysctl -w kern.sysv.shmmax=536870912        # bytes; corresponds to 512MB
+sysctl -w kern.sysv.shmall=131072           # measured in 4 kB pages
+</code></pre>
+<p>OS X has to be rebooted for the command to take effect. To make the change permanent across system reboots, add it to the file <code>/etc/sysctl.conf</code>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="advanced.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="advanced-errorcodes.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="advanced.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="advanced-errorcodes.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

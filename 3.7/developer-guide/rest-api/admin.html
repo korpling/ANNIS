@@ -1,0 +1,366 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Administrative tasks - ANNIS Developer Guide</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="../favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="../favicon.png">
+        
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../architecture.html"><strong aria-hidden="true">1.</strong> Architecture</a></li><li class="chapter-item expanded "><a href="../building.html"><strong aria-hidden="true">2.</strong> Building</a></li><li class="chapter-item expanded "><a href="../release.html"><strong aria-hidden="true">3.</strong> Making a new ANNIS release</a></li><li class="chapter-item expanded "><a href="../annisimportformat.html"><strong aria-hidden="true">4.</strong> ANNIS import format version 3.3</a></li><li class="chapter-item expanded "><a href="../querybuilder.html"><strong aria-hidden="true">5.</strong> Create new query builder</a></li><li class="chapter-item expanded "><a href="../rest-api/index.html"><strong aria-hidden="true">6.</strong> Public REST API</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../rest-api/query.html"><strong aria-hidden="true">6.1.</strong> Corpus queries</a></li><li class="chapter-item expanded "><a href="../rest-api/admin.html" class="active"><strong aria-hidden="true">6.2.</strong> Administrative tasks</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">ANNIS Developer Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#administrative-tasks" id="administrative-tasks">Administrative tasks</a></h1>
+<p>Interface defining the REST API calls that ANNIS provides for administrative tasks.</p>
+<p>Currently it is possible to import corpora, monitor the import status with this interface and to manage user accounts.
+All paths for this part of the service start with &quot;annis/admin/&quot;.</p>
+<h2><a class="header" href="#import-one-or-more-corpora" id="import-one-or-more-corpora"><em>Import</em> one or more corpora</a></h2>
+<h3><a class="header" href="#paths" id="paths">Path(s)</a></h3>
+<ol>
+<li><code>POST</code> annis/admin/import</li>
+</ol>
+<h3><a class="header" href="#request-body" id="request-body">Request body</a></h3>
+<p>A ZIP file which contains one or more corpora in separate sub-folders.
+Consumes MIME type <code>application/zip</code>.</p>
+<h3><a class="header" href="#parameters" id="parameters">Parameters</a></h3>
+<ul>
+<li><code>overwrite</code> - Set to &quot;true&quot; if an existing corpus corpus should be overwritten.</li>
+<li><code>statusMail</code> - An e-mail address to which status reports are sent.</li>
+<li><code>alias</code> - An internal alias name of the corpus which can be used instead of the actual corpus name when referring to it in the URL. Corpora can share the same alias.</li>
+</ul>
+<h3><a class="header" href="#responses" id="responses">Responses</a></h3>
+<h4><a class="header" href="#code-202" id="code-202">Code 202</a></h4>
+<p>Import has been accepted and its status can be queried by the URL given in the <code>Location</code> header.</p>
+<h4><a class="header" href="#code-400" id="code-400">Code 400</a></h4>
+<p>Bad request, e.g. if the corpus already exists and <code>overwrite</code> parameter was not set.</p>
+<h2><a class="header" href="#status-of-all-running-import-jobs" id="status-of-all-running-import-jobs"><em>Status</em> of all running import jobs</a></h2>
+<h3><a class="header" href="#paths-1" id="paths-1">Path(s)</a></h3>
+<ol>
+<li><code>GET</code> annis/admin/import/status/</li>
+</ol>
+<h3><a class="header" href="#responses-1" id="responses-1">Responses</a></h3>
+<h4><a class="header" href="#code-200" id="code-200">Code 200</a></h4>
+<p>The response lists all currently running import jobs has the MIME type <code>application/xml</code> and the following format:</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;importJobs&gt;
+  &lt;!-- an importJob tag for each running import --&gt;
+  &lt;importJob&gt;
+    &lt;!-- visible caption, e.g. corpus name  --&gt;
+    &lt;caption&gt;MyNewCorpus&lt;/caption&gt;
+    &lt;!-- A list of output messages from the import process--&gt;
+    &lt;messages&gt;
+      &lt;m&gt;first message&lt;/m&gt;
+      &lt;m&gt;second message&lt;/m&gt;
+      &lt;m&gt;just another message&lt;/m&gt;
+    &lt;/messages&gt;
+    &lt;!-- true if the corpus will be overwritten --&gt;
+    &lt;overwrite&gt;true&lt;/overwrite&gt;
+    &lt;!-- current status, can be WAITING, RUNNING, SUCCESS or ERROR --&gt;
+    &lt;status&gt;RUNNING&lt;/status&gt;
+    &lt;!-- an unique identifier for this import job --&gt;
+    &lt;uuid&gt;7799322d-83ec-4900-83b0-c542e2ca2137&lt;/uuid&gt;
+    &lt;!-- a mail address to which status reports should be send --&gt;
+    &lt;statusMail&gt;mail@example.com&lt;/statusMail&gt;
+    &lt;!-- alias name of the corpus as defined by the import request --&gt;
+    &lt;alias&gt;CorpusAlias&lt;/alias&gt;
+ &lt;/importJob&gt;
+&lt;/importJobs&gt;
+</code></pre>
+<p>The root element has the name <code>importJobs</code> and there is an <code>importJob</code> element for each element of the list. </p>
+<h2><a class="header" href="#show-import-job-information-after-it-was-finished" id="show-import-job-information-after-it-was-finished">Show import job information after it was <em>finished</em></a></h2>
+<h3><a class="header" href="#paths-2" id="paths-2">Path(s)</a></h3>
+<ol>
+<li><code>GET</code> annis/admin/import/status/finished/<strong>{uuid}</strong></li>
+</ol>
+<p>The <strong>{uuid}</strong> defines an unique identifier of the import job, which was returned by the <a href="#import-one-or-more-corpora">import function</a>.</p>
+<h3><a class="header" href="#responses-2" id="responses-2">Responses</a></h3>
+<h4><a class="header" href="#code-200-1" id="code-200-1">Code 200</a></h4>
+<p>If the import finished, a 200 HTTP status code is sent and a proper description of the import job is returned.
+After this resource has been successfully accessed once, a 404 HTTP status code will be sent on subsequent requests.</p>
+<p>The response has the MIME type <code>application/xml</code> and the following format:</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;importJob&gt;
+  &lt;!-- visible caption, e.g. corpus name  --&gt;
+  &lt;caption&gt;MyNewCorpus&lt;/caption&gt;
+  &lt;!-- A list of output messages from the import process--&gt;
+  &lt;messages&gt;
+    &lt;m&gt;first message&lt;/m&gt;
+    &lt;m&gt;second message&lt;/m&gt;
+    &lt;m&gt;just another message&lt;/m&gt;
+  &lt;/messages&gt;
+  &lt;!-- true if the corpus will be overwritten --&gt;
+  &lt;overwrite&gt;true&lt;/overwrite&gt;
+  &lt;!-- current status, can be WAITING, RUNNING, SUCCESS or ERROR --&gt;
+  &lt;status&gt;RUNNING&lt;/status&gt;
+  &lt;!-- an unique identifier for this import job --&gt;
+  &lt;uuid&gt;7799322d-83ec-4900-83b0-c542e2ca2137&lt;/uuid&gt;
+  &lt;!-- a mail address to which status reports should be send --&gt;
+  &lt;statusMail&gt;mail@example.com&lt;/statusMail&gt;
+  &lt;!-- alias name of the corpus as defined by the import request --&gt;
+  &lt;alias&gt;CorpusAlias&lt;/alias&gt;
+&lt;/importJob&gt;
+</code></pre>
+<h4><a class="header" href="#code-404" id="code-404">Code 404</a></h4>
+<p>When the import is not finished yet or if status was finished and already queries, a 404 HTTP status code will be sent.</p>
+<h2><a class="header" href="#user-managment" id="user-managment"><em>User</em> managment</a></h2>
+<h3><a class="header" href="#paths-3" id="paths-3">Path(s)</a></h3>
+<ol>
+<li><code>GET</code> annis/admin/users/<strong>{userName}</strong></li>
+<li><code>PUT</code> annis/admin/users/<strong>{userName}</strong></li>
+</ol>
+<p>Gets information about an existing user with the name <strong>{userName}</strong> (1) or updates/creates a new user with this name (2).</p>
+<h3><a class="header" href="#request-body-1" id="request-body-1">Request body</a></h3>
+<p>The <code>PUT</code> action accepts the user information in XML (MIME type<code>application/xml</code>). 
+The fields correspond to the fields of the single user configuration file. 
+Please have a look at the general user configuration information in the ANNIS user guide for a more detailed explanation.</p>
+<pre><code class="language-xml">&lt;user&gt;
+  &lt;!-- User name (must be the same as the &quot;userName&quot; parameter) --&gt;
+  &lt;name&gt;myusername&lt;/name&gt;
+  &lt;!-- hashed password in the Shiro1CryptFormat --&gt;
+  &lt;passwordHash&gt;$shiro1$SHA-256$1$tQNwU[...]&lt;/passwordHash&gt;
+  &lt;!-- A list of groups the users should belong to. --&gt;
+  &lt;group&gt;group1&lt;/group&gt;
+  &lt;group&gt;group2&lt;/group&gt;
+  &lt;group&gt;group3&lt;/group&gt;
+  &lt;!-- A list of explicit permission the users should have. --&gt;
+  &lt;permission&gt;admin:*&lt;/permission&gt;
+  &lt;permission&gt;query:*&lt;/permission&gt;
+  &lt;!-- Optional expiration date encoded in the ISO-8601 standard&lt;/a&gt; --&gt;
+  &lt;expires&gt;2015-02-12T00:00:00.000+01:00&lt;/expires&gt;
+&lt;/user&gt;
+</code></pre>
+<h3><a class="header" href="#responses-3" id="responses-3">Responses</a></h3>
+<h4><a class="header" href="#code-200-2" id="code-200-2">Code 200</a></h4>
+<p>If the <code>GET</code> variant is used and the queried user exists, return the user information with the MIME type <code>application/xml</code>.
+The fields correspond to the fields of the single user configuration file. 
+Please have a look at the general user configuration information in the ANNIS user guide for a more detailed explanation.</p>
+<pre><code class="language-xml">&lt;user&gt;
+  &lt;!-- User name (must be the same as the &quot;userName&quot; parameter) --&gt;
+  &lt;name&gt;myusername&lt;/name&gt;
+  &lt;!-- hashed password in the Shiro1CryptFormat --&gt;
+  &lt;passwordHash&gt;$shiro1$SHA-256$1$tQNwU[...]&lt;/passwordHash&gt;
+  &lt;!-- A list of groups the users should belong to. --&gt;
+  &lt;group&gt;group1&lt;/group&gt;
+  &lt;group&gt;group2&lt;/group&gt;
+  &lt;group&gt;group3&lt;/group&gt;
+  &lt;!-- A list of explicit permission the users should have. --&gt;
+  &lt;permission&gt;admin:*&lt;/permission&gt;
+  &lt;permission&gt;query:*&lt;/permission&gt;
+  &lt;!-- Optional expiration date encoded in the ISO-8601 standard&lt;/a&gt; --&gt;
+  &lt;expires&gt;2015-02-12T00:00:00.000+01:00&lt;/expires&gt;
+&lt;/user&gt;
+</code></pre>
+<ul>
+<li><a href="http://shiro.apache.org/static/1.3.2/apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html">Shiro1CryptFormat</a></li>
+<li><a href="https://en.wikipedia.org/wiki/ISO_8601">ISO-8601 standard</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="../rest-api/query.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="../rest-api/query.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
