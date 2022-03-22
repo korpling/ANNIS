@@ -220,14 +220,14 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
             "ANNIS can only be run on Apple M1 systems using the Rosetta emulator "
                 + "(https://support.apple.com/en-us/HT211861)."
                 + "You can try to install and use the Adoptium OpenJDK Java 11 from "
-                + "https://adoptium.net/ to run ANNIS.");
+                + "https://adoptium.net to run ANNIS.");
       } else {
         JOptionPane.showMessageDialog(null,
             "ANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\") "
                 + "and with a 64 bit version of Java, "
                 + "but this computer is reported as architecture " + SystemUtils.OS_ARCH + "!\n\n"
                 + "A common cause is that a 32 bit version of Java is installed."
-                + "Make sure to install a 64 bit Java 11 e.g. from https://adoptium.net/");
+                + "Make sure to install a 64 bit Java 11 e.g. from https://adoptium.net");
       }
     } else {
       showApplicationWindow();
