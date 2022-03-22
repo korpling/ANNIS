@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Show visible error message when 32 Bit Java is used to start ANNIS Desktop (#742)
+
 ## [4.6.2] - 2022-01-06
 
 ### Fixed

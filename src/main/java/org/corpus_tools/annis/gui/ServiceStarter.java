@@ -80,7 +80,9 @@ public class ServiceStarter
           }
         } else {
           log.error(
-              "GraphANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\"), but this is reported as architecture {}!",
+              "GraphANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\") "
+                  + "and with a 64 bit version of Java, "
+                  + "but this is reported as architecture {}!",
               SystemUtils.OS_ARCH);
         }
 
