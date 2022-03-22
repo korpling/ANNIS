@@ -1,7 +1,7 @@
 # Converting Corpora for ANNIS using Pepper
 
 ANNIS supports two types of formats to import:
-- the legacy relANNIS format based on the previous relational database implementation, and
+- the legacy [relANNIS](http://korpling.github.io/ANNIS/3.6/developer-guide/annisimportformat.html) format based on the previous relational database implementation, and
 - a new GraphML based native format which can be exported from ANNIS and exchanged with other tools which support GraphML (like e.g. Neo4j). 
 
 Before a corpus can be imported into ANNIS, it has to be converted into a supported format.

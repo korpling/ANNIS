@@ -22,7 +22,7 @@
     - [Differences in Compatibility Mode](./aql/compatibility-mode.md)
 - [Importing and Configuring Corpora](./import-and-config/README.md)
     - [Converting Corpora for ANNIS using Pepper](./import-and-config/convert.md)
-    - [Importing Corpora in the relANNIS format](./import-and-config/import.md)
+    - [Importing Corpora in the relANNIS or GraphML format](./import-and-config/import.md)
     - [Configuring Settings for a Corpus](./import-and-config/corpus-config.md)
     - [Configuring Visualizations](./import-and-config/visualizations.md)
     - [List of Visualizations](./import-and-config/visualizations-list.md)
