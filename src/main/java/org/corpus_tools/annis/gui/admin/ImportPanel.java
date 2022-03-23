@@ -192,7 +192,7 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
     actionBar.setWidth("100%");
 
     upload = new Upload("", this);
-    upload.setButtonCaption("Upload ZIP file with relANNIS corpus and start import");
+    upload.setButtonCaption("Upload ZIP file with relANNIS or GraphML corpus and start import");
     upload.addStartedListener(this);
     upload.addFinishedListener(this);
     upload.setEnabled(true);

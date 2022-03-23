@@ -1,12 +1,14 @@
-# Importing Corpora in the relANNIS format
+# Importing Corpora in the relANNIS or GraphML format
 
-Corpora in the relANNIS format can be imported into the ANNIS database. For
-information on converting corpora from other formats into relANNIS, see the
+Corpora in the relANNIS or GraphML format can be imported into the ANNIS database. 
+For information on converting corpora from other formats into relANNIS, see the
 [Pepper documentation](http://corpus-tools.org/pepper/userGuide.html).
 
-## Importing a relANNIS corpus using the administration interface
+## Importing a relANNIS or GraphML corpus using the administration interface
 
 When you are logged in as an administrator (automatically in desktop version), you can change to the [administration interface](../interface/admin-web.md) and use the “Import Corpus“ tab.
+Both the relANNIS and GraphML formats might consist of more than one file.
+Instead of uploading each file (uploading a directory is not possible), the corpus files must be compressed as ZIP file before they can be uploaded.
 On a server installation, importing a corpus will not interrupt querying other corpora that are already imported.
 
 ## Importing a corpus using the command line
@@ -21,7 +23,7 @@ Therefore, stop the running ANNIS service (e.g. with `systemctl stop annis` on a
 annis ~/.annis/v4/
 ```
 
-For a list of all available commands see the [graphANNIS documentation](https://korpling.github.io/graphANNIS/docs/v0.30/cli.html).
+For a list of all available commands see the [graphANNIS documentation](https://korpling.github.io/graphANNIS/docs/v1.5/cli.html).
 To import a corpus, just execute the `import` command followed by a path to the corpus to import, e.g.:
 ```
 import /home/thomas/korpora/pcc2/
