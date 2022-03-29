@@ -6,7 +6,7 @@ info:
     Access the graphANNIS corpora and execute AQL queries with this service.
 servers:
   - description: Your local developer service
-    url: http://localhost:5711/v1
+    url: http://localhost:5711/v2
 
 security:
   - bearerAuth: []
