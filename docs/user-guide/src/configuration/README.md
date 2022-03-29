@@ -25,7 +25,7 @@ server.address=127.0.0.1
 annis.webservice-config=${user.home}/.annis/service.toml
 
 # If non-empty this URL is used to communicate with the REST backend service instead of using the embedded service (which will not be started)
-# annis.webservice-url=http://localhost:5711/v0
+# annis.webservice-url=http://localhost:5711/v1
 
 # set to "true" to globally disable right-to-left text detection
 annis.disable-rtl=false
