@@ -10,7 +10,7 @@ ProxyPass /annis3-service http://localhost:5711
  SSLRequireSSL
 </location>
 ~~~ 
-If you your server is `example.com` this configuration would result in the service URL `https://example.com/annis3-service/v2/`
+If you your server is `example.com` this configuration would result in the service URL `https://example.com/annis3-service/v1/`
 
 The service is responsible for the authentication and authorization (see [the user configuration](../configuration/user.md) for more information), thus the corpora are only accessible by the 
 service if the user can provide the appropriate credentials.
@@ -20,7 +20,7 @@ User names and passwords will be sent as clear text over the network.
 After you made the service available for other servers you have to configure the front-end to use this non-default service URL.
 Change the file `application.properties` and set the `annis.webservice-url` to the right value:
 ~~~properties
-annis.webservice-url=https://example.com/annis3-service/v2
+annis.webservice-url=https://example.com/annis3-service/v1
 ~~~
 
 If you want to secure your service even further you might want to setup a firewall in a way that only the server running the front-end is allowed to access the HTTP(S) port on the server running the backend service.

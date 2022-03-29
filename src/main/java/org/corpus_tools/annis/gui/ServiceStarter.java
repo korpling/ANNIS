@@ -162,7 +162,7 @@ public class ServiceStarter
 
 
   protected String getServiceURL(TomlParseResult config) {
-    return "http://localhost:" + config.getLong("bind.port", () -> 5711l) + "/v2";
+    return "http://localhost:" + config.getLong("bind.port", () -> 5711l) + "/v1";
   }
 
   protected File getServiceConfig() throws IOException {
