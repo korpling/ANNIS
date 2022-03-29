@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.6.2
-date-released: 2022-01-06
+version: 4.6.3
+date-released: 2022-03-29
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -1691,7 +1691,7 @@ references:
   title: vaadin-compatibility-client-compiled
   version: 8.14.3
   abbreviation: com.vaadin:vaadin-compatibility-client-compiled
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_client_compiled
     directory.
   authors:
