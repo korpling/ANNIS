@@ -264,11 +264,11 @@ paths:
                 items:
                   $ref: "#/components/schemas/QueryAttributeDescription"
               example:
-                - alternative: 0,
+                - alternative: 0
                   query_fragment: pos="NN"
                   variable: "1"
                   anno_name: "pos"
-                - alternative: 0,
+                - alternative: 0
                   query_fragment: tok
                   variable: "second"
                   anno_name: null
@@ -620,7 +620,7 @@ paths:
       tags:
         - administration
       responses:
-        200:
+        "200":
           description: All available user groups with their name and the corpora the user is allowed to access.
           content:
             application/json:
@@ -628,7 +628,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Group"
-        403:
+        "403":
           description: Access is forbidden if the requesting client does not have administrator privileges.
 
   /groups/{name}:
@@ -653,9 +653,9 @@ paths:
               $ref: "#/components/schemas/Group"
 
       responses:
-        200:
+        "200":
           description: Group was added or replaced successfully.
-        403:
+        "403":
           description: Access is forbidden if the requesting client does not have administrator privileges.
     delete:
       summary: Delete the user group given by its name
@@ -671,9 +671,9 @@ paths:
             type: string
 
       responses:
-        200:
+        "200":
           description: Group was deleted successfully.
-        403:
+        "403":
           description: Access is forbidden if the requesting client does not have administrator privileges.
 
 components:
@@ -833,7 +833,6 @@ components:
       type: object
       properties:
         key:
-          description: Qualified name or unique "key" for the annotation
           $ref: "#/components/schemas/AnnoKey"
         val:
           description: Value of the annotation
@@ -846,7 +845,6 @@ components:
       properties:
         type:
           $ref: "#/components/schemas/AnnotationComponentType"
-          example: Pointing
         name:
           description: Name of the component
           type: string
