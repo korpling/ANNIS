@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Show visible error message when 32-Bit Java is used to start ANNIS Desktop (#742)
 - Mention the possibility to import GraphML in the import panel (#744)
+- Fix configuration example for user configuration with Keycloak
 
 ## [4.6.2] - 2022-01-06
 

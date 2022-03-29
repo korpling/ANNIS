@@ -13,12 +13,14 @@ You can choose from various OAuth2 compatible identity providers, but in the fol
 
 ### Install and run Keycloak
 
-Follow the ["Getting Started with Keycloak"](https://www.keycloak.org/getting-started) guide to install and run the service.
+Follow one of the [Getting Started](https://www.keycloak.org/guides#getting-started) guides to install and run the service.
+If unsure which one to use, select the [OpenJDK](https://www.keycloak.org/getting-started/getting-started-zip) guide.
+
 
 ### Configure Keycloak for ANNIS
 
 Keycloak uses so-called “Realms” to distinguish between different settings.
-Download the realm-configuration file for ANNIS from our repository: <https://raw.githubusercontent.com/korpling/ANNIS/master/misc/keycloak-realm-configuration.json>.
+Download the realm-configuration file for ANNIS from our repository: <https://raw.githubusercontent.com/korpling/ANNIS/main/misc/keycloak-realm-configuration.json>.
 We will add a realm for ANNIS by hovering over the realm selection in the top left menu and clicking on “Add realm”.
 
 ![Screenshot of the "Add realm" button in Keycloak realm selection menu](add-realm.png)
@@ -78,12 +80,18 @@ Add the following lines to configure ANNIS to use the Keycloak server:
 ```properties
 spring.security.oauth2.client.registration.keycloak.client-id=annis
 spring.security.oauth2.client.registration.keycloak.authorization-grant-type=authorization_code
-spring.security.oauth2.client.registration.keycloak.redirect-uri-template=http://localhost:5712/login/oauth2/code/keycloak
-spring.security.oauth2.client.provider.keycloak.issuer-uri=http://localhost:8080/auth/realms/ANNIS
+spring.security.oauth2.client.registration.keycloak.redirect-uri=http://localhost:5712/login/oauth2/code/keycloak
+spring.security.oauth2.client.provider.keycloak.authorization-uri=http://localhost:8080/realms/ANNIS/protocol/openid-connect/auth
+spring.security.oauth2.client.provider.keycloak.token-uri=http://localhost:8080/realms/ANNIS/protocol/openid-connect/token
+spring.security.oauth2.client.provider.keycloak.user-info-uri=http://localhost:8080/realms/ANNIS/protocol/openid-connect/userinfo
+spring.security.oauth2.client.provider.keycloak.user-name-attribute=preferred_username
 ```
 
-Replace the `http://localhost:5712/` in the `redirect-uri-template` with the public URL of your ANNIS service.
-Also replace the `http://localhost:8080/` part of the `issuer-uri` with the public URL of your Keycloak server (if you are testing this on your local computer, you can leave the values as they are).
+Replace the `http://localhost:5712/` in the `redirect-uri` parameter with the
+public URL of your ANNIS service. Also replace the `http://localhost:8080/` part
+of the `authorization-uri`, `token-uri` and `user-info` parameters with the
+public URL of your Keycloak server (if you are testing this on your local
+computer, you can leave the values as they are).
 
 ANNIS uses the Spring Security framework for OAuth2 internally.
 An overview of the configuration parameters is part of the [Spring documentation](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-security-oauth2).
