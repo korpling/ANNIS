@@ -552,9 +552,9 @@ public class HTMLVis extends AbstractVisualizer {
     }
 
     if (inStreamConfigRaw == null) {
-      Notification.show(
+      ui.accessSynchronously(() -> Notification.show(
           "ERROR: html visualization configuration \"" + visConfigName + "\" not found in database",
-          Notification.Type.ERROR_MESSAGE);
+          Notification.Type.ERROR_MESSAGE));
     } else {
 
       try (InputStream inStreamConfig = inStreamConfigRaw) {
@@ -563,8 +563,11 @@ public class HTMLVis extends AbstractVisualizer {
         return p.getDefinitions();
       } catch (IOException | VisParserException ex) {
         log.error("Could not parse the HTML visualization configuration file", ex);
-        Notification.show("Could not parse the HTML visualization configuration file",
-            ex.getMessage(), Notification.Type.ERROR_MESSAGE);
+
+        ui.accessSynchronously(
+            () -> Notification.show("Could not parse the HTML visualization configuration file",
+                ex.getMessage(), Notification.Type.ERROR_MESSAGE));
+
       }
     }
     return null;
