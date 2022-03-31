@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -154,14 +155,14 @@ public class AnnisBaseUI extends UI implements Serializable {
 
     if (wrappedCssContent != null) {
       String hashForCssContent =
-          Hashing.md5().hashString(wrappedCssContent, Charsets.UTF_8).toString();
+          Hashing.md5().hashString(wrappedCssContent, StandardCharsets.UTF_8).toString();
 
       if (!alreadyAddedCSS.contains(hashForCssContent)) {
 
         alreadyAddedCSS.add(hashForCssContent);
-        this.accessSynchronously(() -> {
-          this.getPage().getStyles().add(wrappedCssContent);
-        });
+        this.accessSynchronously(() -> 
+        this.getPage().getStyles().add(wrappedCssContent)
+        );
       }
     }
   }
