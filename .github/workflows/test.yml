@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 8
         run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 1.4.1
+      - run: misc/download-annis-cli.sh 2.0.3
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
@@ -55,7 +55,7 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 11
         run: echo JAVA_HOME=$JAVA_HOME_11_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 1.4.1
+      - run: misc/download-annis-cli.sh 2.0.3
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - run: misc/download-mdbook.sh 0.4.2
+      - run: misc/download-mdbook.sh 0.4.17
         env:
           OS_NAME: linux
       - run: mdbook build docs/user-guide/
