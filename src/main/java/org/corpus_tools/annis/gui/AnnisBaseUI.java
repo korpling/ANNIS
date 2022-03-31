@@ -62,7 +62,8 @@ public class AnnisBaseUI extends UI implements Serializable {
   }
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisBaseUI.class);
-  public final static Resource PINGUIN_IMAGE = new ClassResource("/org.corpus_tools.annis/libgui/penguins.png");
+  public final static Resource PINGUIN_IMAGE =
+      new ClassResource("/org.corpus_tools.annis/libgui/penguins.png");
 
 
   /**
@@ -72,8 +73,8 @@ public class AnnisBaseUI extends UI implements Serializable {
    * The files in the result list do not necessarily exist.
    *
    * These locations are the - base installation: WEB-INF/conf/ folder of the deployment. - global
-   * configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set
-   * - user configuration: ~/.annis/
+   * configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set - user
+   * configuration: ~/.annis/
    * 
    * @param configFile The file path of the configuration file relative to the base config folder.
    * @return list of files or directories in the order in which they should be processed (most
@@ -160,9 +161,7 @@ public class AnnisBaseUI extends UI implements Serializable {
       if (!alreadyAddedCSS.contains(hashForCssContent)) {
 
         alreadyAddedCSS.add(hashForCssContent);
-        this.accessSynchronously(() -> 
-        this.getPage().getStyles().add(wrappedCssContent)
-        );
+        this.accessSynchronously(() -> this.getPage().getStyles().add(wrappedCssContent));
       }
     }
   }
