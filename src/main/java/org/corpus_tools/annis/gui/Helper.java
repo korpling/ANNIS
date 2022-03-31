@@ -119,6 +119,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
  */
 public class Helper {
 
+  private static final String UTF_8 = "UTF-8";
+
   private static final Pattern validQNamePattern =
       Pattern.compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
 
@@ -152,7 +154,7 @@ public class Helper {
               final SNode currNode, final SRelation edge, final SNode fromNode, final long order) {
             if (decodeElements) {
               try {
-                result.add(URLDecoder.decode(currNode.getName(), "UTF-8"));
+                result.add(URLDecoder.decode(currNode.getName(), UTF_8));
               } catch (final UnsupportedEncodingException ex) {
                 log.error(null, ex);
                 // fallback
@@ -204,7 +206,7 @@ public class Helper {
           }
         }
         if (decodeElements) {
-          result.add(URLDecoder.decode(path[i], "UTF-8"));
+          result.add(URLDecoder.decode(path[i], UTF_8));
         } else {
           result.add(path[i]);
         }
@@ -1078,9 +1080,9 @@ public class Helper {
           try {
             // every name that starts with "_" is base64 encoded
             if (name.startsWith("_")) {
-              value = new String(Base64.decodeBase64(parts[1]), "UTF-8");
+              value = new String(Base64.decodeBase64(parts[1]), UTF_8);
             } else {
-              value = URLDecoder.decode(parts[1], "UTF-8");
+              value = URLDecoder.decode(parts[1], UTF_8);
             }
           } catch (final UnsupportedEncodingException ex) {
             log.error(ex.getMessage(), ex);
