@@ -152,10 +152,27 @@ public class Helper {
     return result;
   }
 
-  public static List<String> getCorpusPath(String uri) {
+  /**
+   * Remove a possible legacy id prefix.
+   * 
+   * @param uri The original node ID
+   * 
+   * @return The node ID without a "salt:/" prefix
+   */
+  public static String removeSaltPrefix(String uri) {
     if (uri.startsWith("salt:/")) {
       uri = uri.substring("salt:/".length());
     }
+    return uri;
+
+  }
+
+  public static List<String> getCorpusPath(String uri) {
+    return getCorpusPath(uri, true);
+  }
+
+  public static List<String> getCorpusPath(String uri, boolean decodeElements) {
+    uri = Helper.removeSaltPrefix(uri);
     final String rawPath = StringUtils.strip(uri, "/ \t");
 
     // split on raw path (so "/" in corpus names are still encoded)
@@ -172,7 +189,11 @@ public class Helper {
             path[i] = path[i].substring(0, fragmentStart);
           }
         }
-        result.add(URLDecoder.decode(path[i], "UTF-8"));
+        if (decodeElements) {
+          result.add(URLDecoder.decode(path[i], "UTF-8"));
+        } else {
+          result.add(path[i]);
+        }
       } catch (final UnsupportedEncodingException ex) {
         log.error(null, ex);
         // fallback
@@ -687,7 +708,7 @@ public class Helper {
   }
 
   public static Optional<OAuth2User> getUser(UI ui) {
-    if(ui instanceof AnnisUI) {
+    if (ui instanceof AnnisUI) {
       return Helper.getUser(((AnnisUI) ui).getSecurityContext());
     } else {
       return Helper.getUser(SecurityContextHolder.getContext());
@@ -722,8 +743,8 @@ public class Helper {
     Object rolesRaw = user.getAttributes().get(SecurityConfiguration.ROLES_CLAIM);
     if (rolesRaw instanceof List<?>) {
       List<?> roles = (List<?>) rolesRaw;
-      for(Object o : roles) {
-        if(o instanceof String) {
+      for (Object o : roles) {
+        if (o instanceof String) {
           result.add((String) o);
         }
       }
@@ -885,7 +906,8 @@ public class Helper {
         // 1th condition: hebrew extended and basic, arabic basic and extendend
         // 2nd condition: alphabetic presentations forms (hebrew) to arabic presentation forms A
         // 3rd condition: arabic presentation forms B
-        if((cc >= 1425 && cc <= 1785) || (cc >= 64286 && cc <= 65019) || (cc >= 65136 && cc <= 65276)) {
+        if ((cc >= 1425 && cc <= 1785) || (cc >= 64286 && cc <= 65019)
+            || (cc >= 65136 && cc <= 65276)) {
           return true;
         }
       }

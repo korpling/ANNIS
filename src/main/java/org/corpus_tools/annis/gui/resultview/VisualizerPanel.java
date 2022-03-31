@@ -368,8 +368,12 @@ public class VisualizerPanel extends CssLayout
         && !result.getDocumentGraph().getNodes().isEmpty()) {
       List<String> nodeAnnoFilter = null;
       if (visPlugin instanceof FilteringVisualizerPlugin) {
+        List<SNode> rootCorpora = result.getGraph().getRoots();
+        String rootCorpusId =
+            rootCorpora != null && rootCorpora.size() == 1 ? rootCorpora.get(0).getId()
+                : path.get(0);
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
-            path.get(0), Joiner.on('/').join(path), input.getMappings(), ui);
+            path.get(0), rootCorpusId, Joiner.on('/').join(path), input.getMappings(), ui);
       }
       SaltProject p = getDocument(path, nodeAnnoFilter, visPlugin.isUsingRawText(), ui);
 

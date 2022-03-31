@@ -71,7 +71,9 @@ public class DocBrowserController implements Serializable {
 
     VisualizerRule config;
 
-    String corpus;
+    final String corpus;
+    final String corpusId;
+
 
     List<String> docPath;
 
@@ -86,9 +88,10 @@ public class DocBrowserController implements Serializable {
     private VisualizerInput input;
 
 
-    public DocVisualizerFetcher(String corpus, List<String> docPath, String canonicalTitle,
-        String type, Panel visHolder, VisualizerRule config, Button btn) {
+    public DocVisualizerFetcher(String corpus, String corpusId, List<String> docPath,
+        String canonicalTitle, String type, Panel visHolder, VisualizerRule config, Button btn) {
       this.corpus = corpus;
+      this.corpusId = corpusId;
       this.docPath = docPath;
       this.btn = btn;
       this.config = config;
@@ -110,7 +113,7 @@ public class DocBrowserController implements Serializable {
       if (visualizer.isPresent() && visualizer.get() instanceof FilteringVisualizerPlugin) {
         nodeAnnoFilter =
             ((FilteringVisualizerPlugin) visualizer.get()).getFilteredNodeAnnotationNames(corpus,
-                docPath.get(docPath.size() - 1), config.getMappings(), ui);
+                corpusId, docPath.get(docPath.size() - 1), config.getMappings(), ui);
       } else if (visualizer.isPresent() && visualizer.get().isUsingRawText()) {
         nodeAnnoFilter = new LinkedList<>();
       }
@@ -250,10 +253,10 @@ public class DocBrowserController implements Serializable {
 
   public void openDocVis(String corpus, String docId, VisualizerRule visConfig, Button btn) {
 
-    List<String> path = Helper.getCorpusPath(docId);
+    List<String> pathEncoded = Helper.getCorpusPath(docId, true);
 
     final String canonicalTitle =
-        Joiner.on(" > ").join(path) + " - " + "Visualizer: " + visConfig.getDisplayName();
+        Joiner.on(" > ").join(pathEncoded) + " - " + "Visualizer: " + visConfig.getDisplayName();
     final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
 
     if (visibleVisHolder.containsKey(canonicalTitle)) {
@@ -285,7 +288,9 @@ public class DocBrowserController implements Serializable {
     // register visible visHolder
     this.visibleVisHolder.put(canonicalTitle, visHolder);
 
-    Background.run(new DocVisualizerFetcher(corpus, path, canonicalTitle, visConfig.getVisType(),
-        visHolder, visConfig, btn));
+    List<String> pathRaw = Helper.getCorpusPath(docId, false);
+
+    Background.run(new DocVisualizerFetcher(corpus, pathRaw.get(0), pathEncoded, canonicalTitle,
+        visConfig.getVisType(), visHolder, visConfig, btn));
   }
 }

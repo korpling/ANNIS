@@ -19,8 +19,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.google.common.base.Joiner;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
@@ -86,7 +84,6 @@ public class HTMLVis extends AbstractVisualizer {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
 
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   private Map<SNode, Long> mc;
 
@@ -103,7 +100,12 @@ public class HTMLVis extends AbstractVisualizer {
 
     List<String> corpusPath = Helper.getCorpusPath(vi.getDocument().getGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
-    corpusName = urlPathEscape.escape(corpusName);
+
+    // Get the (internally escaped) node name of the root corpus, fallback to unescaped corpus name
+    List<SNode> rootCorpora = vi.getDocument().getGraph().getRoots();
+    String rootCorpusId =
+        rootCorpora != null && rootCorpora.size() == 1 ? rootCorpora.get(0).getId() : corpusName;
+    rootCorpusId = Helper.removeSaltPrefix(rootCorpusId);
 
     String wrapperClassName =
         "annis-wrapped-htmlvis-" + corpusName.replaceAll("[^0-9A-Za-z-]", "_");
@@ -116,7 +118,7 @@ public class HTMLVis extends AbstractVisualizer {
     mc = vi.getMarkedAndCovered();
 
     VisualizationDefinition[] definitions =
-        parseDefinitions(corpusName, vi.getMappings(), vi.getUI());
+        parseDefinitions(corpusName, rootCorpusId, vi.getMappings(), vi.getUI());
 
     if (definitions != null) {
 
@@ -125,8 +127,8 @@ public class HTMLVis extends AbstractVisualizer {
       String labelClass = vi.getMappings().getOrDefault("class", "htmlvis");
       lblResult.addStyleName(labelClass);
 
-      injectWebFonts(visConfigName, corpusName, vi.getUI());
-      injectCSS(visConfigName, corpusName, wrapperClassName, vi.getUI());
+      injectWebFonts(visConfigName, corpusName, rootCorpusId, vi.getUI());
+      injectCSS(visConfigName, corpusName, rootCorpusId, wrapperClassName, vi.getUI());
 
 
     }
@@ -155,6 +157,11 @@ public class HTMLVis extends AbstractVisualizer {
     StringBuilder sb = new StringBuilder();
 
     List<SToken> token = graph.getSortedTokenByText();
+
+    if (token == null) {
+      return "(no token in result to display)";
+    }
+
     Map<SToken, Long> token2index = new HashMap<>();
     {
       long i = 0;
@@ -384,11 +391,16 @@ public class HTMLVis extends AbstractVisualizer {
   }
 
   @Override
-  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, String documentName,
+  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
+      String toplevelCorpusId, String documentName,
       Map<String, String> mappings, UI ui) {
     Set<String> result = null;
 
-    VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName, mappings, ui);
+
+    toplevelCorpusId = Helper.removeSaltPrefix(toplevelCorpusId);
+
+    VisualizationDefinition[] definitions =
+        parseDefinitions(toplevelCorpusName, toplevelCorpusId, mappings, ui);
 
     if (definitions != null) {
       for (VisualizationDefinition def : definitions) {
@@ -418,15 +430,15 @@ public class HTMLVis extends AbstractVisualizer {
     return "html";
   }
 
-  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName, UI ui) {
+  private void injectCSS(String visConfigName, String corpusName, String corpusNodeId,
+      String wrapperClassName, UI ui) {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
     InputStream inStreamCSSRaw = null;
     if (visConfigName == null) {
       inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
     } else {
       try {
-        File f = api.getFile(corpusName,
-            urlPathEscape.escape(corpusName) + "/" + visConfigName + ".css");
+        File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".css");
         f.deleteOnExit();
 
         inStreamCSSRaw = new FileInputStream(f);
@@ -460,12 +472,11 @@ public class HTMLVis extends AbstractVisualizer {
     }
   }
 
-  private void injectWebFonts(String visConfigName, String corpusName, UI ui) {
+  private void injectWebFonts(String visConfigName, String corpusName, String corpusNodeId, UI ui) {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
     try {
-      File f = api.getFile(corpusName,
-          urlPathEscape.escape(corpusName) + "/" + visConfigName + ".fonts.json");
+      File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".fonts.json");
       f.deleteOnExit();
       try (FileInputStream inStreamJSON = new FileInputStream(f)) {
         ObjectMapper mapper = createJsonMapper();
@@ -527,7 +538,7 @@ public class HTMLVis extends AbstractVisualizer {
     return false;
   }
 
-  public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
+  private VisualizationDefinition[] parseDefinitions(String corpusName, String corpusNodeId,
       Map<String, String> mappings, UI ui) {
     InputStream inStreamConfigRaw = null;
 
@@ -539,8 +550,7 @@ public class HTMLVis extends AbstractVisualizer {
 
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
       try {
-        File file = api.getFile(toplevelCorpusName,
-            urlPathEscape.escape(toplevelCorpusName) + "/" + visConfigName + ".config");
+        File file = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".config");
         inStreamConfigRaw = new FileInputStream(file);
       } catch (ApiException e) {
         if (e.getCode() != 404) {
