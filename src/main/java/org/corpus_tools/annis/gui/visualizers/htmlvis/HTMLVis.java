@@ -396,7 +396,6 @@ public class HTMLVis extends AbstractVisualizer {
       Map<String, String> mappings, UI ui) {
     Set<String> result = null;
 
-
     toplevelCorpusId = Helper.removeSaltPrefix(toplevelCorpusId);
 
     VisualizationDefinition[] definitions =

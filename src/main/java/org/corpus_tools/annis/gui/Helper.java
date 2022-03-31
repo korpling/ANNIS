@@ -122,8 +122,12 @@ public class Helper {
   private static final Pattern validQNamePattern =
       Pattern.compile("([a-zA-Z_%][a-zA-Z0-9_\\-%]*:)?[a-zA-Z_%][a-zA-Z0-9_\\-%]*");
 
-
   public static List<String> getCorpusPath(final SCorpusGraph corpusGraph, final SDocument doc) {
+    return getCorpusPath(corpusGraph, doc, true);
+  }
+
+  public static List<String> getCorpusPath(final SCorpusGraph corpusGraph, final SDocument doc,
+      boolean decodeElements) {
     final List<String> result = new LinkedList<String>();
 
     result.add(doc.getName());
@@ -146,7 +150,17 @@ public class Helper {
           @Override
           public void nodeReached(final GRAPH_TRAVERSE_TYPE traversalType, final String traversalId,
               final SNode currNode, final SRelation edge, final SNode fromNode, final long order) {
-            result.add(currNode.getName());
+            if (decodeElements) {
+              try {
+                result.add(URLDecoder.decode(currNode.getName(), "UTF-8"));
+              } catch (final UnsupportedEncodingException ex) {
+                log.error(null, ex);
+                // fallback
+                result.add(currNode.getName());
+              }
+            } else {
+              result.add(currNode.getName());
+            }
           }
         });
     return result;
