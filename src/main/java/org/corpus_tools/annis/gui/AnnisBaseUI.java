@@ -148,14 +148,21 @@ public class AnnisBaseUI extends UI implements Serializable {
       alreadyAddedCSS = new TreeSet<String>();
     }
 
-    if (wrapperClass != null) {
-      cssContent = wrapCSS(cssContent, wrapperClass);
-    }
+    final String wrappedCssContent =
+        wrapperClass == null ? cssContent : wrapCSS(cssContent, wrapperClass);
 
-    String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
-    if (!alreadyAddedCSS.contains(hashForCssContent)) {
-      this.getPage().getStyles().add(cssContent);
-      alreadyAddedCSS.add(hashForCssContent);
+
+    if (wrappedCssContent != null) {
+      String hashForCssContent =
+          Hashing.md5().hashString(wrappedCssContent, Charsets.UTF_8).toString();
+
+      if (!alreadyAddedCSS.contains(hashForCssContent)) {
+
+        alreadyAddedCSS.add(hashForCssContent);
+        this.accessSynchronously(() -> {
+          this.getPage().getStyles().add(wrappedCssContent);
+        });
+      }
     }
   }
 
