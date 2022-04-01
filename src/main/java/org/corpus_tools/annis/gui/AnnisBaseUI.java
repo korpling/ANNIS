@@ -62,7 +62,7 @@ public class AnnisBaseUI extends UI implements Serializable {
   }
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisBaseUI.class);
-  public final static Resource PINGUIN_IMAGE =
+  public static final Resource PINGUIN_IMAGE =
       new ClassResource("/org.corpus_tools.annis/libgui/penguins.png");
 
 

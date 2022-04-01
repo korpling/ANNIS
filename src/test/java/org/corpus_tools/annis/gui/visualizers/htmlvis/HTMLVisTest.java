@@ -13,11 +13,12 @@
  */
 package org.corpus_tools.annis.gui.visualizers.htmlvis;
 
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.vaadin.server.Page;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,10 +28,11 @@ import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisBaseUI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HTMLVisTest {
+class HTMLVisTest {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVisTest.class);
   private HTMLVis fixture;
@@ -42,20 +44,45 @@ public class HTMLVisTest {
   }
 
   @Test
-  public void testWebFontInjection() throws ApiException, IOException {
+  void testWebFontInjection() throws ApiException, IOException {
     AnnisBaseUI ui = mock(AnnisBaseUI.class);
     CorporaApi api = mock(CorporaApi.class);
 
     File jsonFile = File.createTempFile("test", ".fonts.json");
     FileUtils.writeStringToFile(jsonFile, "{\"web-fonts\": [" + "{" + "\"name\": \"FancyFont\", "
         + "\"sources\": {\"format\":\"url\"}}" + "]}", StandardCharsets.UTF_8);
-
-    when(api.getFile(eq("rootCorpus"), eq("rootCorpus/test.fonts.json"))).thenReturn(jsonFile);
+    when(api.getFile("rootCorpus", "rootCorpus/test.fonts.json")).thenReturn(jsonFile);
 
     fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
 
     verify(ui).injectUniqueCSS(
-        eq("@font-face {\n" + "  font-family: 'FancyFont';\n" + "  font-weight: '400';\n"
-            + "  font-style: 'normal';\n" + "  src: url('url') format('format');\n" + "}\n"));
+        "@font-face {\n" + "  font-family: 'FancyFont';\n" + "  font-weight: '400';\n"
+            + "  font-style: 'normal';\n" + "  src: url('url') format('format');\n" + "}\n");
+  }
+
+  @Test
+  void testWebFontInjectionErrorHandling() throws ApiException, IOException {
+    AnnisBaseUI ui = mock(AnnisBaseUI.class);
+    Page page = mock(Page.class);
+    CorporaApi api = mock(CorporaApi.class);
+
+    when(page.getUI()).thenReturn(ui);
+    when(ui.getPage()).thenReturn(page);
+
+    // Create invalid JSON file
+    File jsonFile = File.createTempFile("test", ".fonts.json");
+    FileUtils.writeStringToFile(jsonFile, "{\"web-fonts\"}", StandardCharsets.UTF_8);
+    when(api.getFile("rootCorpus", "rootCorpus/test.fonts.json")).thenReturn(jsonFile);
+
+    fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
+    verify(ui, Mockito.never()).injectUniqueCSS(any());
+
+    
+    // Don't return a file from the API
+    when(api.getFile(any(), any())).thenThrow(new ApiException(404, "File does not exist"));
+
+    fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
+
+    verify(ui, Mockito.never()).injectUniqueCSS(any());
   }
 }

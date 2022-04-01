@@ -483,8 +483,8 @@ public class HTMLVis extends AbstractVisualizer {
 
       } catch (IOException ex) {
         log.error("Could not parse the HTML visualizer web-font configuration file", ex);
-        Notification.show("Could not parse the HTML visualizer web-font configuration file",
-            ex.getMessage(), Notification.Type.ERROR_MESSAGE);
+        new Notification("Could not parse the HTML visualizer web-font configuration file",
+            ex.getMessage(), Notification.Type.ERROR_MESSAGE).show(ui.getPage());
       } finally {
         Files.deleteIfExists(f.toPath());
       }
@@ -494,8 +494,8 @@ public class HTMLVis extends AbstractVisualizer {
       if (ex.getCode() != 404) {
         log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
         ui.access(() -> {
-          Notification.show("Could not retrieve the HTML visualizer web-font configuration file",
-              ex.getMessage(), Notification.Type.ERROR_MESSAGE);
+          new Notification("Could not retrieve the HTML visualizer web-font configuration file",
+              ex.getMessage(), Notification.Type.ERROR_MESSAGE).show(ui.getPage());
 
         });
       }
