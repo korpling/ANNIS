@@ -79,7 +79,7 @@ class HTMLVisTest {
 
     
     // Don't return a file from the API
-    when(api.getFile(any(), any())).thenThrow(new ApiException(404, "File does not exist"));
+    when(api.getFile(any(), any())).thenThrow(new ApiException(500, "Server error"));
 
     fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
 
