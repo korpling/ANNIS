@@ -127,7 +127,8 @@ public class HTMLVis extends AbstractVisualizer {
       String labelClass = vi.getMappings().getOrDefault("class", "htmlvis");
       lblResult.addStyleName(labelClass);
 
-      injectWebFonts(visConfigName, corpusName, rootCorpusId, vi.getUI());
+      injectWebFonts(visConfigName, corpusName, rootCorpusId, vi.getUI(),
+          new CorporaApi(Helper.getClient(vi.getUI())));
       injectCSS(visConfigName, corpusName, rootCorpusId, wrapperClassName, vi.getUI());
 
 
@@ -466,8 +467,8 @@ public class HTMLVis extends AbstractVisualizer {
     }
   }
 
-  private void injectWebFonts(String visConfigName, String corpusName, String corpusNodeId, UI ui) {
-    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+  protected void injectWebFonts(String visConfigName, String corpusName, String corpusNodeId, UI ui,
+      CorporaApi api) {
 
     try {
       File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".fonts.json");
