@@ -35,7 +35,8 @@ public abstract class AbstractVisualizer implements VisualizerPlugin, FilteringV
   private static final long serialVersionUID = -1146320864910250586L;
 
   @Override
-  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, String documentName,
+  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
+      String toplevelCorpusId, String documentName,
       Map<String, String> mappings, UI ui) {
     return null;
   }

@@ -16,6 +16,7 @@ package org.corpus_tools.annis.gui.visualizers;
 import com.vaadin.ui.UI;
 import java.util.List;
 import java.util.Map;
+import org.corpus_tools.salt.common.SCorpus;
 
 /**
  * A visualizer that defines a filtering for the annotations. This filtering is currently only used
@@ -27,11 +28,15 @@ public interface FilteringVisualizerPlugin {
   /**
    * Return the node annotation names or null if no filtering should be applied.
    * 
-   * @param toplevelCorpusName
+   * @param toplevelCorpusName The name of the toplevel corpus.
+   * @param toplevelCorpusId The Salt node ID for the toplevel {@link SCorpus}
    * @param documentName
    * @param mappings
    * @return
+   * 
+   * @see SCorpus#getId()
    */
-  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, String documentName,
+  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
+      String toplevelCorpusId, String documentName,
       Map<String, String> mappings, UI ui);
 }

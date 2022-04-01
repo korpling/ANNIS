@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,8 @@ public class AnnisBaseUI extends UI implements Serializable {
   }
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(AnnisBaseUI.class);
-  public final static Resource PINGUIN_IMAGE = new ClassResource("/org.corpus_tools.annis/libgui/penguins.png");
+  public static final Resource PINGUIN_IMAGE =
+      new ClassResource("/org.corpus_tools.annis/libgui/penguins.png");
 
 
   /**
@@ -71,8 +73,8 @@ public class AnnisBaseUI extends UI implements Serializable {
    * The files in the result list do not necessarily exist.
    *
    * These locations are the - base installation: WEB-INF/conf/ folder of the deployment. - global
-   * configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set
-   * - user configuration: ~/.annis/
+   * configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set - user
+   * configuration: ~/.annis/
    * 
    * @param configFile The file path of the configuration file relative to the base config folder.
    * @return list of files or directories in the order in which they should be processed (most
@@ -148,14 +150,19 @@ public class AnnisBaseUI extends UI implements Serializable {
       alreadyAddedCSS = new TreeSet<String>();
     }
 
-    if (wrapperClass != null) {
-      cssContent = wrapCSS(cssContent, wrapperClass);
-    }
+    final String wrappedCssContent =
+        wrapperClass == null ? cssContent : wrapCSS(cssContent, wrapperClass);
 
-    String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
-    if (!alreadyAddedCSS.contains(hashForCssContent)) {
-      this.getPage().getStyles().add(cssContent);
-      alreadyAddedCSS.add(hashForCssContent);
+
+    if (wrappedCssContent != null) {
+      String hashForCssContent =
+          Hashing.md5().hashString(wrappedCssContent, StandardCharsets.UTF_8).toString();
+
+      if (!alreadyAddedCSS.contains(hashForCssContent)) {
+
+        alreadyAddedCSS.add(hashForCssContent);
+        this.accessSynchronously(() -> this.getPage().getStyles().add(wrappedCssContent));
+      }
     }
   }
 

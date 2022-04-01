@@ -18,12 +18,14 @@ import com.vaadin.data.provider.DataProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Page;
+import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.TextField;
@@ -378,16 +380,33 @@ class AnnisUITest {
     _get(resultPanel, KWICComponent.class);
 
     // Open the coreference visualizer and check that IFrame component is loaded
-    Button btOpenVisualizer =
+    Button btOpenCorefVisualizer =
         _get(resultPanel, Button.class, spec -> spec.withCaption("coreference (discourse)"));
-    _click(btOpenVisualizer);
+    _click(btOpenCorefVisualizer);
     awaitCondition(120, () -> !_find(resultPanel, AutoHeightIFrame.class).isEmpty());
     AutoHeightIFrame iframe = _get(resultPanel, AutoHeightIFrame.class, spec -> spec.withCount(1));
     assertTrue(iframe.getState().getUrl().startsWith("/vis-iframe-res/"));
 
     // Close the visualizer again
-    _click(btOpenVisualizer);
+    _click(btOpenCorefVisualizer);
     awaitCondition(60, () -> _find(resultPanel, AutoHeightIFrame.class).isEmpty());
+
+    // Open a HTML visualizer
+    Button btOpenHtmlVisualizer = _get(resultPanel, Button.class,
+        spec -> spec.withCaption("information structure (document)"));
+    _click(btOpenHtmlVisualizer);
+    awaitCondition(240,
+        () -> !_find(resultPanel, Panel.class,
+            spec -> spec.withPredicate(p -> p.getStyleName().startsWith("annis-wrapped-htmlvis-")))
+                .isEmpty());
+
+    Panel htmlPanel = _get(resultPanel, Panel.class,
+        spec -> spec.withPredicate(p -> p.getStyleName().startsWith("annis-wrapped-htmlvis-")));
+    Label htmlLabel = _get(htmlPanel, Label.class);
+    assertEquals(ContentMode.HTML, htmlLabel.getContentMode());
+    assertTrue(
+        htmlLabel.getValue().startsWith("<span class=\"tok\"  style=\" color:\" >Feigenblatt<"));
+
   }
 
   @Test

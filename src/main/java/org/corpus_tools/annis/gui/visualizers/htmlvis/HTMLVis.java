@@ -19,15 +19,13 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 import com.google.common.base.Joiner;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
+import com.vaadin.shared.ui.ContentMode;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.v7.ui.Label;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -86,7 +84,6 @@ public class HTMLVis extends AbstractVisualizer {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
 
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   private Map<SNode, Long> mc;
 
@@ -103,7 +100,12 @@ public class HTMLVis extends AbstractVisualizer {
 
     List<String> corpusPath = Helper.getCorpusPath(vi.getDocument().getGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
-    corpusName = urlPathEscape.escape(corpusName);
+
+    // Get the (internally escaped) node name of the root corpus, fallback to unescaped corpus name
+    List<SNode> rootCorpora = vi.getDocument().getGraph().getRoots();
+    String rootCorpusId =
+        rootCorpora != null && rootCorpora.size() == 1 ? rootCorpora.get(0).getId() : corpusName;
+    rootCorpusId = Helper.removeSaltPrefix(rootCorpusId);
 
     String wrapperClassName =
         "annis-wrapped-htmlvis-" + corpusName.replaceAll("[^0-9A-Za-z-]", "_");
@@ -116,7 +118,7 @@ public class HTMLVis extends AbstractVisualizer {
     mc = vi.getMarkedAndCovered();
 
     VisualizationDefinition[] definitions =
-        parseDefinitions(corpusName, vi.getMappings(), vi.getUI());
+        parseDefinitions(corpusName, rootCorpusId, vi.getMappings(), vi.getUI());
 
     if (definitions != null) {
 
@@ -125,8 +127,9 @@ public class HTMLVis extends AbstractVisualizer {
       String labelClass = vi.getMappings().getOrDefault("class", "htmlvis");
       lblResult.addStyleName(labelClass);
 
-      injectWebFonts(visConfigName, corpusName, vi.getUI());
-      injectCSS(visConfigName, corpusName, wrapperClassName, vi.getUI());
+      injectWebFonts(visConfigName, corpusName, rootCorpusId, vi.getUI(),
+          new CorporaApi(Helper.getClient(vi.getUI())));
+      injectCSS(visConfigName, corpusName, rootCorpusId, wrapperClassName, vi.getUI());
 
 
     }
@@ -155,6 +158,7 @@ public class HTMLVis extends AbstractVisualizer {
     StringBuilder sb = new StringBuilder();
 
     List<SToken> token = graph.getSortedTokenByText();
+
     Map<SToken, Long> token2index = new HashMap<>();
     {
       long i = 0;
@@ -384,11 +388,14 @@ public class HTMLVis extends AbstractVisualizer {
   }
 
   @Override
-  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, String documentName,
-      Map<String, String> mappings, UI ui) {
+  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
+      String toplevelCorpusId, String documentName, Map<String, String> mappings, UI ui) {
     Set<String> result = null;
 
-    VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName, mappings, ui);
+    toplevelCorpusId = Helper.removeSaltPrefix(toplevelCorpusId);
+
+    VisualizationDefinition[] definitions =
+        parseDefinitions(toplevelCorpusName, toplevelCorpusId, mappings, ui);
 
     if (definitions != null) {
       for (VisualizationDefinition def : definitions) {
@@ -418,15 +425,15 @@ public class HTMLVis extends AbstractVisualizer {
     return "html";
   }
 
-  private void injectCSS(String visConfigName, String corpusName, String wrapperClassName, UI ui) {
+  private void injectCSS(String visConfigName, String corpusName, String corpusNodeId,
+      String wrapperClassName, UI ui) {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
     InputStream inStreamCSSRaw = null;
     if (visConfigName == null) {
       inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
     } else {
       try {
-        File f = api.getFile(corpusName,
-            urlPathEscape.escape(corpusName) + "/" + visConfigName + ".css");
+        File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".css");
         f.deleteOnExit();
 
         inStreamCSSRaw = new FileInputStream(f);
@@ -460,51 +467,24 @@ public class HTMLVis extends AbstractVisualizer {
     }
   }
 
-  private void injectWebFonts(String visConfigName, String corpusName, UI ui) {
-    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+  protected void injectWebFonts(String visConfigName, String corpusName, String corpusNodeId, UI ui,
+      CorporaApi api) {
 
     try {
-      File f = api.getFile(corpusName,
-          urlPathEscape.escape(corpusName) + "/" + visConfigName + ".fonts.json");
+      File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".fonts.json");
       f.deleteOnExit();
       try (FileInputStream inStreamJSON = new FileInputStream(f)) {
         ObjectMapper mapper = createJsonMapper();
         WebFontList fontConfigList = mapper.readValue(inStreamJSON, WebFontList.class);
 
         for (WebFont fontConfig : fontConfigList.getWebFonts()) {
-
-          if (fontConfig != null && fontConfig.getName() != null) {
-            StringBuilder sb = new StringBuilder();
-
-            sb.append("@font-face {\n");
-            sb.append("  font-family: '" + fontConfig.getName() + "';\n");
-            sb.append("  font-weight: '" + fontConfig.getWeight() + "';\n");
-            sb.append("  font-style: '" + fontConfig.getStyle() + "';\n");
-
-            List<String> sourceDefs = new LinkedList<>();
-            for (Map.Entry<String, String> src : fontConfig.getSources().entrySet()) {
-              sourceDefs.add("url('" + src.getValue() + "') format('" + src.getKey() + "')");
-            }
-
-            if (!sourceDefs.isEmpty()) {
-              sb.append("  src: ");
-              sb.append(Joiner.on(",\n    ").join(sourceDefs));
-              sb.append(";\n");
-            }
-
-            sb.append("}\n");
-
-            if (ui instanceof AnnisBaseUI) {
-              // do not add identical CSS files
-              ((AnnisBaseUI) ui).injectUniqueCSS(sb.toString());
-            }
-          }
+          injectWebFontConfig(fontConfig, ui);
         }
 
       } catch (IOException ex) {
         log.error("Could not parse the HTML visualizer web-font configuration file", ex);
-        Notification.show("Could not parse the HTML visualizer web-font configuration file",
-            ex.getMessage(), Notification.Type.ERROR_MESSAGE);
+        new Notification("Could not parse the HTML visualizer web-font configuration file",
+            ex.getMessage(), Notification.Type.ERROR_MESSAGE).show(ui.getPage());
       } finally {
         Files.deleteIfExists(f.toPath());
       }
@@ -514,10 +494,39 @@ public class HTMLVis extends AbstractVisualizer {
       if (ex.getCode() != 404) {
         log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
         ui.access(() -> {
-          Notification.show("Could not retrieve the HTML visualizer web-font configuration file",
-              ex.getMessage(), Notification.Type.ERROR_MESSAGE);
+          new Notification("Could not retrieve the HTML visualizer web-font configuration file",
+              ex.getMessage(), Notification.Type.ERROR_MESSAGE).show(ui.getPage());
 
         });
+      }
+    }
+  }
+
+  private void injectWebFontConfig(WebFont fontConfig, UI ui) {
+    if (fontConfig != null && fontConfig.getName() != null) {
+      StringBuilder sb = new StringBuilder();
+
+      sb.append("@font-face {\n");
+      sb.append("  font-family: '" + fontConfig.getName() + "';\n");
+      sb.append("  font-weight: '" + fontConfig.getWeight() + "';\n");
+      sb.append("  font-style: '" + fontConfig.getStyle() + "';\n");
+
+      List<String> sourceDefs = new LinkedList<>();
+      for (Map.Entry<String, String> src : fontConfig.getSources().entrySet()) {
+        sourceDefs.add("url('" + src.getValue() + "') format('" + src.getKey() + "')");
+      }
+
+      if (!sourceDefs.isEmpty()) {
+        sb.append("  src: ");
+        sb.append(Joiner.on(",\n    ").join(sourceDefs));
+        sb.append(";\n");
+      }
+
+      sb.append("}\n");
+
+      if (ui instanceof AnnisBaseUI) {
+        // do not add identical CSS files
+        ((AnnisBaseUI) ui).injectUniqueCSS(sb.toString());
       }
     }
   }
@@ -527,7 +536,7 @@ public class HTMLVis extends AbstractVisualizer {
     return false;
   }
 
-  public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
+  private VisualizationDefinition[] parseDefinitions(String corpusName, String corpusNodeId,
       Map<String, String> mappings, UI ui) {
     InputStream inStreamConfigRaw = null;
 
@@ -539,8 +548,7 @@ public class HTMLVis extends AbstractVisualizer {
 
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
       try {
-        File file = api.getFile(toplevelCorpusName,
-            urlPathEscape.escape(toplevelCorpusName) + "/" + visConfigName + ".config");
+        File file = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".config");
         inStreamConfigRaw = new FileInputStream(file);
       } catch (ApiException e) {
         if (e.getCode() != 404) {
@@ -552,9 +560,9 @@ public class HTMLVis extends AbstractVisualizer {
     }
 
     if (inStreamConfigRaw == null) {
-      Notification.show(
+      ui.accessSynchronously(() -> Notification.show(
           "ERROR: html visualization configuration \"" + visConfigName + "\" not found in database",
-          Notification.Type.ERROR_MESSAGE);
+          Notification.Type.ERROR_MESSAGE));
     } else {
 
       try (InputStream inStreamConfig = inStreamConfigRaw) {
@@ -563,8 +571,11 @@ public class HTMLVis extends AbstractVisualizer {
         return p.getDefinitions();
       } catch (IOException | VisParserException ex) {
         log.error("Could not parse the HTML visualization configuration file", ex);
-        Notification.show("Could not parse the HTML visualization configuration file",
-            ex.getMessage(), Notification.Type.ERROR_MESSAGE);
+
+        ui.accessSynchronously(
+            () -> Notification.show("Could not parse the HTML visualization configuration file",
+                ex.getMessage(), Notification.Type.ERROR_MESSAGE));
+
       }
     }
     return null;

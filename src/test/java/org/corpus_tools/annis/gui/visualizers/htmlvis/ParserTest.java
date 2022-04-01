@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.corpus_tools.annis.gui.visualizers.component.htmlvis;
+package org.corpus_tools.annis.gui.visualizers.htmlvis;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

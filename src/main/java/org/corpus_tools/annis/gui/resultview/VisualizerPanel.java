@@ -96,7 +96,7 @@ public class VisualizerPanel extends CssLayout
 
       Throwable exception = null;
       try {
-        final Component createdComponent = future.get(60, TimeUnit.SECONDS);
+        final Component createdComponent = future.get(120, TimeUnit.SECONDS);
 
         ui.access(() -> {
           vis = createdComponent;
@@ -112,7 +112,7 @@ public class VisualizerPanel extends CssLayout
         exception = ex;
       } catch (TimeoutException ex) {
         future.cancel(true);
-        log.error("Could create visualizer {} in 60 seconds: Timeout",
+        log.error("Could create visualizer {} in 2 minutes: Timeout",
             visPlugin == null ? UNKNOWN : visPlugin.getShortName(), ex);
         exception = ex;
       }
@@ -175,7 +175,8 @@ public class VisualizerPanel extends CssLayout
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
-  private List<String> path;
+  private List<String> pathRaw;
+  private List<String> pathDecoded;
 
   private Component vis;
 
@@ -223,9 +224,11 @@ public class VisualizerPanel extends CssLayout
 
     this.result = result;
     if (!match.getSaltIDs().isEmpty()) {
-      this.path = Helper.getCorpusPath(match.getSaltIDs().get(0));
+      this.pathRaw = Helper.getCorpusPath(match.getSaltIDs().get(0), false);
+      this.pathDecoded = Helper.getCorpusPath(match.getSaltIDs().get(0), true);
     } else {
-      this.path = new LinkedList<>();
+      this.pathRaw = new LinkedList<>();
+      this.pathDecoded = new LinkedList<>();
     }
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
@@ -368,10 +371,12 @@ public class VisualizerPanel extends CssLayout
         && !result.getDocumentGraph().getNodes().isEmpty()) {
       List<String> nodeAnnoFilter = null;
       if (visPlugin instanceof FilteringVisualizerPlugin) {
+
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
-            path.get(0), Joiner.on('/').join(path), input.getMappings(), ui);
+            pathDecoded.get(0), pathRaw.get(0), Joiner.on('/').join(pathRaw), input.getMappings(),
+            ui);
       }
-      SaltProject p = getDocument(path, nodeAnnoFilter, visPlugin.isUsingRawText(), ui);
+      SaltProject p = getDocument(nodeAnnoFilter, visPlugin.isUsingRawText(), ui);
 
       if (p != null && p.getCorpusGraphs() != null && !p.getCorpusGraphs().isEmpty()
           && p.getCorpusGraphs().get(0).getDocuments() != null
@@ -387,18 +392,17 @@ public class VisualizerPanel extends CssLayout
   }
 
 
-  private SaltProject getDocument(List<String> docPath, List<String> nodeAnnoFilter,
-      boolean useRawText, UI ui) {
+  private SaltProject getDocument(List<String> nodeAnnoFilter, boolean useRawText, UI ui) {
 
     try {
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
-      String aql = Helper.buildDocumentQuery(docPath, nodeAnnoFilter, useRawText);
+      String aql = Helper.buildDocumentQuery(pathRaw, nodeAnnoFilter, useRawText);
 
-      File graphML = api.subgraphForQuery(path.get(0), aql, QueryLanguage.AQL, null);
+      File graphML = api.subgraphForQuery(pathDecoded.get(0), aql, QueryLanguage.AQL, null);
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
-        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(path));
+        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(pathRaw));
         SDocument doc = cg.createDocument(docURI);
         SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
         doc.setDocumentGraph(docGraph);

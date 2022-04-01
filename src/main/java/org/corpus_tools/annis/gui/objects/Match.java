@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import org.corpus_tools.annis.gui.Helper;
 
 /**
  * Represents a single match of an AQL query.
@@ -101,9 +102,7 @@ public class Match implements Serializable {
     }
 
     // Remove a possible legacy id prefix
-    if (id.startsWith("salt:/")) {
-      id = id.substring("salt:/".length());
-    }
+    id = Helper.removeSaltPrefix(id);
 
     result.addSaltId(id, anno);
   }
