@@ -96,7 +96,7 @@ public class VisualizerPanel extends CssLayout
 
       Throwable exception = null;
       try {
-        final Component createdComponent = future.get(60, TimeUnit.SECONDS);
+        final Component createdComponent = future.get(120, TimeUnit.SECONDS);
 
         ui.access(() -> {
           vis = createdComponent;
@@ -112,7 +112,7 @@ public class VisualizerPanel extends CssLayout
         exception = ex;
       } catch (TimeoutException ex) {
         future.cancel(true);
-        log.error("Could create visualizer {} in 60 seconds: Timeout",
+        log.error("Could create visualizer {} in 2 minutes: Timeout",
             visPlugin == null ? UNKNOWN : visPlugin.getShortName(), ex);
         exception = ex;
       }
