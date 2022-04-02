@@ -5,6 +5,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Mitigate against security issue [CVE-2022-22965
+  ](https://tanzu.vmware.com/security/cve-2022-22965) by upgrading Spring boot
+  dependency to 2.5.12 See
+  <https://spring.io/blog/2022/03/31/spring-framework-rce-early-announcement>
+  for for information.
+
 ## [4.6.4] - 2022-04-01
 
 ### Fixed
