@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix error message in corpus browser window when there is a meta annotation with an invalid name
   (like e.g. a space "corpus description" in the Bematac corpus).
+- HTML visualizer might output the elements several times (#755).
 
 ## [4.6.5] - 2022-04-02
 
