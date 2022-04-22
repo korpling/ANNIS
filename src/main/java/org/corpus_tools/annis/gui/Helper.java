@@ -458,29 +458,33 @@ public class Helper {
     final Set<AnnoKey> metaAnnos = new HashSet<>();
     // Check for each annotation if its actually a meta-annotation
     for (final org.corpus_tools.annis.api.model.Annotation a : nodeAnnos) {
-      final FindQuery q = new FindQuery();
-      q.setCorpora(Arrays.asList(corpus));
-      q.setQuery("annis:node_type=\"corpus\" _ident_ " + getQName(a.getKey()));
-      // Not sorting the results is much faster, especially if we only fetch the first
-      // item
-      // (we are only interested if a match exists, not how many items or which one)
-      q.setOrder(OrderEnum.NOTSORTED);
-      q.setLimit(1);
-      q.setOffset(0);
 
-      q.setQueryLanguage(QueryLanguage.AQL);
-      final File findResult = search.find(q);
-      if (findResult != null && findResult.isFile())
-        try {
-          try (Stream<String> lines = Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
-            Optional<String> anyLine = lines.findAny();
-            if (anyLine.isPresent() && !anyLine.get().isEmpty()) {
-              metaAnnos.add(a.getKey());
+      String annotationName = getQName(a.getKey());
+      if (validQNamePattern.matcher(annotationName).matches()) {
+        final FindQuery q = new FindQuery();
+        q.setCorpora(Arrays.asList(corpus));
+
+        q.setQuery("annis:node_type=\"corpus\" _ident_ " + getQName(a.getKey()));
+        // Not sorting the results is much faster, especially if we only fetch the first
+        // item (we are only interested if a match exists, not how many items or which one)
+        q.setOrder(OrderEnum.NOTSORTED);
+        q.setLimit(1);
+        q.setOffset(0);
+
+        q.setQueryLanguage(QueryLanguage.AQL);
+        final File findResult = search.find(q);
+        if (findResult != null && findResult.isFile())
+          try {
+            try (Stream<String> lines = Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
+              Optional<String> anyLine = lines.findAny();
+              if (anyLine.isPresent() && !anyLine.get().isEmpty()) {
+                metaAnnos.add(a.getKey());
+              }
             }
+          } catch (final IOException ex) {
+            log.error("Error when accessing file with find results", ex);
           }
-        } catch (final IOException ex) {
-          log.error("Error when accessing file with find results", ex);
-        }
+      }
     }
 
     return metaAnnos;
