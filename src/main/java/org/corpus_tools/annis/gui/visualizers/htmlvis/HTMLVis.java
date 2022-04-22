@@ -315,65 +315,64 @@ public class HTMLVis extends AbstractVisualizer {
         }
 
       }
-
-
-
-      // get all used indexes
-      Set<Long> indexes = new TreeSet<>();
-      indexes.addAll(outputStartTags.keySet());
-      indexes.addAll(outputEndTags.keySet());
-
-      for (Long i : indexes) {
-        // output all strings belonging to this token position
-        // first the start tags for this position
-
-        // add priorities from instruction_priorities for sorting length ties
-        List<OutputItem> unsortedStart = outputStartTags.get(i);
-        SortedSet<OutputItem> itemsStart = new TreeSet();
-        if (unsortedStart != null) {
-          Iterator<OutputItem> it = unsortedStart.iterator();
-          while (it.hasNext()) {
-            OutputItem s = it.next();
-            itemsStart.add(s);
-          }
-        }
-
-        {
-          Iterator<OutputItem> it = itemsStart.iterator();
-          boolean first = true;
-          while (it.hasNext()) {
-            OutputItem s = it.next();
-            if (!first) {
-              sb.append("-->");
-            }
-            first = false;
-            sb.append(s.getOutputString());
-            if (it.hasNext()) {
-              sb.append("<!--\n");
-            }
-          }
-        }
-        // then the end tags for this position, but inverse their order
-        List<OutputItem> unsortedEnd = outputEndTags.get(i);
-        SortedSet<OutputItem> itemsEnd = new TreeSet();
-        if (unsortedEnd != null) {
-          Iterator<OutputItem> it = unsortedEnd.iterator();
-          while (it.hasNext()) {
-            OutputItem s = it.next();
-            itemsEnd.add(s);
-          }
-        }
-
-        {
-          List<OutputItem> itemsEndReverse = new LinkedList<>(itemsEnd);
-          Collections.reverse(itemsEndReverse);
-          for (OutputItem s : itemsEndReverse) {
-            sb.append(s.getOutputString());
-          }
-        }
-
-      }
     }
+
+    // get all used indexes
+    Set<Long> indexes = new TreeSet<>();
+    indexes.addAll(outputStartTags.keySet());
+    indexes.addAll(outputEndTags.keySet());
+
+    for (Long i : indexes) {
+      // output all strings belonging to this token position
+      // first the start tags for this position
+
+      // add priorities from instruction_priorities for sorting length ties
+      List<OutputItem> unsortedStart = outputStartTags.get(i);
+      SortedSet<OutputItem> itemsStart = new TreeSet();
+      if (unsortedStart != null) {
+        Iterator<OutputItem> it = unsortedStart.iterator();
+        while (it.hasNext()) {
+          OutputItem s = it.next();
+          itemsStart.add(s);
+        }
+      }
+
+      {
+        Iterator<OutputItem> it = itemsStart.iterator();
+        boolean first = true;
+        while (it.hasNext()) {
+          OutputItem s = it.next();
+          if (!first) {
+            sb.append("-->");
+          }
+          first = false;
+          sb.append(s.getOutputString());
+          if (it.hasNext()) {
+            sb.append("<!--\n");
+          }
+        }
+      }
+      // then the end tags for this position, but inverse their order
+      List<OutputItem> unsortedEnd = outputEndTags.get(i);
+      SortedSet<OutputItem> itemsEnd = new TreeSet();
+      if (unsortedEnd != null) {
+        Iterator<OutputItem> it = unsortedEnd.iterator();
+        while (it.hasNext()) {
+          OutputItem s = it.next();
+          itemsEnd.add(s);
+        }
+      }
+
+      {
+        List<OutputItem> itemsEndReverse = new LinkedList<>(itemsEnd);
+        Collections.reverse(itemsEndReverse);
+        for (OutputItem s : itemsEndReverse) {
+          sb.append(s.getOutputString());
+        }
+      }
+
+    }
+
 
     return sb.toString();
   }
