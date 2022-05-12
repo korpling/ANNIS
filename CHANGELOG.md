@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Upgraded to graphANNIS 2.0.5. 
+  Fix timeout handling for queries with a lot of intermediate results, but less
+  than 1000 matches.
+
 ## [4.6.6] - 2022-04-22
 
 ### Fixed
