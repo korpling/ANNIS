@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.6.6
-date-released: 2022-04-22
+version: 4.6.7
+date-released: 2022-05-12
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -540,7 +540,7 @@ references:
   title: JAXB Runtime
   version: 2.3.6
   abbreviation: org.glassfish.jaxb:jaxb-runtime
-  license: NOASSERTION
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/JAXB_Runtime directory.
   authors:
   - name: Roman Grigoriadi
@@ -569,7 +569,7 @@ references:
   title: JSClipboard Add-on
   version: 1.0.12
   abbreviation: com.github.vaadin4qbanos:jsclipboard
-  license-url: http://www.apache.org/licenses/LICENSE-2.0.txt
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/JSClipboard_Add_on
     directory.
   authors:
@@ -1126,7 +1126,7 @@ references:
   title: TXW2 Runtime
   version: 2.3.6
   abbreviation: org.glassfish.jaxb:txw2
-  license: NOASSERTION
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/TXW2_Runtime directory.
   authors:
   - name: Roman Grigoriadi
