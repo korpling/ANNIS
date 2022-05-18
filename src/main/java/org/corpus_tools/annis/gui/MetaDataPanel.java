@@ -148,6 +148,28 @@ public class MetaDataPanel extends Panel {
       }
       return hasResult;
     }
+
+    /**
+     * Places a label in the middle center of the corpus browser panel.
+     */
+    private void addEmptyLabel() {
+      if (emptyLabel == null) {
+        emptyLabel = new Label("none");
+      }
+
+      if (corpusAnnotationTable != null) {
+        layout.removeComponent(corpusAnnotationTable);
+      }
+
+      layout.addComponent(emptyLabel);
+
+      // this has only an effect after adding the component to a parent. Bug by
+      // vaadin?
+      emptyLabel.setSizeUndefined();
+
+      layout.setComponentAlignment(emptyLabel, Alignment.MIDDLE_CENTER);
+      layout.setExpandRatio(emptyLabel, 1.0f);
+    }
   }
 
   /**
@@ -196,27 +218,6 @@ public class MetaDataPanel extends Panel {
 
   }
 
-  /**
-   * Places a label in the middle center of the corpus browser panel.
-   */
-  private void addEmptyLabel() {
-    if (emptyLabel == null) {
-      emptyLabel = new Label("none");
-    }
-
-    if (corpusAnnotationTable != null) {
-      layout.removeComponent(corpusAnnotationTable);
-    }
-
-    layout.addComponent(emptyLabel);
-
-    // this has only an effect after adding the component to a parent. Bug by
-    // vaadin?
-    emptyLabel.setSizeUndefined();
-
-    layout.setComponentAlignment(emptyLabel, Alignment.MIDDLE_CENTER);
-    layout.setExpandRatio(emptyLabel, 1.0f);
-  }
 
   @Override
   public void attach() {
