@@ -29,7 +29,6 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -124,10 +123,8 @@ public class MetaDataPanel extends Panel {
 
     final UI ui = getUI();
 
-    Background.runWithCallback(() -> {
-      // Get the corpus graph and with it the meta data on the corpus/document nodes
-      return Helper.getMetaData(toplevelCorpusName, documentName, ui);
-    }, new FutureCallback<SCorpusGraph>() {
+    Background.runWithCallback(() -> Helper.getMetaData(toplevelCorpusName, documentName, ui),
+        new FutureCallback<SCorpusGraph>() {
       @Override
       public void onFailure(Throwable t) {
         layout.removeComponent(progress);
@@ -178,13 +175,11 @@ public class MetaDataPanel extends Panel {
         }
         // Sort the (sub-) corpora so sub-corpora come first
         List<SCorpus> corpora = new ArrayList<>(result.getCorpora());
-        corpora.sort(new Comparator<SCorpus>() {
-          public int compare(SCorpus c1, SCorpus c2) {
-            URI u1 = c1.getPath();
-            URI u2 = c2.getPath();
-            return ComparisonChain.start().compare(u1.segmentCount(), u2.segmentCount())
-                .compare(u1.toString(), u2.toString()).result();
-          };
+        corpora.sort((c1, c2) -> {
+          URI u1 = c1.getPath();
+          URI u2 = c2.getPath();
+          return ComparisonChain.start().compare(u1.segmentCount(), u2.segmentCount())
+              .compare(u1.toString(), u2.toString()).result();
         });
 
         for (SCorpus c : corpora) {
