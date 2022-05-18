@@ -171,7 +171,7 @@ public class MetaDataPanel extends Panel {
 
         }
         // Sort the (sub-) corpora so sub-corpora come first
-        List<SCorpus> corpora = result.getCorpora();
+        List<SCorpus> corpora = new ArrayList<>(result.getCorpora());
         corpora.sort(new Comparator<SCorpus>() {
           public int compare(SCorpus c1, SCorpus c2) {
             URI u1 = c1.getPath();
