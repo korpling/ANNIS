@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import kotlin.Pair;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
@@ -231,6 +232,20 @@ class AnnisUITest {
     assertEquals(2, metadataGrids.size());
     assertEquals("11299 (document)", metaAccordion.getTab(metadataGrids.get(0)).getCaption());
     assertEquals("pcc2 (corpus)", metaAccordion.getTab(metadataGrids.get(1)).getCaption());
+
+    @SuppressWarnings("unchecked")
+    Annotation firstAnno = (Annotation) GridKt._get(metadataGrids.get(0), 0);
+    assertEquals("Dokumentname", firstAnno.getKey().getName());
+    assertEquals("pcc-11299", firstAnno.getVal());
+    @SuppressWarnings("unchecked")
+    Annotation secondAnno = (Annotation) GridKt._get(metadataGrids.get(0), 1);
+    assertEquals("Genre", secondAnno.getKey().getName());
+    assertEquals("Politik", secondAnno.getVal());
+    @SuppressWarnings("unchecked")
+    Annotation thirdAnno = (Annotation) GridKt._get(metadataGrids.get(0), 2);
+    assertEquals("Titel", thirdAnno.getKey().getName());
+    assertEquals("Feigenblatt", thirdAnno.getVal());
+
 
 
     // Disable the part-of-speech token annotation display
