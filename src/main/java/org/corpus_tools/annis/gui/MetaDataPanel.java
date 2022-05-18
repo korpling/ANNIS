@@ -160,8 +160,14 @@ public class MetaDataPanel extends Panel {
             }
 
             if (!docAnnos.isEmpty()) {
-              String path = documentName.isPresent() ? "document: " + d.getName()
-                  : "corpus: " + toplevelCorpusName;
+              String path = d.getName();
+
+              // In case we are called to only output a corpus, this might have been mapped as
+              // document. So only add the "document" suffix in case we are sure it is an actual
+              // corpus.
+              if (documentName.isPresent()) {
+                path = path + " (document)";
+              }
 
               accordion.addTab(setupTable(new ListDataProvider<>(docAnnos)), path);
               hasResult = true;
@@ -195,6 +201,10 @@ public class MetaDataPanel extends Panel {
 
           if (!corpusAnnos.isEmpty()) {
             String path = c.getPath().toString();
+            if (path.startsWith("salt:/")) {
+              path = path.substring("salt:/".length());
+            }
+            path = path + " (corpus)";
             accordion.addTab(setupTable(new ListDataProvider<>(corpusAnnos)), path);
             hasResult = true;
           }
