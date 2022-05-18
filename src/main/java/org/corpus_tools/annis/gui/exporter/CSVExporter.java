@@ -200,7 +200,10 @@ public class CSVExporter extends BaseMatrixExporter {
       // TODO is this the best way to get the corpus name?
       String corpusName = Helper.getCorpusPath(graph.getDocument().getId()).get(0);
       // TODO cache the metadata
-      List<SMetaAnnotation> metaAnnos = Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui);
+      List<SMetaAnnotation> metaAnnos = new ArrayList<>();
+      for(SNode n : Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui).getNodes()) {
+        metaAnnos.addAll(n.getMetaAnnotations());
+      }
       Multimap<String, SMetaAnnotation> metaAnnosByName = Multimaps.index(metaAnnos, SMetaAnnotation::getName);
 
       for (String metaName : metakeys) {

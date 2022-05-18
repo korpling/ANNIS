@@ -635,8 +635,12 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
               Helper.getCorpusPath(graph.getDocument().getGraph(), graph.getDocument());
           String corpusName = corpusPath.get(corpusPath.size() - 1);
           corpusName = urlPathEscape.escape(corpusName);
-          List<SMetaAnnotation> metadata =
-              Helper.getMetaData(corpusName, Optional.of(docName), ui);
+          
+          List<SMetaAnnotation> metadata = new ArrayList<>();
+          for(SNode n : Helper.getMetaData(corpusName, Optional.of(docName), ui).getNodes()) {
+            metadata.addAll(n.getMetaAnnotations());
+          }
+          
 
           Map<String, String> annosWithoutNamespace = new HashMap<String, String>();
           Map<String, Map<String, String>> annosWithNamespace = new HashMap<>();

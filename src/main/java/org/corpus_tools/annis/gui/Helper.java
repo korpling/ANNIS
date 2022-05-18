@@ -652,11 +652,10 @@ public class Helper {
    * @param toplevelCorpusName Specifies the the toplevel corpus
    * @param documentName Specifies the document or leave empty if only the corpus meta data should
    *        be fetched.
-   * @return Returns also the metada of the all parent corpora. There must be at least one of them.
+   * @return Returns a corpus graph that contains the meta data as (sub-) corpus annotation.
    */
-  public static List<SMetaAnnotation> getMetaData(final String toplevelCorpusName,
+  public static SCorpusGraph getMetaData(final String toplevelCorpusName,
       final Optional<String> documentName, final UI ui) {
-    final List<SMetaAnnotation> result = new ArrayList<>();
     final SearchApi api = new SearchApi(Helper.getClient(ui));
 
     try {
@@ -675,16 +674,13 @@ public class Helper {
       }
       final File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL,
           AnnotationComponentType.PARTOF);
-      final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
-      for (final SNode n : cg.getNodes()) {
-        result.addAll(n.getMetaAnnotations());
-      }
+      return CorpusGraphMapper.map(graphML);
     } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);
       ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
     }
 
-    return result;
+    return SaltFactory.createSCorpusGraph();
   }
 
   /**
