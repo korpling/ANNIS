@@ -20,6 +20,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.internal.UIScopeImpl;
+import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 import kotlin.Pair;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
+import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
@@ -214,6 +216,37 @@ class AnnisUITest {
     assertEquals(Arrays.asList("NN", "ART", "NN", "APPR", "NE", "VMFIN"),
         posRows.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
 
+    // Test that we can show the first metadata for the button
+    List<Button> infoButtons = _find(Button.class,
+        spec -> spec.withPredicate(b -> "Show metadata".equals(b.getDescription())));
+    assertEquals(10, infoButtons.size());
+    _click(infoButtons.get(0));
+    Window infoWindow = _get(Window.class);
+    assertEquals("Info for salt:/pcc2/11299", infoWindow.getCaption());
+
+    awaitCondition(30, () -> !_find(infoWindow, Accordion.class).isEmpty());
+
+    Accordion metaAccordion = _get(infoWindow, Accordion.class);
+    @SuppressWarnings("rawtypes")
+    List<Grid> metadataGrids = _find(metaAccordion, Grid.class);
+    assertEquals(2, metadataGrids.size());
+    assertEquals("11299 (document)", metaAccordion.getTab(metadataGrids.get(0)).getCaption());
+    assertEquals("pcc2 (corpus)", metaAccordion.getTab(metadataGrids.get(1)).getCaption());
+
+    @SuppressWarnings("unchecked")
+    Annotation firstAnno = (Annotation) GridKt._get(metadataGrids.get(0), 0);
+    assertEquals("Dokumentname", firstAnno.getKey().getName());
+    assertEquals("pcc-11299", firstAnno.getVal());
+    @SuppressWarnings("unchecked")
+    Annotation secondAnno = (Annotation) GridKt._get(metadataGrids.get(0), 1);
+    assertEquals("Genre", secondAnno.getKey().getName());
+    assertEquals("Politik", secondAnno.getVal());
+    @SuppressWarnings("unchecked")
+    Annotation thirdAnno = (Annotation) GridKt._get(metadataGrids.get(0), 2);
+    assertEquals("Titel", thirdAnno.getKey().getName());
+    assertEquals("Feigenblatt", thirdAnno.getVal());
+
+
 
     // Disable the part-of-speech token annotation display
     TreeSet<String> visibleAnnos = new TreeSet<>(Arrays.asList("tiger::lemma"));
@@ -332,8 +365,6 @@ class AnnisUITest {
 
     // The standard SingleResult panel should not be visible
     assertEquals(0, _find(SingleResultPanel.class).size());
-
-
   }
 
   @Test

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -50,6 +51,7 @@ import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SMetaAnnotation;
+import org.corpus_tools.salt.core.SNode;
 
 public abstract class GeneralTextExporter implements ExporterPlugin, Serializable {
 
@@ -65,8 +67,12 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     if (metadataCache.containsKey(toplevelCorpus + ":" + documentName)) {
       metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
     } else {
-      List<SMetaAnnotation> asList =
-          Helper.getMetaData(toplevelCorpus, Optional.ofNullable(documentName), ui);
+
+      List<SMetaAnnotation> asList = new ArrayList<>();
+      for (SNode n : Helper.getMetaData(toplevelCorpus, Optional.ofNullable(documentName), ui)
+          .getNodes()) {
+        asList.addAll(n.getMetaAnnotations());
+      }
       for (SMetaAnnotation anno : asList) {
         metaData.put(anno.getQName(), anno);
         metaData.put(anno.getName(), anno);

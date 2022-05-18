@@ -22,8 +22,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.api.model.Annotation;
-import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -73,7 +71,7 @@ class MetaDataPanelTest {
     awaitCondition(30, () -> _find(w, ProgressBar.class).isEmpty());
 
     Accordion accordion = _get(metaPanel, Accordion.class);
-    assertEquals("corpus: pcc2", accordion.getTab(0).getCaption());
+    assertEquals("pcc2", accordion.getTab(0).getCaption());
     @SuppressWarnings("unchecked")
     Grid<Annotation> metaGrid = _get(metaPanel, Grid.class);
 
