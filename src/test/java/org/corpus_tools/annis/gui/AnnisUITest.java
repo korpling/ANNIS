@@ -20,6 +20,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.internal.UIScopeImpl;
+import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
@@ -214,6 +215,23 @@ class AnnisUITest {
     assertEquals(Arrays.asList("NN", "ART", "NN", "APPR", "NE", "VMFIN"),
         posRows.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
 
+    // Test that we can show the first metadata for the button
+    List<Button> infoButtons = _find(Button.class,
+        spec -> spec.withPredicate(b -> "Show metadata".equals(b.getDescription())));
+    assertEquals(10, infoButtons.size());
+    _click(infoButtons.get(0));
+    Window infoWindow = _get(Window.class);
+    assertEquals("Info for salt:/pcc2/11299", infoWindow.getCaption());
+
+    awaitCondition(30, () -> !_find(infoWindow, Accordion.class).isEmpty());
+
+    Accordion metaAccordion = _get(infoWindow, Accordion.class);
+    @SuppressWarnings("rawtypes")
+    List<Grid> metadataGrids = _find(metaAccordion, Grid.class);
+    assertEquals(2, metadataGrids.size());
+    assertEquals("11299 (document)", metaAccordion.getTab(metadataGrids.get(0)).getCaption());
+    assertEquals("pcc2 (corpus)", metaAccordion.getTab(metadataGrids.get(1)).getCaption());
+
 
     // Disable the part-of-speech token annotation display
     TreeSet<String> visibleAnnos = new TreeSet<>(Arrays.asList("tiger::lemma"));
@@ -332,8 +350,6 @@ class AnnisUITest {
 
     // The standard SingleResult panel should not be visible
     assertEquals(0, _find(SingleResultPanel.class).size());
-
-
   }
 
   @Test
