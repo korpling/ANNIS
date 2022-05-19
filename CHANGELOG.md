@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.7.0] - 2022-05-19
+
 ### Added
 
 - Show corpus metadata with corpus hits and not only the document metadata (#768)
@@ -1103,7 +1105,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.6.7...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.7.0...HEAD
+[4.7.0]: https://github.com/korpling/ANNIS/compare/v4.6.7...v4.7.0
 [4.6.7]: https://github.com/korpling/ANNIS/compare/v4.6.6...v4.6.7
 [4.6.6]: https://github.com/korpling/ANNIS/compare/v4.6.5...v4.6.6
 [4.6.5]: https://github.com/korpling/ANNIS/compare/v4.6.4...v4.6.5
