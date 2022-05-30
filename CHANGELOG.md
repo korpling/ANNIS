@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.7.1] - 2022-05-30
+
 ### Fixed
 
 - Upgrade to graphANNIS 2.0.6 to fix subgraph generation when a segmentation was
@@ -1113,7 +1115,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.7.0...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.7.1...HEAD
+[4.7.1]: https://github.com/korpling/ANNIS/compare/v4.7.0...v4.7.1
 [4.7.0]: https://github.com/korpling/ANNIS/compare/v4.6.7...v4.7.0
 [4.6.7]: https://github.com/korpling/ANNIS/compare/v4.6.6...v4.6.7
 [4.6.6]: https://github.com/korpling/ANNIS/compare/v4.6.5...v4.6.6
