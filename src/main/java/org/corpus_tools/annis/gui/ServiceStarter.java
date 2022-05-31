@@ -218,9 +218,9 @@ public class ServiceStarter
 
     if (this.backgroundProcess != null) {
       this.backgroundProcess.destroy();
-      if (!this.backgroundProcess.waitFor(5, TimeUnit.SECONDS)) {
-        // Destroy the process by force after 5 seconds
-        log.warn("GraphANNIS process did not stop after 5 seconds, stopping it forcefully");
+      if (!this.backgroundProcess.waitFor(15, TimeUnit.SECONDS)) {
+        // Destroy the process by force after waiting for the specified amount of time
+        log.warn("GraphANNIS process did not stop after 15 seconds, stopping it forcefully");
         this.backgroundProcess.destroyForcibly();
       } else {
         log.info("Stopped graphANNIS process");
