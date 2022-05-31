@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   segmentation constraint and also remove the db.lock file when ANNIS is closed
 - Do not skip error messages when started service is aborted. (#761)
 
+### Added
+
+- Because of the update to graphANNIS 2.1.0, it is also now possible to easily
+  allow read-only access to all corpora without login and configuring an
+  authentication provider using the graphANNIS `anonymous_access_all_corpora`
+  configuration parameter.
+
 ## [4.7.1] - 2022-05-30
 
 ### Fixed
