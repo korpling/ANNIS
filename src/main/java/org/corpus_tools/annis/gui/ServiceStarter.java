@@ -111,7 +111,7 @@ public class ServiceStarter
                 new InputStreamReader(backgroundProcess.getErrorStream(), StandardCharsets.UTF_8));
 
             tReaderOut = new Thread(() -> {
-              while (!this.abortThread.get() && backgroundProcess.isAlive()) {
+              while (!this.abortThread.get()) {
                 String line;
                 try {
                   line = outputStream.readLine();
@@ -129,7 +129,7 @@ public class ServiceStarter
             });
             tReaderOut.start();
             tReaderErr = new Thread(() -> {
-              while (!this.abortThread.get() && backgroundProcess.isAlive()) {
+              while (!this.abortThread.get()) {
                 String line;
                 try {
                   line = errorStream.readLine();

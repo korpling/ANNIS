@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Do not skip error messages when started service is aborted. (#761)
+
 ## [4.7.1] - 2022-05-30
 
 ### Fixed
