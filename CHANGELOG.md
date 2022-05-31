@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Upgrade to graphANNIS 2.1.0 to fix near operator which failed to work with
   segmentation constraint and also remove the db.lock file when ANNIS is closed
-
+- Do not skip error messages when started service is aborted. (#761)
 
 ## [4.7.1] - 2022-05-30
 
