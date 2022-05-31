@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Multiple Instances of the Interface - ANNIS User Guide</title>
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../installation/index.html"><strong aria-hidden="true">2.</strong> Installation</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../installation/desktop.html"><strong aria-hidden="true">2.1.</strong> Installing a Local Version (ANNIS Desktop)</a></li><li class="chapter-item expanded "><a href="../installation/server.html"><strong aria-hidden="true">2.2.</strong> Installing an ANNIS Server</a></li><li class="chapter-item expanded "><a href="../installation/migrate-annis3.html"><strong aria-hidden="true">2.3.</strong> Migrating from ANNIS 3</a></li></ol></li><li class="chapter-item expanded "><a href="../interface/index.html"><strong aria-hidden="true">3.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../interface/search-form.html"><strong aria-hidden="true">3.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="../interface/result-window.html"><strong aria-hidden="true">3.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="../interface/query-builder.html"><strong aria-hidden="true">3.3.</strong> Query Builder</a></li><li class="chapter-item expanded "><a href="../interface/admin-web.html"><strong aria-hidden="true">3.4.</strong> Administration Interface</a></li></ol></li><li class="chapter-item expanded "><a href="../aql/index.html"><strong aria-hidden="true">4.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../aql/word-forms.html"><strong aria-hidden="true">4.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="../aql/annotations.html"><strong aria-hidden="true">4.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="../aql/regex.html"><strong aria-hidden="true">4.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="../aql/trees.html"><strong aria-hidden="true">4.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="../aql/pointing.html"><strong aria-hidden="true">4.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="../aql/negation.html"><strong aria-hidden="true">4.6.</strong> Operator Negation</a></li><li class="chapter-item expanded "><a href="../aql/export.html"><strong aria-hidden="true">4.7.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="../aql/frequency.html"><strong aria-hidden="true">4.8.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="../aql/operators.html"><strong aria-hidden="true">4.9.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="../aql/compatibility-mode.html"><strong aria-hidden="true">4.10.</strong> Differences in Compatibility Mode</a></li></ol></li><li class="chapter-item expanded "><a href="../import-and-config/index.html"><strong aria-hidden="true">5.</strong> Importing and Configuring Corpora</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../import-and-config/convert.html"><strong aria-hidden="true">5.1.</strong> Converting Corpora for ANNIS using Pepper</a></li><li class="chapter-item expanded "><a href="../import-and-config/import.html"><strong aria-hidden="true">5.2.</strong> Importing Corpora in the relANNIS or GraphML format</a></li><li class="chapter-item expanded "><a href="../import-and-config/corpus-config.html"><strong aria-hidden="true">5.3.</strong> Configuring Settings for a Corpus</a></li><li class="chapter-item expanded "><a href="../import-and-config/visualizations.html"><strong aria-hidden="true">5.4.</strong> Configuring Visualizations</a></li><li class="chapter-item expanded "><a href="../import-and-config/visualizations-list.html"><strong aria-hidden="true">5.5.</strong> List of Visualizations</a></li><li class="chapter-item expanded "><a href="../import-and-config/documentbrowser.html"><strong aria-hidden="true">5.6.</strong> Document Browser</a></li></ol></li><li class="chapter-item expanded "><a href="../configuration/index.html"><strong aria-hidden="true">6.</strong> Configuration of ANNIS</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../configuration/user.html"><strong aria-hidden="true">6.1.</strong> User Configuration on Server</a></li><li class="chapter-item expanded "><a href="../configuration/instances.html" class="active"><strong aria-hidden="true">6.2.</strong> Multiple Instances of the Interface</a></li><li class="chapter-item expanded "><a href="../configuration/rtl.html"><strong aria-hidden="true">6.3.</strong> Right-to-Left Visualizations</a></li></ol></li><li class="chapter-item expanded "><a href="../advanced/index.html"><strong aria-hidden="true">7.</strong> Advanced Topics</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../advanced/links-to-queries.html"><strong aria-hidden="true">7.1.</strong> Links to queries</a></li><li class="chapter-item expanded "><a href="../advanced/embed-vis.html"><strong aria-hidden="true">7.2.</strong> Embed ANNIS visualizations</a></li><li class="chapter-item expanded "><a href="../advanced/backend-frontend-separation.html"><strong aria-hidden="true">7.3.</strong> Install backend and front-end on different servers</a></li></ol></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">ANNIS User Guide</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="multiple-instances-of-the-interface"><a class="header" href="#multiple-instances-of-the-interface">Multiple Instances of the Interface</a></h1>
+<h2 id="creating-instances"><a class="header" href="#creating-instances">Creating instances</a></h2>
+<p>When multiple corpora from different sources are hosted on one server it is often
+still desired to group the corpora by their origin and present them differently.
+You should not be forced to have an ANNIS frontend and service installation for
+each of this groups. Instead the administrator can define so called instances.</p>
+<p>An instance is defined by a JSON file inside the instances sub-folder in one of
+the <em>configuration locations</em>, e.g. the home folder of the user running the ANNIS service
+(under Windows, in <code>C:\Users\username\.annis</code> , or under Mac OSX under <code>/Users/username/.annis/</code>,
+which is a hidden folder; to view hidden folders you may need to reconfigure your
+Finder application).</p>
+<p>Instances can then be specified under this folder.
+The name of the file also defines the instance name.
+Thus the file <code>instances/falko.json</code> defines the instance named &quot;falko&quot;.</p>
+<pre><code class="language-json">{
+	&quot;display-name&quot;: &quot;Falko&quot;,
+	&quot;default-querybuilder&quot;: &quot;tigersearch&quot;,
+	&quot;default-corpusset&quot;: &quot;falko-essays&quot;,
+	&quot;corpus-sets&quot;: [
+	{
+		&quot;name&quot;: &quot;falko-essays&quot;,
+		&quot;corpus&quot;: [
+		&quot;falko-essay-l1&quot;,
+		&quot;falko-essay-l2&quot;
+		]
+	},
+	{
+		&quot;name&quot;: &quot;falko-summaries&quot;,
+		&quot;corpus&quot;: [
+		&quot;falko-summary-l1&quot;,
+		&quot;falko-summary-l2&quot;
+		]
+	}
+	],
+	&quot;keyboard-layout&quot; : &quot;de&quot;,
+	&quot;login-on-start&quot;: &quot;true&quot;,
+	&quot;help-url&quot;: &quot;https://example.com/annis-help&quot;
+}
+</code></pre>
+<p>Each instance configuration can have a verbose display-name which is
+displayed in the title of the browser window. <code>default-querybuilder</code> defines the
+short name of the query builder you want to use. Currently only &quot;tigersearch&quot; and &quot;flatquerybuilder&quot; are
+available in the default installation.
+The <code>keyboard-layout</code> variable is used as the default value for the virtual keyboard of the AQL query box.
+If <code>login-on-start</code> is set to <code>true</code> a login window is shown at each startup of the ANNIS search UI if the user is not logged in yet.
+<code>help-url</code> allows to set your own help page which is displayed in the &quot;Help&quot; tab.
+<em>This URL must point to the same domain as the ANNIS user interface is located on</em>, because of the same-origin policies of the browsers.</p>
+<p>While any user can group corpora into corpus sets for their own, you can define
+corpus sets for the whole instance. Each corpus set is an JSON-object with a
+name and a list of corpora that belong to the corpus set.</p>
+<p>Any defined instance is assigned a special URL at which it can be accessed:
+<code>http://&lt;server&gt;/annis-gui/&lt;instance-name&gt;</code>. The default instance is
+additionally accessible by not specifying any instance name in the URL. You can
+configure your web server (e.g. Apache) to rewrite the URLs if you need a more
+project specific and less &quot;technical&quot; URL (e.g. <code>http://&lt;server&gt;/falko</code>).</p>
+<h2 id="embedding-web-fonts"><a class="header" href="#embedding-web-fonts">Embedding Web Fonts</a></h2>
+<p>It is also possible to set an embedded font for query result display in your instance,
+using the same JSON instance file file described in the previous section.
+Thus a web font is applied to a specific instance. 
+If you not want to define an extra instance, it is possible to add the font configuration to the
+<code>default.json</code> file in the <em>instance</em> directory. If no <em>instance</em>
+directory or <code>default.json</code> file exists, create it. 
+Add a property <strong>font</strong> to the config with the following parameters:</p>
+<pre><code class="language-json">{
+ ...
+
+ &quot;font&quot; :
+ {
+   &quot;name&quot; : &quot;foo&quot;,
+   &quot;url&quot;: &quot;https://example.com/foo.css&quot;,
+   &quot;size&quot;: &quot;12pt&quot; // optional
+ }
+}
+</code></pre>
+<p>You must also provide a css file, which contains the <code>@font-face</code> rule
+und is reachable under the defined link in the instance config:</p>
+<pre><code class="language-css">@font-face {
+  font-family: 'bar';
+  font-style: normal;
+  font-weight: normal;
+  font-size: larger;
+  src:
+	local('bar'),
+	url(bar.woff) format('woff');
+}
+</code></pre>
+<p>Further explantation about the <code>@font-face</code> rule is available on the <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face">MDN web docs
+</a>.</p>
+<p>If you need to have a different font configuration for the frequency chart
+just add a <code>frequency-font</code> entry. It has the same structure as <code>font</code>.</p>
+<h2 id="using-corpus-groups"><a class="header" href="#using-corpus-groups">Using Corpus Groups</a></h2>
+<p>It is possible to group corpora into groups, which are selected above the corpus list in
+the search form:</p>
+<p><img src="corpus-group.png" alt="corpus group selection" /></p>
+<p>While any user can group corpora into corpus sets for their own use, you can define
+corpus sets for the whole instance using the &quot;corpus-sets&quot; in the JSON file described
+above. Each corpus set is itself a JSON-object with a name and a list of corpora that
+belong to the corpus set.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../configuration/user.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <a rel="next" href="../configuration/rtl.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../configuration/user.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                    <a rel="next" href="../configuration/rtl.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="../book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+    </body>
+</html>
