@@ -20,7 +20,7 @@ The old service must still be available while migrating the reference links (but
 
 ### Import old corpora
 
-You should export a list of all existing corpora from the old service and use the new [ANNIS command line tool to import](../import-and-config/import.html#importing-a-corpus-using-the-command-line) them again.
+You should create a list of paths for of all existing corpora from the old service (e.g. by running the ANNIS3 command `annis-admin.sh list`) and use the new [ANNIS command line tool to import](../import-and-config/import.html#importing-a-corpus-using-the-command-line) them again.
 
 This can take a long time, so if you use SSH you might want use a program like e.g. [Byobu](http://byobu.org/) to start a terminal that continues to run process in the background even if the connection is interrupted.
 
