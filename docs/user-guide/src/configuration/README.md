@@ -26,7 +26,7 @@ server.servlet.context-path=
 
 # A configuration file for the embedded REST Service, which is started automatically
 # by the ANNIS application.
-# See https://korpling.github.io/graphANNIS/docs/v2.0/rest/index.html 
+# See https://korpling.github.io/graphANNIS/docs/v2.1/rest/index.html 
 # for more information on how to configure the graphANNIS service.
 annis.webservice-config=${user.home}/.annis/service.toml
 
