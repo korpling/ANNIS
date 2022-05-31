@@ -4,9 +4,9 @@ For the desktop version of ANNIS, you most probably don't need to change any of 
 If you are installing ANNIS on a server however, you might want to tweak the settings.
 The [Java Properties](http://en.wikipedia.org/w/index.php?title=.properties&oldid=521500688), [TOML](https://toml.io/) and [JSON](http://www.json.org/) file formats are used for different kind of configuration.
 
-ANNIS uses the Spring Boot configuration system and thus it will search for a Java Properties based configuration file named `application.properties` in the current working directory or a `config` sub-directory of the working directory.
+ANNIS uses the Spring Boot configuration system and thus it will search for a Java Properties based configuration file named `application.properties` in the current working directory or a `config` sub-directory of the working directory.[^working-dir]
 You can also use the command line argument `--spring.config.location=file:/<location-on-disk>` to specify a specific configuration file.
-More options are documented in the [Spring Boot documentation](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files).
+More search paths for configurations files are documented in the [Spring Boot documentation](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files).
 
 
 The following is an example configuration with ANNIS-specific configuration values.
@@ -46,3 +46,7 @@ spring.datasource.url=jdbc:h2:file:${user.home}/.annis/v4/frontend_data.h2
 ```
 
 Being a Spring Boot application, ANNIS configuration properties also be directly given as [command line argument](https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-command-line-args).
+
+[^working-dir]: Depending on how you start ANNIS, the working directory can be different.
+When using `java -jar /path/to/annis-server.jar`, the working directory is the same as the working directory of your current shell.
+If you start ANNIS by treating it like an executable file, e.g. by running `/path/to/annis-server.jar` directly, the directory containing the jar is used as the working directory of the application per default.
