@@ -19,8 +19,14 @@ server.port=5712
 # The default value 0.0.0.0 allows connections from everywhere.
 server.address=127.0.0.1
 
-# A configuration file for the embedded REST Service. 
-# See https://korpling.github.io/graphANNIS/docs/v0.30/rest.html 
+# Allows to change the context path the ANNIS frontend application is deployed to
+# E.g. you can change this to /annis4 to change the path to 
+# http://localhost:5711/annis4
+server.servlet.context-path=
+
+# A configuration file for the embedded REST Service, which is started automatically
+# by the ANNIS application.
+# See https://korpling.github.io/graphANNIS/docs/v2.0/rest/index.html 
 # for more information on how to configure the graphANNIS service.
 annis.webservice-config=${user.home}/.annis/service.toml
 
