@@ -4,12 +4,34 @@ ANNIS has an authorization system based on [OAuth2](https://www.oauth.com/) whic
 A user will see different corpora depending on which groups the user is part of.
 **For the desktop version of ANNIS, a single administrator user is automatically created and logged in.**
 
+## Configuration of the graphANNIS backend service
+
 When using an identity provider, the backend graphANNIS service and the ANNIS frontend needs to be configured to use this service.
-Per default, ANNIS uses an embedded graphANNIS service with the configuration located in the home directory of the user running the ANNIS service: `~/.annis/service.toml`.
-See the [graphANNIS documentation on authentication and authorization](https://korpling.github.io/graphANNIS/docs/v0.30/rest/auth.html) for how to use this configuration file to configure the backend.
-You can choose from various OAuth2 compatible identity providers, but in the following example we will use a self-hosted [Keycloak](https://www.keycloak.org/) server.
+Per default, ANNIS uses an embedded graphANNIS service with its configuration located in the home directory of the user running the ANNIS service: `~/.annis/service.toml`.
+You can change the location of the configuration file using the `annis.webservice-config` parameter in the [application configuration](../).
+
+See the [graphANNIS documentation on authentication and authorization](https://korpling.github.io/graphANNIS/docs/v2.1/rest/auth.html) for how to use this configuration file to configure the backend.
+
+## Allowing anonymous access to all corpora
+
+Configuring an authorization service can be a lot of work, especially when all corpora should be accessible without any authorization.
+
+In this case, you can set the `anonymous_access_all_corpora` parameter in the `[auth]` section of the graphANNIS service configuration file (per default `~/.annis/service.toml`) file to `true`.
+
+```toml
+[auth]
+anonymous_access_all_corpora = true
+```
+
+All corpora will be **readable by anyone without any authorization**.
+
+You would still need to configure an authorization service if you want to create a user for the [administration interface](../interface/admin-web.md).
+As alternative to the administration interface, you can [import corpora using the command line](../import-and-config/import.md#importing-a-corpus-using-the-command-line) and delete corpora by just deleting the corpus folder in the configured [graphANNIS data folder](https://korpling.github.io/graphANNIS/docs/v2.1/rest/configuration.html#database-section).
+Not using the administration interface means you can skip the following section.
 
 ## Configure Login with a self-hosted Keycloak server
+
+You can choose from various OAuth2 compatible identity providers, but in the following example we will use a self-hosted [Keycloak](https://www.keycloak.org/) server.
 
 ### Install and run Keycloak
 
