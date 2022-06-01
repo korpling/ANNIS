@@ -29,6 +29,9 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -56,6 +59,24 @@ public class MetaDataPanel extends Panel {
     CorpusConfiguration config;
   }
 
+  private static class ConfiguredSortOrderComparator implements Comparator<Annotation> {
+    private ArrayList<String> corpusAnnotationOrder;
+
+    public ConfiguredSortOrderComparator(Collection<String> corpusAnnotationOrder) {
+      this.corpusAnnotationOrder = new ArrayList<String>(corpusAnnotationOrder);
+    }
+
+    @Override
+    public int compare(Annotation o1, Annotation o2) {
+      // TODO: this must be the qualified name
+      int pos1 = Collections.binarySearch(this.corpusAnnotationOrder, o1.getKey().getName());
+      int pos2 = Collections.binarySearch(this.corpusAnnotationOrder, o2.getKey().getName());
+      return ComparisonChain.start().compare(pos1, pos2)
+          .compare(o1.getKey().getNs(), o2.getKey().getNs())
+          .compare(o1.getKey().getName(), o2.getKey().getName()).result();
+    }
+  }
+
   private final class MetadataAvailableCallback
       implements FutureCallback<CorpusMetadataCallResult> {
     @Override
@@ -72,7 +93,7 @@ public class MetaDataPanel extends Panel {
 
 
       boolean hasDocument = addDocumentMetadata(result.metadata, accordion);
-      boolean hasCorpus = addCorpusMetadata(result.metadata, accordion);
+      boolean hasCorpus = addCorpusMetadata(result, accordion);
 
       // set output to none if no metadata are available
       if (hasDocument || hasCorpus) {
@@ -82,11 +103,11 @@ public class MetaDataPanel extends Panel {
       }
     }
 
-    private boolean addCorpusMetadata(SCorpusGraph result, Accordion accordion) {
+    private boolean addCorpusMetadata(CorpusMetadataCallResult result, Accordion accordion) {
       boolean hasResult = false;
 
       // Sort the (sub-) corpora so sub-corpora come first
-      List<SCorpus> corpora = new ArrayList<>(result.getCorpora());
+      List<SCorpus> corpora = new ArrayList<>(result.metadata.getCorpora());
       corpora.sort((c1, c2) -> {
         URI u1 = c1.getPath();
         URI u2 = c2.getPath();
@@ -106,7 +127,14 @@ public class MetaDataPanel extends Panel {
           corpusAnnos.add(anno);
         }
 
+
         if (!corpusAnnos.isEmpty()) {
+          // Sort the meta annotations by their name if configured
+          if (result.config != null) {
+            corpusAnnos.sort(new ConfiguredSortOrderComparator(
+                result.config.getView().getCorpusAnnotationOrder()));
+          }
+
           String path = c.getPath().toString();
           if (path.startsWith("salt:/")) {
             path = path.substring("salt:/".length());
