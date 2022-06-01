@@ -996,6 +996,16 @@ components:
               items:
                 type: string
               description: A list of fully qualified annotation names that should be hidden when displayed.
+            corpus_annotation_order:
+              type: array
+              items:
+                type: string
+              description: >
+                A sorted list of fully qualified annotation names. When showing
+                (metadata) annotations for a (sub)-corpus, the given annotations
+                should be displayed first and in the given order. Annotations
+                not listed should be appended in alphabetical order to the given
+                entries.
         example_queries:
           type: array
           description: An array of example queries for the corpus with a description.
