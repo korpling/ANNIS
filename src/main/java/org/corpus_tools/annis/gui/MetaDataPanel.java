@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Optional;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -49,7 +50,14 @@ import org.eclipse.emf.common.util.URI;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class MetaDataPanel extends Panel {
-  private final class MetadataAvailableCallback implements FutureCallback<SCorpusGraph> {
+
+  private static class CorpusMetadataCallResult {
+    SCorpusGraph metadata;
+    CorpusConfiguration config;
+  }
+
+  private final class MetadataAvailableCallback
+      implements FutureCallback<CorpusMetadataCallResult> {
     @Override
     public void onFailure(Throwable t) {
       layout.removeComponent(progress);
@@ -57,14 +65,14 @@ public class MetaDataPanel extends Panel {
     }
 
     @Override
-    public void onSuccess(SCorpusGraph result) {
+    public void onSuccess(CorpusMetadataCallResult result) {
       layout.removeComponent(progress);
       Accordion accordion = new Accordion();
       accordion.setSizeFull();
 
 
-      boolean hasDocument = addDocumentMetadata(result, accordion);
-      boolean hasCorpus = addCorpusMetadata(result, accordion);
+      boolean hasDocument = addDocumentMetadata(result.metadata, accordion);
+      boolean hasCorpus = addCorpusMetadata(result.metadata, accordion);
 
       // set output to none if no metadata are available
       if (hasDocument || hasCorpus) {
@@ -215,7 +223,6 @@ public class MetaDataPanel extends Panel {
 
     layout.addComponent(progress);
     layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
-
   }
 
 
@@ -225,8 +232,18 @@ public class MetaDataPanel extends Panel {
 
     final UI ui = getUI();
 
-    Background.runWithCallback(() -> Helper.getMetaData(toplevelCorpusName, documentName, ui),
-        new MetadataAvailableCallback());
+    Background.runWithCallback(() -> {
+      CorpusMetadataCallResult result = new CorpusMetadataCallResult();
+
+      result.metadata = Helper.getMetaData(toplevelCorpusName, documentName, ui);
+      if (ui instanceof AnnisUI) {
+        result.config = ((AnnisUI) ui).getCorpusConfigWithCache(toplevelCorpusName);
+      } else {
+        result.config = Helper.getCorpusConfig(toplevelCorpusName, ui);
+      }
+      return result;
+
+    }, new MetadataAvailableCallback());
   }
 
   private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData) {
