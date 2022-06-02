@@ -120,6 +120,35 @@ public class MetaDataPanel extends Panel {
       }
     }
 
+    private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData,
+        CorpusConfiguration config) {
+      ValueProvider<Annotation, String> nameProvider = anno -> Helper.getQName(anno.getKey());
+
+
+      if (config == null) {
+        metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
+      } else {
+        metaData.setSortComparator(
+            new ConfiguredSortOrderComparator(config.getView().getCorpusAnnotationOrder()));
+      }
+      Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
+      tblMeta.setDataProvider(metaData);
+      Column<Annotation, String> nameColumn = tblMeta.addColumn(nameProvider);
+      nameColumn.setWidthUndefined();
+      nameColumn.setCaption("Name");
+      nameColumn.setId("genname");
+      Column<Annotation, ?> valueColumn =
+          tblMeta.addComponentColumn(anno -> new Label(anno.getVal(), ContentMode.HTML));
+      valueColumn.setId("genval");
+      valueColumn.setCaption("Value");
+
+      tblMeta.setColumns(nameColumn.getId(), valueColumn.getId());
+
+      tblMeta.setSizeFull();
+      valueColumn.setExpandRatio(1);
+      return tblMeta;
+    }
+
     private boolean addCorpusMetadata(CorpusMetadataCallResult result, Accordion accordion) {
       boolean hasResult = false;
 
@@ -286,32 +315,5 @@ public class MetaDataPanel extends Panel {
     }, new MetadataAvailableCallback());
   }
 
-  private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData,
-      CorpusConfiguration config) {
-    ValueProvider<Annotation, String> nameProvider = anno -> Helper.getQName(anno.getKey());
 
-
-    if (config == null) {
-      metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
-    } else {
-      metaData.setSortComparator(
-          new ConfiguredSortOrderComparator(config.getView().getCorpusAnnotationOrder()));
-    }
-    Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
-    tblMeta.setDataProvider(metaData);
-    Column<Annotation, String> nameColumn = tblMeta.addColumn(nameProvider);
-    nameColumn.setWidthUndefined();
-    nameColumn.setCaption("Name");
-    nameColumn.setId("genname");
-    Column<Annotation, ?> valueColumn =
-        tblMeta.addComponentColumn(anno -> new Label(anno.getVal(), ContentMode.HTML));
-    valueColumn.setId("genval");
-    valueColumn.setCaption("Value");
-
-    tblMeta.setColumns(nameColumn.getId(), valueColumn.getId());
-
-    tblMeta.setSizeFull();
-    valueColumn.setExpandRatio(1);
-    return tblMeta;
-  }
 }
