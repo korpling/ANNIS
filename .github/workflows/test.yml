@@ -16,7 +16,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-8-${{ hashFiles('**/pom.xml', 'misc/import-test-corpora.sh') }}
+          key: ${{ runner.os }}-maven-8-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-8-
       - name: Cache test corpora
@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-11-${{ hashFiles('**/pom.xml', 'misc/import-test-corpora.sh') }}
+          key: ${{ runner.os }}-maven-11-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-11-
       - name: Cache test corpora
