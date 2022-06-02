@@ -17,6 +17,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.server.SerializableComparator;
 import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Accordion;
@@ -31,7 +32,6 @@ import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -59,7 +59,7 @@ public class MetaDataPanel extends Panel {
     CorpusConfiguration config;
   }
 
-  private static class ConfiguredSortOrderComparator implements Comparator<Annotation> {
+  private static class ConfiguredSortOrderComparator implements SerializableComparator<Annotation> {
     private ArrayList<String> corpusAnnotationOrder;
 
     public ConfiguredSortOrderComparator(Collection<String> corpusAnnotationOrder) {
@@ -68,12 +68,23 @@ public class MetaDataPanel extends Panel {
 
     @Override
     public int compare(Annotation o1, Annotation o2) {
-      // TODO: this must be the qualified name
-      int pos1 = Collections.binarySearch(this.corpusAnnotationOrder, o1.getKey().getName());
-      int pos2 = Collections.binarySearch(this.corpusAnnotationOrder, o2.getKey().getName());
-      return ComparisonChain.start().compare(pos1, pos2)
-          .compare(o1.getKey().getNs(), o2.getKey().getNs())
-          .compare(o1.getKey().getName(), o2.getKey().getName()).result();
+
+      String q1 = Helper.getQName(o1.getKey());
+      q1 = q1 == null ? "" : q1;
+      String q2 = Helper.getQName(o2.getKey());
+      q2 = q2 == null ? "" : q2;
+
+
+      int pos1 = Collections.binarySearch(this.corpusAnnotationOrder, q1);
+      int pos2 = Collections.binarySearch(this.corpusAnnotationOrder, q2);
+
+      if (pos1 < 0) {
+        pos1 = this.corpusAnnotationOrder.size();
+      }
+      if (pos2 < 0) {
+        pos2 = this.corpusAnnotationOrder.size();
+      }
+      return ComparisonChain.start().compare(pos1, pos2).compare(q1, q2).result();
     }
   }
 
@@ -92,7 +103,7 @@ public class MetaDataPanel extends Panel {
       accordion.setSizeFull();
 
 
-      boolean hasDocument = addDocumentMetadata(result.metadata, accordion);
+      boolean hasDocument = addDocumentMetadata(result, accordion);
       boolean hasCorpus = addCorpusMetadata(result, accordion);
 
       // set output to none if no metadata are available
@@ -129,29 +140,24 @@ public class MetaDataPanel extends Panel {
 
 
         if (!corpusAnnos.isEmpty()) {
-          // Sort the meta annotations by their name if configured
-          if (result.config != null) {
-            corpusAnnos.sort(new ConfiguredSortOrderComparator(
-                result.config.getView().getCorpusAnnotationOrder()));
-          }
 
           String path = c.getPath().toString();
           if (path.startsWith("salt:/")) {
             path = path.substring("salt:/".length());
           }
           path = path + " (corpus)";
-          accordion.addTab(setupTable(new ListDataProvider<>(corpusAnnos)), path);
+          accordion.addTab(setupTable(new ListDataProvider<>(corpusAnnos), result.config), path);
           hasResult = true;
         }
       }
       return hasResult;
     }
 
-    private boolean addDocumentMetadata(SCorpusGraph result, Accordion accordion) {
+    private boolean addDocumentMetadata(CorpusMetadataCallResult result, Accordion accordion) {
       boolean hasResult = false;
 
       // Add all document metadata first, then the corpus metadata
-      List<SDocument> documents = result.getDocuments();
+      List<SDocument> documents = result.metadata.getDocuments();
       if (documents != null) {
         // There should only be one document in the corpus graph, but keeping the code generic
         // should not hurt
@@ -177,7 +183,7 @@ public class MetaDataPanel extends Panel {
               path = path + " (document)";
             }
 
-            accordion.addTab(setupTable(new ListDataProvider<>(docAnnos)), path);
+            accordion.addTab(setupTable(new ListDataProvider<>(docAnnos), result.config), path);
             hasResult = true;
           }
         }
@@ -274,10 +280,17 @@ public class MetaDataPanel extends Panel {
     }, new MetadataAvailableCallback());
   }
 
-  private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData) {
+  private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData,
+      CorpusConfiguration config) {
     ValueProvider<Annotation, String> nameProvider = anno -> Helper.getQName(anno.getKey());
-    metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
 
+
+    if (config == null) {
+      metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
+    } else {
+      metaData.setSortComparator(
+          new ConfiguredSortOrderComparator(config.getView().getCorpusAnnotationOrder()));
+    }
     Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
     tblMeta.setDataProvider(metaData);
     Column<Annotation, String> nameColumn = tblMeta.addColumn(nameProvider);
