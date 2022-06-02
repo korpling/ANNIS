@@ -31,7 +31,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -60,6 +59,8 @@ public class MetaDataPanel extends Panel {
   }
 
   private static class ConfiguredSortOrderComparator implements SerializableComparator<Annotation> {
+
+    private static final long serialVersionUID = 1L;
     private ArrayList<String> corpusAnnotationOrder;
 
     public ConfiguredSortOrderComparator(Collection<String> corpusAnnotationOrder) {
@@ -80,8 +81,8 @@ public class MetaDataPanel extends Panel {
       q2 = q2 == null ? "" : q2;
 
 
-      int pos1 = Collections.binarySearch(this.corpusAnnotationOrder, q1);
-      int pos2 = Collections.binarySearch(this.corpusAnnotationOrder, q2);
+      int pos1 = this.corpusAnnotationOrder.indexOf(q1);
+      int pos2 = this.corpusAnnotationOrder.indexOf(q2);
 
       if (pos1 < 0) {
         pos1 = this.corpusAnnotationOrder.size();
