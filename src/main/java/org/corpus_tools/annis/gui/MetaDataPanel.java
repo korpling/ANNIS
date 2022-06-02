@@ -63,7 +63,12 @@ public class MetaDataPanel extends Panel {
     private ArrayList<String> corpusAnnotationOrder;
 
     public ConfiguredSortOrderComparator(Collection<String> corpusAnnotationOrder) {
-      this.corpusAnnotationOrder = new ArrayList<String>(corpusAnnotationOrder);
+      if (corpusAnnotationOrder == null) {
+        this.corpusAnnotationOrder = new ArrayList<>();
+      } else {
+        this.corpusAnnotationOrder = new ArrayList<>(corpusAnnotationOrder);
+      }
+
     }
 
     @Override
