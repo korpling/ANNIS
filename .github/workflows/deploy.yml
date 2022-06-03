@@ -12,7 +12,7 @@ jobs:
           uses: actions/checkout@v2
         - name: Set JAVA_HOME to included JDK 8
           run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
-        - run: misc/download-annis-cli.sh 2.0.3
+        - run: misc/download-annis-cli.sh 2.2.0
           env:
             OS_NAME: linux
         - run: misc/import-test-corpora.sh
