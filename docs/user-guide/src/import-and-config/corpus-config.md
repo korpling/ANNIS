@@ -50,6 +50,25 @@ base_text_segmentation="SEGNAME"
 For more details on segmentations, see the ANNIS Multiple Segmentation Corpora
 Guide.
 
+## Order of metadata annotations
+
+In some views, like the corpus information window (accessible by clicking on the
+info icon in the corpus list), metadata annotations are shown. Per default, they
+are displayed in alphabetical order. Use the `corpus_annotation_order` parameter
+of the `[view]` section to explicitly define the order.
+
+```toml
+[view]
+corpus_annotation_order = ["full_name", "version"]
+```
+
+For the pcc2 corpus, this would change display of the metadata in the corpus
+information view:
+
+![](ordered-metadata.png)
+
+All non-mentioned metadata annotations are listed behind the defined ones in
+alphabetical order.
 
 ## Adding Example Queries
 

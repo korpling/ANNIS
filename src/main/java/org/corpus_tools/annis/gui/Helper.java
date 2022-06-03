@@ -502,6 +502,9 @@ public class Helper {
 
 
   public static String getQName(final AnnoKey key) {
+    if (key == null) {
+      return null;
+    }
     if (key.getNs() == null || key.getNs().isEmpty()) {
       return key.getName();
     } else {

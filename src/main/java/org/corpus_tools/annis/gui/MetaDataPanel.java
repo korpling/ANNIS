@@ -17,6 +17,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.server.SerializableComparator;
 import com.vaadin.shared.data.sort.SortDirection;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Accordion;
@@ -29,10 +30,12 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -49,7 +52,50 @@ import org.eclipse.emf.common.util.URI;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class MetaDataPanel extends Panel {
-  private final class MetadataAvailableCallback implements FutureCallback<SCorpusGraph> {
+
+  private static class CorpusMetadataCallResult {
+    SCorpusGraph metadata;
+    CorpusConfiguration config;
+  }
+
+  private static class ConfiguredSortOrderComparator implements SerializableComparator<Annotation> {
+
+    private static final long serialVersionUID = 1L;
+    private ArrayList<String> corpusAnnotationOrder;
+
+    public ConfiguredSortOrderComparator(Collection<String> corpusAnnotationOrder) {
+      if (corpusAnnotationOrder == null) {
+        this.corpusAnnotationOrder = new ArrayList<>();
+      } else {
+        this.corpusAnnotationOrder = new ArrayList<>(corpusAnnotationOrder);
+      }
+
+    }
+
+    @Override
+    public int compare(Annotation o1, Annotation o2) {
+
+      String q1 = Helper.getQName(o1.getKey());
+      q1 = q1 == null ? "" : q1;
+      String q2 = Helper.getQName(o2.getKey());
+      q2 = q2 == null ? "" : q2;
+
+
+      int pos1 = this.corpusAnnotationOrder.indexOf(q1);
+      int pos2 = this.corpusAnnotationOrder.indexOf(q2);
+
+      if (pos1 < 0) {
+        pos1 = this.corpusAnnotationOrder.size();
+      }
+      if (pos2 < 0) {
+        pos2 = this.corpusAnnotationOrder.size();
+      }
+      return ComparisonChain.start().compare(pos1, pos2).compare(q1, q2).result();
+    }
+  }
+
+  private final class MetadataAvailableCallback
+      implements FutureCallback<CorpusMetadataCallResult> {
     @Override
     public void onFailure(Throwable t) {
       layout.removeComponent(progress);
@@ -57,7 +103,7 @@ public class MetaDataPanel extends Panel {
     }
 
     @Override
-    public void onSuccess(SCorpusGraph result) {
+    public void onSuccess(CorpusMetadataCallResult result) {
       layout.removeComponent(progress);
       Accordion accordion = new Accordion();
       accordion.setSizeFull();
@@ -74,11 +120,40 @@ public class MetaDataPanel extends Panel {
       }
     }
 
-    private boolean addCorpusMetadata(SCorpusGraph result, Accordion accordion) {
+    private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData,
+        CorpusConfiguration config) {
+      ValueProvider<Annotation, String> nameProvider = anno -> Helper.getQName(anno.getKey());
+
+
+      if (config == null) {
+        metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
+      } else {
+        metaData.setSortComparator(
+            new ConfiguredSortOrderComparator(config.getView().getCorpusAnnotationOrder()));
+      }
+      Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
+      tblMeta.setDataProvider(metaData);
+      Column<Annotation, String> nameColumn = tblMeta.addColumn(nameProvider);
+      nameColumn.setWidthUndefined();
+      nameColumn.setCaption("Name");
+      nameColumn.setId("genname");
+      Column<Annotation, ?> valueColumn =
+          tblMeta.addComponentColumn(anno -> new Label(anno.getVal(), ContentMode.HTML));
+      valueColumn.setId("genval");
+      valueColumn.setCaption("Value");
+
+      tblMeta.setColumns(nameColumn.getId(), valueColumn.getId());
+
+      tblMeta.setSizeFull();
+      valueColumn.setExpandRatio(1);
+      return tblMeta;
+    }
+
+    private boolean addCorpusMetadata(CorpusMetadataCallResult result, Accordion accordion) {
       boolean hasResult = false;
 
       // Sort the (sub-) corpora so sub-corpora come first
-      List<SCorpus> corpora = new ArrayList<>(result.getCorpora());
+      List<SCorpus> corpora = new ArrayList<>(result.metadata.getCorpora());
       corpora.sort((c1, c2) -> {
         URI u1 = c1.getPath();
         URI u2 = c2.getPath();
@@ -98,24 +173,26 @@ public class MetaDataPanel extends Panel {
           corpusAnnos.add(anno);
         }
 
+
         if (!corpusAnnos.isEmpty()) {
+
           String path = c.getPath().toString();
           if (path.startsWith("salt:/")) {
             path = path.substring("salt:/".length());
           }
           path = path + " (corpus)";
-          accordion.addTab(setupTable(new ListDataProvider<>(corpusAnnos)), path);
+          accordion.addTab(setupTable(new ListDataProvider<>(corpusAnnos), result.config), path);
           hasResult = true;
         }
       }
       return hasResult;
     }
 
-    private boolean addDocumentMetadata(SCorpusGraph result, Accordion accordion) {
+    private boolean addDocumentMetadata(CorpusMetadataCallResult result, Accordion accordion) {
       boolean hasResult = false;
 
       // Add all document metadata first, then the corpus metadata
-      List<SDocument> documents = result.getDocuments();
+      List<SDocument> documents = result.metadata.getDocuments();
       if (documents != null) {
         // There should only be one document in the corpus graph, but keeping the code generic
         // should not hurt
@@ -141,7 +218,7 @@ public class MetaDataPanel extends Panel {
               path = path + " (document)";
             }
 
-            accordion.addTab(setupTable(new ListDataProvider<>(docAnnos)), path);
+            accordion.addTab(setupTable(new ListDataProvider<>(docAnnos), result.config), path);
             hasResult = true;
           }
         }
@@ -215,7 +292,6 @@ public class MetaDataPanel extends Panel {
 
     layout.addComponent(progress);
     layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
-
   }
 
 
@@ -225,29 +301,19 @@ public class MetaDataPanel extends Panel {
 
     final UI ui = getUI();
 
-    Background.runWithCallback(() -> Helper.getMetaData(toplevelCorpusName, documentName, ui),
-        new MetadataAvailableCallback());
+    Background.runWithCallback(() -> {
+      CorpusMetadataCallResult result = new CorpusMetadataCallResult();
+
+      result.metadata = Helper.getMetaData(toplevelCorpusName, documentName, ui);
+      if (ui instanceof AnnisUI) {
+        result.config = ((AnnisUI) ui).getCorpusConfigWithCache(toplevelCorpusName);
+      } else {
+        result.config = Helper.getCorpusConfig(toplevelCorpusName, ui);
+      }
+      return result;
+
+    }, new MetadataAvailableCallback());
   }
 
-  private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData) {
-    ValueProvider<Annotation, String> nameProvider = anno -> Helper.getQName(anno.getKey());
-    metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
 
-    Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
-    tblMeta.setDataProvider(metaData);
-    Column<Annotation, String> nameColumn = tblMeta.addColumn(nameProvider);
-    nameColumn.setWidthUndefined();
-    nameColumn.setCaption("Name");
-    nameColumn.setId("genname");
-    Column<Annotation, ?> valueColumn =
-        tblMeta.addComponentColumn(anno -> new Label(anno.getVal(), ContentMode.HTML));
-    valueColumn.setId("genval");
-    valueColumn.setCaption("Value");
-
-    tblMeta.setColumns(nameColumn.getId(), valueColumn.getId());
-
-    tblMeta.setSizeFull();
-    valueColumn.setExpandRatio(1);
-    return tblMeta;
-  }
 }

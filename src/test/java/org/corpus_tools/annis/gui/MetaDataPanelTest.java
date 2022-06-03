@@ -4,11 +4,10 @@ import static com.github.mvysny.kaributesting.v8.LocatorJ._find;
 import static com.github.mvysny.kaributesting.v8.LocatorJ._get;
 import static org.corpus_tools.annis.gui.TestHelper.awaitCondition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import com.github.mvysny.kaributesting.v8.GridKt;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
-import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
@@ -17,10 +16,6 @@ import com.vaadin.ui.Grid.Column;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Window;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
 import org.junit.jupiter.api.AfterEach;
@@ -85,27 +80,23 @@ class MetaDataPanelTest {
         (Column<Annotation, Label>) metaGrid.getColumns().get(1);
     assertEquals("Value", valueColumn.getCaption());
 
-    assertTrue(metaGrid.getDataProvider() instanceof ListDataProvider<?>);
-    if (metaGrid.getDataProvider() instanceof ListDataProvider<?>) {
-      @SuppressWarnings("unchecked")
-      ListDataProvider<Annotation> dataProvider =
-          (ListDataProvider<Annotation>) metaGrid.getDataProvider();
-      Set<String> displayedNames = dataProvider.getItems().stream()
-          .map(i -> nameColumn.getValueProvider().apply(i)).collect(Collectors.toSet());
-      Set<String> displayedValues = dataProvider.getItems().stream()
-          .map(i -> valueColumn.getValueProvider().apply(i).getValue())
-          .collect(Collectors.toSet());
+    // Check name of each annotation row
+    assertEquals("full_name", GridKt._getFormattedRow(metaGrid, 0).get(0));
+    assertEquals("URL", GridKt._getFormattedRow(metaGrid, 1).get(0));
+    assertEquals("version", GridKt._getFormattedRow(metaGrid, 2).get(0));
+    assertEquals("annotation_description", GridKt._getFormattedRow(metaGrid, 3).get(0));
+    assertEquals("annotation_levels", GridKt._getFormattedRow(metaGrid, 4).get(0));
+    assertEquals("language", GridKt._getFormattedRow(metaGrid, 5).get(0));
+    assertEquals("source", GridKt._getFormattedRow(metaGrid, 6).get(0));
 
-      assertEquals(new HashSet<>(Arrays.asList("URL", "annotation_description", "annotation_levels",
-          "full_name", "language", "source", "version")), displayedNames);
+    // Also check some of the annotation values
+    assertEquals(
+        "<a href=\"http://www.aclweb.org/anthology/W/W04/W04-0213.pdf\" target=\"_new\">link</a>",
+        GridKt._get(metaGrid, 1).getVal());
+    assertEquals("7.0", GridKt._get(metaGrid, 2).getVal());
+    assertEquals("German", GridKt._get(metaGrid, 5).getVal());
 
-      assertEquals(7, displayedValues.size());
-      assertTrue(displayedValues
-          .contains(
-              "<a href=\"http://www.aclweb.org/anthology/W/W04/W04-0213.pdf\" target=\"_new\">link</a>"));
-      assertTrue(displayedValues.contains("German"));
-      assertTrue(displayedValues.contains("6.0"));
-    }
+
   }
 
 }

@@ -48,6 +48,8 @@ public class ServiceStarter
     implements ApplicationListener<ApplicationReadyEvent>, DisposableBean {
 
 
+  private static final String LOGGING_SECTION = "logging";
+
   private final static Logger log = LoggerFactory.getLogger(ServiceStarter.class);
 
   @Autowired
@@ -195,7 +197,17 @@ public class ServiceStarter
         Paths.get(System.getProperty("user.home"), ".annis", "v4", "service_data.sqlite3")
             .toAbsolutePath().toString());
 
-    if (previousDatabase == null || previousSqlite == null) {
+    // Change service debug level if ANNIS itself is in debug mode
+    Map<String, Object> loggingConfig;
+    if (configToml.isTable(LOGGING_SECTION)) {
+      loggingConfig = configToml.getTable(LOGGING_SECTION).toMap();
+    } else {
+      loggingConfig = new LinkedHashMap<>();
+      config.put(LOGGING_SECTION, loggingConfig);
+    }
+    Object previousDebugConfig = loggingConfig.put("debug", log.isDebugEnabled());
+
+    if (previousDatabase == null || previousSqlite == null || previousDebugConfig == null) {
       // Write updated configuration to file
       TomlWriter writer = new TomlWriter();
       writer.write(config, result);
