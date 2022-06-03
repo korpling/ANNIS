@@ -100,6 +100,7 @@ public class HTMLVis extends AbstractVisualizer {
 
     List<String> corpusPath = Helper.getCorpusPath(vi.getDocument().getGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
+    log.debug("Creating htmlvis component for path {}", corpusPath.toArray());
 
     // Get the (internally escaped) node name of the root corpus, fallback to unescaped corpus name
     List<SNode> rootCorpora = vi.getDocument().getGraph().getRoots();
@@ -119,6 +120,8 @@ public class HTMLVis extends AbstractVisualizer {
 
     VisualizationDefinition[] definitions =
         parseDefinitions(corpusName, rootCorpusId, vi.getMappings(), vi.getUI());
+    log.debug("Parsed {} htmlvis definitions for path {}", definitions.length,
+        corpusPath.toArray());
 
     if (definitions != null) {
 

@@ -335,7 +335,7 @@ public class VisualizerPanel extends CssLayout
 
     Component c = visPlugin.createComponent(input, this);
     if (c == null) {
-      log.debug("Ccmponent for visualizer {} was null", visPlugin.getShortName());
+      log.debug("Component for visualizer {} was null", visPlugin.getShortName());
       return c;
     }
 
