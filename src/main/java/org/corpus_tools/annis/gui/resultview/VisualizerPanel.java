@@ -112,7 +112,7 @@ public class VisualizerPanel extends CssLayout
         exception = ex;
       } catch (TimeoutException ex) {
         future.cancel(true);
-        log.error("Could create visualizer {} in 2 minutes: Timeout",
+        log.error("Could not create visualizer {} in 2 minutes: Timeout",
             visPlugin == null ? UNKNOWN : visPlugin.getShortName(), ex);
         exception = ex;
       }
@@ -331,11 +331,15 @@ public class VisualizerPanel extends CssLayout
     }
 
     final VisualizerInput input = createInput();
+    log.debug("Created input for visualizer {}", visPlugin.getShortName());
 
     Component c = visPlugin.createComponent(input, this);
     if (c == null) {
+      log.debug("Ccmponent for visualizer {} was null", visPlugin.getShortName());
       return c;
     }
+
+    log.debug("Created component for visualizer {}", visPlugin.getShortName());
     c.setVisible(false);
     c.addStyleName(Helper.CORPUS_FONT);
     c.addStyleName("vis-content");
