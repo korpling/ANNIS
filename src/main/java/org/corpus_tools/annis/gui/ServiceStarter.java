@@ -66,13 +66,14 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
 
   private Thread tReaderErr;
 
+  private Timer serviceWatcherTimer;
+
 
   @Override
   public void onApplicationEvent(final ApplicationReadyEvent event) {
     if (config.getWebserviceUrl() == null || config.getWebserviceUrl().isEmpty()) {
       startService();
-      // Add callback when the process is exited so we can restart it when necessary
-      Timer serviceWatcherTime = new Timer(true);
+      serviceWatcherTimer = new Timer(true);
       TimerTask serviceWatcherTask = new TimerTask() {
 
         @Override
@@ -85,7 +86,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           }
         }
       };
-      serviceWatcherTime.scheduleAtFixedRate(serviceWatcherTask, 2500, 2500);
+      serviceWatcherTimer.scheduleAtFixedRate(serviceWatcherTask, 2500, 2500);
     }
   }
 
@@ -262,6 +263,10 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   @Override
   public void destroy() throws Exception {
     this.abortThread.set(true);
+
+    if (this.serviceWatcherTimer != null) {
+      this.serviceWatcherTimer.cancel();
+    }
 
     if (this.tReaderOut != null) {
       this.tReaderOut.interrupt();
