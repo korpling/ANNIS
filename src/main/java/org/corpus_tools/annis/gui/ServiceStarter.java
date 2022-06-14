@@ -27,11 +27,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.annotation.PreDestroy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -46,7 +46,7 @@ import org.tomlj.TomlTable;
 
 @Component
 @Profile("!desktop")
-public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent>, DisposableBean {
+public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent> {
 
 
   private static final String LOGGING_SECTION = "logging";
@@ -89,6 +89,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
       serviceWatcherTimer.scheduleAtFixedRate(serviceWatcherTask, 2500, 2500);
     }
   }
+
 
   /**
    * Start the bundled web service
@@ -260,8 +261,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     return result;
   }
 
-  @Override
-  public void destroy() throws Exception {
+  @PreDestroy
+  private void destroy() throws Exception {
     this.abortThread.set(true);
 
     if (this.serviceWatcherTimer != null) {
@@ -281,7 +282,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
       if (!this.backgroundProcess.waitFor(5, TimeUnit.SECONDS)) {
         // Destroy the process by force after 5 seconds
         log.warn("GraphANNIS process did not stop after 5 seconds, stopping it forcefully");
-        this.backgroundProcess.destroyForcibly();
+        this.backgroundProcess.destroyForcibly().waitFor();
       } else {
         log.info("Stopped graphANNIS process");
       }
