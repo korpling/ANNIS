@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Allow to change the displayed order of corpus metadata annotations using the
   `corpus_annotation_order` configuration in the `corpus-config.toml`
-  file.(#500
+  file. (#500)
 - Automatically restart the bundled web service when it crashed.
 
 ### Fixed
