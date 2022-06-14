@@ -432,7 +432,8 @@ class AnnisUITest {
     awaitCondition(240,
         () -> !_find(resultPanel, Panel.class,
             spec -> spec.withPredicate(p -> p.getStyleName().startsWith("annis-wrapped-htmlvis-")))
-                .isEmpty());
+                .isEmpty(),
+        2000);
 
     Panel htmlPanel = _get(resultPanel, Panel.class,
         spec -> spec.withPredicate(p -> p.getStyleName().startsWith("annis-wrapped-htmlvis-")));
