@@ -214,27 +214,30 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
       log.warn(
           "ANNIS is running in desktop mode, but no desktop has been detected. You can open {} manually.",
           webURL);
-    } else if (!("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH))) {
+    } else if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)
+        || SystemUtils.IS_OS_MAC_OSX) {
       if (SystemUtils.IS_OS_MAC_OSX && "aarch64".equals(SystemUtils.OS_ARCH)) {
+        // Show warning, but still run ANNIS
         JOptionPane.showMessageDialog(null,
-            "ANNIS can only be run on Apple M1 systems using the Rosetta emulator "
-                + "(https://support.apple.com/en-us/HT211861). "
-                + "You can try to install and use the Adoptium OpenJDK Java 11 from "
-                + "https://adoptium.net to run ANNIS.",
-            "Cannot run ANNIS on incompatible operating system", JOptionPane.ERROR_MESSAGE);
-      } else {
-        JOptionPane.showMessageDialog(null,
-            "ANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\") "
-                + "and with a 64 bit version of Java, "
-                + "but this computer is reported as architecture " + SystemUtils.OS_ARCH + "!\n\n"
-                + "A common cause is that a 32 bit version of Java is installed. "
-                + "Make sure to install a 64 bit Java 11 e.g. from https://adoptium.net",
-            "Cannot run ANNIS on incompatible operating system", JOptionPane.ERROR_MESSAGE);
+            "ANNIS is not tested on Apple M1 systems yet!\n"
+                + "It is prefered to use the Rosetta emulator,\n"
+                + "but your version of Java uses the M1 processor natively.\n\n"
+                + "You can try to install and use the Adoptium OpenJDK Java Version 11\n"
+                + "from https://adoptium.net to run ANNIS and make sure Rosetta is used.",
+            "ANNIS not tested on MacOS with M1 processor", JOptionPane.WARNING_MESSAGE);
       }
-      System.exit(64);
-    } else {
       showApplicationWindow();
       openBrowser(webURL);
+    } else {
+      // No supported system detected, show error and exit
+      JOptionPane.showMessageDialog(null,
+          "ANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\")\n"
+              + "and with a 64 bit version of Java,\n"
+              + "but this computer is reported as architecture " + SystemUtils.OS_ARCH + "!\n\n"
+              + "A common cause is that a 32 bit version of Java is installed.\n"
+              + "Make sure to install a 64 bit Java 11\n" + "e.g. from https://adoptium.net",
+          "Cannot run ANNIS on incompatible operating system", JOptionPane.ERROR_MESSAGE);
+      System.exit(64);
     }
   }
 

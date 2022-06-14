@@ -426,10 +426,11 @@ class AnnisUITest {
     Button btOpenHtmlVisualizer = _get(resultPanel, Button.class,
         spec -> spec.withCaption("information structure (document)"));
     _click(btOpenHtmlVisualizer);
-    awaitCondition(240,
+    awaitCondition(65,
         () -> !_find(resultPanel, Panel.class,
             spec -> spec.withPredicate(p -> p.getStyleName().startsWith("annis-wrapped-htmlvis-")))
-                .isEmpty());
+                .isEmpty(),
+        2000);
 
     Panel htmlPanel = _get(resultPanel, Panel.class,
         spec -> spec.withPredicate(p -> p.getStyleName().startsWith("annis-wrapped-htmlvis-")));

@@ -15,7 +15,7 @@ public class TestHelper {
   }
 
   public static void awaitCondition(int seconds, Callable<Boolean> conditionEvaluator,
-      Callable<String> message)
+      Callable<String> message, int sleepTimeInMs)
       throws Exception {
     long startTime = System.currentTimeMillis();
     long maxExecutionTime = ((long) seconds) * 1000l;
@@ -30,8 +30,8 @@ public class TestHelper {
 
       if (!condition) {
         // Wait until invoking the condition again
-        log.debug("Waiting 250 ms before checking condition again");
-        Thread.sleep(250); // NOSONAR The code should similar to the Karibu async example
+        log.debug("Waiting {} ms before checking condition again", sleepTimeInMs);
+        Thread.sleep(sleepTimeInMs); // NOSONAR The code should similar to the Karibu async example
       }
     }
 
@@ -42,9 +42,20 @@ public class TestHelper {
     }
   }
 
+  public static void awaitCondition(int seconds, Callable<Boolean> conditionEvaluator,
+      Callable<String> message) throws Exception {
+    awaitCondition(seconds, conditionEvaluator, message, 250);
+  }
+
   public static void awaitCondition(int seconds, Callable<Boolean> conditionEvaluator)
       throws Exception {
     awaitCondition(seconds, conditionEvaluator,
-        () -> "Condition did not become true in " + seconds + " seconds.");
+        () -> "Condition did not become true in " + seconds + " seconds.", 250);
+  }
+
+  public static void awaitCondition(int seconds, Callable<Boolean> conditionEvaluator,
+      int sleepTimeInMs) throws Exception {
+    awaitCondition(seconds, conditionEvaluator,
+        () -> "Condition did not become true in " + seconds + " seconds.", sleepTimeInMs);
   }
 }
