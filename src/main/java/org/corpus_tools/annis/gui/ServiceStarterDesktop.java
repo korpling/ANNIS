@@ -225,9 +225,9 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
                 + "You can try to install and use the Adoptium OpenJDK Java Version 11\n"
                 + "from https://adoptium.net to run ANNIS and make sure Rosetta is used.",
             "ANNIS not tested on MacOS with M1 processor", JOptionPane.WARNING_MESSAGE);
-        showApplicationWindow();
-        openBrowser(webURL);
       }
+      showApplicationWindow();
+      openBrowser(webURL);
     } else {
       // No supported system detected, show error and exit
       JOptionPane.showMessageDialog(null,
