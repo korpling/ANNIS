@@ -86,7 +86,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           }
         }
       };
-      serviceWatcherTimer.scheduleAtFixedRate(serviceWatcherTask, 2500, 2500);
+      serviceWatcherTimer.schedule(serviceWatcherTask, 2500, 2500);
     }
   }
 
@@ -267,6 +267,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
 
     if (this.serviceWatcherTimer != null) {
       this.serviceWatcherTimer.cancel();
+      int purgedTasks = this.serviceWatcherTimer.purge();
+      log.debug("Cancelled {} graphANNIS service watchdog tasks", purgedTasks);
     }
 
     if (this.tReaderOut != null) {
