@@ -17,6 +17,7 @@ import com.moandjiezana.toml.TomlWriter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -118,8 +119,10 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           backgroundProcess = new ProcessBuilder(tmpExec.getAbsolutePath(), "--config",
               serviceConfigFile.getAbsolutePath()).start();
 
-          createOutputWatcherThreads();
-
+          // Create threads that read from the output and error streams and add the messages to
+          // our log
+          this.tReaderOut = createOutputWatcherThread(backgroundProcess.getInputStream(), false);
+          this.tReaderErr = createOutputWatcherThread(backgroundProcess.getErrorStream(), true);
 
           // Use the provided service configuration to get the correct port
           TomlParseResult parsedServiceConfig = Toml.parse(serviceConfigFile.toPath());
@@ -160,22 +163,22 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     return execPath;
   }
 
-  private void createOutputWatcherThreads() {
-    // Create threads that read from the output and error streams and add the messages to
-    // our log
-    final BufferedReader outputStream = new BufferedReader(
-        new InputStreamReader(backgroundProcess.getInputStream(), StandardCharsets.UTF_8));
+  private Thread createOutputWatcherThread(InputStream stream, boolean isError) {
+    final BufferedReader bufferedStream =
+        new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
 
-    final BufferedReader errorStream = new BufferedReader(
-        new InputStreamReader(backgroundProcess.getErrorStream(), StandardCharsets.UTF_8));
 
-    tReaderOut = new Thread(() -> {
+    Thread result = new Thread(() -> {
       while (!this.abortThread.get()) {
         String line;
         try {
-          line = outputStream.readLine();
+          line = bufferedStream.readLine();
           if (line != null) {
-            log.info(line);
+            if (isError) {
+              log.error(line);
+            } else {
+              log.info(line);
+            }
           }
         } catch (IOException ex) {
           if (!this.abortThread.get()) {
@@ -186,25 +189,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         Thread.yield();
       }
     });
-    tReaderOut.start();
-    tReaderErr = new Thread(() -> {
-      while (!this.abortThread.get()) {
-        String line;
-        try {
-          line = errorStream.readLine();
-          if (line != null) {
-            log.error(line);
-          }
-        } catch (IOException ex) {
-          if (!this.abortThread.get()) {
-            log.error("Could not read service error output", ex);
-          }
-          break;
-        }
-        Thread.yield();
-      }
-    });
-    tReaderErr.start();
+    result.start();
+    return result;
   }
 
 
@@ -262,7 +248,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   }
 
   @PreDestroy
-  private void destroy() throws Exception {
+  private void destroy() throws InterruptedException {
     this.abortThread.set(true);
 
     if (this.serviceWatcherTimer != null) {
