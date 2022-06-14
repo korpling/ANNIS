@@ -51,6 +51,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
@@ -58,6 +59,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @ActiveProfiles({"desktop", "test", "headless"})
 @WebAppConfiguration
 @NotThreadSafe
+@DirtiesContext
 class MigrationPanelTest {
 
   private static final String VALID_PARTIAL_REFERENCE_ENTRY =
