@@ -56,8 +56,6 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   @Autowired
   private UIConfig config;
   
-  private boolean usesBundledWebservice = false;
-
   @Autowired
   private ResourceLoader resourceLoader;
   private final AtomicBoolean abortThread = new AtomicBoolean();
@@ -91,26 +89,13 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     }
   }
 
+  /**
+   * Start the bundled web service
+   */
   private void startService() {
-    // start the bundled web service
     try {
       // Extract the bundled resource to a temporary file
-      Optional<String> execPath = Optional.empty();
-      if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
-        if (SystemUtils.IS_OS_LINUX) {
-          execPath = Optional.of("linux-x86-64/graphannis-webservice");
-        } else if (SystemUtils.IS_OS_MAC_OSX) {
-          execPath = Optional.of("darwin/graphannis-webservice.osx");
-        } else if (SystemUtils.IS_OS_WINDOWS) {
-          execPath = Optional.of("win32-x86-64/graphannis-webservice.exe");
-        }
-      } else {
-        log.error(
-            "GraphANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\") "
-                + "and with a 64 bit version of Java, "
-                + "but this is reported as architecture {}!",
-            SystemUtils.OS_ARCH);
-      }
+      Optional<String> execPath = executablePathForSystem();
 
       if (execPath.isPresent()) {
         File tmpExec = File.createTempFile("graphannis-webservice-", "");
@@ -131,50 +116,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           backgroundProcess = new ProcessBuilder(tmpExec.getAbsolutePath(), "--config",
               serviceConfigFile.getAbsolutePath()).start();
 
-          // Create threads that read from the output and error streams and add the messages to
-          // our log
-          final BufferedReader outputStream = new BufferedReader(
-              new InputStreamReader(backgroundProcess.getInputStream(), StandardCharsets.UTF_8));
+          createOutputWatcherThreads();
 
-          final BufferedReader errorStream = new BufferedReader(
-              new InputStreamReader(backgroundProcess.getErrorStream(), StandardCharsets.UTF_8));
-
-          tReaderOut = new Thread(() -> {
-            while (!this.abortThread.get()) {
-              String line;
-              try {
-                line = outputStream.readLine();
-                if (line != null) {
-                  log.info(line);
-                }
-              } catch (IOException ex) {
-                if (!this.abortThread.get()) {
-                  log.error("Could not read service output", ex);
-                }
-                break;
-              }
-              Thread.yield();
-            }
-          });
-          tReaderOut.start();
-          tReaderErr = new Thread(() -> {
-            while (!this.abortThread.get()) {
-              String line;
-              try {
-                line = errorStream.readLine();
-                if (line != null) {
-                  log.error(line);
-                }
-              } catch (IOException ex) {
-                if (!this.abortThread.get()) {
-                  log.error("Could not read service error output", ex);
-                }
-                break;
-              }
-              Thread.yield();
-            }
-          });
-          tReaderErr.start();
 
           // Use the provided service configuration to get the correct port
           TomlParseResult parsedServiceConfig = Toml.parse(serviceConfigFile.toPath());
@@ -187,6 +130,79 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           ex);
     }
 
+  }
+
+  /**
+   * Get the system-specific relative path to the bundled resource.
+   * 
+   * @return The path to the executable if system is supported. Empty if architecture is not
+   *         supported.
+   */
+  private Optional<String> executablePathForSystem() {
+    Optional<String> execPath = Optional.empty();
+    if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
+      if (SystemUtils.IS_OS_LINUX) {
+        execPath = Optional.of("linux-x86-64/graphannis-webservice");
+      } else if (SystemUtils.IS_OS_MAC_OSX) {
+        execPath = Optional.of("darwin/graphannis-webservice.osx");
+      } else if (SystemUtils.IS_OS_WINDOWS) {
+        execPath = Optional.of("win32-x86-64/graphannis-webservice.exe");
+      }
+    } else {
+      log.error(
+          "GraphANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\") "
+              + "and with a 64 bit version of Java, "
+              + "but this is reported as architecture {}!",
+          SystemUtils.OS_ARCH);
+    }
+    return execPath;
+  }
+
+  private void createOutputWatcherThreads() {
+    // Create threads that read from the output and error streams and add the messages to
+    // our log
+    final BufferedReader outputStream = new BufferedReader(
+        new InputStreamReader(backgroundProcess.getInputStream(), StandardCharsets.UTF_8));
+
+    final BufferedReader errorStream = new BufferedReader(
+        new InputStreamReader(backgroundProcess.getErrorStream(), StandardCharsets.UTF_8));
+
+    tReaderOut = new Thread(() -> {
+      while (!this.abortThread.get()) {
+        String line;
+        try {
+          line = outputStream.readLine();
+          if (line != null) {
+            log.info(line);
+          }
+        } catch (IOException ex) {
+          if (!this.abortThread.get()) {
+            log.error("Could not read service output", ex);
+          }
+          break;
+        }
+        Thread.yield();
+      }
+    });
+    tReaderOut.start();
+    tReaderErr = new Thread(() -> {
+      while (!this.abortThread.get()) {
+        String line;
+        try {
+          line = errorStream.readLine();
+          if (line != null) {
+            log.error(line);
+          }
+        } catch (IOException ex) {
+          if (!this.abortThread.get()) {
+            log.error("Could not read service error output", ex);
+          }
+          break;
+        }
+        Thread.yield();
+      }
+    });
+    tReaderErr.start();
   }
 
 
