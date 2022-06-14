@@ -222,7 +222,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
               + "but your version of Java uses the M1 processor natively.\n\n"
               + "You can try to install and use the Adoptium OpenJDK Java Version 11\n"
               + "from https://adoptium.net to run ANNIS and make sure Rosetta is used.",
-          "Cannot run ANNIS on incompatible operating system", JOptionPane.WARNING_MESSAGE);
+          "ANNIS not tested on MacOS with M1 processor", JOptionPane.WARNING_MESSAGE);
     } else if (!("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH))) {
       // Completely unsupported system, show error and exit
       JOptionPane.showMessageDialog(null,
