@@ -130,8 +130,6 @@ public class HTMLVis extends AbstractVisualizer {
       injectWebFonts(visConfigName, corpusName, rootCorpusId, vi.getUI(),
           new CorporaApi(Helper.getClient(vi.getUI())));
       injectCSS(visConfigName, corpusName, rootCorpusId, wrapperClassName, vi.getUI());
-
-
     }
 
     if (vi.getMappings().containsKey("debug")) {

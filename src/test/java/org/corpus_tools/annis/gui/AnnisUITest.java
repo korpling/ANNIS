@@ -43,7 +43,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import kotlin.Pair;
-import net.jcip.annotations.NotThreadSafe;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.corpus_tools.annis.api.model.Annotation;
@@ -71,16 +70,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 @SpringBootTest
 @ActiveProfiles({"desktop", "test", "headless"})
 @WebAppConfiguration
-@NotThreadSafe
-@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 class AnnisUITest {
 
   @Autowired

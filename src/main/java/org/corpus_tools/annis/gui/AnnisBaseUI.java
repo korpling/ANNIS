@@ -146,24 +146,26 @@ public class AnnisBaseUI extends UI implements Serializable {
    * @param wrapperClass Name of the wrapper class (a CSS class that is applied to a parent element)
    */
   public void injectUniqueCSS(String cssContent, String wrapperClass) {
-    if (alreadyAddedCSS == null) {
-      alreadyAddedCSS = new TreeSet<String>();
-    }
-
-    final String wrappedCssContent =
-        wrapperClass == null ? cssContent : wrapCSS(cssContent, wrapperClass);
-
-
-    if (wrappedCssContent != null) {
-      String hashForCssContent =
-          Hashing.md5().hashString(wrappedCssContent, StandardCharsets.UTF_8).toString();
-
-      if (!alreadyAddedCSS.contains(hashForCssContent)) {
-
-        alreadyAddedCSS.add(hashForCssContent);
-        this.accessSynchronously(() -> this.getPage().getStyles().add(wrappedCssContent));
+    this.access(() -> {
+      if (alreadyAddedCSS == null) {
+        alreadyAddedCSS = new TreeSet<String>();
       }
-    }
+
+      final String wrappedCssContent =
+          wrapperClass == null ? cssContent : wrapCSS(cssContent, wrapperClass);
+
+
+      if (wrappedCssContent != null) {
+        String hashForCssContent =
+            Hashing.md5().hashString(wrappedCssContent, StandardCharsets.UTF_8).toString();
+
+        if (!alreadyAddedCSS.contains(hashForCssContent)) {
+
+          alreadyAddedCSS.add(hashForCssContent);
+          this.getPage().getStyles().add(wrappedCssContent);
+        }
+      }
+    });
   }
 
   protected Map<String, InstanceConfig> loadInstanceConfig() {
