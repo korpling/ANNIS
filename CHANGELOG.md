@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Adressed some non-security issues confusing static code analyzers (#782)
+- Addressed some non-security issues confusing static code analyzers (#782)
+- Do not restart possible crashed graphANNIS service in integration tests.
 
 ## [4.9.0] - 2022-06-15
 
