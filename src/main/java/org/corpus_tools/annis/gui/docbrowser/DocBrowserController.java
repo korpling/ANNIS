@@ -75,7 +75,8 @@ public class DocBrowserController implements Serializable {
     final String corpusId;
 
 
-    List<String> docPath;
+    private List<String> docPathDecoded;
+    private List<String> docPathRaw;
 
     final Button btn;
 
@@ -88,11 +89,13 @@ public class DocBrowserController implements Serializable {
     private VisualizerInput input;
 
 
-    public DocVisualizerFetcher(String corpus, String corpusId, List<String> docPath,
+    public DocVisualizerFetcher(String corpus, String corpusId, List<String> docPathDecoded,
+        List<String> docPathRaw,
         String canonicalTitle, String type, Panel visHolder, VisualizerRule config, Button btn) {
       this.corpus = corpus;
       this.corpusId = corpusId;
-      this.docPath = docPath;
+      this.docPathDecoded = docPathDecoded;
+      this.docPathRaw = docPathRaw;
       this.btn = btn;
       this.config = config;
       this.canonicalTitle = canonicalTitle;
@@ -113,7 +116,7 @@ public class DocBrowserController implements Serializable {
       if (visualizer.isPresent() && visualizer.get() instanceof FilteringVisualizerPlugin) {
         nodeAnnoFilter =
             ((FilteringVisualizerPlugin) visualizer.get()).getFilteredNodeAnnotationNames(corpus,
-                corpusId, docPath.get(docPath.size() - 1), config.getMappings(), ui);
+                corpusId, docPathDecoded.get(docPathDecoded.size() - 1), config.getMappings(), ui);
       } else if (visualizer.isPresent() && visualizer.get().isUsingRawText()) {
         nodeAnnoFilter = new LinkedList<>();
       }
@@ -122,7 +125,7 @@ public class DocBrowserController implements Serializable {
       {
         if (createVis && visualizer.isPresent()) {
           // fetch the salt project - so long part
-          input = createInput(corpus, docPath, config, nodeAnnoFilter,
+          input = createInput(corpus, docPathDecoded, docPathRaw, config, nodeAnnoFilter,
               visualizer.get().isUsingRawText(), ui);
         }
       }
@@ -171,14 +174,17 @@ public class DocBrowserController implements Serializable {
    * both, since the increase the performance for large texts.
    *
    * @param corpus the name of the toplevel corpus
-   * @param docPath the path of the document
+   * @param docPathDecoded the path of the document with all path elements decoded from the URI
+   *        * @param docPathRaw the path of the document with all path elements in its original
+   *        unencoded form as given in the URI
    * @param config the visualizer configuration
    * @param nodeAnnoFilter A list of node annotation names for filtering the nodes or null if no
    *        filtering should be applied.
    * @param useRawText If true, only extract the original raw text
    * @return a {@link VisualizerInput} input, which is usable for rendering the whole document.
    */
-  public static VisualizerInput createInput(String corpus, List<String> docPath,
+  public static VisualizerInput createInput(String corpus, List<String> docPathDecoded,
+      List<String> docPathRaw,
       VisualizerRule config, List<String> nodeAnnoFilter, boolean useRawText, CommonUI ui) {
     VisualizerInput input = new VisualizerInput();
 
@@ -195,12 +201,13 @@ public class DocBrowserController implements Serializable {
 
       final SaltProject p = SaltFactory.createSaltProject();
       SCorpusGraph cg = p.createCorpusGraph();
-      URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPath));
+
+      URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(docPathDecoded));
       SDocument doc = cg.createDocument(docURI);
 
       // Build a query that includes all (possible filtered by name) node of the document
-      String aql = Helper.buildDocumentQuery(docPath, nodeAnnoFilter, useRawText);
-      File graphML = api.subgraphForQuery(docPath.get(0), aql, QueryLanguage.AQL,
+      String aql = Helper.buildDocumentQuery(docPathDecoded, nodeAnnoFilter, useRawText);
+      File graphML = api.subgraphForQuery(docPathDecoded.get(0), aql, QueryLanguage.AQL,
           useRawText ? AnnotationComponentType.ORDERING : null);
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
@@ -253,10 +260,10 @@ public class DocBrowserController implements Serializable {
 
   public void openDocVis(String corpus, String docId, VisualizerRule visConfig, Button btn) {
 
-    List<String> pathEncoded = Helper.getCorpusPath(docId, true);
+    List<String> pathDecoded = Helper.getCorpusPath(docId, true);
 
     final String canonicalTitle =
-        Joiner.on(" > ").join(pathEncoded) + " - " + "Visualizer: " + visConfig.getDisplayName();
+        Joiner.on(" > ").join(pathDecoded) + " - " + "Visualizer: " + visConfig.getDisplayName();
     final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
 
     if (visibleVisHolder.containsKey(canonicalTitle)) {
@@ -290,7 +297,8 @@ public class DocBrowserController implements Serializable {
 
     List<String> pathRaw = Helper.getCorpusPath(docId, false);
 
-    Background.run(new DocVisualizerFetcher(corpus, pathRaw.get(0), pathEncoded, canonicalTitle,
+    Background.run(new DocVisualizerFetcher(corpus, pathRaw.get(0), pathDecoded, pathRaw,
+        canonicalTitle,
         visConfig.getVisType(), visHolder, visConfig, btn));
   }
 }

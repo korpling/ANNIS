@@ -15,7 +15,6 @@ package org.corpus_tools.annis.gui;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
-import com.google.common.base.Splitter;
 import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
@@ -218,7 +217,7 @@ public class EmbeddedVisUI extends CommonUI {
     // Create a subgraph query
     CorporaApi api = new CorporaApi(client);
     Match match = Match.parseFromString(args.get(KEY_MATCH)[0]);
-    List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
+    List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0), false);
     if (args.containsKey(KEY_FULLTEXT)) {
       
       boolean isUsingRawText = visPlugin.get().isUsingRawText();
@@ -411,10 +410,9 @@ public class EmbeddedVisUI extends CommonUI {
 
   protected void attachToPath(String rawPath, VaadinRequest request) {
     List<String> splittedPath = new LinkedList<>();
+
     if (rawPath != null) {
       rawPath = rawPath.substring(URL_PREFIX.length());
-      splittedPath =
-          Splitter.on("/").omitEmptyStrings().trimResults().limit(3).splitToList(rawPath);
     }
 
     if (splittedPath.size() == 1) {
@@ -432,7 +430,9 @@ public class EmbeddedVisUI extends CommonUI {
     } else if (splittedPath.size() >= 3) {
       // a visualizer definition visname/corpusname/documentname
       if ("htmldoc".equals(splittedPath.get(0))) {
-        showHtmlDoc(splittedPath.get(1), splittedPath.subList(1, splittedPath.size()),
+        List<String> docPathRaw = splittedPath.subList(1, splittedPath.size());
+        List<String> docPathDecoded = Helper.getCorpusPath(Joiner.on("/").join(docPathRaw), true);
+        showHtmlDoc(splittedPath.get(1), docPathDecoded, docPathRaw,
             request.getParameterMap());
       } else {
         displayMessage("Unknown visualizer \"" + splittedPath.get(0) + "\"",
@@ -444,7 +444,8 @@ public class EmbeddedVisUI extends CommonUI {
     addStyleName("loaded-embedded-vis");
   }
 
-  private void showHtmlDoc(String corpus, List<String> docPath, Map<String, String[]> args) {
+  private void showHtmlDoc(String corpus, List<String> docPathDecoded, List<String> docPathRaw,
+      Map<String, String[]> args) {
     // do nothing for empty fragments
     if (args == null || args.isEmpty()) {
       return;
@@ -468,7 +469,7 @@ public class EmbeddedVisUI extends CommonUI {
       visConfig.setVisType("htmldoc");
 
       // create input
-      input = DocBrowserController.createInput(corpus, docPath, visConfig, null,
+      input = DocBrowserController.createInput(corpus, docPathDecoded, docPathRaw, visConfig, null,
           visualizer.isUsingRawText(), EmbeddedVisUI.this);
       // create components, put in a panel
       Panel viszr = visualizer.createComponent(input, null);
