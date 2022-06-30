@@ -99,7 +99,7 @@ public class SecurityConfiguration {
         // Cross-site request forgery running.
         // Spring will try to enforce an additional layer
         // on the filtered resources, which conflicts with
-        // the Vaadin CSRF protection and make the frontend
+        // the Vaadin CSRF protection and makes the frontend
         // unusable. Disabling Spring CSRF is therefore
         // safe, as long as Vaadin CSRF protection is
         // activated (which it is per default).
