@@ -46,9 +46,9 @@ public class CitationRedirectionServlet extends HttpServlet { // NO_UCD (use def
             req.getSession().setAttribute("citation", uri.getPath());
             resp.sendRedirect(req.getContextPath() + "/");
           } catch (URISyntaxException | IOException ex) {
-            log.error(null, ex);
+            log.error("Could not redirect citation link", ex);
             try {
-              resp.sendError(400, ex.getMessage());
+              resp.sendError(400, "Could not redirect citation link");
             } catch (IOException sendEx) {
               log.error("Could not send error to client", sendEx);
             }
