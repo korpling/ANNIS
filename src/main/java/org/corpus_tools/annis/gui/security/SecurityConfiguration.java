@@ -95,7 +95,15 @@ public class SecurityConfiguration {
         // Restrict access to our application.
         .and().authorizeRequests().anyRequest().authenticated()
 
-        // Not using Spring CSRF here to be able to use plain HTML for the login page
+        // Not using Spring CSRF here because Vaadin also has a
+        // Cross-site request forgery running.
+        // Spring will try to enforce an additional layer
+        // on the filtered resources, which conflicts with
+        // the Vaadin CSRF protection and makes the frontend
+        // unusable. Disabling Spring CSRF is therefore
+        // safe, as long as Vaadin CSRF protection is
+        // activated (which it is per default).
+        // https://vaadin.com/blog/filter-based-spring-security-in-vaadin-applications
         .and().csrf().disable();
 
     // We depend on IFrames embedded into the application
