@@ -14,7 +14,6 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.corpus_tools.annis.gui.servlets.CitationRedirectionServlet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,6 +47,7 @@ class CitationRedirectionServletTest {
     assertEquals(HttpStatus.FOUND, response.getStatusCode());
     assertEquals("http://localhost:" + port + "/", response.getHeaders().get("Location").get(0));
   }
+
 
   @Test
   void handleIOException() throws IOException {
