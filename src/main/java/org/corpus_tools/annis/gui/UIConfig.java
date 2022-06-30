@@ -24,6 +24,8 @@ public class UIConfig implements Serializable {
 
   private boolean shortenReferenceLinks;
   
+  private boolean restartBackendOnCrash;
+
   public String getBugEmail() {
     return bugEMail;
   }
@@ -110,5 +112,15 @@ public class UIConfig implements Serializable {
 
   public void setMailFrom(String mailFrom) {
     this.mailFrom = mailFrom;
+  }
+
+  public boolean isRestartBackendOnCrash() {
+    return restartBackendOnCrash;
+  }
+
+  public void setRestartBackendOnCrash(boolean restartBackendOnCrash) {
+    this.restartBackendOnCrash = restartBackendOnCrash;
   }  
+
+
 }

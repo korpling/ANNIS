@@ -80,7 +80,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         @Override
         public void run() {
           // Check if the process is crashed and not manually shutdown
-          if (!backgroundProcess.isAlive() && !abortThread.get()) {
+          if (config.isRestartBackendOnCrash() && !backgroundProcess.isAlive()
+              && !abortThread.get()) {
             // Restart the whole process
             log.warn("It seems the bundled graphANNIS service has crashed, restarting it.");
             startService();
