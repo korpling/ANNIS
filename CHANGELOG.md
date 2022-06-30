@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Configure CI build jobs to use disk based corpora.
+
 ## [4.9.0] - 2022-06-15
 
 ###  Added
