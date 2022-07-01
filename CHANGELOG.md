@@ -5,6 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Avoid issues with possible problematic random number generation in visualizer
+  result ID. Since the ID is only locally used for one match view, the impact of
+  a flawed random generator are limited, but it is still bad practice to create
+  a new random generator each time.
+
 ## [4.9.1] - 2022-06-30
 
 ### Fixed
