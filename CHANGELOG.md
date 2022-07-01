@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Documents which special characters (like %) in their name could not be opened
+  in full text visualizes (like the document browser).
+
 ## [4.9.1] - 2022-06-30
 
 ### Fixed
