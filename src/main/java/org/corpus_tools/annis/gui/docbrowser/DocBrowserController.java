@@ -38,7 +38,6 @@ import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.AnnisUI;
@@ -201,8 +200,7 @@ public class DocBrowserController implements Serializable {
 
       // Build a query that includes all (possible filtered by name) node of the document
       String aql = Helper.buildDocumentQuery(documentNodeName, nodeAnnoFilter, useRawText);
-      File graphML = api.subgraphForQuery(corpus, aql, QueryLanguage.AQL,
-          useRawText ? AnnotationComponentType.ORDERING : null);
+      File graphML = api.subgraphForQuery(corpus, aql, QueryLanguage.AQL, null);
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
       doc.setDocumentGraph(docGraph);

@@ -1176,8 +1176,8 @@ public class Helper {
 
     StringBuilder aql = new StringBuilder();
     if (fallbackToAll) {
-      aql.append("(n#node");
-      aql.append(") & doc#annis:node_name=/");
+      aql.append("n#annis:node_type");
+      aql.append("& doc#annis:node_name=/");
       aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(documentNodeName));
       aql.append("/ & #n @* #doc");
     } else {
@@ -1188,6 +1188,7 @@ public class Helper {
           aql.append(nodeAnno);
         }
       }
+      aql.append(" | a#annis:node_type=\"datasource\"");
 
       aql.append(") & doc#annis:node_name=/");
       aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(documentNodeName));

@@ -50,7 +50,6 @@ import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
 import org.corpus_tools.annis.api.model.VisualizerRule;
@@ -230,8 +229,7 @@ public class EmbeddedVisUI extends CommonUI {
       String aql = Helper.buildDocumentQuery(corpusNodeId, null, isUsingRawText);
 
       Background.runWithCallback(
-          () -> api.subgraphForQuery(toplevelCorpus, aql, QueryLanguage.AQL,
-              isUsingRawText ? AnnotationComponentType.ORDERING : null),
+          () -> api.subgraphForQuery(toplevelCorpus, aql, QueryLanguage.AQL, null),
           new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args));
 
 
