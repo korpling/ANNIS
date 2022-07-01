@@ -30,13 +30,11 @@ public interface FilteringVisualizerPlugin {
    * 
    * @param toplevelCorpusName The name of the toplevel corpus.
    * @param toplevelCorpusId The Salt node ID for the toplevel {@link SCorpus}
-   * @param documentName
    * @param mappings
    * @return
    * 
    * @see SCorpus#getId()
    */
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
-      String toplevelCorpusId, String documentName,
-      Map<String, String> mappings, UI ui);
+      String toplevelCorpusId, Map<String, String> mappings, UI ui);
 }

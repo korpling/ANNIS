@@ -175,8 +175,8 @@ public class VisualizerPanel extends CssLayout
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
-  private List<String> pathRaw;
-  private List<String> pathDecoded;
+  private List<String> documentPathRaw;
+  private List<String> documentPathDecoded;
 
   private Component vis;
 
@@ -224,11 +224,11 @@ public class VisualizerPanel extends CssLayout
 
     this.result = result;
     if (!match.getSaltIDs().isEmpty()) {
-      this.pathRaw = Helper.getCorpusPath(match.getSaltIDs().get(0), false);
-      this.pathDecoded = Helper.getCorpusPath(match.getSaltIDs().get(0), true);
+      this.documentPathRaw = Helper.getCorpusPath(match.getSaltIDs().get(0), false);
+      this.documentPathDecoded = Helper.getCorpusPath(match.getSaltIDs().get(0), true);
     } else {
-      this.pathRaw = new LinkedList<>();
-      this.pathDecoded = new LinkedList<>();
+      this.documentPathRaw = new LinkedList<>();
+      this.documentPathDecoded = new LinkedList<>();
     }
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
@@ -367,13 +367,14 @@ public class VisualizerPanel extends CssLayout
     }
 
     // getting the whole document, when plugin is using text
-    if (visPlugin != null && visPlugin.isUsingText() && result != null
+    if (visPlugin != null && (visPlugin.isUsingText() || visPlugin.isUsingRawText())
+        && result != null
         && !result.getDocumentGraph().getNodes().isEmpty()) {
       List<String> nodeAnnoFilter = null;
       if (visPlugin instanceof FilteringVisualizerPlugin) {
 
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
-            pathDecoded.get(0), pathRaw.get(0), Joiner.on('/').join(pathRaw), input.getMappings(),
+            documentPathDecoded.get(0), documentPathRaw.get(0), input.getMappings(),
             ui);
       }
       SaltProject p = getDocument(nodeAnnoFilter, visPlugin.isUsingRawText(), ui);
@@ -396,13 +397,15 @@ public class VisualizerPanel extends CssLayout
 
     try {
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
-      String aql = Helper.buildDocumentQuery(pathRaw, nodeAnnoFilter, useRawText);
+      // Reconstruct the document node name from the raw path of the match
+      String documentNodeName = Joiner.on('/').join(documentPathRaw);
+      String aql = Helper.buildDocumentQuery(documentNodeName, nodeAnnoFilter, useRawText);
 
-      File graphML = api.subgraphForQuery(pathDecoded.get(0), aql, QueryLanguage.AQL, null);
+      File graphML = api.subgraphForQuery(documentPathDecoded.get(0), aql, QueryLanguage.AQL, null);
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
-        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(pathRaw));
+        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(documentPathRaw));
         SDocument doc = cg.createDocument(docURI);
         SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
         doc.setDocumentGraph(docGraph);

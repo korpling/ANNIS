@@ -60,17 +60,17 @@ public interface VisualizerPlugin extends Serializable {
   public String getShortName();
 
   /**
-   * Determines if this visaulizer wants to use the original text.
+   * Determines if this visualizer wants to use the original text.
    *
    * <p>
-   * This is a convenient and very fast method for extracting the whole text of a document, since
-   * this method simply reads database tupels and does not map anything to salt. It is recommended
-   * to use the raw text over the {@link VisualizerPlugin#isUsingText()} method, which indicates,
-   * that the visualizer needs the whole document graph, which can slow down the user experience.
+   * This is a convenient and very fast method for extracting the whole text of a document, and does
+   * not map anything to salt. It is recommended to use the raw text over the
+   * {@link VisualizerPlugin#isUsingText()} method, which indicates, that the visualizer needs the
+   * whole document graph, which can slow down the user experience.
    * </p>
    *
    * <p>
-   * It can be use in parralel with {@link #isUsingText()}, but makes in most cases no sense.
+   * It can be use in parallel with {@link #isUsingText()}, but makes in most cases no sense.
    * </p>
    *
    */

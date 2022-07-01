@@ -22,8 +22,8 @@ import org.corpus_tools.salt.core.SNode;
 
 /**
  * Base class for all Visualizer. This class sets some defaults, so you may implement the
- * {@link VisualizerPlugin#createComponent(org.corpus_tools.annis.gui.visualizers.VisualizerInput)} method for pure
- * Vaadin component plugins.
+ * {@link VisualizerPlugin#createComponent(org.corpus_tools.annis.gui.visualizers.VisualizerInput)}
+ * method for pure Vaadin component plugins.
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
@@ -36,8 +36,7 @@ public abstract class AbstractVisualizer implements VisualizerPlugin, FilteringV
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
-      String toplevelCorpusId, String documentName,
-      Map<String, String> mappings, UI ui) {
+      String toplevelCorpusId, Map<String, String> mappings, UI ui) {
     return null;
   }
 
