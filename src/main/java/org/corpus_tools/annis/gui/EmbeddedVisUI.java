@@ -218,9 +218,11 @@ public class EmbeddedVisUI extends CommonUI {
     // Create a subgraph query
     CorporaApi api = new CorporaApi(client);
     Match match = Match.parseFromString(args.get(KEY_MATCH)[0]);
-    String corpusNodeId = match.getSaltIDs().get(0);
-    List<String> corpusPathDecoded = Helper.getCorpusPath(corpusNodeId, true);
+    String matchId = match.getSaltIDs().get(0);
+    List<String> corpusPathRaw = Helper.getCorpusPath(matchId, true);
+    List<String> corpusPathDecoded = Helper.getCorpusPath(matchId, true);
     String toplevelCorpus = corpusPathDecoded.get(0);
+    String corpusNodeId = Joiner.on('/').join(corpusPathRaw);
 
     if (args.containsKey(KEY_FULLTEXT)) {
       
