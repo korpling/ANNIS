@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   result ID. Since the ID is only locally used for one match view, the impact of
   a flawed random generator are limited, but it is still bad practice to create
   a new random generator each time.
+- Multiple texts in parallel corpora where treated as a single text, causing
+  several problems. E.g. the KWIC view was showing a single token row with gaps
+  instead of several token rows for parallel corpora.
 
 ## [4.9.1] - 2022-06-30
 
