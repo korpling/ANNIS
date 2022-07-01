@@ -13,8 +13,10 @@
  */
 package org.corpus_tools.annis.gui.objects;
 
+import com.google.common.collect.ComparisonChain;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.STextualDS;
@@ -29,7 +31,14 @@ public class RawTextWrapper implements Serializable {
   public RawTextWrapper(SDocumentGraph docGraph) {
     if (docGraph != null) {
       this.texts = new ArrayList<>();
-      for (STextualDS ds : docGraph.getTextualDSs()) {
+
+      // Sort textual data sources by their name
+      List<STextualDS> allDatasources = new ArrayList<>(docGraph.getTextualDSs());
+      Collections.sort(allDatasources,
+          (ds1, ds2) -> ComparisonChain.start().compare(ds1.getName(), ds1.getName())
+              .compare(ds1.getId(), ds2.getId()).result());
+
+      for (STextualDS ds : allDatasources) {
         this.texts.add(ds.getData());
       }
     }

@@ -644,8 +644,9 @@ class AnnisUITest {
     // Wait for label to appear
     awaitCondition(20, () -> _find(rawTextPanel, Label.class).size() == 2, 1000);
     List<Label> rawTextLabels = _find(rawTextPanel, Label.class);
-    assertEquals("Das ist ein Beispielsatz . ", rawTextLabels.get(0).getValue());
-    assertEquals("This is an example . ", rawTextLabels.get(1).getValue());
+    assertEquals("This is an example . ", rawTextLabels.get(0).getValue());
+    assertEquals("Das ist ein Beispielsatz . ", rawTextLabels.get(1).getValue());
+
   }
 
   @Test
