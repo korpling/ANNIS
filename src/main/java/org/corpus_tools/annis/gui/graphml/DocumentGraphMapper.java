@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -193,7 +192,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                   // Map node and add it
                   SNode n = mapNode(currentNodeId.get(), data);
                   graph.addNode(n);
-                } else if("datasource".equals(nodeType)) {
+                } else if ("datasource".equals(nodeType)) {
                   // Create a textual datasource of this name
                   STextualDS ds = SaltFactory.createSTextualDS();
                   setNodeName(ds, currentNodeId.get());
@@ -265,7 +264,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
         for (STextualDS ds : rootsForDatasource.keySet()) {
           // re-create text if this is the default (possible virtual) tokenization
-          recreateText(name, rootsForDatasource.get(ds), ds);
+          recreateTextForRootNodes(name, rootsForDatasource.get(ds), ds);
         }
       } else {
         // add the text as label to the spans
@@ -325,7 +324,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       SRelation<?, ?> rel = null;
       switch (component.getType()) {
         case DOMINANCE:
-          if ((component.getName() == null || component.getName().isEmpty()) && hasNonEmptyDominanceEdge.contains(Pair.of(sourceId, targetId))) {
+          if ((component.getName() == null || component.getName().isEmpty())
+              && hasNonEmptyDominanceEdge.contains(Pair.of(sourceId, targetId))) {
             // We don't include edges that have no type if there is an edge
             // between the same nodes which has a type.
             // In this case, exclude this relation
@@ -360,8 +360,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
   }
 
-  private void recreateText(final String textName, Collection<? extends SNode> rootsForText,
-      STextualDS originalDs) {
+  private void recreateTextForRootNodes(final String textName,
+      Collection<? extends SNode> rootsForText, STextualDS originalDs) {
 
     final StringBuilder text = new StringBuilder();
     final STextualDS ds;
@@ -375,56 +375,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     Map<SToken, Range<Integer>> token2Range = new HashMap<>();
 
     // traverse the token chain using the order relations
-    Iterator<? extends SNode> itRoots = rootsForText.iterator();
-    while (itRoots.hasNext()) {
-      SNode root = itRoots.next();
-      graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-          "ORDERING_" + textName, new GraphTraverseHandler() {
-            @SuppressWarnings("rawtypes")
-            @Override
-            public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
-                String traversalId, SRelation relation, SNode currNode, long order) {
-              if (relation == null) {
-                return true;
-              } else if (relation instanceof SOrderRelation
-                  && Objects.equal(textName, relation.getType())) {
-                return true;
-              } else {
-                return false;
-              }
-            }
-
-            @Override
-            public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
-
-            @Override
-            public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-
-              if (currNode instanceof SToken) {
-                SFeature featTokWhitespaceBefore =
-                    currNode.getFeature("annis::tok-whitespace-before");
-                if (featTokWhitespaceBefore != null) {
-                  text.append(featTokWhitespaceBefore.getValue().toString());
-                }
-
-                SFeature featTok = currNode.getFeature("annis::tok");
-                if (featTok != null) {
-                  int idxStart = text.length();
-                  text.append(featTok.getValue_STEXT());
-                  token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
-                }
-
-                SFeature featTokWhitespaceAfter =
-                    currNode.getFeature("annis::tok-whitespace-after");
-                if (featTokWhitespaceAfter != null) {
-                  text.append(featTokWhitespaceAfter.getValue().toString());
-                }
-              }
-
-            }
-          });
+    for (SNode root : rootsForText) {
+      recreateTextBySingleRootNode(root, textName, text, token2Range);
     }
 
     // update the actual text
@@ -439,6 +391,56 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       rel.setEnd(r.upperEndpoint());
       graph.addRelation(rel);
     });
+  }
+
+  private void recreateTextBySingleRootNode(SNode root, String textName, StringBuilder text,
+      Map<SToken, Range<Integer>> token2Range) {
+    graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+        "ORDERING_" + textName, new GraphTraverseHandler() {
+          @SuppressWarnings("rawtypes")
+          @Override
+          public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
+              String traversalId, SRelation relation, SNode currNode, long order) {
+            if (relation == null) {
+              return true;
+            } else if (relation instanceof SOrderRelation
+                && Objects.equal(textName, relation.getType())) {
+              return true;
+            } else {
+              return false;
+            }
+          }
+
+          @Override
+          public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+              SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
+
+          @Override
+          public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+              SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
+
+            if (currNode instanceof SToken) {
+              SFeature featTokWhitespaceBefore =
+                  currNode.getFeature("annis::tok-whitespace-before");
+              if (featTokWhitespaceBefore != null) {
+                text.append(featTokWhitespaceBefore.getValue().toString());
+              }
+
+              SFeature featTok = currNode.getFeature("annis::tok");
+              if (featTok != null) {
+                int idxStart = text.length();
+                text.append(featTok.getValue_STEXT());
+                token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
+              }
+
+              SFeature featTokWhitespaceAfter = currNode.getFeature("annis::tok-whitespace-after");
+              if (featTokWhitespaceAfter != null) {
+                text.append(featTokWhitespaceAfter.getValue().toString());
+              }
+            }
+
+          }
+        });
   }
 
   private void addTextToSegmentation(final String name, List<SNode> rootNodes) {
