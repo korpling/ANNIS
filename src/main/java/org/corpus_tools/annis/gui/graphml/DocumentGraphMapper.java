@@ -51,6 +51,8 @@ import org.corpus_tools.salt.util.SaltUtil;
  */
 public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
+  private static final String ANNIS_TOK = "annis::tok";
+
   private final class RecreateTextForRootNodeTraverser implements GraphTraverseHandler {
     private final Map<SToken, Range<Integer>> token2Range;
     private final StringBuilder text;
@@ -92,7 +94,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
           text.append(featTokWhitespaceBefore.getValue().toString());
         }
 
-        SFeature featTok = currNode.getFeature("annis::tok");
+        SFeature featTok = currNode.getFeature(ANNIS_TOK);
         if (featTok != null) {
           int idxStart = text.length();
           text.append(featTok.getValue_STEXT());
@@ -353,7 +355,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private SNode mapNode(String nodeName, Map<String, String> labels) {
     SNode newNode;
 
-    if ((labels.containsKey("annis::tok")) && !hasOutgoingCoverageEdge.contains(nodeName)) {
+    if ((labels.containsKey(ANNIS_TOK)) && !hasOutgoingCoverageEdge.contains(nodeName)) {
       newNode = SaltFactory.createSToken();
     } else if (hasOutgoingDominanceEdge.contains(nodeName)) {
       newNode = SaltFactory.createSStructure();
@@ -481,7 +483,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
           public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
               SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
 
-            SFeature featTok = currNode.getFeature("annis::tok");
+            SFeature featTok = currNode.getFeature(ANNIS_TOK);
             if (featTok != null && currNode instanceof SSpan) {
               // only add the annotation if not yet existing (e.g. in another namespace)
               for (SAnnotation existingAnno : currNode.getAnnotations()) {
