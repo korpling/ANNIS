@@ -36,6 +36,11 @@ class HelperTest {
     assertEquals(
         "(a#tok | a#pos | a#something | a#annis:node_type=\"datasource\") & doc#annis:node_name=/corpus\\x2Fdoc/ & #a @* #doc",
         Helper.buildDocumentQuery("corpus/doc", Arrays.asList("pos", "something"), true));
+    // Test the node annotation filter with qualified annotation names
+    assertEquals(
+        "(a#tok | a#ns:pos | a#something | a#default:another | a#annis:node_type=\"datasource\") & doc#annis:node_name=/corpus\\x2Fdoc/ & #a @* #doc",
+        Helper.buildDocumentQuery("corpus/doc",
+            Arrays.asList("ns::pos", "something", "default::another"), true));
     // Check invalid node annotation names lead to falling back to the whole document query
     assertEquals(WHOLEDOCUMENT_QUERY,
         Helper.buildDocumentQuery("corpus/doc", Arrays.asList("pos", "myanno=something"), false));
