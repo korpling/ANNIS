@@ -206,7 +206,7 @@ public class DocBrowserController implements Serializable {
       SDocument doc = cg.createDocument(docURI);
 
       // Build a query that includes all (possible filtered by name) node of the document
-      String aql = Helper.buildDocumentQuery(docPathDecoded, nodeAnnoFilter, useRawText);
+      String aql = Helper.buildDocumentQuery(docPathRaw, nodeAnnoFilter, useRawText);
       File graphML = api.subgraphForQuery(docPathDecoded.get(0), aql, QueryLanguage.AQL,
           useRawText ? AnnotationComponentType.ORDERING : null);
 

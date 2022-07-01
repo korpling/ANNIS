@@ -217,16 +217,18 @@ public class EmbeddedVisUI extends CommonUI {
     // Create a subgraph query
     CorporaApi api = new CorporaApi(client);
     Match match = Match.parseFromString(args.get(KEY_MATCH)[0]);
-    List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0), false);
+    List<String> corpusPathRaw = Helper.getCorpusPath(match.getSaltIDs().get(0), false);
+    List<String> corpusPathDecoded = Helper.getCorpusPath(match.getSaltIDs().get(0), true);
+
     if (args.containsKey(KEY_FULLTEXT)) {
       
       boolean isUsingRawText = visPlugin.get().isUsingRawText();
-      String aql = Helper.buildDocumentQuery(corpusPath, null, isUsingRawText);
+      String aql = Helper.buildDocumentQuery(corpusPathRaw, null, isUsingRawText);
 
       Background.runWithCallback(
-          () -> api.subgraphForQuery(corpusPath.get(0), aql, QueryLanguage.AQL,
+          () -> api.subgraphForQuery(corpusPathDecoded.get(0), aql, QueryLanguage.AQL,
               isUsingRawText ? AnnotationComponentType.ORDERING : null),
-          new GraphMLLoaderCallback(corpusPath, visPlugin.get(), args));
+          new GraphMLLoaderCallback(corpusPathDecoded, visPlugin.get(), args));
 
 
     } else {
@@ -240,8 +242,9 @@ public class EmbeddedVisUI extends CommonUI {
       } else {
         subgraphQuery.setSegmentation(null);
       }
-      Background.runWithCallback(() -> api.subgraphForNodes(corpusPath.get(0), subgraphQuery),
-          new GraphMLLoaderCallback(corpusPath, visPlugin.get(), args));
+      Background.runWithCallback(
+          () -> api.subgraphForNodes(corpusPathDecoded.get(0), subgraphQuery),
+          new GraphMLLoaderCallback(corpusPathRaw, visPlugin.get(), args));
     }
   }
 

@@ -1112,7 +1112,7 @@ public class Helper {
   /**
    * Build a query that includes all (possible filtered by name) node of the document.
    * 
-   * @param docPath the path of the document
+   * @param docPath The path of the document. The single elements of the path should not be decoded.
    * @param nodeAnnoFilter A list of node annotation names for filtering the nodes or null if no
    *        filtering should be applied.
    * @param useRawText If true, only extract the original raw text
