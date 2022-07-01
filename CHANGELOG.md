@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update to graphANNIS 2.2.1, which fixes a bug where the left/right context was
+  switched when using a segmentation as context.
+
 ## [4.9.2] - 2022-07-01
 
 ### Fixed
