@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.9.0
-date-released: 2022-06-15
+version: 4.9.1
+date-released: 2022-06-30
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -139,6 +139,30 @@ references:
   - name: Thomas Neidhart
   - name: Rob Tompkins
   repository-code: https://github.com/apache/commons-codec
+- type: software
+  title: Apache Commons Email
+  version: '1.5'
+  abbreviation: org.apache.commons:commons-email
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Email
+    directory.
+  authors:
+  - name: dIon Gillard
+  - name: John McNally
+  - name: Quinton McCombs
+  - name: Eric Pugh
+  - name: Daniel Rall
+  - name: Jon Scott Stevens
+  - name: Jason van Zyl
+  - name: Joe Germuska
+  - name: Robert Burrell Donkin
+  - name: Henning P. Schmiedehausen
+  - name: Stephen Colebourne
+  - name: Ben Speakmon
+  - name: Siegfried Goeschl
+  - name: Thomas Neidhart
+  - name: Gary Gregory
+  repository-code: http://svn.apache.org/viewvc/commons/proper/email/tags/EMAIL_1_5
 - type: software
   title: Apache Commons IO
   version: '2.7'
@@ -357,28 +381,6 @@ references:
   - name: Tatu Saloranta
   - name: Brian Langel
   repository-code: https://github.com/FasterXML/java-classmate
-- type: software
-  title: Commons Email
-  version: 1.3.2
-  abbreviation: org.apache.commons:commons-email
-  license: Apache-2.0
-  notes: More license information can be found in the THIRD-PARTY/Commons_Email directory.
-  authors:
-  - name: dIon Gillard
-  - name: John McNally
-  - name: Quinton McCombs
-  - name: Eric Pugh
-  - name: Daniel Rall
-  - name: Jon Scott Stevens
-  - name: Jason van Zyl
-  - name: Joe Germuska
-  - name: Robert Burrell Donkin
-  - name: Henning P. Schmiedehausen
-  - name: Stephen Colebourne
-  - name: Ben Speakmon
-  - name: Siegfried Goeschl
-  - name: Thomas Neidhart
-  repository-code: http://svn.apache.org/viewvc/commons/proper/email/trunk
 - type: software
   title: Env Utils
   version: '1.0'
@@ -768,24 +770,23 @@ references:
   - name: Thomas Hammerl
   repository-code: http://textcat.cvs.sourceforge.net/textcat/
 - type: software
-  title: JavaBeans(TM) Activation Framework
-  version: 1.1.1
+  title: JavaBeans Activation Framework (JAF)
+  version: '1.1'
   abbreviation: javax.activation:activation
   license: CDDL-1.0
-  notes: More license information can be found in the THIRD-PARTY/JavaBeans_TM_Activation_Framework
+  notes: More license information can be found in the THIRD-PARTY/JavaBeans_Activation_Framework_JAF_
     directory.
   authors:
-  - name: The JavaBeans(TM) Activation Framework 1.1.1 Team
+  - name: The JavaBeans Activation Framework (JAF) 1.1 Team
 - type: software
-  title: JavaMail API (compat)
-  version: 1.4.5
-  abbreviation: javax.mail:mail
-  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
-  notes: More license information can be found in the THIRD-PARTY/JavaMail_API_compat_
-    directory.
+  title: JavaMail API
+  version: 1.5.6
+  abbreviation: com.sun.mail:javax.mail
+  license: CDDL-1.0 OR GPL-2.0-only WITH Classpath-exception-2.0
+  notes: More license information can be found in the THIRD-PARTY/JavaMail_API directory.
   authors:
   - name: Bill Shannon
-  repository-code: http://kenai.com/hg/javamail~mercurial/mail
+  repository-code: http://java.net/hg/javamail~mercurial/javax.mail
 - type: software
   title: Javassist
   version: 3.27.0-GA

@@ -5,6 +5,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.9.1] - 2022-06-30
+
+### Fixed
+
+- Addressed some non-security issues confusing static code analyzers (#782)
+- Bumps commons-email from 1.3.2 to 1.5.
+- Update Kotlin test dependency to 1.6 and also Karibu Testing
+  (which needs the Kotlin dependency)
+- Do not restart possible crashed graphANNIS service in integration tests.
+
 ## [4.9.0] - 2022-06-15
 
 ###  Added
@@ -1145,7 +1155,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.0...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.1...HEAD
+[4.9.1]: https://github.com/korpling/ANNIS/compare/v4.9.0...v4.9.1
 [4.9.0]: https://github.com/korpling/ANNIS/compare/v4.8.0...v4.9.0
 [4.8.0]: https://github.com/korpling/ANNIS/compare/v4.7.1...v4.8.0
 [4.7.1]: https://github.com/korpling/ANNIS/compare/v4.7.0...v4.7.1
