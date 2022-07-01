@@ -33,6 +33,7 @@ import com.vaadin.v7.data.Property;
 import com.vaadin.v7.data.util.IndexedContainer;
 import com.vaadin.v7.ui.AbstractSelect;
 import com.vaadin.v7.ui.ComboBox;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -65,6 +66,8 @@ import org.slf4j.LoggerFactory;
  */
 public class SingleResultPanel extends CssLayout
     implements Button.ClickListener, VisualizerContextChanger {
+  private static final Random RANDOM = new SecureRandom();
+
   private static class AddNewItemHandler implements AbstractSelect.NewItemHandler {
 
 
@@ -378,7 +381,7 @@ public class SingleResultPanel extends CssLayout
       Map<SNode, Long> markedAndCovered =
           Helper.calculateMarkedAndCovered(result, segNodes, segmentationName);
 
-      String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
+      String resultID = "" + RANDOM.nextInt(Integer.MAX_VALUE);
 
       int i = 0;
       for (VisualizerRule visRule : resolverEntries) {
