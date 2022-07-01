@@ -1184,6 +1184,9 @@ public class Helper {
       aql.append("(a#tok");
       if (nodeAnnoFilter != null) {
         for (String nodeAnno : nodeAnnoFilter) {
+          // This could be a fully qualified annotation name with "::", replace it with an AQL
+          // compatible namespace separator
+          nodeAnno = nodeAnno.replaceFirst("::", ":");
           aql.append(" | a#");
           aql.append(nodeAnno);
         }
