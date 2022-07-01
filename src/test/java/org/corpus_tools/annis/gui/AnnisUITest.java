@@ -60,6 +60,7 @@ import org.corpus_tools.annis.gui.resultview.SingleCorpusResultPanel;
 import org.corpus_tools.annis.gui.resultview.SingleResultPanel;
 import org.corpus_tools.annis.gui.visualizers.component.grid.GridComponent;
 import org.corpus_tools.annis.gui.visualizers.component.kwic.KWICComponent;
+import org.corpus_tools.annis.gui.visualizers.component.kwic.KWICMultipleTextComponent;
 import org.corpus_tools.annis.gui.widgets.AutoHeightIFrame;
 import org.corpus_tools.annis.gui.widgets.grid.AnnotationGrid;
 import org.corpus_tools.annis.gui.widgets.grid.GridEvent;
@@ -161,14 +162,15 @@ class AnnisUITest {
             + ui.getQueryState().getSelectedCorpora() + " was the current selection.");
   }
 
-  private void executeTokenSearch(String corpusName, int matchCount, int documentCount)
+
+  private void executeSearch(String corpusName, String query, int matchCount, int documentCount)
       throws Exception {
     selectCorpus(corpusName);
 
     // Set the query and submit query
-    _get(AqlCodeEditor.class).getPropertyDataSource().setValue("tok");
+    _get(AqlCodeEditor.class).getPropertyDataSource().setValue(query);
     MockVaadin.INSTANCE.clientRoundtrip();
-    awaitCondition(5, () -> "tok".equals(ui.getQueryState().getAql().getValue()));
+    awaitCondition(5, () -> query.equals(ui.getQueryState().getAql().getValue()));
     awaitCondition(5, () -> "Valid query, click on \"Search\" to start searching."
         .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
 
@@ -182,17 +184,18 @@ class AnnisUITest {
         () -> expectedStatus
             .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
         () -> "Waited for status \"" + expectedStatus + "\" but was \""
-            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"");
+            + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"",
+        1000);
 
     ResultViewPanel resultView = _get(ResultViewPanel.class);
 
-    awaitCondition(30, () -> _find(resultView, SingleResultPanel.class).size() == 10);
+    awaitCondition(30,
+        () -> _find(resultView, SingleResultPanel.class).size() == Math.min(matchCount, 10), 1000);
   }
 
   @Test
   void tokenSearchPcc2() throws Exception {
-
-    executeTokenSearch("pcc2", 399, 2);
+    executeSearch("pcc2", "tok", 399, 2);
 
     // Test that the cell values have the correct token value
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
@@ -404,8 +407,7 @@ class AnnisUITest {
 
   @Test
   void openVisualizerPcc2() throws Exception {
-
-    executeTokenSearch("pcc2", 399, 2);
+    executeSearch("pcc2", "tok", 399, 2);
 
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
     _get(resultPanel, KWICComponent.class);
@@ -444,7 +446,7 @@ class AnnisUITest {
   @Test
   void tokenSearchDialog() throws Exception {
 
-    executeTokenSearch("dialog.demo", 102, 1);
+    executeSearch("dialog.demo", "tok", 102, 1);
 
     // Test that there is a grid visualizer
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
@@ -473,10 +475,36 @@ class AnnisUITest {
     awaitCondition(120, () -> _find(resultPanel, MediaElementPlayer.class).isEmpty());
   }
 
+  @Test
+  void parallelTextKwic() throws Exception {
+    executeSearch("parallel.sample", "tok ->align_e-g tok", 5, 1);
+
+
+    // Test that there are two KWIC panels with the correct table cells
+    SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
+    KWICMultipleTextComponent parentKwicVis = _get(resultPanel, KWICMultipleTextComponent.class);
+
+    List<KWICComponent> kwicVisualizers = _find(parentKwicVis, KWICComponent.class);
+    assertEquals(2, kwicVisualizers.size());
+
+
+    AnnotationGrid firstKwicGrid = _get(kwicVisualizers.get(0), AnnotationGrid.class);
+    ArrayList<Row> tokens = firstKwicGrid.getRowsByAnnotation().get("tok");
+    assertEquals(1, tokens.size());
+    assertEquals(Arrays.asList("This", "is", "an", "example", "."),
+        tokens.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
+
+    AnnotationGrid secondKwicGrid = _get(kwicVisualizers.get(1), AnnotationGrid.class);
+    tokens = secondKwicGrid.getRowsByAnnotation().get("tok");
+    assertEquals(1, tokens.size());
+    assertEquals(Arrays.asList("Das", "ist", "ein", "Beispielsatz", "."),
+        tokens.get(0).getEvents().stream().map(GridEvent::getValue).collect(Collectors.toList()));
+
+  }
 
   @Test
   void shareSingleResult() throws Exception {
-    executeTokenSearch("pcc2", 399, 2);
+    executeSearch("pcc2", "tok", 399, 2);
 
     // Activate the share window
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
@@ -620,9 +648,6 @@ class AnnisUITest {
 
   @Test
   void emptyCorpusStatus() throws Exception {
-
-
-
     @SuppressWarnings("unchecked")
     Grid<String> grid = _get(_get(CorpusListPanel.class), Grid.class);
     grid.getSelectionModel().deselectAll();
@@ -688,14 +713,12 @@ class AnnisUITest {
 
   @Test
   void testCorpusFragment() throws Exception {
-    
+
     assertTrue(ui.getQueryState().getSelectedCorpora().isEmpty());
 
     Page.getCurrent().setUriFragment("c=pcc2");
-    awaitCondition(15,
-        () -> ui.getQueryState().getSelectedCorpora().size() == 1
-            && ui.getQueryState().getSelectedCorpora().contains("pcc2"));
-
+    awaitCondition(15, () -> ui.getQueryState().getSelectedCorpora().size() == 1
+        && ui.getQueryState().getSelectedCorpora().contains("pcc2"));
 
   }
 
