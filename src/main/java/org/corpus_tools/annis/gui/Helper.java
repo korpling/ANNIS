@@ -1176,7 +1176,7 @@ public class Helper {
 
     StringBuilder aql = new StringBuilder();
     if (fallbackToAll) {
-      aql.append("n#annis:node_type");
+      aql.append("n#annis:node_type ");
       aql.append("& doc#annis:node_name=/");
       aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(documentNodeName));
       aql.append("/ & #n @* #doc");

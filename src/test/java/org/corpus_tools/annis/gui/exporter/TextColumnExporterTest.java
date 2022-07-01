@@ -65,9 +65,10 @@ class TextColumnExporterTest {
     String[] lines = out.toString().split("\n");
     assertEquals(3, lines.length);
     assertEquals("match_number\tspeaker\tleft_context\tmatch_column\tright_context", lines[0]);
-    assertEquals("1\t\t\tFeigenblatt\tDie Jugendlichen in Zossen wollen", lines[1]);
+    assertEquals("1\tmerged.maz-11299.text.xml\t\tFeigenblatt\tDie Jugendlichen in Zossen wollen",
+        lines[1]);
     assertEquals(
-        "2\t\tJugendlichen wurden somit zum bloßen\tFeigenblatt\tdegradiert . Nicht über sondern",
+        "2\tmerged.maz-11299.text.xml\tJugendlichen wurden somit zum bloßen\tFeigenblatt\tdegradiert . Nicht über sondern",
         lines[2]);
   }
 
@@ -88,9 +89,11 @@ class TextColumnExporterTest {
     assertEquals(
         "match_number\tspeaker\tleft_context\tmatch_1\tmiddle_context_1\tmatch_2\tright_context",
         lines[0]);
-    assertEquals("1\t\t\tFeigenblatt\t\tDie\tJugendlichen in Zossen wollen ein", lines[1]);
     assertEquals(
-        "2\t\tJugendlichen wurden somit zum bloßen\tFeigenblatt\t\tdegradiert\t. Nicht über sondern mit",
+        "1\tmerged.maz-11299.text.xml\t\tFeigenblatt\t\tDie\tJugendlichen in Zossen wollen ein",
+        lines[1]);
+    assertEquals(
+        "2\tmerged.maz-11299.text.xml\tJugendlichen wurden somit zum bloßen\tFeigenblatt\t\tdegradiert\t. Nicht über sondern mit",
         lines[2]);
   }
 
@@ -111,9 +114,11 @@ class TextColumnExporterTest {
     assertEquals(3, lines.length);
     assertEquals("match_number\tspeaker\tGenre\tleft_context\tmatch_column\tright_context",
         lines[0]);
-    assertEquals("1\t\tPolitik\t\tFeigenblatt\tDie Jugendlichen in Zossen wollen", lines[1]);
     assertEquals(
-        "2\t\tPolitik\tJugendlichen wurden somit zum bloßen\tFeigenblatt\tdegradiert . Nicht über sondern",
+        "1\tmerged.maz-11299.text.xml\tPolitik\t\tFeigenblatt\tDie Jugendlichen in Zossen wollen",
+        lines[1]);
+    assertEquals(
+        "2\tmerged.maz-11299.text.xml\tPolitik\tJugendlichen wurden somit zum bloßen\tFeigenblatt\tdegradiert . Nicht über sondern",
         lines[2]);
   }
 
