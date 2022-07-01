@@ -180,7 +180,20 @@ public class Helper {
       uri = uri.substring("salt:/".length());
     }
     return uri;
+  }
 
+  /**
+   * Add a legacy id prefix if it does not exist yet.
+   * 
+   * @param uri The original node ID
+   * 
+   * @return The node ID with the "salt:/" prefix
+   */
+  public static String addSaltPrefix(String uri) {
+    if (!uri.startsWith("salt:/")) {
+      uri = "salt:/" + uri;
+    }
+    return uri;
   }
 
   /**
