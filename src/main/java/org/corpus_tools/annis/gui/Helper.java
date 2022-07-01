@@ -180,7 +180,20 @@ public class Helper {
       uri = uri.substring("salt:/".length());
     }
     return uri;
+  }
 
+  /**
+   * Add a legacy id prefix if it does not exist yet.
+   * 
+   * @param uri The original node ID
+   * 
+   * @return The node ID with the "salt:/" prefix
+   */
+  public static String addSaltPrefix(String uri) {
+    if (!uri.startsWith("salt:/")) {
+      uri = "salt:/" + uri;
+    }
+    return uri;
   }
 
   /**
@@ -1163,18 +1176,22 @@ public class Helper {
 
     StringBuilder aql = new StringBuilder();
     if (fallbackToAll) {
-      aql.append("(n#node");
-      aql.append(") & doc#annis:node_name=/");
+      aql.append("n#annis:node_type ");
+      aql.append("& doc#annis:node_name=/");
       aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(documentNodeName));
       aql.append("/ & #n @* #doc");
     } else {
       aql.append("(a#tok");
       if (nodeAnnoFilter != null) {
         for (String nodeAnno : nodeAnnoFilter) {
+          // This could be a fully qualified annotation name with "::", replace it with an AQL
+          // compatible namespace separator
+          nodeAnno = nodeAnno.replaceFirst("::", ":");
           aql.append(" | a#");
           aql.append(nodeAnno);
         }
       }
+      aql.append(" | a#annis:node_type=\"datasource\"");
 
       aql.append(") & doc#annis:node_name=/");
       aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(documentNodeName));

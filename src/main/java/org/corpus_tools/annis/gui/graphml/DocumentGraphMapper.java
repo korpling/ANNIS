@@ -1,15 +1,16 @@
 package org.corpus_tools.annis.gui.graphml;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +26,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -49,11 +51,71 @@ import org.corpus_tools.salt.util.SaltUtil;
  */
 public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
+  private static final String ANNIS_TOK = "annis::tok";
+
+  private final class RecreateTextForRootNodeTraverser implements GraphTraverseHandler {
+    private final Map<SToken, Range<Integer>> token2Range;
+    private final StringBuilder text;
+    private final String textName;
+
+    private RecreateTextForRootNodeTraverser(Map<SToken, Range<Integer>> token2Range,
+        StringBuilder text, String textName) {
+      this.token2Range = token2Range;
+      this.text = text;
+      this.textName = textName;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
+        String traversalId, SRelation relation, SNode currNode, long order) {
+      if (relation == null) {
+        return true;
+      } else if (relation instanceof SOrderRelation
+          && Objects.equal(textName, relation.getType())) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+        SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
+
+    @Override
+    public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+        SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
+
+      if (currNode instanceof SToken) {
+        SFeature featTokWhitespaceBefore =
+            currNode.getFeature("annis::tok-whitespace-before");
+        if (featTokWhitespaceBefore != null) {
+          text.append(featTokWhitespaceBefore.getValue().toString());
+        }
+
+        SFeature featTok = currNode.getFeature(ANNIS_TOK);
+        if (featTok != null) {
+          int idxStart = text.length();
+          text.append(featTok.getValue_STEXT());
+          token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
+        }
+
+        SFeature featTokWhitespaceAfter = currNode.getFeature("annis::tok-whitespace-after");
+        if (featTokWhitespaceAfter != null) {
+          text.append(featTokWhitespaceAfter.getValue().toString());
+        }
+      }
+
+    }
+  }
+
   private final SDocumentGraph graph;
 
   private final Set<String> hasOutgoingCoverageEdge;
   private final Set<String> hasOutgoingDominanceEdge;
   private final Set<Pair<String, String>> hasNonEmptyDominanceEdge;
+  private final Multimap<String, String> isPartOf;
 
 
   protected DocumentGraphMapper() {
@@ -61,6 +123,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     this.hasOutgoingCoverageEdge = new HashSet<>();
     this.hasOutgoingDominanceEdge = new HashSet<>();
     this.hasNonEmptyDominanceEdge = new HashSet<>();
+    this.isPartOf = HashMultimap.create();
   }
 
 
@@ -87,6 +150,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                 hasOutgoingCoverageEdge.add(source.getValue());
               } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
                 hasOutgoingDominanceEdge.add(source.getValue());
+              } else if (c.getType() == AnnotationComponentType.PARTOF) {
+                isPartOf.put(Helper.addSaltPrefix(source.getValue()),
+                    Helper.addSaltPrefix(target.getValue()));
               }
               if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
                   && !c.getName().isEmpty()) {
@@ -94,7 +160,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               }
             }
           }
-
         }
       }
     }
@@ -111,6 +176,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     Optional<String> currentSourceId = Optional.empty();
     Optional<String> currentTargetId = Optional.empty();
     Optional<String> currentComponent = Optional.empty();
+
+    Map<String, STextualDS> datasources = new HashMap<>();
 
     Map<String, String> data = new HashMap<>();
 
@@ -184,6 +251,14 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                   // Map node and add it
                   SNode n = mapNode(currentNodeId.get(), data);
                   graph.addNode(n);
+                } else if ("datasource".equals(nodeType)) {
+                  // Create a textual datasource of this name
+                  STextualDS ds = SaltFactory.createSTextualDS();
+                  setNodeName(ds, currentNodeId.get());
+                  mapLabels(ds, data, true);
+                  ds.setText("");
+                  graph.addNode(ds);
+                  datasources.put(Helper.addSaltPrefix(currentNodeId.get()), ds);
                 }
               }
               currentNodeId = Optional.empty();
@@ -219,6 +294,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       }
     }
 
+
     // find all chains of SOrderRelations and reconstruct the texts belonging to
     // them
     Multimap<String, SNode> orderRoots = graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
@@ -232,8 +308,23 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
         name = null;
       }
       if (name == null || "".equals(name)) {
-        // re-create text if this is the default (possible virtual) tokenization
-        recreateText(name, roots);
+        // Decide to which data sources the token belong to. A single data source could have
+        // multiple root token due to gaps in the result. But there also could be multiple root
+        // token because multiple textual data sources are involved.
+        Multimap<STextualDS, SNode> rootsForDatasource = HashMultimap.create();
+        for (SNode r : roots) {
+          for (String targetId : isPartOf.get(r.getId())) {
+            STextualDS targetDs = datasources.get(targetId);
+            if (targetDs != null) {
+              rootsForDatasource.put(targetDs, r);
+            }
+          }
+        }
+
+        for (STextualDS ds : rootsForDatasource.keySet()) {
+          // re-create text if this is the default (possible virtual) tokenization
+          recreateTextForRootNodes(name, rootsForDatasource.get(ds), ds);
+        }
       } else {
         // add the text as label to the spans
         addTextToSegmentation(name, roots);
@@ -262,9 +353,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   }
 
   private SNode mapNode(String nodeName, Map<String, String> labels) {
-    SNode newNode = SaltFactory.createSNode();
+    SNode newNode;
 
-    if ((labels.containsKey("annis::tok")) && !hasOutgoingCoverageEdge.contains(nodeName)) {
+    if ((labels.containsKey(ANNIS_TOK)) && !hasOutgoingCoverageEdge.contains(nodeName)) {
       newNode = SaltFactory.createSToken();
     } else if (hasOutgoingDominanceEdge.contains(nodeName)) {
       newNode = SaltFactory.createSStructure();
@@ -281,8 +372,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private void mapAndAddEdge(String sourceId, String targetId, String componentRaw,
       Map<String, String> labels) {
 
-    SNode source = graph.getNode("salt:/" + sourceId);
-    SNode target = graph.getNode("salt:/" + targetId);
+    SNode source = graph.getNode(Helper.addSaltPrefix(sourceId));
+    SNode target = graph.getNode(Helper.addSaltPrefix(targetId));
 
     // Split the component description into its parts
     Component component = parseComponent(componentRaw);
@@ -292,7 +383,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       SRelation<?, ?> rel = null;
       switch (component.getType()) {
         case DOMINANCE:
-          if ((component.getName() == null || component.getName().isEmpty()) && hasNonEmptyDominanceEdge.contains(Pair.of(sourceId, targetId))) {
+          if ((component.getName() == null || component.getName().isEmpty())
+              && hasNonEmptyDominanceEdge.contains(Pair.of(sourceId, targetId))) {
             // We don't include edges that have no type if there is an edge
             // between the same nodes which has a type.
             // In this case, exclude this relation
@@ -327,65 +419,25 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
   }
 
-  private void recreateText(final String textName, List<SNode> rootsForText) {
+  private void recreateTextForRootNodes(final String textName,
+      Collection<? extends SNode> rootsForText, STextualDS originalDs) {
 
     final StringBuilder text = new StringBuilder();
-    final STextualDS ds = graph.createTextualDS("");
-    ds.setName(textName);
+    final STextualDS ds;
+    if (originalDs == null) {
+      ds = graph.createTextualDS("");
+      ds.setName(textName);
+    } else {
+      ds = originalDs;
+    }
 
     Map<SToken, Range<Integer>> token2Range = new HashMap<>();
 
     // traverse the token chain using the order relations
-    Iterator<SNode> itRoots = rootsForText.iterator();
-    while (itRoots.hasNext()) {
-      SNode root = itRoots.next();
+    for (SNode root : rootsForText) {
       graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-          "ORDERING_" + textName, new GraphTraverseHandler() {
-            @SuppressWarnings("rawtypes")
-            @Override
-            public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
-                String traversalId, SRelation relation, SNode currNode, long order) {
-              if (relation == null) {
-                return true;
-              } else if (relation instanceof SOrderRelation
-                  && Objects.equal(textName, relation.getType())) {
-                return true;
-              } else {
-                return false;
-              }
-            }
-
-            @Override
-            public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
-
-            @Override
-            public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-
-              if (currNode instanceof SToken) {
-                SFeature featTokWhitespaceBefore =
-                    currNode.getFeature("annis::tok-whitespace-before");
-                if (featTokWhitespaceBefore != null) {
-                  text.append(featTokWhitespaceBefore.getValue().toString());
-                }
-
-                SFeature featTok = currNode.getFeature("annis::tok");
-                if (featTok != null) {
-                  int idxStart = text.length();
-                  text.append(featTok.getValue_STEXT());
-                  token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
-                }
-
-                SFeature featTokWhitespaceAfter =
-                    currNode.getFeature("annis::tok-whitespace-after");
-                if (featTokWhitespaceAfter != null) {
-                  text.append(featTokWhitespaceAfter.getValue().toString());
-                }
-              }
-
-            }
-          });
+          "ORDERING_" + textName,
+          new RecreateTextForRootNodeTraverser(token2Range, text, textName));
     }
 
     // update the actual text
@@ -401,6 +453,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       graph.addRelation(rel);
     });
   }
+
 
   private void addTextToSegmentation(final String name, List<SNode> rootNodes) {
 
@@ -430,7 +483,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
           public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
               SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
 
-            SFeature featTok = currNode.getFeature("annis::tok");
+            SFeature featTok = currNode.getFeature(ANNIS_TOK);
             if (featTok != null && currNode instanceof SSpan) {
               // only add the annotation if not yet existing (e.g. in another namespace)
               for (SAnnotation existingAnno : currNode.getAnnotations()) {

@@ -156,6 +156,9 @@ public class HTMLVis extends AbstractVisualizer {
     StringBuilder sb = new StringBuilder();
 
     List<SToken> token = graph.getSortedTokenByText();
+    if (token == null) {
+      return "";
+    }
 
     Map<SToken, Long> token2index = new HashMap<>();
     {
