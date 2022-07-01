@@ -51,6 +51,63 @@ import org.corpus_tools.salt.util.SaltUtil;
  */
 public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
+  private final class RecreateTextForRootNodeTraverser implements GraphTraverseHandler {
+    private final Map<SToken, Range<Integer>> token2Range;
+    private final StringBuilder text;
+    private final String textName;
+
+    private RecreateTextForRootNodeTraverser(Map<SToken, Range<Integer>> token2Range,
+        StringBuilder text, String textName) {
+      this.token2Range = token2Range;
+      this.text = text;
+      this.textName = textName;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
+        String traversalId, SRelation relation, SNode currNode, long order) {
+      if (relation == null) {
+        return true;
+      } else if (relation instanceof SOrderRelation
+          && Objects.equal(textName, relation.getType())) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+        SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
+
+    @Override
+    public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+        SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
+
+      if (currNode instanceof SToken) {
+        SFeature featTokWhitespaceBefore =
+            currNode.getFeature("annis::tok-whitespace-before");
+        if (featTokWhitespaceBefore != null) {
+          text.append(featTokWhitespaceBefore.getValue().toString());
+        }
+
+        SFeature featTok = currNode.getFeature("annis::tok");
+        if (featTok != null) {
+          int idxStart = text.length();
+          text.append(featTok.getValue_STEXT());
+          token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
+        }
+
+        SFeature featTokWhitespaceAfter = currNode.getFeature("annis::tok-whitespace-after");
+        if (featTokWhitespaceAfter != null) {
+          text.append(featTokWhitespaceAfter.getValue().toString());
+        }
+      }
+
+    }
+  }
+
   private final SDocumentGraph graph;
 
   private final Set<String> hasOutgoingCoverageEdge;
@@ -376,7 +433,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
     // traverse the token chain using the order relations
     for (SNode root : rootsForText) {
-      recreateTextBySingleRootNode(root, textName, text, token2Range);
+      graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+          "ORDERING_" + textName,
+          new RecreateTextForRootNodeTraverser(token2Range, text, textName));
     }
 
     // update the actual text
@@ -393,55 +452,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     });
   }
 
-  private void recreateTextBySingleRootNode(SNode root, String textName, StringBuilder text,
-      Map<SToken, Range<Integer>> token2Range) {
-    graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-        "ORDERING_" + textName, new GraphTraverseHandler() {
-          @SuppressWarnings("rawtypes")
-          @Override
-          public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
-              String traversalId, SRelation relation, SNode currNode, long order) {
-            if (relation == null) {
-              return true;
-            } else if (relation instanceof SOrderRelation
-                && Objects.equal(textName, relation.getType())) {
-              return true;
-            } else {
-              return false;
-            }
-          }
-
-          @Override
-          public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
-
-          @Override
-          public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-
-            if (currNode instanceof SToken) {
-              SFeature featTokWhitespaceBefore =
-                  currNode.getFeature("annis::tok-whitespace-before");
-              if (featTokWhitespaceBefore != null) {
-                text.append(featTokWhitespaceBefore.getValue().toString());
-              }
-
-              SFeature featTok = currNode.getFeature("annis::tok");
-              if (featTok != null) {
-                int idxStart = text.length();
-                text.append(featTok.getValue_STEXT());
-                token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
-              }
-
-              SFeature featTokWhitespaceAfter = currNode.getFeature("annis::tok-whitespace-after");
-              if (featTokWhitespaceAfter != null) {
-                text.append(featTokWhitespaceAfter.getValue().toString());
-              }
-            }
-
-          }
-        });
-  }
 
   private void addTextToSegmentation(final String name, List<SNode> rootNodes) {
 
