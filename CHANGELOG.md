@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Documents which special characters (like %) in their name could not be opened
   in full text visualizes (like the document browser).
+- The `raw_text` visualizer did not work properly and did not show the whole
+  text.
 
 ## [4.9.1] - 2022-06-30
 

@@ -367,7 +367,8 @@ public class VisualizerPanel extends CssLayout
     }
 
     // getting the whole document, when plugin is using text
-    if (visPlugin != null && visPlugin.isUsingText() && result != null
+    if (visPlugin != null && (visPlugin.isUsingText() || visPlugin.isUsingRawText())
+        && result != null
         && !result.getDocumentGraph().getNodes().isEmpty()) {
       List<String> nodeAnnoFilter = null;
       if (visPlugin instanceof FilteringVisualizerPlugin) {
