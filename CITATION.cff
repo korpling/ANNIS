@@ -38,7 +38,7 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.9.2
+version: 4.9.3
 date-released: 2022-07-01
 references:
 - type: article
