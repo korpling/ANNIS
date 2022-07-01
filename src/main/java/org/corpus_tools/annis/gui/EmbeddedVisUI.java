@@ -86,15 +86,15 @@ public class EmbeddedVisUI extends CommonUI {
 
   private class GraphMLLoaderCallback implements FutureCallback<File> {
 
-    private final List<String> corpusPath;
+    private final String corpusNodeId;
     private final VisualizerPlugin visPlugin;
     private final Map<String, String[]> args;
 
-    GraphMLLoaderCallback(List<String> corpusPath, VisualizerPlugin visPlugin,
+    GraphMLLoaderCallback(String corpusNodeId, VisualizerPlugin visPlugin,
         Map<String, String[]> args) {
       this.visPlugin = visPlugin;
       this.args = args;
-      this.corpusPath = corpusPath;
+      this.corpusNodeId = corpusNodeId;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class EmbeddedVisUI extends CommonUI {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
         org.eclipse.emf.common.util.URI docURI =
-            org.eclipse.emf.common.util.URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
+            org.eclipse.emf.common.util.URI.createURI("salt:/" + corpusNodeId);
         SDocument doc = cg.createDocument(docURI);
         SDocumentGraph docGraph = DocumentGraphMapper.map(result);
         doc.setDocumentGraph(docGraph);
@@ -218,16 +218,21 @@ public class EmbeddedVisUI extends CommonUI {
     // Create a subgraph query
     CorporaApi api = new CorporaApi(client);
     Match match = Match.parseFromString(args.get(KEY_MATCH)[0]);
-    List<String> corpusPath = Helper.getCorpusPath(match.getSaltIDs().get(0));
+    String matchId = match.getSaltIDs().get(0);
+    List<String> corpusPathRaw = Helper.getCorpusPath(matchId, true);
+    List<String> corpusPathDecoded = Helper.getCorpusPath(matchId, true);
+    String toplevelCorpus = corpusPathDecoded.get(0);
+    String corpusNodeId = Joiner.on('/').join(corpusPathRaw);
+
     if (args.containsKey(KEY_FULLTEXT)) {
       
       boolean isUsingRawText = visPlugin.get().isUsingRawText();
-      String aql = Helper.buildDocumentQuery(corpusPath, null, isUsingRawText);
+      String aql = Helper.buildDocumentQuery(corpusNodeId, null, isUsingRawText);
 
       Background.runWithCallback(
-          () -> api.subgraphForQuery(corpusPath.get(0), aql, QueryLanguage.AQL,
+          () -> api.subgraphForQuery(toplevelCorpus, aql, QueryLanguage.AQL,
               isUsingRawText ? AnnotationComponentType.ORDERING : null),
-          new GraphMLLoaderCallback(corpusPath, visPlugin.get(), args));
+          new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args));
 
 
     } else {
@@ -241,8 +246,9 @@ public class EmbeddedVisUI extends CommonUI {
       } else {
         subgraphQuery.setSegmentation(null);
       }
-      Background.runWithCallback(() -> api.subgraphForNodes(corpusPath.get(0), subgraphQuery),
-          new GraphMLLoaderCallback(corpusPath, visPlugin.get(), args));
+      Background.runWithCallback(
+          () -> api.subgraphForNodes(toplevelCorpus, subgraphQuery),
+          new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args));
     }
   }
 
@@ -411,6 +417,7 @@ public class EmbeddedVisUI extends CommonUI {
 
   protected void attachToPath(String rawPath, VaadinRequest request) {
     List<String> splittedPath = new LinkedList<>();
+
     if (rawPath != null) {
       rawPath = rawPath.substring(URL_PREFIX.length());
       splittedPath =
@@ -430,10 +437,13 @@ public class EmbeddedVisUI extends CommonUI {
         generateVisFromRemoteSaltURL(splittedPath.get(0), saltUrl, request.getParameterMap());
       }
     } else if (splittedPath.size() >= 3) {
-      // a visualizer definition visname/corpusname/documentname
+      // a visualizer definition in the form
+      // visname/corpusname/documentname
       if ("htmldoc".equals(splittedPath.get(0))) {
-        showHtmlDoc(splittedPath.get(1), splittedPath.subList(1, splittedPath.size()),
-            request.getParameterMap());
+        // Reconstruct the document name from the rest of the list
+        String documentNodeName = Joiner.on("/").join(splittedPath.subList(1, splittedPath.size()));
+        List<String> docPathDecoded = Helper.getCorpusPath(documentNodeName, true);
+        showHtmlDoc(docPathDecoded.get(0), documentNodeName, request.getParameterMap());
       } else {
         displayMessage("Unknown visualizer \"" + splittedPath.get(0) + "\"",
             "Only \"htmldoc\" is supported yet.");
@@ -444,7 +454,8 @@ public class EmbeddedVisUI extends CommonUI {
     addStyleName("loaded-embedded-vis");
   }
 
-  private void showHtmlDoc(String corpus, List<String> docPath, Map<String, String[]> args) {
+  private void showHtmlDoc(String corpus, String documentNodeName,
+      Map<String, String[]> args) {
     // do nothing for empty fragments
     if (args == null || args.isEmpty()) {
       return;
@@ -468,7 +479,7 @@ public class EmbeddedVisUI extends CommonUI {
       visConfig.setVisType("htmldoc");
 
       // create input
-      input = DocBrowserController.createInput(corpus, docPath, visConfig, null,
+      input = DocBrowserController.createInput(corpus, documentNodeName, visConfig, null,
           visualizer.isUsingRawText(), EmbeddedVisUI.this);
       // create components, put in a panel
       Panel viszr = visualizer.createComponent(input, null);

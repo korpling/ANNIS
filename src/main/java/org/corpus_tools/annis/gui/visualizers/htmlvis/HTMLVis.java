@@ -386,7 +386,7 @@ public class HTMLVis extends AbstractVisualizer {
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
-      String toplevelCorpusId, String documentName, Map<String, String> mappings, UI ui) {
+      String toplevelCorpusId, Map<String, String> mappings, UI ui) {
     Set<String> result = null;
 
     toplevelCorpusId = Helper.removeSaltPrefix(toplevelCorpusId);
