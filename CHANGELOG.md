@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multiple texts in parallel corpora where treated as a single text, causing
   several problems. E.g. the KWIC view was showing a single token row with gaps
   instead of several token rows for parallel corpora.
+- Fixed issue with qualified annotation names in HTML visualizer, which resulted
+  in incomplete results.
 
 ## [4.9.1] - 2022-06-30
 
