@@ -479,7 +479,6 @@ class AnnisUITest {
   void parallelTextKwic() throws Exception {
     executeSearch("parallel.sample", "tok ->align_e-g tok", 5, 1);
 
-
     // Test that there are two KWIC panels with the correct table cells
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
     KWICMultipleTextComponent parentKwicVis = _get(resultPanel, KWICMultipleTextComponent.class);
@@ -621,6 +620,32 @@ class AnnisUITest {
         .startsWith("Feigenblatt Die Jugendlichen in Zossen wollen ein Musikcafé ."));
     assertTrue(rawTextLabel.getValue().endsWith("Die glänzten diesmal noch mit Abwesenheit ."));
 
+  }
+
+  @Test
+  void showDocumentRawTextParallel() throws Exception {
+    UI.getCurrent().getNavigator().navigateTo("");
+
+    ui.getSearchView().getDocBrowserController().openDocBrowser("parallel.sample");
+
+    DocBrowserPanel panel = _get(DocBrowserPanel.class);
+
+    awaitCondition(120, () -> !_find(panel, DocBrowserTable.class).isEmpty());
+
+    DocBrowserTable docBrowserTable = _get(panel, DocBrowserTable.class);
+
+    // Click on the button to open the full text visualization for the first document
+    _click(_get(docBrowserTable, Button.class, spec -> spec.withCaption("full text")));
+
+    Component rawTextPanel = ui.getSearchView().getTabSheet().getSelectedTab();
+    Tab selectedTab = ui.getSearchView().getTabSheet().getTab(rawTextPanel);
+    assertEquals("parallel.sample...", selectedTab.getCaption());
+
+    // Wait for label to appear
+    awaitCondition(20, () -> _find(rawTextPanel, Label.class).size() == 2, 1000);
+    List<Label> rawTextLabels = _find(rawTextPanel, Label.class);
+    assertEquals("Das ist ein Beispielsatz . ", rawTextLabels.get(0).getValue());
+    assertEquals("This is an example . ", rawTextLabels.get(1).getValue());
   }
 
   @Test
