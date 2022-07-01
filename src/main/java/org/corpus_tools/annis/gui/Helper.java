@@ -183,10 +183,38 @@ public class Helper {
 
   }
 
+  /**
+   * Gets the decoded corpus path for any node ID.
+   * 
+   * <p>
+   * It assumes a hierarchical node name of the form "toplevelcorpus/corpus/document" with first
+   * part of the path beeing the toplevel corpus, any number of sub-corpora and the last part of the
+   * path beeing the document name. The returned path does not include a possible "salt:/" prefix or
+   * any URI fragment.
+   * </p>
+   * 
+   * @param uri The URI to get the corpus path from.
+   * @return The assumed corpus path.
+   * @see #getCorpusPath(String, boolean)
+   */
   public static List<String> getCorpusPath(String uri) {
     return getCorpusPath(uri, true);
   }
 
+  /**
+   * Gets the corpus path for any node ID.
+   * 
+   * <p>
+   * It assumes a hierarchical node name of the form "toplevelcorpus/corpus/document" with first
+   * part of the path beeing the toplevel corpus, any number of sub-corpora and the last part of the
+   * path beeing the document name. The returned path does not include a possible "salt:/" prefix or
+   * any URI fragment.
+   * </p>
+   * 
+   * @param uri The URI to get the corpus path from.
+   * @param decodeElements If true, each part of the path is decoded.
+   * @return The assumed corpus path.
+   */
   public static List<String> getCorpusPath(String uri, boolean decodeElements) {
     uri = Helper.removeSaltPrefix(uri);
     final String rawPath = StringUtils.strip(uri, "/ \t");
@@ -1112,14 +1140,16 @@ public class Helper {
   /**
    * Build a query that includes all (possible filtered by name) node of the document.
    * 
-   * @param docPath The path of the document. The single elements of the path should not be decoded.
+   * @param documentNodeName The name of the document node.
    * @param nodeAnnoFilter A list of node annotation names for filtering the nodes or null if no
    *        filtering should be applied.
    * @param useRawText If true, only extract the original raw text
    * @return
    */
-  public static String buildDocumentQuery(List<String> docPath, List<String> nodeAnnoFilter,
+  public static String buildDocumentQuery(String documentNodeName, List<String> nodeAnnoFilter,
       boolean useRawText) {
+
+    documentNodeName = Helper.removeSaltPrefix(documentNodeName);
 
     // Always fallback to all annotation when not using raw text and no filter is given
     boolean fallbackToAll = !useRawText && nodeAnnoFilter == null;
@@ -1135,7 +1165,7 @@ public class Helper {
     if (fallbackToAll) {
       aql.append("(n#node");
       aql.append(") & doc#annis:node_name=/");
-      aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+      aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(documentNodeName));
       aql.append("/ & #n @* #doc");
     } else {
       aql.append("(a#tok");
@@ -1147,7 +1177,7 @@ public class Helper {
       }
 
       aql.append(") & doc#annis:node_name=/");
-      aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(Joiner.on('/').join(docPath)));
+      aql.append(Helper.AQL_REGEX_VALUE_ESCAPER.escape(documentNodeName));
       aql.append("/ & #a @* #doc");
     }
     return aql.toString();
