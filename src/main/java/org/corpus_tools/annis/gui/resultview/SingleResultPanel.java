@@ -33,6 +33,7 @@ import com.vaadin.v7.data.Property;
 import com.vaadin.v7.data.util.IndexedContainer;
 import com.vaadin.v7.ui.AbstractSelect;
 import com.vaadin.v7.ui.ComboBox;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -65,7 +66,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SingleResultPanel extends CssLayout
     implements Button.ClickListener, VisualizerContextChanger {
-  private static final Random RANDOM = new Random();
+  private static final Random RANDOM = new SecureRandom();
 
   private static class AddNewItemHandler implements AbstractSelect.NewItemHandler {
 
