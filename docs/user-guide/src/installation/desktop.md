@@ -11,7 +11,7 @@ To install ANNIS follow these steps:
    Open your system terminal and navigate to the directory where the JAR-file is located, e.g. `/Users/myself/Documents` and directly start the JAR-file with java:
    ```bash
    cd /Users/myself/Documents
-   java -jar annis-gui-<version>-desktop.jar
+   java -jar annis-<version>-desktop.jar
    ```
    You have to replace `<version>` with the version of ANNIS you are using.
 3. A browser window with the address <http://localhost:5712> should open automatically, if not you can click on the button in the ANNIS Desktop window.
