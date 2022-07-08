@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.9.4] - 2022-07-08
+
 ### Fixed
 
 - Ignore terminal namespace when null in tree visualizers. The tree visualizer
@@ -1188,7 +1190,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.3...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.4...HEAD
+[4.9.4]: https://github.com/korpling/ANNIS/compare/v4.9.3...v4.9.4
 [4.9.3]: https://github.com/korpling/ANNIS/compare/v4.9.2...v4.9.3
 [4.9.2]: https://github.com/korpling/ANNIS/compare/v4.9.1...v4.9.2
 [4.9.1]: https://github.com/korpling/ANNIS/compare/v4.9.0...v4.9.1

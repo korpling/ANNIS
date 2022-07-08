@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.9.3
-date-released: 2022-07-01
+version: 4.9.4
+date-released: 2022-07-08
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -782,7 +782,7 @@ references:
   title: JavaMail API
   version: 1.5.6
   abbreviation: com.sun.mail:javax.mail
-  license: CDDL-1.0 OR GPL-2.0-only WITH Classpath-exception-2.0
+  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
   notes: More license information can be found in the THIRD-PARTY/JavaMail_API directory.
   authors:
   - name: Bill Shannon
