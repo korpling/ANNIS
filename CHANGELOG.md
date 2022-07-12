@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Corpus selection was not reliably shown when executing a corpus query or
+  corpus selecting by using the URL.
+
 ## [4.9.4] - 2022-07-08
 
 ### Fixed
