@@ -336,22 +336,22 @@ public class CorpusListPanel extends VerticalLayout {
     MultiSelect<String> corpusSelection = tblCorpora.asMultiSelect();
     binder.forField(corpusSelection).bind(QueryUIState::getSelectedCorpora,
         QueryUIState::setSelectedCorpora);
-    binder.setBean(ui.getQueryState());
-
-
-    binder.addValueChangeListener(event -> {
-      Set<String> selectedCorpora = new HashSet<>(ui.getQueryState().getSelectedCorpora());
-      autoGenQueries.setSelectedCorpusInBackground(selectedCorpora);
-      ui.getQueryController().corpusSelectionChangedInBackground();
-      // trigger a resort
-      tblCorpora.clearSortOrder();
-      tblCorpora.setSortOrder(
-          new GridSortOrderBuilder<String>().thenDesc(selectedColumn).thenAsc(nameColumn).build());
-      tblCorpora.scrollTo(0);
-    });
-
+    binder.addStatusChangeListener(event -> resetSortOrder());
 
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
+
+    resetSortOrder();
+  }
+
+  private void resetSortOrder() {
+    Set<String> selectedCorpora = new HashSet<>(ui.getQueryState().getSelectedCorpora());
+    autoGenQueries.setSelectedCorpusInBackground(selectedCorpora);
+    ui.getQueryController().corpusSelectionChangedInBackground();
+    // trigger a resort
+    tblCorpora.clearSortOrder();
+    tblCorpora.setSortOrder(
+        new GridSortOrderBuilder<String>().thenDesc(selectedColumn).thenAsc(nameColumn).build());
+    tblCorpora.scrollTo(0);
   }
 
   public Grid<String> getTblCorpora() {
