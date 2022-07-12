@@ -332,7 +332,7 @@ public class CorpusListPanel extends VerticalLayout {
       ExceptionDialog.show(e, "Coould not get corpus list", getUI());
     }
 
-    Binder<QueryUIState> binder = new Binder<>();
+    Binder<QueryUIState> binder = ui.getQueryController().getBinder();
     MultiSelect<String> corpusSelection = tblCorpora.asMultiSelect();
     binder.forField(corpusSelection).bind(QueryUIState::getSelectedCorpora,
         QueryUIState::setSelectedCorpora);
