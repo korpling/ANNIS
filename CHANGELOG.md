@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Corpus selection was not reliably shown when executing a corpus query or
   corpus selecting by using the URL.
+- Update to graphANNIS 2.2.2 to avoid out of memory errors for results which a
+  large number of matches.
+
 
 ## [4.9.4] - 2022-07-08
 
