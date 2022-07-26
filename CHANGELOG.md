@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.9.5] - 2022-07-26
+
 ### Fixed
 
 - Corpus selection was not reliably shown when executing a corpus query or
@@ -1198,7 +1200,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.4...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.5...HEAD
+[4.9.5]: https://github.com/korpling/ANNIS/compare/v4.9.4...v4.9.5
 [4.9.4]: https://github.com/korpling/ANNIS/compare/v4.9.3...v4.9.4
 [4.9.3]: https://github.com/korpling/ANNIS/compare/v4.9.2...v4.9.3
 [4.9.2]: https://github.com/korpling/ANNIS/compare/v4.9.1...v4.9.2
