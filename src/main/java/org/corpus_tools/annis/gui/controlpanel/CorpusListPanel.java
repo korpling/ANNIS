@@ -329,7 +329,7 @@ public class CorpusListPanel extends VerticalLayout {
 
 
     } catch (ApiException e) {
-      ExceptionDialog.show(e, "Coould not get corpus list", getUI());
+      ExceptionDialog.show(e, "Could not get corpus list", getUI());
     }
 
     Binder<QueryUIState> binder = ui.getQueryController().getBinder();
@@ -351,7 +351,9 @@ public class CorpusListPanel extends VerticalLayout {
     tblCorpora.clearSortOrder();
     tblCorpora.setSortOrder(
         new GridSortOrderBuilder<String>().thenDesc(selectedColumn).thenAsc(nameColumn).build());
-    tblCorpora.scrollTo(0);
+    if (availableCorpora != null && !availableCorpora.getItems().isEmpty()) {
+      tblCorpora.scrollTo(0);
+    }
   }
 
   public Grid<String> getTblCorpora() {
