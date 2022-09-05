@@ -19,7 +19,6 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.HelpPanel;
 
 /**
  * This panel allows the user to control and execute queries.
@@ -40,7 +39,7 @@ public class ControlPanel extends VerticalLayout {
 
     private final TabSheet optionsTab;
 
-    public ControlPanel(AnnisUI ui, HelpPanel helpPanel) {
+    public ControlPanel(AnnisUI ui) {
       this.ui = ui;
         setSizeFull();
         setMargin(true);
@@ -53,7 +52,7 @@ public class ControlPanel extends VerticalLayout {
         optionsTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
         queryPanel = new QueryPanel(ui);
-        corpusList = new CorpusListPanel(ui, helpPanel.getExamples());
+        corpusList = new CorpusListPanel(ui);
         searchOptions = new SearchOptionsPanel();
 
         optionsTab.addTab(corpusList, "Corpus List", null);

@@ -148,7 +148,7 @@ public class SearchView extends GridLayout
         helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
         helpTab.setClosable(false);
 
-        controlPanel = new ControlPanel(ui, helpPanel);
+        controlPanel = new ControlPanel(ui);
 
         controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
         controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
@@ -323,7 +323,6 @@ public class SearchView extends GridLayout
                     q.setCorpora(corpora);
                     q.setQuery("");
                     ui.getQueryController().setQuery(q);
-                    ui.getQueryController().corpusSelectionChangedInBackground();
                 } else if (args.get("cl") != null && args.get("cr") != null) {
                     // make sure the properties are not overwritten by the background process
                     getControlPanel().getSearchOptions().setUpdateStateFromConfig(false);

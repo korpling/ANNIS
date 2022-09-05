@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - No `Row outside dataProvider size` error message when the corpus list is
   empty.
+- The segmentation context was automatically reset to its default value from
+  configuration when changed manually.
 
 ## [4.9.5] - 2022-07-26
 
