@@ -1,6 +1,7 @@
 package org.corpus_tools.annis.gui.graphml;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
@@ -181,6 +182,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
     Map<String, String> data = new HashMap<>();
 
+    long nodeCounter = 0;
+    Map<String, Long> nodePosition = new HashMap<>();
+
     while (reader.hasNext()) {
       XMLEvent event = reader.nextEvent();
       switch (event.getEventType()) {
@@ -205,7 +209,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                 if (id != null) {
                   currentNodeId = Optional.ofNullable(id.getValue());
                 }
-
               }
               break;
             case "edge":
@@ -251,6 +254,10 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                   // Map node and add it
                   SNode n = mapNode(currentNodeId.get(), data);
                   graph.addNode(n);
+
+                  nodePosition.put(n.getId(), nodeCounter);
+                  nodeCounter++;
+
                 } else if ("datasource".equals(nodeType)) {
                   // Create a textual datasource of this name
                   STextualDS ds = SaltFactory.createSTextualDS();
@@ -322,8 +329,18 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
         }
 
         for (STextualDS ds : rootsForDatasource.keySet()) {
+          // Sort the roots by their position in the GraphML file, which should correlate with their
+          // position in the text. This at least gives a stable sorting in case there are gaps
+          // in the token data.
+          List<SNode> dsRoots = new ArrayList<>(rootsForDatasource.get(ds));
+          dsRoots.sort((o1, o2) -> {
+            Long pos1 = nodePosition.get(o1.getId());
+            Long pos2 = nodePosition.get(o2.getId());
+            return ComparisonChain.start().compare(pos1, pos2).compare(o1.getId(), o2.getId())
+                .result();
+          });
           // re-create text if this is the default (possible virtual) tokenization
-          recreateTextForRootNodes(name, rootsForDatasource.get(ds), ds);
+          recreateTextForRootNodes(name, dsRoots, ds);
         }
       } else {
         // add the text as label to the spans
