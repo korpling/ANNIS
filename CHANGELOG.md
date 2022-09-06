@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   configuration when changed manually.
 - Update to graphANNIS 2.3.0 which has various bug fixes, including fixing
   broken result ordering for certain queries.
+- Fixed order of subgraphs when there are gaps in the result
 
 ## [4.9.5] - 2022-07-26
 
