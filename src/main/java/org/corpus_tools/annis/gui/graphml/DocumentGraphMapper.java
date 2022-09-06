@@ -60,7 +60,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     private final StringBuilder text;
 
     private RecreateTextForRootNodeTraverser(Map<SToken, Range<Integer>> token2Range,
-        StringBuilder text, String textName) {
+        StringBuilder text) {
       this.token2Range = token2Range;
       this.text = text;
     }
@@ -485,7 +485,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     for (SNode root : rootsForText) {
       graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
           "ORDERING",
-          new RecreateTextForRootNodeTraverser(token2Range, text, ""));
+          new RecreateTextForRootNodeTraverser(token2Range, text));
     }
 
     // update the actual text

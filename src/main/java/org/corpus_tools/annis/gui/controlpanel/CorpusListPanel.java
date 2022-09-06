@@ -329,9 +329,7 @@ public class CorpusListPanel extends VerticalLayout {
     Binder<QueryUIState> binder = ui.getQueryController().getBinder();
     MultiSelect<String> corpusSelection = tblCorpora.asMultiSelect();
     binder.forField(corpusSelection).bind(QueryUIState::getSelectedCorpora,
-        (state, selectedCorpora) -> {
-          ui.getQueryController().setSelectedCorpora(selectedCorpora);
-        });
+        (state, selectedCorpora) -> ui.getQueryController().setSelectedCorpora(selectedCorpora));
 
 
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);

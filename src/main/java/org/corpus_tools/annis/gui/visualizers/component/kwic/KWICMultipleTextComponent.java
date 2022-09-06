@@ -44,9 +44,7 @@ public class KWICMultipleTextComponent extends CssLayout implements KWICInterfac
     if (visInput != null) {
       List<STextualDS> texts =
           new ArrayList<>(visInput.getDocument().getDocumentGraph().getTextualDSs());
-      texts.sort((t1, t2) -> {
-        return t1.getName().compareTo(t2.getName());
-      });
+      texts.sort((t1, t2) -> t1.getName().compareTo(t2.getName()));
       for (STextualDS t : texts) {
         KWICComponent kwic = new KWICComponent(visInput, mediaController, pdfController, t);
         kwicPanels.add(kwic);
