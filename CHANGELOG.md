@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   empty.
 - The segmentation context was automatically reset to its default value from
   configuration when changed manually.
+- Update to graphANNIS 2.3.0 which has various bug fixes, including fixing
+  broken result ordering for certain queries.
 
 ## [4.9.5] - 2022-07-26
 
