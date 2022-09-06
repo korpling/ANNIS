@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
@@ -175,7 +176,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     Optional<String> currentTargetId = Optional.empty();
     Optional<String> currentComponent = Optional.empty();
 
-    Map<String, STextualDS> datasources = new HashMap<>();
+    SortedMap<String, STextualDS> datasources = new TreeMap<>();
     Map<SToken, SToken> gapEdges = new HashMap<>();
 
     Map<String, String> data = new HashMap<>();
@@ -306,6 +307,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
         recreateTextForRootNodes(orderedTokenRoots, ds);
       }
     } else {
+      // Sort data sources by their name
+
       for (STextualDS ds : datasources.values()) {
         List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, ds);
         recreateTextForRootNodes(orderedTokenRoots, ds);
