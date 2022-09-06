@@ -1,7 +1,6 @@
 package org.corpus_tools.annis.gui.graphml;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
@@ -17,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -57,23 +57,21 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private final class RecreateTextForRootNodeTraverser implements GraphTraverseHandler {
     private final Map<SToken, Range<Integer>> token2Range;
     private final StringBuilder text;
-    private final String textName;
 
     private RecreateTextForRootNodeTraverser(Map<SToken, Range<Integer>> token2Range,
         StringBuilder text, String textName) {
       this.token2Range = token2Range;
       this.text = text;
-      this.textName = textName;
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType,
-        String traversalId, SRelation relation, SNode currNode, long order) {
+    public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+        SRelation relation, SNode currNode, long order) {
       if (relation == null) {
         return true;
       } else if (relation instanceof SOrderRelation
-          && Objects.equal(textName, relation.getType())) {
+          && Objects.equal("", relation.getType())) {
         return true;
       } else {
         return false;
@@ -89,8 +87,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
         SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
 
       if (currNode instanceof SToken) {
-        SFeature featTokWhitespaceBefore =
-            currNode.getFeature("annis::tok-whitespace-before");
+        SFeature featTokWhitespaceBefore = currNode.getFeature("annis::tok-whitespace-before");
         if (featTokWhitespaceBefore != null) {
           text.append(featTokWhitespaceBefore.getValue().toString());
         }
@@ -179,11 +176,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     Optional<String> currentComponent = Optional.empty();
 
     Map<String, STextualDS> datasources = new HashMap<>();
+    Map<SToken, SToken> gapEdges = new HashMap<>();
 
     Map<String, String> data = new HashMap<>();
-
-    long nodeCounter = 0;
-    Map<String, Long> nodePosition = new HashMap<>();
 
     while (reader.hasNext()) {
       XMLEvent event = reader.nextEvent();
@@ -254,10 +249,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                   // Map node and add it
                   SNode n = mapNode(currentNodeId.get(), data);
                   graph.addNode(n);
-
-                  nodePosition.put(n.getId(), nodeCounter);
-                  nodeCounter++;
-
                 } else if ("datasource".equals(nodeType)) {
                   // Create a textual datasource of this name
                   STextualDS ds = SaltFactory.createSTextualDS();
@@ -276,7 +267,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               if (currentSourceId.isPresent() && currentTargetId.isPresent()
                   && currentComponent.isPresent()) {
                 mapAndAddEdge(currentSourceId.get(), currentTargetId.get(), currentComponent.get(),
-                    data);
+                    data, gapEdges);
               }
 
               currentSourceId = Optional.empty();
@@ -302,8 +293,24 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
 
 
-    // find all chains of SOrderRelations and reconstruct the texts belonging to
-    // them
+    // Create the textual DS for the minimal token roots
+    if (datasources.isEmpty()) {
+      // In case there are no data sources, create an empty default one
+      STextualDS ds = SaltFactory.createSTextualDS();
+      ds.setText("");
+      graph.addNode(ds);
+      // Find roots ignoring the data source, but add them to the newly created one
+      List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, null);
+      recreateTextForRootNodes(orderedTokenRoots, ds);
+    } else {
+      for (STextualDS ds : datasources.values()) {
+        List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, ds);
+        recreateTextForRootNodes(orderedTokenRoots, ds);
+      }
+    }
+
+
+    // Create the text annotation for the segmentation nodes
     Multimap<String, SNode> orderRoots = graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
     if (orderRoots.isEmpty() && graph.getTokens().size() == 1) {
       // if there is only one token, there won't be any order relations
@@ -314,35 +321,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       if (SaltUtil.SALT_NULL_VALUE.equals(name)) {
         name = null;
       }
-      if (name == null || "".equals(name)) {
-        // Decide to which data sources the token belong to. A single data source could have
-        // multiple root token due to gaps in the result. But there also could be multiple root
-        // token because multiple textual data sources are involved.
-        Multimap<STextualDS, SNode> rootsForDatasource = HashMultimap.create();
-        for (SNode r : roots) {
-          for (String targetId : isPartOf.get(r.getId())) {
-            STextualDS targetDs = datasources.get(targetId);
-            if (targetDs != null) {
-              rootsForDatasource.put(targetDs, r);
-            }
-          }
-        }
-
-        for (STextualDS ds : rootsForDatasource.keySet()) {
-          // Sort the roots by their position in the GraphML file, which should correlate with their
-          // position in the text. This at least gives a stable sorting in case there are gaps
-          // in the token data.
-          List<SNode> dsRoots = new ArrayList<>(rootsForDatasource.get(ds));
-          dsRoots.sort((o1, o2) -> {
-            Long pos1 = nodePosition.get(o1.getId());
-            Long pos2 = nodePosition.get(o2.getId());
-            return ComparisonChain.start().compare(pos1, pos2).compare(o1.getId(), o2.getId())
-                .result();
-          });
-          // re-create text if this is the default (possible virtual) tokenization
-          recreateTextForRootNodes(name, dsRoots, ds);
-        }
-      } else {
+      if (name != null && !"".equals(name)) {
         // add the text as label to the spans
         addTextToSegmentation(name, roots);
       }
@@ -350,7 +329,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
     addNodeLayers();
   }
-
 
 
   /**
@@ -387,7 +365,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   }
 
   private void mapAndAddEdge(String sourceId, String targetId, String componentRaw,
-      Map<String, String> labels) {
+      Map<String, String> labels, Map<SToken, SToken> gapEdges) {
 
     SNode source = graph.getNode(Helper.addSaltPrefix(sourceId));
     SNode target = graph.getNode(Helper.addSaltPrefix(targetId));
@@ -414,7 +392,15 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
           rel = graph.createRelation(source, target, SALT_TYPE.SPOINTING_RELATION, null);
           break;
         case ORDERING:
-          rel = graph.createRelation(source, target, SALT_TYPE.SORDER_RELATION, null);
+          if ("annis".equals(component.getLayer())
+              && "datasource-gap".equals(component.getName())) {
+            if (source instanceof SToken && target instanceof SToken) {
+              gapEdges.put((SToken) source, (SToken) target);
+            }
+          } else {
+            rel = graph.createRelation(source, target, SALT_TYPE.SORDER_RELATION, null);
+          }
+
           break;
         case COVERAGE:
           // only add coverage edges in salt to spans, not structures
@@ -436,25 +422,64 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
   }
 
-  private void recreateTextForRootNodes(final String textName,
-      Collection<? extends SNode> rootsForText, STextualDS originalDs) {
+  private List<SToken> getOrderedTokenRootsForDatasource(SDocumentGraph graph,
+      Map<SToken, SToken> gapEdges, STextualDS ds) {
+    Map<SToken, SToken> outgoingOrderingEdges = new HashMap<>();
+    Map<SToken, SToken> incomingOrderingEdgesWithGaps = new HashMap<>();
+
+    for (SOrderRelation rel : graph.getOrderRelations()) {
+      if (("".equals(rel.getType()) || rel.getType() == null) && rel.getSource() instanceof SToken
+          && rel.getTarget() instanceof SToken) {
+        outgoingOrderingEdges.put((SToken) rel.getSource(), (SToken) rel.getTarget());
+        incomingOrderingEdgesWithGaps.put((SToken) rel.getTarget(), (SToken) rel.getSource());
+      }
+    }
+
+    for (Map.Entry<SToken, SToken> rel : gapEdges.entrySet()) {
+      incomingOrderingEdgesWithGaps.put(rel.getValue(), rel.getKey());
+    }
+    
+    // Get all root nodes of this data source (token without any incoming ordering edge)
+    List<SToken> datasourceRoots = graph.getTokens().stream()
+        .filter(t -> !incomingOrderingEdgesWithGaps.containsKey(t))
+        .filter(t -> ds == null
+            || isPartOf.get(t.getId()).stream().anyMatch(dsId -> ds.getId().equals(dsId)))
+        .collect(Collectors.toList());
+
+    List<SToken> result = new ArrayList<>();
+    // Create an ordered list of local roots (without the gap ordering edges) by following the
+    // outgoing ordering edges
+    for(SToken root : datasourceRoots) {
+      SToken token = root;
+
+      while (token != null) {
+        result.add(token);
+
+        // Skip to to end of this token chain
+        while (outgoingOrderingEdges.containsKey(token)) {
+          token = outgoingOrderingEdges.get(token);
+        }
+        // Step over the possible gap
+        token = gapEdges.get(token);
+      }
+    }
+
+    return result;
+
+  }
+
+
+  private void recreateTextForRootNodes(Collection<? extends SNode> rootsForText, STextualDS ds) {
 
     final StringBuilder text = new StringBuilder();
-    final STextualDS ds;
-    if (originalDs == null) {
-      ds = graph.createTextualDS("");
-      ds.setName(textName);
-    } else {
-      ds = originalDs;
-    }
 
     Map<SToken, Range<Integer>> token2Range = new HashMap<>();
 
     // traverse the token chain using the order relations
     for (SNode root : rootsForText) {
       graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-          "ORDERING_" + textName,
-          new RecreateTextForRootNodeTraverser(token2Range, text, textName));
+          "ORDERING",
+          new RecreateTextForRootNodeTraverser(token2Range, text, ""));
     }
 
     // update the actual text
