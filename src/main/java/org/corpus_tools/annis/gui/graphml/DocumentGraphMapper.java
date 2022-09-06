@@ -295,13 +295,16 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
     // Create the textual DS for the minimal token roots
     if (datasources.isEmpty()) {
-      // In case there are no data sources, create an empty default one
-      STextualDS ds = SaltFactory.createSTextualDS();
-      ds.setText("");
-      graph.addNode(ds);
-      // Find roots ignoring the data source, but add them to the newly created one
+      // Find roots ignoring the data source
       List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, null);
-      recreateTextForRootNodes(orderedTokenRoots, ds);
+      if (!orderedTokenRoots.isEmpty()) {
+        // Create an empty default data source, because there are none yet
+        STextualDS ds = SaltFactory.createSTextualDS();
+        ds.setText("");
+        graph.addNode(ds);
+        // Use this default data source to attach the token to
+        recreateTextForRootNodes(orderedTokenRoots, ds);
+      }
     } else {
       for (STextualDS ds : datasources.values()) {
         List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, ds);
