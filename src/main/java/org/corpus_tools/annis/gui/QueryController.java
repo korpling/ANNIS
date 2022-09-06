@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
 import okhttp3.Call;
@@ -245,9 +246,12 @@ public class QueryController implements Serializable {
     }
   }
 
-  public void corpusSelectionChangedInBackground() {
+  private void corpusSelectionChanged() {
     searchView.getControlPanel().getSearchOptions()
         .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora());
+    searchView.getHelpPanel().getExamples()
+        .setSelectedCorpusInBackground(getState().getSelectedCorpora());
+    searchView.getControlPanel().getCorpusList().corpusSelectionChanged();
   }
 
   public void executeExport(ExportPanel panel, EventBus eventBus) {
@@ -552,10 +556,8 @@ public class QueryController implements Serializable {
     if (q.getQueryLanguage() != state.getQueryLanguageLegacy()) {
       state.setQueryLanguageLegacy(q.getQueryLanguage());
     }
-    if (!Objects.deepEquals(state.getSelectedCorpora(), q.getCorpora())) {
-      state.setSelectedCorpora(q.getCorpora());
-      corpusSelectionChangedInBackground();
-    }
+    setSelectedCorpora(q.getCorpora());
+
 
     if (q instanceof ContextualizedQuery) {
       if (!Objects.equals(state.getLeftContext(), ((ContextualizedQuery) q).getLeftContext())) {
@@ -592,6 +594,13 @@ public class QueryController implements Serializable {
 
     // Update the binder
     binder.setBean(state);
+  }
+
+  public void setSelectedCorpora(Set<String> selected) {
+    if (!Objects.deepEquals(state.getSelectedCorpora(), selected)) {
+      state.setSelectedCorpora(selected);
+      corpusSelectionChanged();
+    }
   }
 
   public void validateQuery() {

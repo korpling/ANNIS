@@ -3,12 +3,18 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
 ### Fixed
 
 - No `Row outside dataProvider size` error message when the corpus list is
   empty.
-
-## [Unreleased]
+- The segmentation context was automatically reset to its default value from
+  configuration when changed manually.
+- Update to graphANNIS 2.3.0 which has various bug fixes, including fixing
+  broken result ordering for certain queries.
+- Fixed order of subgraphs when there are gaps in the result
+- Update jsoup dependency to 1.15.3
 
 ## [4.9.5] - 2022-07-26
 

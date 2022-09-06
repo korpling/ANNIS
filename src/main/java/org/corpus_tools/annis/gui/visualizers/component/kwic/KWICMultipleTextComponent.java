@@ -15,6 +15,7 @@
 package org.corpus_tools.annis.gui.visualizers.component.kwic;
 
 import com.vaadin.ui.CssLayout;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,9 @@ public class KWICMultipleTextComponent extends CssLayout implements KWICInterfac
     setHeight("-1");
     this.kwicPanels = new LinkedList<KWICInterface>();
     if (visInput != null) {
-      List<STextualDS> texts = visInput.getDocument().getDocumentGraph().getTextualDSs();
+      List<STextualDS> texts =
+          new ArrayList<>(visInput.getDocument().getDocumentGraph().getTextualDSs());
+      texts.sort((t1, t2) -> t1.getName().compareTo(t2.getName()));
       for (STextualDS t : texts) {
         KWICComponent kwic = new KWICComponent(visInput, mediaController, pdfController, t);
         kwicPanels.add(kwic);

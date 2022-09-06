@@ -8,8 +8,6 @@ import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.google.common.collect.Sets;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
-import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.ExportPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +43,8 @@ class ExportPanelTest {
   @Test
   void testCSVExport() throws Exception {
     // Prepare query
-    ui.getQueryState().setSelectedCorpora(Sets.newHashSet("pcc2"));
-    ui.getQueryState().getAql().setValue("tok=\"Feigenblatt\"");
+    ui.getQueryController().setQuery(QueryGenerator.displayed().corpora(Sets.newHashSet("pcc2"))
+        .query("tok=\"Feigenblatt\"").build());
     
     // Click on the "More" button and then "Export"
     PopupButton moreButton = _get(PopupButton.class, spec -> spec.withCaption("More"));

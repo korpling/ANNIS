@@ -40,7 +40,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.ApiException;
@@ -49,7 +48,6 @@ import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CorpusBrowserPanel;
 import org.corpus_tools.annis.gui.CorpusSet;
-import org.corpus_tools.annis.gui.ExampleQueriesPanel;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.MetaDataPanel;
@@ -119,9 +117,6 @@ public class CorpusListPanel extends VerticalLayout {
 
   public static final String ALL_CORPORA = "All";
 
-  // holds the panels of auto generated queries
-  private final ExampleQueriesPanel autoGenQueries;
-
 
   private final Grid<String> tblCorpora = new Grid<>();
   private final GridScrollExtension<String> tblCorporaScrollExt =
@@ -144,9 +139,8 @@ public class CorpusListPanel extends VerticalLayout {
   private final Column<String, Boolean> selectedColumn;
 
 
-  public CorpusListPanel(AnnisUI ui, ExampleQueriesPanel autoGenQueries) {
+  public CorpusListPanel(AnnisUI ui) {
     this.ui = ui;
-    this.autoGenQueries = autoGenQueries;
 
     setWidthFull();
     setHeightFull();
@@ -335,18 +329,14 @@ public class CorpusListPanel extends VerticalLayout {
     Binder<QueryUIState> binder = ui.getQueryController().getBinder();
     MultiSelect<String> corpusSelection = tblCorpora.asMultiSelect();
     binder.forField(corpusSelection).bind(QueryUIState::getSelectedCorpora,
-        QueryUIState::setSelectedCorpora);
-    binder.addStatusChangeListener(event -> resetSortOrder());
+        (state, selectedCorpora) -> ui.getQueryController().setSelectedCorpora(selectedCorpora));
+
 
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
-
-    resetSortOrder();
+    corpusSelectionChanged();
   }
 
-  private void resetSortOrder() {
-    Set<String> selectedCorpora = new HashSet<>(ui.getQueryState().getSelectedCorpora());
-    autoGenQueries.setSelectedCorpusInBackground(selectedCorpora);
-    ui.getQueryController().corpusSelectionChangedInBackground();
+  public void corpusSelectionChanged() {
     // trigger a resort
     tblCorpora.clearSortOrder();
     tblCorpora.setSortOrder(

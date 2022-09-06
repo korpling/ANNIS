@@ -24,14 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.SingletonBeanStoreRetrievalStrategy;
-import org.corpus_tools.annis.gui.flatquerybuilder.EdgeBox;
-import org.corpus_tools.annis.gui.flatquerybuilder.FlatQueryBuilder;
-import org.corpus_tools.annis.gui.flatquerybuilder.MetaBox;
-import org.corpus_tools.annis.gui.flatquerybuilder.SearchBox;
-import org.corpus_tools.annis.gui.flatquerybuilder.SensitiveComboBox;
-import org.corpus_tools.annis.gui.flatquerybuilder.SpanBox;
-import org.corpus_tools.annis.gui.flatquerybuilder.ValueField;
-import org.corpus_tools.annis.gui.flatquerybuilder.VerticalNode;
 import org.corpus_tools.annis.gui.querybuilder.QueryBuilderChooser;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +52,7 @@ class FlatQueryBuilderTest {
     this.ui = beanFactory.getBean(AnnisUI.class);
     MockVaadin.setup(() -> this.ui);
 
-    ui.getQueryState().setSelectedCorpora(Sets.newSet("pcc2"));
+    ui.getQueryController().setSelectedCorpora(Sets.newSet("pcc2"));
 
     // Click on the query builder button and select the flat query builder
     _click(_get(Button.class, spec -> spec.withCaption("Query<br />Builder")));
