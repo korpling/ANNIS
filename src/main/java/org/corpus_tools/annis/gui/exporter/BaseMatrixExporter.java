@@ -127,7 +127,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
         while (lines.hasNext()) {
           String currentLine = lines.nextLine();
           Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
-              contextLeft, contextRight, args);
+              contextLeft, contextRight, args, corpusConfigs);
           if (p.isPresent()) {
             processFirstPass(p.get(), args, recordNumber++, nodeCount);
           }
@@ -154,7 +154,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
         while (lines.hasNext()) {
           String currentLine = lines.nextLine();
           Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
-              contextLeft, contextRight, args);
+              contextLeft, contextRight, args, corpusConfigs);
           if (p.isPresent()) {
             for (SCorpusGraph cg : p.get().getCorpusGraphs()) {
               for (SDocument doc : cg.getDocuments()) {
@@ -212,6 +212,5 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
 
   public abstract void outputText(SDocumentGraph graph, Map<String, String> args, boolean alignmc,
-      int recordNumber,
-      Writer out, UI ui) throws IOException;
+      int recordNumber, Writer out, UI ui) throws IOException;
 }
