@@ -1006,6 +1006,36 @@ components:
                 should be displayed first and in the given order. Annotations
                 not listed should be appended in alphabetical order to the given
                 entries.
+            timeline_strategy:
+              type: object
+              description: Configure strategy on how to display virtual tokenizations that mimic a timeline.
+              properties:
+                strategy:
+                  type: string
+                  description: >
+                    Which strategy to apply.
+                    
+                    - Explicit: Do not assume any relation between spans and segmentation nodes if not explicitly given by a `Coverage` edge).
+                    
+                    - ImplicitFromNamespace:  Use the namespace of an annotated span to map them to a segmentation node.
+                    
+                    - ImplicitFromMapping: Map qualified annotation names (e.g. `speaker1::pause`) to the segmentation names.
+                  enum:
+                    - Explicit
+                    - ImplicitFromNamespace
+                    - ImplicitFromMapping
+                  example: ImplicitFromMapping
+                mappings:
+                  type: object
+                  description: "When ImplicitFromMapping' is select, mappings with the annotation name as key and the corresponding segmentation as value"
+                  example:
+                    "annotation::bound_head": "tok_anno"
+                    "annotation::bound_sent": "tok_anno"
+                    "annotation::posMWU": "tok_anno"
+                    "layout::column": "tok_dipl"
+                    "layout::line": "tok_dipl"
+                    "layout::page": "tok_dipl"
+                    
         example_queries:
           type: array
           description: An array of example queries for the corpus with a description.
