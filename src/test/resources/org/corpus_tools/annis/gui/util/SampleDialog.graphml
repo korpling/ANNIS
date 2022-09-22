@@ -1,0 +1,1341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml>
+    <key id="k0" for="node" attr.name="acquainted" attr.type="string"/>
+    <key id="k1" for="node" attr.name="instructee::age" attr.type="string"/>
+    <key id="k2" for="node" attr.name="instructor::age" attr.type="string"/>
+    <key id="k3" for="node" attr.name="instructee::braces" attr.type="string"/>
+    <key id="k4" for="node" attr.name="instructor::braces" attr.type="string"/>
+    <key id="k5" for="node" attr.name="default_ns::break" attr.type="string"/>
+    <key id="k6" for="node" attr.name="corpus" attr.type="string"/>
+    <key id="k7" for="node" attr.name="corpus%20description" attr.type="string"/>
+    <key id="k8" for="node" attr.name="annis::doc" attr.type="string"/>
+    <key id="k9" for="node" attr.name="document" attr.type="string"/>
+    <key id="k10" for="node" attr.name="instructee::education" attr.type="string"/>
+    <key id="k11" for="node" attr.name="instructor::education" attr.type="string"/>
+    <key id="k12" for="node" attr.name="instructee::height" attr.type="string"/>
+    <key id="k13" for="node" attr.name="instructor::height" attr.type="string"/>
+    <key id="k14" for="node" attr.name="default_ns::instructee_bc" attr.type="string"/>
+    <key id="k15" for="node" attr.name="annis::instructee_dipl" attr.type="string"/>
+    <key id="k16" for="node" attr.name="default_ns::instructee_extra" attr.type="string"/>
+    <key id="k17" for="node" attr.name="default_ns::instructee_lemma" attr.type="string"/>
+    <key id="k18" for="node" attr.name="default_ns::instructee_norm" attr.type="string"/>
+    <key id="k19" for="node" attr.name="default_ns::instructee_pos" attr.type="string"/>
+    <key id="k20" for="node" attr.name="default_ns::instructee_utt" attr.type="string"/>
+    <key id="k21" for="node" attr.name="annis::instructor_dipl" attr.type="string"/>
+    <key id="k22" for="node" attr.name="default_ns::instructor_lemma" attr.type="string"/>
+    <key id="k23" for="node" attr.name="default_ns::instructor_norm" attr.type="string"/>
+    <key id="k24" for="node" attr.name="default_ns::instructor_pos" attr.type="string"/>
+    <key id="k25" for="node" attr.name="default_ns::instructor_utt" attr.type="string"/>
+    <key id="k26" for="node" attr.name="instructee::l1" attr.type="string"/>
+    <key id="k27" for="node" attr.name="instructor::l1" attr.type="string"/>
+    <key id="k28" for="node" attr.name="instructee::l2" attr.type="string"/>
+    <key id="k29" for="node" attr.name="instructor::l2" attr.type="string"/>
+    <key id="k30" for="node" attr.name="language" attr.type="string"/>
+    <key id="k31" for="node" attr.name="instructee::language_disorder" attr.type="string"/>
+    <key id="k32" for="node" attr.name="instructor::language_disorder" attr.type="string"/>
+    <key id="k33" for="node" attr.name="instructee::languages-used" attr.type="string"/>
+    <key id="k34" for="node" attr.name="instructor::languages-used" attr.type="string"/>
+    <key id="k35" for="node" attr.name="annis::layer" attr.type="string"/>
+    <key id="k36" for="node" attr.name="default_ns::len" attr.type="string"/>
+    <key id="k37" for="node" attr.name="instructee::map" attr.type="string"/>
+    <key id="k38" for="node" attr.name="instructor::map" attr.type="string"/>
+    <key id="k39" for="node" attr.name="instructee::name" attr.type="string"/>
+    <key id="k40" for="node" attr.name="instructor::name" attr.type="string"/>
+    <key id="k41" for="node" attr.name="annis::node_type" attr.type="string"/>
+    <key id="k42" for="node" attr.name="instructee::piercing" attr.type="string"/>
+    <key id="k43" for="node" attr.name="instructor::piercing" attr.type="string"/>
+    <key id="k44" for="node" attr.name="instructee::primary_school" attr.type="string"/>
+    <key id="k45" for="node" attr.name="instructor::primary_school" attr.type="string"/>
+    <key id="k46" for="node" attr.name="project" attr.type="string"/>
+    <key id="k47" for="node" attr.name="recording_date" attr.type="string"/>
+    <key id="k48" for="node" attr.name="annis::relannis-version" attr.type="string"/>
+    <key id="k49" for="node" attr.name="sequence" attr.type="string"/>
+    <key id="k50" for="node" attr.name="instructee::sex" attr.type="string"/>
+    <key id="k51" for="node" attr.name="instructor::sex" attr.type="string"/>
+    <key id="k52" for="node" attr.name="instructee::smoker" attr.type="string"/>
+    <key id="k53" for="node" attr.name="instructor::smoker" attr.type="string"/>
+    <key id="k54" for="node" attr.name="subcorpus" attr.type="string"/>
+    <key id="k55" for="node" attr.name="subcorpus%20description" attr.type="string"/>
+    <key id="k56" for="node" attr.name="annis::time" attr.type="string"/>
+    <key id="k57" for="node" attr.name="annis::tok" attr.type="string"/>
+    <key id="k58" for="node" attr.name="annis::tok-whitespace-after" attr.type="string"/>
+    <key id="k59" for="node" attr.name="version" attr.type="string"/>
+    <key id="k60" for="node" attr.name="website" attr.type="string"/>
+    <key id="k61" for="node" attr.name="instructee::weight" attr.type="string"/>
+    <key id="k62" for="node" attr.name="instructor::weight" attr.type="string"/>
+    <graph edgedefault="directed" parse.order="nodesfirst" parse.nodeids="free" parse.edgeids="canonical">
+        <node id="BeMaTaC_L1_2013-02.1">
+            <data key="k41">corpus</data>
+            <data key="k48">3.2</data>
+            <data key="k6">Berlin Map Task Corpus</data>
+            <data key="k7">a deeply annotated multimodal map-task corpus of spoken learner and native German</data>
+            <data key="k30">German</data>
+            <data key="k46">BeMaTaC</data>
+            <data key="k54">L1</data>
+            <data key="k55">native speaker subcorpus</data>
+            <data key="k59">2013-02.1</data>
+            <data key="k60">&lt;a href=&quot;http://u.hu-berlin.de/bematac&quot; target=&quot;_blank&quot;&gt;BeMaTaC website&lt;/a&gt;</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A">
+            <data key="k41">corpus</data>
+            <data key="k8">2011-12-14-A</data>
+            <data key="k0">false</data>
+            <data key="k1">26</data>
+            <data key="k2">22</data>
+            <data key="k3">false</data>
+            <data key="k4">false</data>
+            <data key="k9">2011-12-14-A</data>
+            <data key="k10">B.A.                        Politikwissenschaft</data>
+            <data key="k11">B.A. Sonderpädagogik</data>
+            <data key="k12">171</data>
+            <data key="k13">178</data>
+            <data key="k26">deu</data>
+            <data key="k27">deu</data>
+            <data key="k28">eng, fra, spa</data>
+            <data key="k29">eng, pol</data>
+            <data key="k31">false</data>
+            <data key="k32">false</data>
+            <data key="k33">deu</data>
+            <data key="k34">deu</data>
+            <data key="k37">&lt;a href=&quot;http://korpling.german.hu-berlin.de/bematac/maps/2011-12-14-A.jpg&quot; target=&quot;_blank&quot;&gt;instructee&apos;s map&lt;/a&gt;</data>
+            <data key="k38">&lt;a href=&quot;http://korpling.german.hu-berlin.de/bematac/maps/map_1_instructor.pdf&quot; target=&quot;_blank&quot;&gt;instructor&apos;s map&lt;/a&gt;</data>
+            <data key="k39">Paul</data>
+            <data key="k40">Benni</data>
+            <data key="k42">false</data>
+            <data key="k43">false</data>
+            <data key="k44">Hamburg</data>
+            <data key="k45">Sittensen</data>
+            <data key="k47">2011-12-14</data>
+            <data key="k49">1</data>
+            <data key="k50">m</data>
+            <data key="k51">m</data>
+            <data key="k52">true</data>
+            <data key="k53">true</data>
+            <data key="k61">75</data>
+            <data key="k62">85</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5106">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">Toasters</data>
+            <data key="k21">Toasters</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5107">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">gehst</data>
+            <data key="k21">gehst</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan693">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k22">in</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4101">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3076">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.098</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1332">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k24">APPR</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5103">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">in</data>
+            <data key="k21">in</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan53">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">in</data>
+            <data key="k23">in</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1928">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k25">utt</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">80</data>
+            <data key="k56">50.54016606166636-50.63841893392833</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3077">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.404</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan694">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k22">Richtung</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan54">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">Richtung</data>
+            <data key="k23">Richtung</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1333">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k24">NN</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4102">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5104">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">Richtung</data>
+            <data key="k21">Richtung</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">81</data>
+            <data key="k56">50.63841893392833-51.042110083004665</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4103">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan55">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">des</data>
+            <data key="k23">des</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3078">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.182</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5105">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">des</data>
+            <data key="k21">des</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1334">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k24">ART</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan695">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k22">die</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">82</data>
+            <data key="k56">51.042110083004665-51.22366430348873</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan696">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k22">Toaster</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1335">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k24">NN</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3079">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.600</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4104">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan56">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">Toasters</data>
+            <data key="k23">Toasters</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">83</data>
+            <data key="k56">51.22366430348873-51.82316495661779</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1336">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k24">VVFIN</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan57">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">gehst</data>
+            <data key="k23">gehst</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4105">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan697">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k22">gehen</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3080">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.459</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">84</data>
+            <data key="k56">51.82316495661779-52.28239033784219</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2883">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k5">0.5</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3081">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.541</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4106">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1970">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">85</data>
+            <data key="k56">52.28239033784219-52.82346710144886</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5724">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">mhm</data>
+            <data key="k15">mhm</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2790">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k14">bc</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3082">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.569</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2728">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k20">utt</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4107">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">86</data>
+            <data key="k56">52.82346710144886-53.39272677082862</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1929">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k25">utt</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4108">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan58">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">ja</data>
+            <data key="k23">ja</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5108">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">ja</data>
+            <data key="k21">ja</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3083">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.226</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan698">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k22">ja</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1337">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k24">ADV</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">87</data>
+            <data key="k56">53.39272677082862-53.61913556343227</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4109">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2864">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k16">zeichnet</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3084">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.854</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1973">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">88</data>
+            <data key="k56">53.61913556343227-54.47281212523901</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1930">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k25">utt</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3085">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.228</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan699">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k22">gehen</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5109">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">gehst</data>
+            <data key="k21">gehst</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4110">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan59">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">gehst</data>
+            <data key="k23">gehst</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1338">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k24">VVFIN</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">89</data>
+            <data key="k56">54.47281212523901-54.70040224090706</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k20">utt</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3086">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.105</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2397">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k17">ich</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2563">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k19">PPER</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2229">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">ich</data>
+            <data key="k18">ich</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4111">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5725">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">ich</data>
+            <data key="k15">ich</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">90</data>
+            <data key="k56">54.70040224090706-54.80501624279921</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5726">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">geh</data>
+            <data key="k15">geh</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2564">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k19">VVFIN</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3087">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.035</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2230">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">gehe</data>
+            <data key="k18">gehe</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4112">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2398">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k17">gehen</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">91</data>
+            <data key="k56">54.80501624279921-54.839844399722246</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4113">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3088">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.036</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">92</data>
+            <data key="k56">54.839844399722246-54.876155243819056</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4114">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2399">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k17">in</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3089">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.105</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5727">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">in</data>
+            <data key="k15">in</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2231">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">in</data>
+            <data key="k18">in</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2565">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k19">APPR</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">93</data>
+            <data key="k56">54.876155243819056-54.98081591209811</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5728">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">Richtung</data>
+            <data key="k15">Richtung</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4115">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3090">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.239</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2566">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k19">NN</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2232">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">Richtung</data>
+            <data key="k18">Richtung</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2400">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k17">Richtung</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">94</data>
+            <data key="k56">54.98081591209811-55.22004029673594</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5729">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">des</data>
+            <data key="k15">des</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4116">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2233">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">des</data>
+            <data key="k18">des</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2401">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k17">die</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3091">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.120</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2567">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k19">ART</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">95</data>
+            <data key="k56">55.22004029673594-55.33965248905485</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2568">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k19">NN</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5730">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">Toasters</data>
+            <data key="k15">Toasters</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2234">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">Toasters</data>
+            <data key="k18">Toasters</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4117">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3092">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.438</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2402">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k17">Toaster</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">96</data>
+            <data key="k56">55.33965248905485-55.777518550222304</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2235">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">okay</data>
+            <data key="k18">okay</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4118">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2403">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k17">Okay</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2569">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k19">NE</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3093">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k36">0.239</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5731">
+            <data key="k41">node</data>
+            <data key="k35">default_ns</data>
+            <data key="k57">okay</data>
+            <data key="k15">okay</data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982">
+            <data key="k41">node</data>
+            <data key="k35">token</data>
+            <data key="k57">97</data>
+            <data key="k56">55.777518550222304-56.01674293486013</data>
+            <data key="k58"> </data>
+        </node>
+        <node id="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4">
+            <data key="k41">datasource</data>
+        </node>
+        <edge id="e0" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5105" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e1" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5727" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e2" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2229" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e3" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan59" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e4" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan59" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e5" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan59" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e6" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2864" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1973" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e7" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan698" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e8" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2728" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e9" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3092" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e10" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5106" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e11" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2567" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e12" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3079" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e13" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2400" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e14" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1334" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e15" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2231" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e16" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan694" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e17" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2398" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e18" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2398" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e19" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan53" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e20" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5728" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e21" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2397" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e22" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan699" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e23" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan699" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e24" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan699" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e25" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3084" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1973" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e26" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1337" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e27" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2790" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e28" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4118" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e29" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4106" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1970" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e30" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3091" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e31" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4105" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e32" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2566" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e33" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3078" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e34" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2399" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e35" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1333" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e36" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2564" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e37" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2564" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e38" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan693" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e39" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5107" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e40" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e41" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2563" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e42" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1338" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e43" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1338" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e44" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1338" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e45" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1929" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e46" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3082" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e47" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2235" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e48" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2883" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1970" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e49" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4117" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e50" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan57" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e51" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3090" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e52" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4104" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e53" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2565" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e54" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3077" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e55" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3087" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e56" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1332" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e57" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e58" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e59" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e60" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e61" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e62" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e63" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e64" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e65" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5108" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e66" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5724" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e67" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5730" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e68" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1930" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e69" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1930" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e70" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1930" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e71" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4110" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e72" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3083" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e73" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5109" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e74" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5109" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e75" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5109" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e76" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2403" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e77" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3081" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1970" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e78" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2234" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e79" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan697" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e80" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1928" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e81" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1928" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e82" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1928" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e83" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1928" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e84" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1928" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e85" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan56" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e86" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3089" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e87" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4103" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e88" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4113" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e89" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3076" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e90" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3086" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e91" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4116" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e92" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5103" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e93" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5725" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e94" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3085" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e95" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5731" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e96" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4108" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e97" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2569" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e98" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5104" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e99" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2402" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e100" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1336" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e101" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2233" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e102" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan696" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e103" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4115" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e104" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan55" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e105" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3088" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e106" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4102" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e107" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4112" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e108" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5726" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e109" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5726" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e110" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4111" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e111" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4109" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1973" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e112" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan58" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e113" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3093" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e114" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4107" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e115" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2568" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e116" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3080" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e117" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2401" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e118" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1335" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e119" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2232" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e120" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan695" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e121" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4114" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e122" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan54" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e123" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2230" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e124" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2230" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e125" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4101" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" label="Coverage/default_ns/">
+        </edge>
+        <edge id="e126" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" label="Ordering/annis/">
+        </edge>
+        <edge id="e127" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" label="Ordering/annis/">
+        </edge>
+        <edge id="e128" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" label="Ordering/annis/">
+        </edge>
+        <edge id="e129" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" label="Ordering/annis/">
+        </edge>
+        <edge id="e130" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" label="Ordering/annis/">
+        </edge>
+        <edge id="e131" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1973" label="Ordering/annis/">
+        </edge>
+        <edge id="e132" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" label="Ordering/annis/">
+        </edge>
+        <edge id="e133" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1970" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971" label="Ordering/annis/">
+        </edge>
+        <edge id="e134" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" label="Ordering/annis/">
+        </edge>
+        <edge id="e135" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" label="Ordering/annis/">
+        </edge>
+        <edge id="e136" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" label="Ordering/annis/">
+        </edge>
+        <edge id="e137" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" label="Ordering/annis/">
+        </edge>
+        <edge id="e138" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" label="Ordering/annis/">
+        </edge>
+        <edge id="e139" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1970" label="Ordering/annis/">
+        </edge>
+        <edge id="e140" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" label="Ordering/annis/">
+        </edge>
+        <edge id="e141" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" label="Ordering/annis/">
+        </edge>
+        <edge id="e142" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1973" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" label="Ordering/annis/">
+        </edge>
+        <edge id="e143" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5728" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5729" label="Ordering/default_ns/instructee_dipl">
+        </edge>
+        <edge id="e144" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5725" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5726" label="Ordering/default_ns/instructee_dipl">
+        </edge>
+        <edge id="e145" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5730" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5731" label="Ordering/default_ns/instructee_dipl">
+        </edge>
+        <edge id="e146" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5727" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5728" label="Ordering/default_ns/instructee_dipl">
+        </edge>
+        <edge id="e147" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5724" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5725" label="Ordering/default_ns/instructee_dipl">
+        </edge>
+        <edge id="e148" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5730" label="Ordering/default_ns/instructee_dipl">
+        </edge>
+        <edge id="e149" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5726" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5727" label="Ordering/default_ns/instructee_dipl">
+        </edge>
+        <edge id="e150" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2231" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2232" label="Ordering/default_ns/instructee_norm">
+        </edge>
+        <edge id="e151" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2229" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2230" label="Ordering/default_ns/instructee_norm">
+        </edge>
+        <edge id="e152" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2232" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2233" label="Ordering/default_ns/instructee_norm">
+        </edge>
+        <edge id="e153" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2233" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2234" label="Ordering/default_ns/instructee_norm">
+        </edge>
+        <edge id="e154" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2234" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2235" label="Ordering/default_ns/instructee_norm">
+        </edge>
+        <edge id="e155" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2230" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2231" label="Ordering/default_ns/instructee_norm">
+        </edge>
+        <edge id="e156" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5104" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5105" label="Ordering/default_ns/instructor_dipl">
+        </edge>
+        <edge id="e157" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5106" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5107" label="Ordering/default_ns/instructor_dipl">
+        </edge>
+        <edge id="e158" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5103" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5104" label="Ordering/default_ns/instructor_dipl">
+        </edge>
+        <edge id="e159" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5108" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5109" label="Ordering/default_ns/instructor_dipl">
+        </edge>
+        <edge id="e160" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5105" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5106" label="Ordering/default_ns/instructor_dipl">
+        </edge>
+        <edge id="e161" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5107" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5108" label="Ordering/default_ns/instructor_dipl">
+        </edge>
+        <edge id="e162" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan57" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan58" label="Ordering/default_ns/instructor_norm">
+        </edge>
+        <edge id="e163" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan58" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan59" label="Ordering/default_ns/instructor_norm">
+        </edge>
+        <edge id="e164" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan53" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan54" label="Ordering/default_ns/instructor_norm">
+        </edge>
+        <edge id="e165" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan54" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan55" label="Ordering/default_ns/instructor_norm">
+        </edge>
+        <edge id="e166" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan55" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan56" label="Ordering/default_ns/instructor_norm">
+        </edge>
+        <edge id="e167" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan56" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan57" label="Ordering/default_ns/instructor_norm">
+        </edge>
+        <edge id="e168" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1980" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e169" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan59" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e170" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan698" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e171" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3092" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e172" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1970" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e173" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2400" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e174" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1334" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e175" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2398" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e176" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan53" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e177" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2397" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e178" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3084" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e179" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2790" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e180" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5107" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e181" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3091" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e182" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4105" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e183" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1968" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e184" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e185" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2399" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e186" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1333" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e187" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1982" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e188" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1338" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e189" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1929" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e190" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2235" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e191" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2883" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e192" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3090" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e193" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4104" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e194" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5724" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e195" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3087" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e196" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1332" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e197" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1977" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e198" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4110" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e199" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1972" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e200" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5109" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e201" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2234" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e202" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan697" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e203" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1928" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e204" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5731" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e205" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3089" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e206" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4103" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e207" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3086" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e208" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3085" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e209" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1973" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e210" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2569" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e211" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1971" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e212" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5104" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e213" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2233" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e214" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan696" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e215" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1965" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e216" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5726" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e217" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3088" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e218" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4102" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e219" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" target="BeMaTaC_L1_2013-02.1/2011-12-14-A" label="PartOf/annis/">
+        </edge>
+        <edge id="e220" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1979" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e221" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1976" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e222" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan58" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e223" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2568" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e224" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3080" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e225" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2232" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e226" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan695" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e227" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2230" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e228" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4101" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e229" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2229" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e230" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2864" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e231" source="BeMaTaC_L1_2013-02.1/2011-12-14-A" target="BeMaTaC_L1_2013-02.1" label="PartOf/annis/">
+        </edge>
+        <edge id="e232" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2728" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e233" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5106" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e234" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2567" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e235" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3079" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e236" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1967" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e237" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5728" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e238" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2231" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e239" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan694" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e240" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1981" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e241" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan699" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e242" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1337" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e243" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4118" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e244" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4106" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e245" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2566" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e246" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3078" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e247" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2564" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e248" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan693" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e249" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2563" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e250" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1974" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e251" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3082" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e252" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5108" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e253" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4117" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e254" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan57" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e255" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1969" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e256" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5730" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e257" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2565" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e258" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3077" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e259" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2729" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e260" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1930" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e261" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3083" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e262" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2403" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e263" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3081" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e264" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5103" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e265" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4116" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e266" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan56" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e267" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5725" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e268" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4113" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e269" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3076" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e270" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1978" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e271" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1975" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e272" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4108" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e273" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2402" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e274" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1336" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e275" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4115" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e276" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan55" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e277" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4112" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e278" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4111" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e279" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4109" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e280" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan3093" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e281" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5105" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e282" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4107" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e283" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan2401" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e284" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan1335" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e285" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sTok1966" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e286" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan5727" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e287" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan4114" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+        <edge id="e288" source="BeMaTaC_L1_2013-02.1/2011-12-14-A#sSpan54" target="BeMaTaC_L1_2013-02.1/2011-12-14-A#sText4" label="PartOf/annis/">
+        </edge>
+    </graph>
+</graphml>

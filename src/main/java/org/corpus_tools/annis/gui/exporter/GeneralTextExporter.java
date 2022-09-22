@@ -179,7 +179,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
         while (lines.hasNext()) {
           String currentLine = lines.nextLine();
           Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
-              contextLeft, contextRight, args);
+              contextLeft, contextRight, args, corpusConfigs);
           if (p.isPresent()) {
             int currentOffset = offset.getAndIncrement();
             convertText(p.get(), finalKeys, args, out, currentOffset, ui);

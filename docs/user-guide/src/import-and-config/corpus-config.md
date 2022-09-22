@@ -92,6 +92,53 @@ description = "search for the word \"so\" followed by the word \"statisch\""
 query_language = "AQL"
 ```
 
+## Handling of virtual tokens
+
+Corpora with multiple segmentation layers often have "virtual tokens" layer with
+empty tokens. These virtual tokens are used to align all different spans
+(including the segmentations) and represent points of time in a timeline. The
+problem with this data model is, that other span annotations are in theory
+connected to one of the segmentation layers, but practically only directly
+connected to the virtual tokens. There is no special relationship between the
+segmentation spans and other types of spans. This is problematic e.g. when using
+an exporter, which will use the empty virtual tokens to create the spanned text
+of a span annotation instead of the correct segmentation layer.
+
+Legacy relANNIS corpora had the `virtual_tokenization_mapping` and
+`virtual_tokenization_from_namespace` properties in the corpus configuration
+(`ExtData/corpus.properties` file) to explicitly define these relationships.
+When importing a relANNIS corpus, these properties will be translated into the
+new `view.timeline_strategy` key in the `corpus-config.toml` file.
+
+Set the `strategy` sub-key to the value `ImplicitFromNamespace` to configure that
+non-segmentation span annotations are always referring to the segmentation layer
+with the same name as the namespace.
+
+```toml
+[view.timeline_strategy]
+strategy = "ImplicitFromNamespace"
+```
+
+E.g., an annotation `instructee:pos` would refer to the segmentation layer
+`instructee`.
+
+An explicit mapping between the fully qualified annotation name and the
+segmentation layer it refers to can be configured by setting `strategy` to the
+value `ImplicitFromMapping` and define the mappings in the key
+`view.timeline_strategy.mappings`. In the example, the annotations `pos` and
+`lemma` are defined to refer to the normalized segmentation `norm` and the
+`quote` annotation spans refer to the diplomatic transcription `dipl`.
+
+```toml
+[view.timeline_strategy]
+strategy = "ImplicitFromMapping"
+
+[view.timeline_strategy.mappings]
+"lexical::pos" = "norm"
+"lexical::lemma" = "norm"
+"graphical::quote " = "dipl"
+```
+
 
 [^old-annis-configs]: In ANNIS 3 the corpus specific configuration was distributed over several configuration files (e.g. the `corpus.properties` file) and database tables (like the `resolver_vis_map.annis` or `example_queries.annis` files).
 When importing an relANNIS corpus, the previous corpus configuration files will be mapped to the new format automatically.
