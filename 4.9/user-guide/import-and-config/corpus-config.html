@@ -205,6 +205,43 @@ query = &quot;\&quot;so\&quot; &amp; \&quot;statisch\&quot; &amp; #1 . #2&quot;
 description = &quot;search for the word \&quot;so\&quot; followed by the word \&quot;statisch\&quot;&quot;
 query_language = &quot;AQL&quot;
 </code></pre>
+<h2 id="handling-of-virtual-tokens"><a class="header" href="#handling-of-virtual-tokens">Handling of virtual tokens</a></h2>
+<p>Corpora with multiple segmentation layers often have &quot;virtual tokens&quot; layer with
+empty tokens. These virtual tokens are used to align all different spans
+(including the segmentations) and represent points of time in a timeline. The
+problem with this data model is, that other span annotations are in theory
+connected to one of the segmentation layers, but practically only directly
+connected to the virtual tokens. There is no special relationship between the
+segmentation spans and other types of spans. This is problematic e.g. when using
+an exporter, which will use the empty virtual tokens to create the spanned text
+of a span annotation instead of the correct segmentation layer.</p>
+<p>Legacy relANNIS corpora had the <code>virtual_tokenization_mapping</code> and
+<code>virtual_tokenization_from_namespace</code> properties in the corpus configuration
+(<code>ExtData/corpus.properties</code> file) to explicitly define these relationships.
+When importing a relANNIS corpus, these properties will be translated into the
+new <code>view.timeline_strategy</code> key in the <code>corpus-config.toml</code> file.</p>
+<p>Set the <code>strategy</code> sub-key to the value <code>ImplicitFromNamespace</code> to configure that
+non-segmentation span annotations are always referring to the segmentation layer
+with the same name as the namespace.</p>
+<pre><code class="language-toml">[view.timeline_strategy]
+strategy = &quot;ImplicitFromNamespace&quot;
+</code></pre>
+<p>E.g., an annotation <code>instructee:pos</code> would refer to the segmentation layer
+<code>instructee</code>.</p>
+<p>An explicit mapping between the fully qualified annotation name and the
+segmentation layer it refers to can be configured by setting <code>strategy</code> to the
+value <code>ImplicitFromMapping</code> and define the mappings in the key
+<code>view.timeline_strategy.mappings</code>. In the example, the annotations <code>pos</code> and
+<code>lemma</code> are defined to refer to the normalized segmentation <code>norm</code> and the
+<code>quote</code> annotation spans refer to the diplomatic transcription <code>dipl</code>.</p>
+<pre><code class="language-toml">[view.timeline_strategy]
+strategy = &quot;ImplicitFromMapping&quot;
+
+[view.timeline_strategy.mappings]
+&quot;lexical::pos&quot; = &quot;norm&quot;
+&quot;lexical::lemma&quot; = &quot;norm&quot;
+&quot;graphical::quote &quot; = &quot;dipl&quot;
+</code></pre>
 <div class="footnote-definition" id="old-annis-configs"><sup class="footnote-definition-label">1</sup>
 <p>In ANNIS 3 the corpus specific configuration was distributed over several configuration files (e.g. the <code>corpus.properties</code> file) and database tables (like the <code>resolver_vis_map.annis</code> or <code>example_queries.annis</code> files).
 When importing an relANNIS corpus, the previous corpus configuration files will be mapped to the new format automatically.</p>
