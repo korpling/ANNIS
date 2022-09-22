@@ -83,7 +83,7 @@ public class ExportPanel extends GridLayout {
       tmpOutputFile = null;
 
       Optional<ExporterPlugin> exporter = ui.getExporterPlugins().stream()
-          .filter((e) -> e.getClass().equals(ui.getQueryState().getExporter())).findAny();
+          .filter(e -> e.getClass().equals(ui.getQueryState().getExporter())).findAny();
 
       if (exporter.isPresent()) {
         if ("".equals(ui.getQueryState().getAql().getValue())) {
@@ -128,7 +128,7 @@ public class ExportPanel extends GridLayout {
     @Override
     public void valueChange(com.vaadin.data.HasValue.ValueChangeEvent<String> event) {
       Optional<ExporterPlugin> exporter = ui.getExporterPlugins().stream()
-          .filter((e) -> e.getClass().getSimpleName().equals(event.getValue())).findAny();
+          .filter(e -> e.getClass().getSimpleName().equals(event.getValue())).findAny();
       if (exporter.isPresent()) {
         btCancel.setVisible(exporter.get().isCancelable());
 
@@ -317,7 +317,7 @@ public class ExportPanel extends GridLayout {
           (field, value) -> {
             // Get the matching plugin from the class name
             Optional<ExporterPlugin> matchingExporter = ui.getExporterPlugins().stream()
-                .filter((e) -> e.getClass().getSimpleName().equals(value)).findAny();
+                .filter(e -> e.getClass().getSimpleName().equals(value)).findAny();
             if (matchingExporter.isPresent()) {
               field.setExporter(matchingExporter.get().getClass());
             }

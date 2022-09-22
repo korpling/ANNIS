@@ -95,31 +95,28 @@ class ExportPanelTest {
         _get(panel, ComboBox.class, spec -> spec.withCaption("Left Context"));
     ComboBox rightContextExportPanel =
         _get(panel, ComboBox.class, spec -> spec.withCaption("Right Context"));
-    assertEquals(leftContextExportPanel.getValue(), 5);
-    assertEquals(rightContextExportPanel.getValue(), 5);
+    assertEquals(5, leftContextExportPanel.getValue());
+    assertEquals(5, rightContextExportPanel.getValue());
 
     ComboBox leftContextSearchOptions =
         _get(searchOptions, ComboBox.class, spec -> spec.withCaption("Left Context"));
     ComboBox rightContextSearchOptions =
         _get(searchOptions, ComboBox.class, spec -> spec.withCaption("Right Context"));
-    assertEquals(leftContextSearchOptions.getValue(), 5);
-    assertEquals(rightContextSearchOptions.getValue(), 5);
+    assertEquals(5, leftContextSearchOptions.getValue());
+    assertEquals(5, rightContextSearchOptions.getValue());
 
-    assertEquals(ui.getQueryState().getLeftContext(), 5);
-    assertEquals(ui.getQueryState().getRightContext(), 5);
+    assertEquals(5, ui.getQueryState().getLeftContext());
+    assertEquals(5, ui.getQueryState().getRightContext());
 
     // Change the value of the combo boxes and test that the query state and the search panel
     // options have changed
     _setValue(leftContextExportPanel, 10);
     _setValue(rightContextExportPanel, 20);
 
-    assertEquals(ui.getQueryState().getLeftContext(), 10);
-    assertEquals(ui.getQueryState().getRightContext(), 20);
-    assertEquals(leftContextSearchOptions.getValue(), 10);
-    assertEquals(rightContextSearchOptions.getValue(), 20);
-
-
-
+    assertEquals(10, ui.getQueryState().getLeftContext());
+    assertEquals(20, ui.getQueryState().getRightContext());
+    assertEquals(10, leftContextSearchOptions.getValue());
+    assertEquals(20, rightContextSearchOptions.getValue());
   }
 
 }
