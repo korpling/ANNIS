@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.9.7] - 2022-09-22
+
 ### Fixed
 
 - Fixed handling of virtual tokenization in exporters when relANNIS corpora had
@@ -1226,7 +1228,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.6...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.7...HEAD
+[4.9.7]: https://github.com/korpling/ANNIS/compare/v4.9.6...v4.9.7
 [4.9.6]: https://github.com/korpling/ANNIS/compare/v4.9.5...v4.9.6
 [4.9.5]: https://github.com/korpling/ANNIS/compare/v4.9.4...v4.9.5
 [4.9.4]: https://github.com/korpling/ANNIS/compare/v4.9.3...v4.9.4
