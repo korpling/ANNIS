@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.Map;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.CorpusConfigurationView;
+import org.corpus_tools.annis.api.model.CorpusConfigurationViewTimelineStrategy;
+import org.corpus_tools.annis.api.model.CorpusConfigurationViewTimelineStrategy.StrategyEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.SingletonBeanStoreRetrievalStrategy;
@@ -120,7 +125,6 @@ class CSVExporterTest {
     EventBus eventBus = mock(EventBus.class);
     Writer out = new StringWriter();
 
-
     Exception ex =
         exporter.convertText("norm0=\"mal\"", QueryLanguage.AQL, 0, 0, Sets.newSet("dialog.demo"),
             null, "segmentation=phon0", false, out, eventBus, new HashMap<>(), ui);
@@ -133,6 +137,62 @@ class CSVExporterTest {
     assertEquals(2, lines.length);
     assertEquals("1_id\t1_span\t1_anno_default_ns::norm0", lines[0]);
     assertEquals("salt:/dialog.demo/dialog.demo#sSpan79\tma\tmal", lines[1]);
+  }
+
+  @Test
+  void exportDialogWithTimelineConfiguration() throws IOException {
+    EventBus eventBus = mock(EventBus.class);
+    Writer out = new StringWriter();
+
+    // Create a mapping and configuration for the dialog.demo corpus virtual tokenization
+    HashMap<String, String> mappings = new HashMap<>();
+    mappings.put("default_ns::utterance0", "phon0");
+    mappings.put("default_ns::norm0", "phon0");
+    mappings.put("default_ns::utterance1", "phon1");
+    mappings.put("default_ns::norm1", "phon1");
+    CorpusConfigurationViewTimelineStrategy timelineStrategy =
+        new CorpusConfigurationViewTimelineStrategy();
+    timelineStrategy.setStrategy(StrategyEnum.IMPLICITFROMMAPPING);
+    timelineStrategy.setMappings(mappings);
+
+
+    CorpusConfigurationView configView = new CorpusConfigurationView();
+    configView.setTimelineStrategy(timelineStrategy);
+
+    CorpusConfiguration singleConfig = new CorpusConfiguration();
+    singleConfig.setView(configView);
+    
+    Map<String, CorpusConfiguration> allConfigs = new HashMap<>();
+    allConfigs.put("dialog.demo", singleConfig);
+
+    Exception ex = exporter.convertText("utterance1 _o_ phon1=\"so\"", QueryLanguage.AQL, 5, 5,
+        Sets.newSet("dialog.demo"), null, "", false, out, eventBus, allConfigs, ui);
+
+    assertNull(ex);
+
+    // Compare the generated CSV file with the ground truth
+    out.close();
+    String[] lines = out.toString().split("\n");
+    assertEquals(4, lines.length);
+    // There is no annotation column for the second node, because it is converted into a token layer
+    assertEquals("1_id\t1_span\t1_anno_default_ns::utterance1\t2_id\t2_span",
+        lines[0]);
+    assertEquals(
+        "salt:/dialog.demo/dialog.demo#sSpan68\t"
+            + "naja pass auf also du hast jetz wohl hier auch so ne Karte wie ich bloß ich hab ne Linie und du nich eine\t"
+            + "naja pass auf also du hast jetzt wohl hier auch so ne Karte wie ich bloß ich hab ne Linie und du nich ne\t"
+            + "salt:/dialog.demo/dialog.demo#sTok46\t" + "so",
+        lines[1]);
+    assertEquals(
+        "salt:/dialog.demo/dialog.demo#sSpan70\t"
+            + "und ich muss dir jetzt erklärn wie du vom Start zum Ziel kommst so wie meine Linie geht\t"
+            + "und ich muss dir jetzt erklären wie du vom Start zum Ziel kommst so wie meine Linie geht\t"
+            + "salt:/dialog.demo/dialog.demo#sTok46\t" + "so",
+        lines[2]);
+    assertEquals(
+        "salt:/dialog.demo/dialog.demo#sSpan71\t" + "so\t" + "so\t"
+            + "salt:/dialog.demo/dialog.demo#sTok14\t" + "so",
+        lines[3]);
   }
 
 }

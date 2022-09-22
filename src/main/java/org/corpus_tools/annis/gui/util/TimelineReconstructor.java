@@ -41,6 +41,37 @@ import org.corpus_tools.salt.core.SRelation;
  */
 public class TimelineReconstructor {
 
+  private final class SpanToTokenTraverser implements GraphTraverseHandler {
+    @Override
+    public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
+        SRelation relation, SNode fromNode, long order) {
+      if (relation instanceof SOrderRelation && currNode instanceof SSpan) {
+        String orderName = ((SOrderRelation) relation).getType();
+        if (fromNode != null) {
+          // add a space to the text
+          StringBuilder t = textDataByName.get(orderName);
+          if (t != null) {
+            t.append(" ");
+          }
+        }
+        convertSpanToToken((SSpan) currNode, orderName);
+      }
+    }
+
+    @Override
+    public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
+        SRelation relation, SNode fromNode, long order) {
+      // We don't need to handle this case, because we already do have all information
+      // needed in nodedReached()
+    }
+
+    @Override
+    public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+        SRelation relation, SNode currNode, long order) {
+      return relation == null || relation instanceof SOrderRelation;
+    }
+  }
+
   private final SDocumentGraph graph;
 
   private final Map<String, STextualDS> textsByName = new HashMap<>();
@@ -144,41 +175,12 @@ public class TimelineReconstructor {
       convertSpanToToken(root, orderName);
     }
 
-    // traverse through all SOrderRelations in order
-    graph.traverse(new LinkedList<>(rootNodes.values()), GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-        "TimeReconstructSOrderRelations", new GraphTraverseHandler() {
+    if (!rootNodes.isEmpty()) {
+      // traverse through all SOrderRelations in order
+      graph.traverse(new LinkedList<>(rootNodes.values()), GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+          "TimeReconstructSOrderRelations", new SpanToTokenTraverser());
 
-          @Override
-          public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SNode currNode, SRelation relation, SNode fromNode, long order) {
-            if (relation instanceof SOrderRelation && currNode instanceof SSpan) {
-              String orderName = ((SOrderRelation) relation).getType();
-              if (fromNode != null) {
-                // add a space to the text
-                StringBuilder t = textDataByName.get(orderName);
-                if (t != null) {
-                  t.append(" ");
-                }
-              }
-              convertSpanToToken((SSpan) currNode, orderName);
-            }
-          }
-
-          @Override
-          public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SNode currNode, SRelation relation, SNode fromNode, long order) {
-            // We don't need to handle this case, because we already do have all information needed
-            // in nodedReached()
-          }
-
-          @Override
-          public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SRelation relation, SNode currNode, long order) {
-            return relation == null || relation instanceof SOrderRelation;
-          }
-        });
-
-
+    }
     // update the text of the TextualDSs
     for (Map.Entry<String, StringBuilder> textDataEntry : textDataByName.entrySet()) {
       STextualDS textDS = textsByName.get(textDataEntry.getKey());
@@ -186,6 +188,7 @@ public class TimelineReconstructor {
         textDS.setText(textDataEntry.getValue().toString());
       }
     }
+
   }
 
   private void convertSpanToToken(SSpan span, String orderName) {
@@ -267,8 +270,10 @@ public class TimelineReconstructor {
 
   private void moveRelations(SSpan oldSpan, SToken newToken, Set<String> validSpanAnnos,
       String orderName) {
-    final List<SRelation<?, ?>> inRels = new LinkedList<>(oldSpan.getInRelations());
-    final List<SRelation<?, ?>> outRels = new LinkedList<>(oldSpan.getOutRelations());
+    @SuppressWarnings("rawtypes")
+    final List<SRelation> inRels = new LinkedList<>(oldSpan.getInRelations());
+    @SuppressWarnings("rawtypes")
+    final List<SRelation> outRels = new LinkedList<>(oldSpan.getOutRelations());
 
     final List<SToken> coveredByOldSpan = new LinkedList<>();
 
