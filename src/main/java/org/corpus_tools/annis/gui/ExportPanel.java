@@ -17,6 +17,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Binder;
+import com.vaadin.data.HasValue;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
@@ -30,13 +31,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.v7.data.Property;
-import com.vaadin.v7.data.Property.ValueChangeEvent;
-import com.vaadin.v7.data.util.BeanItemContainer;
 import com.vaadin.v7.shared.ui.label.ContentMode;
-import com.vaadin.v7.ui.AbstractSelect.ItemCaptionMode;
 import com.vaadin.v7.ui.CheckBox;
-import com.vaadin.v7.ui.ComboBox;
 import com.vaadin.v7.ui.Label;
 import com.vaadin.v7.ui.TextField;
 import java.io.File;
@@ -87,7 +83,7 @@ public class ExportPanel extends GridLayout {
       tmpOutputFile = null;
 
       Optional<ExporterPlugin> exporter = ui.getExporterPlugins().stream()
-          .filter((e) -> e.getClass().equals(cbExporter.getValue())).findAny();
+          .filter((e) -> e.getClass().equals(ui.getQueryState().getExporter())).findAny();
 
       if (exporter.isPresent()) {
         if ("".equals(ui.getQueryState().getAql().getValue())) {
@@ -121,17 +117,18 @@ public class ExportPanel extends GridLayout {
     }
   }
 
-  public class ExporterSelectionHelpListener implements Property.ValueChangeListener {
+  public class ExporterSelectionHelpListener implements HasValue.ValueChangeListener<String> {
 
     /**
      * 
      */
     private static final long serialVersionUID = 732470870668073722L;
 
+
     @Override
-    public void valueChange(ValueChangeEvent event) {
+    public void valueChange(com.vaadin.data.HasValue.ValueChangeEvent<String> event) {
       Optional<ExporterPlugin> exporter = ui.getExporterPlugins().stream()
-          .filter((e) -> e.getClass().equals(cbExporter.getValue())).findAny();
+          .filter((e) -> e.getClass().getSimpleName().equals(event.getValue())).findAny();
       if (exporter.isPresent()) {
         btCancel.setVisible(exporter.get().isCancelable());
 
@@ -154,6 +151,7 @@ public class ExportPanel extends GridLayout {
         lblHelp.setValue("No valid exporter selected");
       }
     }
+
   }
 
   /**
@@ -171,10 +169,7 @@ public class ExportPanel extends GridLayout {
 
   private final TextField txtParameters;
 
-  private final BeanItemContainer<Class> exporterClassContainer =
-      new BeanItemContainer<>(Class.class);
-
-  private final ComboBox cbExporter;
+  private final com.vaadin.ui.ComboBox<String> cbExporter;
 
   private final Button btDownload;
 
@@ -221,11 +216,8 @@ public class ExportPanel extends GridLayout {
     setColumnExpandRatio(0, 0.0f);
     setColumnExpandRatio(1, 1.0f);
 
-    cbExporter = new ComboBox("Exporter");
-    cbExporter.setNewItemsAllowed(false);
-    cbExporter.setNullSelectionAllowed(false);
-    cbExporter.setImmediate(true);
-
+    cbExporter = new com.vaadin.ui.ComboBox<>("Exporter");
+    cbExporter.setEmptySelectionAllowed(false);
 
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
 
@@ -318,11 +310,22 @@ public class ExportPanel extends GridLayout {
     vLayout.addComponent(progressLabel);
 
     if (state != null) {
-      Binder<QueryUIState> binder = new Binder<QueryUIState>(QueryUIState.class);
+      Binder<QueryUIState> binder = ui.getQueryController().getBinder();
       binder.forField(cbLeftContext).bind("leftContext");
       binder.forField(cbRightContext).bind("rightContext");
+      binder.forField(cbExporter).bind(source -> source.getExporter().getSimpleName(),
+          (field, value) -> {
+            // Get the matching plugin from the class name
+            Optional<ExporterPlugin> matchingExporter = ui.getExporterPlugins().stream()
+                .filter((e) -> e.getClass().getSimpleName().equals(value)).findAny();
+            if (matchingExporter.isPresent()) {
+              field.setExporter(matchingExporter.get().getClass());
+            }
+          });
 
-      cbExporter.setPropertyDataSource(state.getExporter());
+      // Make sure all other binded components are also updated
+      cbLeftContext.addSelectionListener(event -> binder.setBean(state));
+      cbRightContext.addSelectionListener(event -> binder.setBean(state));
 
       txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
       txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
@@ -339,23 +342,11 @@ public class ExportPanel extends GridLayout {
   public void attach() {
     super.attach();
 
+    cbExporter
+        .setItems(ui.getExporterPlugins().stream().map(p -> p.getClass().getSimpleName()).sorted());
 
-    cbExporter.setPropertyDataSource(state.getExporter());
-    cbExporter.setContainerDataSource(exporterClassContainer);
-
-    for (ExporterPlugin e : ui.getExporterPlugins()) {
-      exporterClassContainer.addItem(e.getClass());
-    }
-
-    exporterClassContainer.sort(new Object[] {"simpleName"}, new boolean[] {true});
-    cbExporter.setItemCaptionMode(ItemCaptionMode.PROPERTY);
-    cbExporter.setItemCaptionPropertyId("simpleName");
-
-    if (exporterClassContainer.size() > 0) {
-      cbExporter.setValue(exporterClassContainer.getIdByIndex(0));
-    }
-
-    IDGenerator.assignIDForFields(this, cbExporter, btDownload, btExport, txtAnnotationKeys,txtParameters);
+    IDGenerator.assignIDForFields(this, cbExporter, btDownload, btExport, txtAnnotationKeys,
+        txtParameters);
   }
 
   @Override
@@ -394,8 +385,7 @@ public class ExportPanel extends GridLayout {
     // when not longer needed
     tmpOutputFile = currentTmpFile;
     //
-    if (exportError instanceof IllegalStateException
-        || exportError instanceof ClassCastException) {
+    if (exportError instanceof IllegalStateException || exportError instanceof ClassCastException) {
       Notification.show(exportError.getMessage(), Notification.Type.ERROR_MESSAGE);
     } else if (tmpOutputFile == null) {
       Notification.show("Could not create the Exporter",
