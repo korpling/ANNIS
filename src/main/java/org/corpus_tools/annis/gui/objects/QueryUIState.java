@@ -28,10 +28,10 @@ import java.util.TreeSet;
 import java.util.concurrent.Future;
 import okhttp3.Call;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
+import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.exporter.CSVExporter;
 import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.frequency.UserGeneratedFrequencyEntry;
-import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +71,7 @@ public class QueryUIState implements Serializable {
   private final ObjectProperty<Set<Long>> selectedMatches =
       new ObjectProperty<Set<Long>>(new TreeSet<Long>());
 
-  private final ObjectProperty<Class<? extends ExporterPlugin>> exporter =
-      new ObjectProperty<Class<? extends ExporterPlugin>>(CSVExporter.class);
+  private Class<? extends ExporterPlugin> exporter = CSVExporter.class;
   private final ObjectProperty<List<String>> exportAnnotationKeys =
       new ObjectProperty<List<String>>(new ArrayList<String>());
   private final ObjectProperty<String> exportParameters = new ObjectProperty<>("");
@@ -120,8 +119,12 @@ public class QueryUIState implements Serializable {
     return exportAnnotationKeys;
   }
 
-  public ObjectProperty<Class<? extends ExporterPlugin>> getExporter() {
+  public Class<? extends ExporterPlugin> getExporter() {
     return exporter;
+  }
+
+  public void setExporter(Class<? extends ExporterPlugin> exporter) {
+    this.exporter = exporter;
   }
 
   public ObjectProperty<String> getExportParameters() {

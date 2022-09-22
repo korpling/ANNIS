@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   items and the segmentation spans become actual SToken. There are several
   corpora that depend on this functionality and where the exporters failed to
   generated proper text spans because of this.
+- The context defined in the exporter panel was not taken into account.
 
 ## [4.9.6] - 2022-09-06
 

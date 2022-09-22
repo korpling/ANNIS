@@ -449,7 +449,7 @@ public class QueryController implements Serializable {
         .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
         .queryLanguage(state.getQueryLanguageLegacy()).left(state.getLeftContext())
         .right(state.getRightContext()).segmentation(state.getVisibleBaseText().getValue())
-        .exporter(state.getExporter().getValue())
+        .exporter(state.getExporter())
         .annotations(state.getExportAnnotationKeys().getValue())
         .param(state.getExportParameters().getValue()).alignmc(state.getAlignmc().getValue())
         .build();
@@ -585,7 +585,9 @@ public class QueryController implements Serializable {
       setIfNew(state.getVisibleBaseText(), ((DisplayedResultQuery) q).getBaseText());
     }
     if (q instanceof ExportQuery) {
-      setIfNew(state.getExporter(), ((ExportQuery) q).getExporter());
+      if (!Objects.equals(state.getExporter(), ((ExportQuery) q).getExporter())) {
+        state.setExporter(((ExportQuery) q).getExporter());
+      }
       setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).getAnnotationKeys());
       setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
       setIfNew(state.getAlignmc(), ((ExportQuery) q).getAlignmc());

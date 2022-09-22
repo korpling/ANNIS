@@ -38,12 +38,12 @@ import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
+import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.objects.CorpusConfigMap;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -297,6 +297,10 @@ public class SearchOptionsPanel extends FormLayout {
       binder.forField(cbOrder).bind("order");
       binder.forField(cbQueryLanguage).bind(QueryUIState::getQueryLanguage,
           QueryUIState::setQueryLanguage);
+
+      // Make sure all other binded components are also updated
+      cbLeftContext.addSelectionListener(event -> binder.setBean(state));
+      cbRightContext.addSelectionListener(event -> binder.setBean(state));
 
       Background
           .run(new CorpusConfigUpdater(ui, new LinkedHashSet<>(state.getSelectedCorpora()), false));
