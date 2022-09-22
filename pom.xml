@@ -11,14 +11,14 @@
 
 	<groupId>org.corpus-tools</groupId>
 	<artifactId>annis</artifactId>
-	<version>4.9.7</version>
+	<version>4.9.8-SNAPSHOT</version>
 	<name>ANNIS user interface</name>
 	<packaging>jar</packaging>
 	<scm>
 		<connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
 		<developerConnection>scm:git:git@github.com:korpling/ANNIS.git</developerConnection>
 		<url>https://github.com/korpling/ANNIS</url>
-	  <tag>v4.9.7</tag>
+	  <tag>v4.5.3</tag>
   </scm>
 
 	<organization>
