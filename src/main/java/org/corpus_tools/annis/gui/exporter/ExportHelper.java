@@ -51,7 +51,6 @@ public class ExportHelper {
 
   private static void recreateTimelineIfNecessary(SaltProject p, CorporaApi corporaApi,
       Map<String, CorpusConfiguration> corpusConfigs) throws ApiException {
-    Map<String, String> spanAnno2order = new TreeMap<>();
 
     StrategyEnum timelineStrategy = StrategyEnum.EXPLICIT;
 
@@ -82,6 +81,14 @@ public class ExportHelper {
         segNames.add(c.getName());
       }
     }
+
+    recreateTimeline(p, timelineStrategy, segNames, config);
+  }
+
+  private static void recreateTimeline(SaltProject p, StrategyEnum timelineStrategy,
+      Set<String> segNames,
+      CorpusConfiguration config) throws ApiException {
+    Map<String, String> spanAnno2order = new TreeMap<>();
 
     if (timelineStrategy == IMPLICITFROMMAPPING
         && config.getView().getTimelineStrategy().getMappings() instanceof Map) {
