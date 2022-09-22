@@ -82,7 +82,7 @@ public class TimelineReconstructor {
         order2spanAnnos.put(e.getValue(), e.getKey());
       }
     }
-    
+
   }
 
   private void getMatchedNodes() {
@@ -145,9 +145,8 @@ public class TimelineReconstructor {
     }
 
     // traverse through all SOrderRelations in order
-    graph.traverse(new LinkedList<>(rootNodes.values()),
-        GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "TimeReconstructSOrderRelations",
-        new GraphTraverseHandler() {
+    graph.traverse(new LinkedList<>(rootNodes.values()), GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+        "TimeReconstructSOrderRelations", new GraphTraverseHandler() {
 
           @Override
           public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
@@ -214,25 +213,12 @@ public class TimelineReconstructor {
           int endTextIdx = textData.length();
           SToken newToken = graph.createToken(textDS, startTextIdx, endTextIdx);
           // keep track of changed ids for matches
-          if (this.matchIDs.contains(span.getId()))
+          if (this.matchIDs.contains(span.getId())) {
             this.oldID2newID.put(span.getId(), newToken.getId());
+          }
 
-          // move all features to the new token
-          if (span.getFeatures() != null) {
-            for (SFeature feat : span.getFeatures()) {
-              if (!"salt".equals(feat.getNamespace())) {
-                newToken.addFeature(feat);
-              }
-            }
-          }
-          // move all annotations to the new token
-          if (span.getAnnotations() != null) {
-            for (SAnnotation annot : span.getAnnotations()) {
-              if (!"salt".equals(annot.getNamespace()) && !orderName.equals(annot.getName())) {
-                newToken.addAnnotation(annot);
-              }
-            }
-          }
+          moveLabels(span, newToken, orderName);
+
           STimelineRelation timeRel = SaltFactory.createSTimelineRelation();
           timeRel.setSource(newToken);
           timeRel.setTarget(graph.getTimeline());
@@ -245,7 +231,22 @@ public class TimelineReconstructor {
         }
       }
     }
+  }
 
+  private void moveLabels(SSpan span, SToken newToken, String orderName) {
+    // move all features to the new token
+    for (SFeature feat : span.getFeatures()) {
+      if (!"salt".equals(feat.getNamespace())) {
+        newToken.addFeature(feat);
+      }
+    }
+
+    // move all annotations to the new token
+    for (SAnnotation annot : span.getAnnotations()) {
+      if (!"salt".equals(annot.getNamespace()) && !orderName.equals(annot.getName())) {
+        newToken.addAnnotation(annot);
+      }
+    }
   }
 
   private SAnnotation getTextValueAnno(String orderName, SNode node) {
@@ -353,8 +354,7 @@ public class TimelineReconstructor {
    * @param segmentations A set of known segmentations
    * @param spanAnno2order A mapping from annotation names to the corresponding segmentation name
    */
-  public static void removeVirtualTokenization(SDocumentGraph graph,
-      Set<String> segmentations,
+  public static void removeVirtualTokenization(SDocumentGraph graph, Set<String> segmentations,
       Map<String, String> spanAnno2order) {
     if (graph.getTimeline() != null) {
       // do nothing if the graph does not contain any virtual tokenization
