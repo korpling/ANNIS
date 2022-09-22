@@ -139,13 +139,13 @@ public class TimelineReconstructor {
 
     // convert all root nodes to spans
     for (Map.Entry<String, SSpan> rootEntry : rootNodes.entrySet()) {
-      SNode root = rootEntry.getValue();
+      SSpan root = rootEntry.getValue();
       String orderName = rootEntry.getKey();
-      convertSpanToToken((SSpan) root, orderName);
+      convertSpanToToken(root, orderName);
     }
 
     // traverse through all SOrderRelations in order
-    graph.traverse(new LinkedList<SNode>(rootNodes.values()),
+    graph.traverse(new LinkedList<>(rootNodes.values()),
         GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "TimeReconstructSOrderRelations",
         new GraphTraverseHandler() {
 
@@ -167,16 +167,15 @@ public class TimelineReconstructor {
 
           @Override
           public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-              SNode currNode, SRelation relation, SNode fromNode, long order) {}
+              SNode currNode, SRelation relation, SNode fromNode, long order) {
+            // We don't need to handle this case, because we already do have all information needed
+            // in nodedReached()
+          }
 
           @Override
           public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
               SRelation relation, SNode currNode, long order) {
-            if (relation == null || relation instanceof SOrderRelation) {
-              return true;
-            } else {
-              return false;
-            }
+            return relation == null || relation instanceof SOrderRelation;
           }
         });
 
@@ -190,7 +189,7 @@ public class TimelineReconstructor {
     }
   }
 
-  private void convertSpanToToken(SStructuredNode span, String orderName) {
+  private void convertSpanToToken(SSpan span, String orderName) {
     final Set<String> validSpanAnnos = new HashSet<>(order2spanAnnos.get(orderName));
     if (!nodesToDelete.contains(span)) {
       nodesToDelete.add(span);
@@ -265,24 +264,29 @@ public class TimelineReconstructor {
     return result;
   }
 
-  private void moveRelations(SStructuredNode oldSpan, SToken newToken, Set<String> validSpanAnnos,
+  private void moveRelations(SSpan oldSpan, SToken newToken, Set<String> validSpanAnnos,
       String orderName) {
-    final List<SRelation> inRels = new LinkedList<>(oldSpan.getInRelations());
-    final List<SRelation> outRels = new LinkedList<>(oldSpan.getOutRelations());
+    final List<SRelation<?, ?>> inRels = new LinkedList<>(oldSpan.getInRelations());
+    final List<SRelation<?, ?>> outRels = new LinkedList<>(oldSpan.getOutRelations());
 
     final List<SToken> coveredByOldSpan = new LinkedList<>();
 
-    for (SRelation rel : outRels) {
-      if (rel instanceof SPointingRelation || rel instanceof SDominanceRelation) {
-        rel.setSource(newToken);
+    for (SRelation<?, ?> rel : outRels) {
+      if (rel instanceof SPointingRelation) {
+        SPointingRelation pointingRel = (SPointingRelation) rel;
+        pointingRel.setSource(newToken);
       } else if (rel instanceof SSpanningRelation) {
         coveredByOldSpan.add(((SSpanningRelation) rel).getTarget());
       }
     }
 
-    for (SRelation rel : inRels) {
-      if (rel instanceof SPointingRelation || rel instanceof SDominanceRelation) {
-        rel.setTarget(newToken);
+    for (SRelation<?, ?> rel : inRels) {
+      if (rel instanceof SPointingRelation) {
+        SPointingRelation pointingRel = (SPointingRelation) rel;
+        pointingRel.setTarget(newToken);
+      } else if (rel instanceof SDominanceRelation) {
+        SDominanceRelation domRel = (SDominanceRelation) rel;
+        domRel.setTarget(newToken);
       }
     }
 
