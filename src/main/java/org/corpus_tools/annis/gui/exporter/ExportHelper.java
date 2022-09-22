@@ -52,7 +52,6 @@ public class ExportHelper {
   private static void recreateTimelineIfNecessary(SaltProject p, CorporaApi corporaApi,
       Map<String, CorpusConfiguration> corpusConfigs) throws ApiException {
 
-    StrategyEnum timelineStrategy = StrategyEnum.EXPLICIT;
 
     Set<String> corpusNames = Helper.getToplevelCorpusNames(p);
     if (corpusNames.isEmpty()) {
@@ -68,7 +67,8 @@ public class ExportHelper {
     if (config.getView().getTimelineStrategy() == null) {
       return;
     }
-    timelineStrategy = config.getView().getTimelineStrategy().getStrategy();
+
+    StrategyEnum timelineStrategy = config.getView().getTimelineStrategy().getStrategy();
     if (timelineStrategy == StrategyEnum.EXPLICIT) {
       return;
     }
