@@ -26,7 +26,7 @@ import org.corpus_tools.salt.util.DataSourceSequence;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.ResourceUtils;
 
-public class TimelineReconstructorTest {
+class TimelineReconstructorTest {
 
   /**
    * Tests a sample dialog reconstruction from mapping.
@@ -62,7 +62,7 @@ public class TimelineReconstructorTest {
    * @throws IOException
    */
   @Test
-  public void testBematacDialogMapping() throws IOException, XMLStreamException {
+  void testBematacDialogMapping() throws IOException, XMLStreamException {
 
     File sampleDialogFile =
         ResourceUtils.getFile(this.getClass().getResource("SampleDialog.graphml"));
@@ -148,7 +148,7 @@ public class TimelineReconstructorTest {
    * @throws IOException
    */
   @Test
-  public void testBematacDialogNamespace() throws IOException, XMLStreamException {
+  void testBematacDialogNamespace() throws IOException, XMLStreamException {
 
     File sampleDialogFile =
         ResourceUtils.getFile(this.getClass().getResource("SampleDialogNamespace.graphml"));
