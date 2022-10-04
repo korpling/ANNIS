@@ -186,22 +186,23 @@ public class ResultFetchJob implements Runnable {
 
   private SaltProject createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber,
       CorporaApi api) throws ApiException {
-    List<String> corpusPath = Helper.getCorpusPath(m.getSaltIDs().get(0));
+    List<String> corpusPathRaw = Helper.getCorpusPath(m.getSaltIDs().get(0), false);
+    List<String> corpusPathDecoded = Helper.getCorpusPath(m.getSaltIDs().get(0), true);
     final SaltProject p = SaltFactory.createSaltProject();
 
-    if (!corpusPath.isEmpty()) {
-      File graphML = api.subgraphForNodes(corpusPath.get(0), arg);
+    if (!corpusPathRaw.isEmpty()) {
+      File graphML = api.subgraphForNodes(corpusPathDecoded.get(0), arg);
       try {
 
         final SCorpusGraph cg = p.createCorpusGraph();
-        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
-        if (corpusPath.size() > 1) {
+        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPathRaw));
+        if (corpusPathRaw.size() > 1) {
           SDocument doc = cg.createDocument(docURI);
           SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
           doc.setDocumentGraph(docGraph);
           Helper.addMatchToDocumentGraph(m, doc.getDocumentGraph());
-        } else if (corpusPath.size() == 1) {
-          cg.createCorpus(null, corpusPath.get(0));
+        } else if (corpusPathRaw.size() == 1) {
+          cg.createCorpus(null, corpusPathRaw.get(0));
         }
         log.debug("added match {} to queue", currentMatchNumber + 1);
       } catch (XMLStreamException | IOException ex) {

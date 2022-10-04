@@ -226,7 +226,7 @@ public class SingleResultPanel extends CssLayout
     /**
      * Extract the top level corpus name and the document name of this single result.
      */
-    path = Helper.getCorpusPath(result.getGraph(), result);
+    path = Helper.getCorpusPath(result.getGraph(), result, true);
     Collections.reverse(path);
     // Escape all parts of the corpus path to make it safe to render as HTML
     List<String> escapedPaths =
@@ -371,7 +371,7 @@ public class SingleResultPanel extends CssLayout
   private void initVisualizer() {
     try {
       resolverEntries = resolverProvider == null ? new LinkedList<>()
-          : resolverProvider.getResolverEntries(result, UI.getCurrent());
+          : resolverProvider.getResolverEntries(path.get(0), result, UI.getCurrent());
       visualizers.clear();
 
       List<VisualizerPanel> openVisualizers = new LinkedList<>();

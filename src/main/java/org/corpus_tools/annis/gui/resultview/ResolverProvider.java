@@ -24,6 +24,6 @@ import org.corpus_tools.salt.common.SDocument;
  * @author thomas
  */
 public interface ResolverProvider extends Serializable {
-  public List<VisualizerRule> getResolverEntries(SDocument result, UI ui);
+  public List<VisualizerRule> getResolverEntries(String corpusName, SDocument result, UI ui);
 
 }

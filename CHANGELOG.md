@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix display of match path in results that match a document or corpus (metadata
+  search) and the corpus has a special character like an umlaut.
+
 ## [4.9.7] - 2022-09-22
 
 ### Fixed

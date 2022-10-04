@@ -54,7 +54,7 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
   }
 
   @Override
-  public List<VisualizerRule> getResolverEntries(SDocument doc, UI ui) {
+  public List<VisualizerRule> getResolverEntries(String corpusName, SDocument doc, UI ui) {
 
 
     // create a request for resolver entries
@@ -81,8 +81,6 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
       }
 
     }
-
-    String corpusName = doc.getGraph().getRoots().get(0).getName();
 
     for (String ns : nodeLayers) {
       resolverRequests.add(new SingleResolverRequest(corpusName, ns, ElementEnum.NODE));
