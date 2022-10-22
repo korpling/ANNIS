@@ -55,7 +55,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   private final static Logger log = LoggerFactory.getLogger(ServiceStarter.class);
 
   @Autowired
-  private UIConfig config;
+  protected UIConfig config;
 
   @Autowired
   private ResourceLoader resourceLoader;
@@ -195,9 +195,9 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   }
 
 
-  protected String getServiceURL(Map<?, ?> config) {
+  protected String getServiceURL(Map<?, ?> serviceConfig) {
     long port = 5711l;
-    Object bindSection = config.get("bind");
+    Object bindSection = serviceConfig.get("bind");
     if (bindSection instanceof Map) {
       @SuppressWarnings("rawtypes")
       Object portRaw = ((Map) bindSection).get("port");

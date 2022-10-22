@@ -83,6 +83,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     config.put("auth", auth);
 
     File temporaryFile = File.createTempFile("annis-service-config-desktop-", ".toml");
+    temporaryFile.deleteOnExit();
     mapper.writeValue(temporaryFile, config);
     return temporaryFile;
   }
