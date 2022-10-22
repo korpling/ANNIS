@@ -2,7 +2,7 @@ package org.corpus_tools.annis.gui;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.moandjiezana.toml.TomlWriter;
+import com.fasterxml.jackson.dataformat.toml.TomlMapper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
@@ -15,7 +15,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -47,10 +46,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
-import org.tomlj.Toml;
-import org.tomlj.TomlArray;
-import org.tomlj.TomlParseResult;
-import org.tomlj.TomlTable;
 
 @Component
 @Profile("desktop")
@@ -67,49 +62,15 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
   @Autowired
   private Environment env;
 
-  protected static List<Object> unpackToml(TomlArray orig) {
-    ArrayList<Object> result = new ArrayList<>(orig.size());
-
-    for (Object o : orig.toList()) {
-      if (o instanceof TomlArray) {
-        TomlArray tomlArray = (TomlArray) o;
-        result.add(unpackToml(tomlArray));
-      } else if (o instanceof TomlTable) {
-        TomlTable tomlTable = (TomlTable) o;
-        result.add(unpackToml(tomlTable));
-      } else {
-        result.add(o);
-      }
-    }
-
-    return result;
-  }
-
-  protected static Map<String, Object> unpackToml(TomlTable orig) {
-    LinkedHashMap<String, Object> result = new LinkedHashMap<>();
-
-    for (Map.Entry<String, Object> e : orig.toMap().entrySet()) {
-      if (e.getValue() instanceof TomlArray) {
-        TomlArray tomlArray = (TomlArray) e.getValue();
-        result.put(e.getKey(), unpackToml(tomlArray));
-      } else if (e.getValue() instanceof TomlTable) {
-        TomlTable tomlTable = (TomlTable) e.getValue();
-        result.put(e.getKey(), unpackToml(tomlTable));
-      } else {
-        result.put(e.getKey(), e.getValue());
-      }
-    }
-
-    return result;
-  }
 
   /**
    * Overwrite the existing configuration file and add a temporary user for the desktop.
    */
   @Override
   protected File getServiceConfig() throws IOException {
-    TomlParseResult tomlConfig = Toml.parse(super.getServiceConfig().toPath());
-    Map<String, Object> config = unpackToml(tomlConfig);
+    TomlMapper mapper = new TomlMapper();
+    @SuppressWarnings("unchecked")
+    Map<Object, Object> config = mapper.readValue(super.getServiceConfig(), Map.class);
 
     // Add it to the configuration
     Map<String, Object> tokenVerification = new LinkedHashMap<>();
@@ -122,8 +83,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
     config.put("auth", auth);
 
     File temporaryFile = File.createTempFile("annis-service-config-desktop-", ".toml");
-    TomlWriter writer = new TomlWriter();
-    writer.write(config, temporaryFile);
+    mapper.writeValue(temporaryFile, config);
     return temporaryFile;
   }
 

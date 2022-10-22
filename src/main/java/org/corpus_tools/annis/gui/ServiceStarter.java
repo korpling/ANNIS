@@ -13,7 +13,8 @@
  */
 package org.corpus_tools.annis.gui;
 
-import com.moandjiezana.toml.TomlWriter;
+import com.fasterxml.jackson.dataformat.toml.TomlMapper;
+import com.google.common.base.Objects;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -41,14 +42,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import org.tomlj.Toml;
-import org.tomlj.TomlParseResult;
-import org.tomlj.TomlTable;
 
 @Component
 @Profile("!desktop")
 public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent> {
 
+
+  private static final String DATABASE_SECTION = "database";
 
   private static final String LOGGING_SECTION = "logging";
 
@@ -56,7 +56,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
 
   @Autowired
   private UIConfig config;
-  
+
   @Autowired
   private ResourceLoader resourceLoader;
   private final AtomicBoolean abortThread = new AtomicBoolean();
@@ -126,7 +126,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           this.tReaderErr = createOutputWatcherThread(backgroundProcess.getErrorStream(), true);
 
           // Use the provided service configuration to get the correct port
-          TomlParseResult parsedServiceConfig = Toml.parse(serviceConfigFile.toPath());
+          TomlMapper mapper = new TomlMapper();
+          Map<?, ?> parsedServiceConfig = mapper.readValue(serviceConfigFile, Map.class);
           config.setWebserviceUrl(getServiceURL(parsedServiceConfig));
         }
       }
@@ -157,8 +158,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     } else {
       log.error(
           "GraphANNIS can only be run on 64 bit operating systems (\"amd64\" or \"x86_64\") "
-              + "and with a 64 bit version of Java, "
-              + "but this is reported as architecture {}!",
+              + "and with a 64 bit version of Java, " + "but this is reported as architecture {}!",
           SystemUtils.OS_ARCH);
     }
     return execPath;
@@ -195,57 +195,100 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   }
 
 
-  protected String getServiceURL(TomlParseResult config) {
-    return "http://localhost:" + config.getLong("bind.port", () -> 5711l) + "/v1";
+  protected String getServiceURL(Map<?, ?> config) {
+    long port = 5711l;
+    Object bindSection = config.get("bind");
+    if (bindSection instanceof Map) {
+      @SuppressWarnings("rawtypes")
+      Object portRaw = ((Map) bindSection).get("port");
+      if (portRaw instanceof Long) {
+        port = (Long) portRaw;
+      }
+    }
+    return "http://localhost:" + port + "/v1";
   }
 
+  @SuppressWarnings("unchecked")
   protected File getServiceConfig() throws IOException {
-    File result = new File(config.getWebserviceConfig());
-    if (!result.exists()) {
-      File parentDir = result.getParentFile();
-      if (!parentDir.mkdirs()) {
-        log.error("Could not create directory {}", parentDir.getAbsolutePath());
-      }
-      if (!result.createNewFile()) {
-        log.error("Could not create new file {}", result.getAbsolutePath());
-      }
+    File existingConfigFile = new File(config.getWebserviceConfig());
+
+    final TomlMapper mapper = new TomlMapper();
+
+    boolean writeTemporaryConfigFile = false;
+
+    // Read existing file or create empty configuration
+    final Map<Object, Object> config;
+    if (existingConfigFile.exists()) {
+      config = mapper.readValue(existingConfigFile, Map.class);
+    } else {
+      config = new LinkedHashMap<>();
+      writeTemporaryConfigFile = true;
     }
+
     // Set to a default data folder and SQLite file
-    TomlParseResult configToml = Toml.parse(result.toPath());
-    Map<String, Object> config = configToml.toMap();
-    TomlTable databaseTable = configToml.getTable("database");
-    Map<String, Object> databaseConfig;
-    if (databaseTable == null) {
+    Object databaseConfigRaw = config.get(DATABASE_SECTION);
+    final Map<Object, Object> databaseConfig;
+    if (databaseConfigRaw instanceof Map) {
+      databaseConfig = (Map<Object, Object>) databaseConfigRaw;
+    } else {
       // Create a new map instead of re-using the existing one
       databaseConfig = new LinkedHashMap<>();
-      config.put("database", databaseConfig);
-    } else {
-      databaseConfig = databaseTable.toMap();
+      config.put(DATABASE_SECTION, databaseConfig);
+      writeTemporaryConfigFile = true;
     }
     // Add the graphannis data and sqlite location of not existing yet
-    Object previousDatabase = databaseConfig.putIfAbsent("graphannis",
-        Paths.get(System.getProperty("user.home"), ".annis", "v4").toAbsolutePath().toString());
-    Object previousSqlite = databaseConfig.putIfAbsent("sqlite",
+    String defaultGraphannisLocation =
+        Paths.get(System.getProperty("user.home"), ".annis", "v4").toAbsolutePath().toString();
+    Object overwrittenGraphannisLocation =
+        databaseConfig.putIfAbsent("graphannis", defaultGraphannisLocation);
+
+    String defaultSqliteLocation =
         Paths.get(System.getProperty("user.home"), ".annis", "v4", "service_data.sqlite3")
-            .toAbsolutePath().toString());
+            .toAbsolutePath().toString();
+    Object overwrittenSqliteLocation = databaseConfig.putIfAbsent("sqlite", defaultSqliteLocation);
+
+    if (overwrittenGraphannisLocation == null || overwrittenSqliteLocation == null) {
+      // If any of the configuration values did not exist yet,
+      // we have to write a new configuration file with the default location
+      writeTemporaryConfigFile = true;
+    }
 
     // Change service debug level if ANNIS itself is in debug mode
-    Map<String, Object> loggingConfig;
-    if (configToml.isTable(LOGGING_SECTION)) {
-      loggingConfig = configToml.getTable(LOGGING_SECTION).toMap();
+    Object loggingConfigRaw = config.get(LOGGING_SECTION);
+    final Map<Object, Object> loggingConfig;
+    if (loggingConfigRaw instanceof Map) {
+      loggingConfig = (Map<Object, Object>) loggingConfigRaw;
     } else {
       loggingConfig = new LinkedHashMap<>();
       config.put(LOGGING_SECTION, loggingConfig);
     }
-    Object previousDebugConfig = loggingConfig.put("debug", log.isDebugEnabled());
-
-    if (previousDatabase == null || previousSqlite == null || previousDebugConfig == null) {
-      // Write updated configuration to file
-      TomlWriter writer = new TomlWriter();
-      writer.write(config, result);
+    Object debugConfigRaw = loggingConfig.get("debug");
+    if (!Objects.equal(debugConfigRaw, log.isDebugEnabled())) {
+      // Overwrite the original configuration to make sure the graphANNIS webservice has the same
+      // level as the ANNIS front-end
+      loggingConfig.put("debug", log.isDebugEnabled());
+      writeTemporaryConfigFile = true;
     }
 
-    return result;
+    if (writeTemporaryConfigFile) {
+      // Write updated configuration to a new temporary file
+      File tmpConfigFile = File.createTempFile("annis-service-config-", ".toml");
+      tmpConfigFile.deleteOnExit();
+      if (existingConfigFile.exists()) {
+        log.info("Writing adjusted service configuration file {} -> {}.",
+            existingConfigFile.getAbsolutePath(), tmpConfigFile.getAbsolutePath());
+      } else {
+        log.info("Writing default service configuration file to {}",
+            tmpConfigFile.getAbsolutePath());
+      }
+      mapper.writeValue(tmpConfigFile, config);
+      return tmpConfigFile;
+    } else {
+      // Return the original configuration file, which did not need to be changed
+      log.info("Using unchanged service configuration file {}",
+          existingConfigFile.getAbsolutePath());
+      return existingConfigFile;
+    }
   }
 
   @PreDestroy
