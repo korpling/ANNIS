@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.9.7
-date-released: 2022-09-22
+version: 4.9.8
+date-released: 2022-10-22
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -214,7 +214,7 @@ references:
   repository-code: https://gitbox.apache.org/repos/asf?p=commons-lang.git
 - type: software
   title: Apache Commons Text
-  version: '1.9'
+  version: 1.10.0
   abbreviation: org.apache.commons:commons-text
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Text
@@ -668,6 +668,16 @@ references:
   authors:
   - name: Tatu Saloranta
   repository-code: http://github.com/FasterXML/jackson-core
+- type: software
+  title: Jackson-dataformat-TOML
+  version: 2.12.6
+  abbreviation: com.fasterxml.jackson.dataformat:jackson-dataformat-toml
+  license: Apache-2.0
+  notes: More license information can be found in the THIRD-PARTY/Jackson_dataformat_TOML
+    directory.
+  authors:
+  - name: Tatu Saloranta
+  repository-code: http://github.com/FasterXML/jackson-dataformats-text/jackson-dataformat-toml
 - type: software
   title: Jackson-dataformat-XML
   version: 2.12.6
@@ -1636,24 +1646,6 @@ references:
     directory.
   authors:
   - name: The tomcat-embed-websocket 9.0.60 Team
-- type: software
-  title: toml4j
-  version: 0.7.2
-  abbreviation: com.moandjiezana.toml:toml4j
-  license: MIT
-  notes: More license information can be found in the THIRD-PARTY/toml4j directory.
-  authors:
-  - name: Moandji Ezana
-  repository-code: https://github.com/mwanji/toml4j
-- type: software
-  title: tomlj
-  version: 1.0.0
-  abbreviation: org.tomlj:tomlj
-  license: Apache-2.0
-  notes: More license information can be found in the THIRD-PARTY/tomlj directory.
-  authors:
-  - name: Chris Leishman
-  repository-code: https://github.com/tomlj/tomlj
 - type: software
   title: vaadin-client
   version: 8.14.3

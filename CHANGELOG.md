@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.9.8] - 2022-10-22
+
 ### Fixed
 
 - Fix display of match path in results that match a document or corpus (metadata
@@ -1237,7 +1239,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.7...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.8...HEAD
+[4.9.8]: https://github.com/korpling/ANNIS/compare/v4.9.7...v4.9.8
 [4.9.7]: https://github.com/korpling/ANNIS/compare/v4.9.6...v4.9.7
 [4.9.6]: https://github.com/korpling/ANNIS/compare/v4.9.5...v4.9.6
 [4.9.5]: https://github.com/korpling/ANNIS/compare/v4.9.4...v4.9.5
