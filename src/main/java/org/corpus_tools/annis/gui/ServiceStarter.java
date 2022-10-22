@@ -217,23 +217,23 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     boolean writeTemporaryConfigFile = false;
 
     // Read existing file or create empty configuration
-    final Map<Object, Object> config;
+    final Map<Object, Object> serviceConfig;
     if (existingConfigFile.exists()) {
-      config = mapper.readValue(existingConfigFile, Map.class);
+      serviceConfig = mapper.readValue(existingConfigFile, Map.class);
     } else {
-      config = new LinkedHashMap<>();
+      serviceConfig = new LinkedHashMap<>();
       writeTemporaryConfigFile = true;
     }
 
     // Set to a default data folder and SQLite file
-    Object databaseConfigRaw = config.get(DATABASE_SECTION);
+    Object databaseConfigRaw = serviceConfig.get(DATABASE_SECTION);
     final Map<Object, Object> databaseConfig;
     if (databaseConfigRaw instanceof Map) {
       databaseConfig = (Map<Object, Object>) databaseConfigRaw;
     } else {
       // Create a new map instead of re-using the existing one
       databaseConfig = new LinkedHashMap<>();
-      config.put(DATABASE_SECTION, databaseConfig);
+      serviceConfig.put(DATABASE_SECTION, databaseConfig);
       writeTemporaryConfigFile = true;
     }
     // Add the graphannis data and sqlite location of not existing yet
@@ -254,13 +254,13 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
     }
 
     // Change service debug level if ANNIS itself is in debug mode
-    Object loggingConfigRaw = config.get(LOGGING_SECTION);
+    Object loggingConfigRaw = serviceConfig.get(LOGGING_SECTION);
     final Map<Object, Object> loggingConfig;
     if (loggingConfigRaw instanceof Map) {
       loggingConfig = (Map<Object, Object>) loggingConfigRaw;
     } else {
       loggingConfig = new LinkedHashMap<>();
-      config.put(LOGGING_SECTION, loggingConfig);
+      serviceConfig.put(LOGGING_SECTION, loggingConfig);
     }
     Object debugConfigRaw = loggingConfig.get("debug");
     if (!Objects.equal(debugConfigRaw, log.isDebugEnabled())) {
@@ -281,7 +281,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
         log.info("Writing default service configuration file to {}",
             tmpConfigFile.getAbsolutePath());
       }
-      mapper.writeValue(tmpConfigFile, config);
+      mapper.writeValue(tmpConfigFile, serviceConfig);
       return tmpConfigFile;
     } else {
       // Return the original configuration file, which did not need to be changed
