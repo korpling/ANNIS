@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed issue with corpus names containing special characters when login is
+  active. There was a "Forbidden" error when trying to access the corpus
+  configuration.
+
 ## [4.9.8] - 2022-10-22
 
 ### Fixed

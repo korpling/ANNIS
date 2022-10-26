@@ -1094,15 +1094,19 @@ public class Helper {
    *
    * @param p Salt project
    * @return returns an empty list if project is empty or null.
+   * @throws UnsupportedEncodingException
    */
-  public static Set<String> getToplevelCorpusNames(final SaltProject p) {
+  public static Set<String> getToplevelCorpusNames(final SaltProject p)
+      throws UnsupportedEncodingException {
     final Set<String> names = new HashSet<>();
 
     if (p != null && p.getCorpusGraphs() != null) {
       for (final SCorpusGraph g : p.getCorpusGraphs()) {
         if (g.getRoots() != null) {
           for (final SNode c : g.getRoots()) {
-            names.add(c.getName());
+            String rawName = c.getName();
+            String decodedName = URLDecoder.decode(rawName, UTF_8);
+            names.add(decodedName);
           }
         }
       }

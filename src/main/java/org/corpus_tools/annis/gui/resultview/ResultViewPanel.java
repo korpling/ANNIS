@@ -25,6 +25,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
+import java.io.UnsupportedEncodingException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -433,7 +434,7 @@ public class ResultViewPanel extends VerticalLayout {
     } // end iterate for segmentation layer
   }
 
-  private void updateVariables(SaltProject p) {
+  private void updateVariables(SaltProject p) throws UnsupportedEncodingException {
     segmentationLayerSet.addAll(getSegmentationNames(p));
     tokenAnnotationLevelSet.addAll(Helper.getTokenAnnotationLevelSet(p));
     Set<String> hiddenTokenAnnos = null;
