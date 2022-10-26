@@ -5,6 +5,7 @@ import static org.corpus_tools.annis.api.model.CorpusConfigurationViewTimelineSt
 import com.google.common.base.Joiner;
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,7 +51,8 @@ public class ExportHelper {
   }
 
   private static void recreateTimelineIfNecessary(SaltProject p, CorporaApi corporaApi,
-      Map<String, CorpusConfiguration> corpusConfigs) throws ApiException {
+      Map<String, CorpusConfiguration> corpusConfigs)
+      throws ApiException, UnsupportedEncodingException {
 
 
     Set<String> corpusNames = Helper.getToplevelCorpusNames(p);
