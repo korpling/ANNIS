@@ -385,8 +385,10 @@ public class ExportPanel extends GridLayout {
     // when not longer needed
     tmpOutputFile = currentTmpFile;
     //
-    if (exportError instanceof IllegalStateException || exportError instanceof ClassCastException) {
-      Notification.show(exportError.getMessage(), Notification.Type.ERROR_MESSAGE);
+    if (exportError instanceof IllegalStateException
+        || exportError instanceof IllegalArgumentException
+        || exportError instanceof ClassCastException) {
+      Notification.show("Export failed", exportError.getMessage(), Notification.Type.ERROR_MESSAGE);
     } else if (tmpOutputFile == null) {
       Notification.show("Could not create the Exporter",
           "The server logs might contain more information about this "

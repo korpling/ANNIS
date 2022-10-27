@@ -88,8 +88,7 @@ public class ExportHelper {
   }
 
   private static void recreateTimeline(SaltProject p, StrategyEnum timelineStrategy,
-      Set<String> segNames,
-      CorpusConfiguration config) throws ApiException {
+      Set<String> segNames, CorpusConfiguration config) throws ApiException {
     Map<String, String> spanAnno2order = new TreeMap<>();
 
     if (timelineStrategy == IMPLICITFROMMAPPING
@@ -130,7 +129,8 @@ public class ExportHelper {
     Match parsedMatch = Match.parseFromString(match);
 
     if (!parsedMatch.getSaltIDs().isEmpty()) {
-      List<String> corpusPath = Helper.getCorpusPath(parsedMatch.getSaltIDs().get(0));
+      final List<String> corpusPathForMatch = Helper.getCorpusPath(parsedMatch.getSaltIDs().get(0));
+      final String corpusNameForMatch = corpusPathForMatch.get(0);
 
       SubgraphWithContext subgraphQuery = new SubgraphWithContext();
       subgraphQuery.setLeft(contextLeft);
@@ -138,14 +138,15 @@ public class ExportHelper {
       subgraphQuery.segmentation(null);
       subgraphQuery.setNodeIds(parsedMatch.getSaltIDs());
 
+
       if (args.containsKey(SEGMENTATION_KEY)) {
         subgraphQuery.setSegmentation(args.get(SEGMENTATION_KEY));
       }
 
-      File graphML = corporaApi.subgraphForNodes(corpusPath.get(0), subgraphQuery);
+      File graphML = corporaApi.subgraphForNodes(corpusNameForMatch, subgraphQuery);
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-      SaltProject p = documentGraphToProject(docGraph, corpusPath);
+      SaltProject p = documentGraphToProject(docGraph, corpusPathForMatch);
       Helper.addMatchToDocumentGraph(parsedMatch, docGraph);
       recreateTimelineIfNecessary(p, corporaApi, corpusConfigs);
 

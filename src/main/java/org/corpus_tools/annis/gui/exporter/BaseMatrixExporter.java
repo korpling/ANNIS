@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,6 +35,7 @@ import org.apache.commons.io.LineIterator;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
+import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
@@ -44,6 +46,8 @@ import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.hibernate.cache.CacheException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An abstract base class for exporters that use Salt subgraphs to some kind of matrix output
@@ -56,6 +60,8 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
    * 
    */
   private static final long serialVersionUID = 787797500368376816L;
+
+  private static final Logger log = LoggerFactory.getLogger(BaseMatrixExporter.class);
 
   /**
    * Iterates over all matches (modelled as corpus graphs) and executes the first pass
@@ -80,6 +86,25 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     }
   }
 
+  private static boolean segmentationNameIsValid(Collection<String> corpora, String segmentation,
+      UI ui) {
+    CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
+    for (String corpus : corpora) {
+      try {
+        if (corporaApi.components(corpus, AnnotationComponentType.ORDERING.getValue(), segmentation)
+            .isEmpty()) {
+          return false;
+        }
+      } catch (ApiException ex) {
+        if (ex.getCode() == 403) {
+          log.debug("Did not have access rights to query segmentation names for corpus", ex);
+        } else {
+          log.warn("Could not query segmentation names for corpus", ex);
+        }
+      }
+    }
+    return true;
+  }
 
   @Override
   public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft,
@@ -101,6 +126,17 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     }
 
     SearchApi searchApi = new SearchApi(Helper.getClient(ui));
+
+    // Do some validity checks of the arguments, like a segmentation must exist on all selected
+    // corpora
+    String segmentation = args.get(ExportHelper.SEGMENTATION_KEY);
+    if (segmentation != null) {
+      if (!segmentationNameIsValid(corpora, segmentation, ui)) {
+        return new IllegalArgumentException("The 'segmentation' parameter is set to '"
+            + segmentation
+            + "' but this segmentation does not exist in all corpora.");
+      }
+    }
 
     // 1. Get all the matches as Salt ID
     FindQuery query = new FindQuery();

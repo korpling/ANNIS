@@ -153,9 +153,6 @@ public class SearchOptionsPanel extends FormLayout {
         }
       }
     }
-
-
-
     return segNames;
   }
 
