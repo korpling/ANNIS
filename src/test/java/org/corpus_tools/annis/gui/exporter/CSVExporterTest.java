@@ -1,5 +1,7 @@
 package org.corpus_tools.annis.gui.exporter;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
@@ -137,6 +139,22 @@ class CSVExporterTest {
     assertEquals(2, lines.length);
     assertEquals("1_id\t1_span\t1_anno_default_ns::norm0", lines[0]);
     assertEquals("salt:/dialog.demo/dialog.demo#sSpan79\tma\tmal", lines[1]);
+  }
+
+  @Test
+  void exportWithNonExistingSegmentation() throws IOException {
+    EventBus eventBus = mock(EventBus.class);
+    Writer out = new StringWriter();
+
+    Exception ex =
+        exporter.convertText("norm0=\"mal\"", QueryLanguage.AQL, 0, 0, Sets.newSet("dialog.demo"),
+            null, "segmentation=notthere", false, out, eventBus, new HashMap<>(), ui);
+
+    assertNotNull(ex);
+    assertTrue(ex instanceof IllegalArgumentException);
+    assertTrue(ex.getMessage().contains("'notthere'"));
+    out.close();
+
   }
 
   @Test
