@@ -173,7 +173,7 @@ public class ExportPanel extends GridLayout {
       String caption = "Help";
       Button button = event.getButton();
       if (component.getCaption() != null && !component.getCaption().isEmpty()) {
-        caption = "Help for \"" + component.getCaption();
+        caption = "Help for \"" + component.getCaption() + "\"";
       }
       caption = caption + "<br/><br/>(Click here to close)";
       Notification notify = new Notification(caption, Notification.Type.HUMANIZED_MESSAGE);
