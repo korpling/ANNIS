@@ -65,10 +65,19 @@ class ExportPanelTest {
     Button downloadButton = _get(panel, Button.class, spec -> spec.withCaption("Download"));
     assertFalse(downloadButton.isEnabled());
 
+    // Set the annotation keys
+    TextField keysField = _get(panel, TextField.class, spec -> spec.withCaption("Annotation Keys"));
+    _setValue(keysField, "pos,lemma,pb");
+
+
     // Click on "Perform Export" button, wait until export is finished and download button is
     // enabled
     _click(_get(panel, Button.class, spec -> spec.withCaption("Perform Export")));
     TestHelper.awaitCondition(30, downloadButton::isEnabled);
+
+    // Check that the parameters have been updated
+    assertEquals(java.util.Arrays.asList("pos", "lemma", "pb"),
+        ui.getQueryState().getExportAnnotationKeys());
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})

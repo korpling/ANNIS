@@ -315,7 +315,7 @@ public class ExportPanel extends GridLayout {
     btHelpParameters.setIcon(VaadinIcons.QUESTION);
     btHelpParameters.addStyleName(ValoTheme.BUTTON_BORDERLESS);
     btHelpParameters.addStyleName("helpbutton");
-    btHelpParameters.addClickListener(new HelpButtonListener(txtAnnotationKeys));
+    btHelpParameters.addClickListener(new HelpButtonListener(txtParameters));
     formLayout.addComponent(new CssLayout(txtParameters, btHelpParameters));
 
     // check box for match-with-context exporter
