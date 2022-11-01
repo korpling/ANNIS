@@ -27,6 +27,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox.NewItemProvider;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.GridLayout;
@@ -161,9 +162,9 @@ public class ExportPanel extends GridLayout {
 
   public static class HelpButtonListener implements Button.ClickListener {
 
-    private final TextField component;
+    private final Component component;
 
-    public HelpButtonListener(TextField component) {
+    public HelpButtonListener(Component component) {
       this.component = component;
     }
 
@@ -296,27 +297,33 @@ public class ExportPanel extends GridLayout {
     formLayout.addComponent(cbLeftContext);
     formLayout.addComponent(cbRightContext);
 
-    txtAnnotationKeys = new TextField("Annotation Keys");
-    txtAnnotationKeys.setDescription("Some exporters will use this comma "
-        + "seperated list of annotation keys to limit the exported data to these "
-        + "annotations.");
+    txtAnnotationKeys = new TextField();
     Button btHelpAnnotationKeys = new Button("");
     btHelpAnnotationKeys.setIcon(VaadinIcons.QUESTION);
     btHelpAnnotationKeys.addStyleName(ValoTheme.BUTTON_BORDERLESS);
     btHelpAnnotationKeys.addStyleName("helpbutton");
-    btHelpAnnotationKeys.addClickListener(new HelpButtonListener(txtAnnotationKeys));
-    formLayout.addComponent(new CssLayout(txtAnnotationKeys, btHelpAnnotationKeys));
 
-    txtParameters = new TextField("Parameters");
-    txtParameters.setDescription("You can input special parameters "
-        + "for certain exporters. See the description of each exporter "
-        + "(‘?’ button above) for specific parameter settings.");
+    CssLayout keysLayout = new CssLayout(txtAnnotationKeys, btHelpAnnotationKeys);
+    keysLayout.setCaption("Annotation Keys");
+    keysLayout.setDescription("Some exporters will use this comma "
+        + "seperated list of annotation keys to limit the exported data to these "
+        + "annotations.");
+    btHelpAnnotationKeys.addClickListener(new HelpButtonListener(keysLayout));
+    formLayout.addComponent(keysLayout);
+
+    txtParameters = new TextField();
     Button btHelpParameters = new Button("");
     btHelpParameters.setIcon(VaadinIcons.QUESTION);
     btHelpParameters.addStyleName(ValoTheme.BUTTON_BORDERLESS);
     btHelpParameters.addStyleName("helpbutton");
-    btHelpParameters.addClickListener(new HelpButtonListener(txtParameters));
-    formLayout.addComponent(new CssLayout(txtParameters, btHelpParameters));
+    CssLayout parametersLayout = new CssLayout(txtParameters, btHelpParameters);
+    parametersLayout.setCaption("Parameters");
+    parametersLayout.setDescription("You can input special parameters "
+        + "for certain exporters. See the description of each exporter "
+        + "(‘?’ button above) for specific parameter settings.");
+
+    btHelpParameters.addClickListener(new HelpButtonListener(parametersLayout));
+    formLayout.addComponent(parametersLayout);
 
     // check box for match-with-context exporter
     cbAlignmc = new CheckBox("align matches" + "<br/>" + "by node number");

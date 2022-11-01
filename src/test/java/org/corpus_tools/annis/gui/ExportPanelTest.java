@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
@@ -66,7 +67,9 @@ class ExportPanelTest {
     assertFalse(downloadButton.isEnabled());
 
     // Set the annotation keys
-    TextField keysField = _get(panel, TextField.class, spec -> spec.withCaption("Annotation Keys"));
+    CssLayout keysLayout =
+        _get(panel, CssLayout.class, spec -> spec.withCaption("Annotation Keys"));
+    TextField keysField = _get(keysLayout, TextField.class);
     _setValue(keysField, "pos,lemma,pb");
 
 
@@ -151,7 +154,8 @@ class ExportPanelTest {
     ComboBox exporterSelection = _get(panel, ComboBox.class, spec -> spec.withCaption("Exporter"));
     _setValue(exporterSelection, "CSVExporter");
 
-    TextField paramField = _get(panel, TextField.class, spec -> spec.withCaption("Parameters"));
+    CssLayout paramLayout = _get(panel, CssLayout.class, spec -> spec.withCaption("Parameters"));
+    TextField paramField = _get(paramLayout, TextField.class);
     _setValue(paramField, "segmentation=nonexisting");
 
     // Click on "Perform Export" button, wait until export is finished and download button is
