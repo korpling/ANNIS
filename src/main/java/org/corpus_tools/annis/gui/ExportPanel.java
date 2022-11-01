@@ -13,33 +13,38 @@
  */
 package org.corpus_tools.annis.gui;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Binder;
 import com.vaadin.data.HasValue;
+import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox.NewItemProvider;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.shared.ui.label.ContentMode;
 import com.vaadin.v7.ui.CheckBox;
 import com.vaadin.v7.ui.Label;
-import com.vaadin.v7.ui.TextField;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
-import org.corpus_tools.annis.gui.components.HelpButton;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
-import org.corpus_tools.annis.gui.converter.CommaSeperatedStringConverterList;
 import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.LoggerFactory;
@@ -154,6 +159,31 @@ public class ExportPanel extends GridLayout {
 
   }
 
+  public static class HelpButtonListener implements Button.ClickListener {
+
+    private final TextField component;
+
+    public HelpButtonListener(TextField component) {
+      this.component = component;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event) {
+      String caption = "Help";
+      Button button = event.getButton();
+      if (component.getCaption() != null && !component.getCaption().isEmpty()) {
+        caption = "Help for \"" + component.getCaption();
+      }
+      caption = caption + "<br/><br/>(Click here to close)";
+      Notification notify = new Notification(caption, Notification.Type.HUMANIZED_MESSAGE);
+      notify.setHtmlContentAllowed(true);
+      notify.setDescription(component.getDescription());
+      notify.setDelayMsec(-1);
+      notify.show(UI.getCurrent().getPage());
+    }
+
+  }
+
   /**
    * 
    */
@@ -198,6 +228,12 @@ public class ExportPanel extends GridLayout {
   private final Label lblHelp;
 
   private final CheckBox cbAlignmc;
+
+
+  private static final Splitter paramSplitter = Splitter.on(',').trimResults().omitEmptyStrings();
+
+  private static final Joiner paramJoiner = Joiner.on(", ");
+
 
   public ExportPanel(AnnisUI ui) {
     super(2, 3);
@@ -264,13 +300,23 @@ public class ExportPanel extends GridLayout {
     txtAnnotationKeys.setDescription("Some exporters will use this comma "
         + "seperated list of annotation keys to limit the exported data to these "
         + "annotations.");
-    formLayout.addComponent(new HelpButton<String>(txtAnnotationKeys));
+    Button btHelpAnnotationKeys = new Button("");
+    btHelpAnnotationKeys.setIcon(VaadinIcons.QUESTION);
+    btHelpAnnotationKeys.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+    btHelpAnnotationKeys.addStyleName("helpbutton");
+    btHelpAnnotationKeys.addClickListener(new HelpButtonListener(txtAnnotationKeys));
+    formLayout.addComponent(new CssLayout(txtAnnotationKeys, btHelpAnnotationKeys));
 
     txtParameters = new TextField("Parameters");
     txtParameters.setDescription("You can input special parameters "
         + "for certain exporters. See the description of each exporter "
         + "(‘?’ button above) for specific parameter settings.");
-    formLayout.addComponent(new HelpButton<String>(txtParameters));
+    Button btHelpParameters = new Button("");
+    btHelpParameters.setIcon(VaadinIcons.QUESTION);
+    btHelpParameters.addStyleName(ValoTheme.BUTTON_BORDERLESS);
+    btHelpParameters.addStyleName("helpbutton");
+    btHelpParameters.addClickListener(new HelpButtonListener(txtAnnotationKeys));
+    formLayout.addComponent(new CssLayout(txtParameters, btHelpParameters));
 
     // check box for match-with-context exporter
     cbAlignmc = new CheckBox("align matches" + "<br/>" + "by node number");
@@ -327,10 +373,16 @@ public class ExportPanel extends GridLayout {
       cbLeftContext.addSelectionListener(event -> binder.setBean(state));
       cbRightContext.addSelectionListener(event -> binder.setBean(state));
 
-      txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
-      txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
 
-      txtParameters.setPropertyDataSource(state.getExportParameters());
+      binder.forField(txtAnnotationKeys).withConverter(presentation -> {
+        List<String> result = new ArrayList<>();
+        for (String s : paramSplitter.split(presentation)) {
+          result.add(s);
+        }
+        return result;
+      }, paramJoiner::join).bind("exportAnnotationKeys");
+
+      binder.forField(txtParameters).bind("exportParameters");
 
       cbAlignmc.setPropertyDataSource(state.getAlignmc());
 

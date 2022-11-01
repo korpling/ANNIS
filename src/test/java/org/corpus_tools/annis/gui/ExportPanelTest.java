@@ -14,7 +14,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
-import org.corpus_tools.annis.gui.components.HelpButton;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -143,9 +142,7 @@ class ExportPanelTest {
     ComboBox exporterSelection = _get(panel, ComboBox.class, spec -> spec.withCaption("Exporter"));
     _setValue(exporterSelection, "CSVExporter");
 
-    HelpButton<?> paramHelpButton =
-        _get(panel, HelpButton.class, spec -> spec.withCaption("Parameters"));
-    TextField paramField = _get(paramHelpButton, TextField.class);
+    TextField paramField = _get(panel, TextField.class, spec -> spec.withCaption("Parameters"));
     _setValue(paramField, "segmentation=nonexisting");
 
     // Click on "Perform Export" button, wait until export is finished and download button is
@@ -157,7 +154,7 @@ class ExportPanelTest {
     });
 
     Notification notification = NotificationsKt.getNotifications().get(0);
-    assertEquals("Export error", notification.getCaption());
+    assertEquals("Export failed", notification.getCaption());
   }
 
 }

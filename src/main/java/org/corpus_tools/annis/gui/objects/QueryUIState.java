@@ -72,9 +72,8 @@ public class QueryUIState implements Serializable {
       new ObjectProperty<Set<Long>>(new TreeSet<Long>());
 
   private Class<? extends ExporterPlugin> exporter = CSVExporter.class;
-  private final ObjectProperty<List<String>> exportAnnotationKeys =
-      new ObjectProperty<List<String>>(new ArrayList<String>());
-  private final ObjectProperty<String> exportParameters = new ObjectProperty<>("");
+  private List<String> exportAnnotationKeys = new ArrayList<String>();
+  private String exportParameters = "";
 
   private final ObjectProperty<Boolean> alignmc = new ObjectProperty<Boolean>(false);
 
@@ -115,8 +114,17 @@ public class QueryUIState implements Serializable {
     return executedCalls;
   }
 
-  public ObjectProperty<List<String>> getExportAnnotationKeys() {
+  public List<String> getExportAnnotationKeys() {
     return exportAnnotationKeys;
+  }
+
+  public void setExportAnnotationKeys(List<String> keys) {
+    this.exportAnnotationKeys = keys;
+  }
+
+
+  public void setExportParameters(String exportParameters) {
+    this.exportParameters = exportParameters;
   }
 
   public Class<? extends ExporterPlugin> getExporter() {
@@ -127,7 +135,7 @@ public class QueryUIState implements Serializable {
     this.exporter = exporter;
   }
 
-  public ObjectProperty<String> getExportParameters() {
+  public String getExportParameters() {
     return exportParameters;
   }
 
