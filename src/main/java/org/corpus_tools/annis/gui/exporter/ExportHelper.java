@@ -88,7 +88,7 @@ public class ExportHelper {
   }
 
   private static void recreateTimeline(SaltProject p, StrategyEnum timelineStrategy,
-      Set<String> segNames, CorpusConfiguration config) throws ApiException {
+      Set<String> segNames, CorpusConfiguration config) {
     Map<String, String> spanAnno2order = new TreeMap<>();
 
     if (timelineStrategy == IMPLICITFROMMAPPING

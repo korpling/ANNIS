@@ -171,7 +171,6 @@ public class ExportPanel extends GridLayout {
     @Override
     public void buttonClick(ClickEvent event) {
       String caption = "Help";
-      Button button = event.getButton();
       if (component.getCaption() != null && !component.getCaption().isEmpty()) {
         caption = "Help for \"" + component.getCaption() + "\"";
       }

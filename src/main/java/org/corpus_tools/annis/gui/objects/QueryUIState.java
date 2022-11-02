@@ -72,7 +72,7 @@ public class QueryUIState implements Serializable {
       new ObjectProperty<Set<Long>>(new TreeSet<Long>());
 
   private Class<? extends ExporterPlugin> exporter = CSVExporter.class;
-  private List<String> exportAnnotationKeys = new ArrayList<String>();
+  private List<String> exportAnnotationKeys = new ArrayList<>();
   private String exportParameters = "";
 
   private final ObjectProperty<Boolean> alignmc = new ObjectProperty<Boolean>(false);

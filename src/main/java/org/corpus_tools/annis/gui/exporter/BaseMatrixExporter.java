@@ -130,12 +130,10 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     // Do some validity checks of the arguments, like a segmentation must exist on all selected
     // corpora
     String segmentation = args.get(ExportHelper.SEGMENTATION_KEY);
-    if (segmentation != null) {
-      if (!segmentationNameIsValid(corpora, segmentation, ui)) {
+    if (segmentation != null && !segmentationNameIsValid(corpora, segmentation, ui)) {
         return new IllegalArgumentException("The 'segmentation' parameter is set to '"
             + segmentation
             + "' but this segmentation does not exist in all corpora.");
-      }
     }
 
     // 1. Get all the matches as Salt ID
