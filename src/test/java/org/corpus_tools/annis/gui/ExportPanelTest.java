@@ -173,6 +173,8 @@ class ExportPanelTest {
     TextField paramField = _get(paramLayout, TextField.class);
     _setValue(paramField, "segmentation=nonexisting");
 
+    assertEquals("segmentation=nonexisting", ui.getQueryState().getExportParameters());
+
     // Click on "Perform Export" button, wait until export is finished and download button is
     // still disabled, error message should be shown
     _click(_get(panel, Button.class, spec -> spec.withCaption("Perform Export")));
