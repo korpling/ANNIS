@@ -15,6 +15,7 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextField;
+import kotlin.Pair;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,8 +49,12 @@ class ExportPanelTest {
     MockVaadin.tearDown();
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   void testCSVExport() throws Exception {
+
+    NotificationsKt.clearNotifications();
+
     // Prepare query
     ui.getQueryController().setQuery(QueryGenerator.displayed().corpora(Sets.newHashSet("pcc2"))
         .query("tok=\"Feigenblatt\"").build());
@@ -66,9 +71,19 @@ class ExportPanelTest {
     Button downloadButton = _get(panel, Button.class, spec -> spec.withCaption("Download"));
     assertFalse(downloadButton.isEnabled());
 
-    // Set the annotation keys
     CssLayout keysLayout =
         _get(panel, CssLayout.class, spec -> spec.withCaption("Annotation Keys"));
+
+    // Clicking on the help button should show a notification with the info text
+    _click(_get(keysLayout, Button.class));
+    NotificationsKt.expectNotifications(
+        new Pair<>("Help for \"Annotation Keys\"<br/><br/>(Click here to close)",
+            "Some exporters will use this comma "
+                + "seperated list of annotation keys to limit the exported data to these "
+                + "annotations."));
+    NotificationsKt.clearNotifications();
+
+    // Set the annotation keys
     TextField keysField = _get(keysLayout, TextField.class);
     _setValue(keysField, "pos,lemma,pb");
 
