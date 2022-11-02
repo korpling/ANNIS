@@ -230,7 +230,7 @@ public class ExportPanel extends GridLayout {
   private final CheckBox cbAlignmc;
 
 
-  private static final Splitter paramSplitter = Splitter.on(',').trimResults().omitEmptyStrings();
+  private static final Splitter paramSplitter = Splitter.on(',').trimResults();
 
   private static final Joiner paramJoiner = Joiner.on(", ");
 
