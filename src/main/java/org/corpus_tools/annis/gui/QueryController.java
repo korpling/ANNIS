@@ -450,8 +450,8 @@ public class QueryController implements Serializable {
         .queryLanguage(state.getQueryLanguageLegacy()).left(state.getLeftContext())
         .right(state.getRightContext()).segmentation(state.getVisibleBaseText().getValue())
         .exporter(state.getExporter())
-        .annotations(state.getExportAnnotationKeys().getValue())
-        .param(state.getExportParameters().getValue()).alignmc(state.getAlignmc().getValue())
+        .annotations(state.getExportAnnotationKeys())
+        .param(state.getExportParameters()).alignmc(state.getAlignmc().getValue())
         .build();
   }
 
@@ -588,8 +588,13 @@ public class QueryController implements Serializable {
       if (!Objects.equals(state.getExporter(), ((ExportQuery) q).getExporter())) {
         state.setExporter(((ExportQuery) q).getExporter());
       }
-      setIfNew(state.getExportAnnotationKeys(), ((ExportQuery) q).getAnnotationKeys());
-      setIfNew(state.getExportParameters(), ((ExportQuery) q).getParameters());
+      if (!Objects.deepEquals(state.getExportAnnotationKeys(),
+          ((ExportQuery) q).getAnnotationKeys())) {
+        state.setExportAnnotationKeys(((ExportQuery) q).getAnnotationKeys());
+      }
+      if (!Objects.equals(state.getExportParameters(), ((ExportQuery) q).getParameters())) {
+        state.setExportParameters(((ExportQuery) q).getParameters());
+      }
       setIfNew(state.getAlignmc(), ((ExportQuery) q).getAlignmc());
     }
 

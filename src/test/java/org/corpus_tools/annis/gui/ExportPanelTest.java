@@ -7,10 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import com.github.mvysny.kaributesting.v8.MockVaadin;
+import com.github.mvysny.kaributesting.v8.NotificationsKt;
 import com.google.common.collect.Sets;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TextField;
+import kotlin.Pair;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,8 +49,12 @@ class ExportPanelTest {
     MockVaadin.tearDown();
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   void testCSVExport() throws Exception {
+
+    NotificationsKt.clearNotifications();
+
     // Prepare query
     ui.getQueryController().setQuery(QueryGenerator.displayed().corpora(Sets.newHashSet("pcc2"))
         .query("tok=\"Feigenblatt\"").build());
@@ -62,10 +71,31 @@ class ExportPanelTest {
     Button downloadButton = _get(panel, Button.class, spec -> spec.withCaption("Download"));
     assertFalse(downloadButton.isEnabled());
 
+    CssLayout keysLayout =
+        _get(panel, CssLayout.class, spec -> spec.withCaption("Annotation Keys"));
+
+    // Clicking on the help button should show a notification with the info text
+    _click(_get(keysLayout, Button.class));
+    NotificationsKt.expectNotifications(
+        new Pair<>("Help for \"Annotation Keys\"<br/><br/>(Click here to close)",
+            "Some exporters will use this comma "
+                + "seperated list of annotation keys to limit the exported data to these "
+                + "annotations."));
+    NotificationsKt.clearNotifications();
+
+    // Set the annotation keys
+    TextField keysField = _get(keysLayout, TextField.class);
+    _setValue(keysField, "pos,lemma,pb");
+
+
     // Click on "Perform Export" button, wait until export is finished and download button is
     // enabled
     _click(_get(panel, Button.class, spec -> spec.withCaption("Perform Export")));
     TestHelper.awaitCondition(30, downloadButton::isEnabled);
+
+    // Check that the parameters have been updated
+    assertEquals(java.util.Arrays.asList("pos", "lemma", "pb"),
+        ui.getQueryState().getExportAnnotationKeys());
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
@@ -117,6 +147,44 @@ class ExportPanelTest {
     assertEquals(20, ui.getQueryState().getRightContext());
     assertEquals(10, leftContextSearchOptions.getValue());
     assertEquals(20, rightContextSearchOptions.getValue());
+  }
+
+  @Test
+  void testNonExistingSegmentation() throws Exception {
+
+    NotificationsKt.clearNotifications();
+
+    // Prepare query
+    ui.getQueryController().setQuery(QueryGenerator.displayed().corpora(Sets.newHashSet("pcc2"))
+        .query("tok=\"Feigenblatt\"").build());
+
+    // Click on the "More" button and then "Export"
+    PopupButton moreButton = _get(PopupButton.class, spec -> spec.withCaption("More"));
+    moreButton.setPopupVisible(true);
+    _click(_get(Button.class, spec -> spec.withCaption("Export")));
+
+    // Make sure the Export tab is there
+    ExportPanel panel = _get(ExportPanel.class);
+
+    ComboBox exporterSelection = _get(panel, ComboBox.class, spec -> spec.withCaption("Exporter"));
+    _setValue(exporterSelection, "CSVExporter");
+
+    CssLayout paramLayout = _get(panel, CssLayout.class, spec -> spec.withCaption("Parameters"));
+    TextField paramField = _get(paramLayout, TextField.class);
+    _setValue(paramField, "segmentation=nonexisting");
+
+    assertEquals("segmentation=nonexisting", ui.getQueryState().getExportParameters());
+
+    // Click on "Perform Export" button, wait until export is finished and download button is
+    // still disabled, error message should be shown
+    _click(_get(panel, Button.class, spec -> spec.withCaption("Perform Export")));
+
+    TestHelper.awaitCondition(10, () -> {
+      return !NotificationsKt.getNotifications().isEmpty();
+    });
+
+    Notification notification = NotificationsKt.getNotifications().get(0);
+    assertEquals("Export failed", notification.getCaption());
   }
 
 }
