@@ -43,7 +43,6 @@
 		<spring.profiles.active>server</spring.profiles.active>
 		<swagger-core-version>1.5.24</swagger-core-version>
 		<gson-fire-version>1.8.4</gson-fire-version>
-		<kotlin.version>1.6.0</kotlin.version>
 	</properties>
 
 	<repositories>
@@ -526,13 +525,6 @@
 			<artifactId>antlr4-runtime</artifactId>
 			<version>${antlr4.version}</version>
 			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-stdlib</artifactId>
-			<version>${kotlin.version}</version>
-			<scope>test</scope>
 		</dependency>
 
 		<dependency>
