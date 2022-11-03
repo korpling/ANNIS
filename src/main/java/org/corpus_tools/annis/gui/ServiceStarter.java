@@ -124,7 +124,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
             // with the Rosetta tool. We use the `arch` helper program to trigger emulation if
             // necessary. This is necessary when Java support the native processor architecture and
             // thus is not emulated yet.
-            backgroundProcessBuilder = new ProcessBuilder("arch", "-arch x86_64",
+            backgroundProcessBuilder = new ProcessBuilder("arch", "-x86_64",
                 tmpExec.getAbsolutePath(), "--config", serviceConfigFile.getAbsolutePath());
 
           } else {
@@ -160,11 +160,11 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
    */
   private Optional<String> executablePathForSystem() {
     Optional<String> execPath = Optional.empty();
-    if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
+    if (SystemUtils.IS_OS_MAC_OSX) {
+      execPath = Optional.of("darwin/graphannis-webservice.osx");
+    } else if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
       if (SystemUtils.IS_OS_LINUX) {
         execPath = Optional.of("linux-x86-64/graphannis-webservice");
-      } else if (SystemUtils.IS_OS_MAC_OSX) {
-        execPath = Optional.of("darwin/graphannis-webservice.osx");
       } else if (SystemUtils.IS_OS_WINDOWS) {
         execPath = Optional.of("win32-x86-64/graphannis-webservice.exe");
       }
