@@ -5,6 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Long running exports could fail when you are logged in and the internal token
+  expired. The communication with the REST webservice has been refactored to
+  always get the newest token (automatically refreshed by spring) before
+  executing the call.
+
 ## [4.10.0] - 2022-11-03
 
 ### Added
