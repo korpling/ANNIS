@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.10.0] - 2022-11-03
+
 ### Added
 
 - Show informative error message when segmentation in export does not exist
@@ -1257,7 +1259,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.9.9...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.10.0...HEAD
+[4.10.0]: https://github.com/korpling/ANNIS/compare/v4.9.9...v4.10.0
 [4.9.9]: https://github.com/korpling/ANNIS/compare/v4.9.8...v4.9.9
 [4.9.8]: https://github.com/korpling/ANNIS/compare/v4.9.7...v4.9.8
 [4.9.7]: https://github.com/korpling/ANNIS/compare/v4.9.6...v4.9.7

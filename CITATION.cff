@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.9.9
-date-released: 2022-10-26
+version: 4.10.0
+date-released: 2022-11-03
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
