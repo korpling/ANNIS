@@ -177,16 +177,6 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
           webURL);
     } else if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)
         || SystemUtils.IS_OS_MAC_OSX) {
-      if (SystemUtils.IS_OS_MAC_OSX && "aarch64".equals(SystemUtils.OS_ARCH)) {
-        // Show warning, but still run ANNIS
-        JOptionPane.showMessageDialog(null,
-            "ANNIS is not tested on Apple M1 systems yet!\n"
-                + "It is prefered to use the Rosetta emulator,\n"
-                + "but your version of Java uses the M1 processor natively.\n\n"
-                + "You can try to install and use the Adoptium OpenJDK Java Version 11\n"
-                + "from https://adoptium.net to run ANNIS and make sure Rosetta is used.",
-            "ANNIS not tested on MacOS with M1 processor", JOptionPane.WARNING_MESSAGE);
-      }
       showApplicationWindow();
       openBrowser(webURL);
     } else {
