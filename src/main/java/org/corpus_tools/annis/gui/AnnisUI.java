@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.ServletContext;
+import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.admin.AdminView;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
@@ -44,6 +45,7 @@ import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.querybuilder.QueryBuilderPlugin;
 import org.corpus_tools.annis.gui.requesthandler.BinaryRequestHandler;
 import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
+import org.corpus_tools.annis.gui.security.AutoTokenRefreshClient;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
 import org.slf4j.LoggerFactory;
@@ -258,9 +260,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   }
 
   @Override
-  protected String getLastAccessToken() {
-    return authListener.getToken();
+  public ApiClient getClient() {
+    return new AutoTokenRefreshClient(this, this.getAuthListener());
   }
+
 
   public UIConfig getConfig() {
     return config;
@@ -315,5 +318,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Override
   public OAuth2ClientProperties getOauth2ClientProperties() {
     return this.oauth2Clients;
+  }
+
+  public AuthenticationSuccessListener getAuthListener() {
+    return authListener;
   }
 }

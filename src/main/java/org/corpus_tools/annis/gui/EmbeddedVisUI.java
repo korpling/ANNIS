@@ -58,6 +58,7 @@ import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.annis.gui.objects.Match;
 import org.corpus_tools.annis.gui.objects.RawTextWrapper;
 import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
+import org.corpus_tools.annis.gui.security.AutoTokenRefreshClient;
 import org.corpus_tools.annis.gui.util.ANNISFontIcon;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
@@ -495,9 +496,10 @@ public class EmbeddedVisUI extends CommonUI {
   }
   
   @Override
-  protected String getLastAccessToken() {
-      return authListener.getToken();
+  public ApiClient getClient() {
+    return new AutoTokenRefreshClient(this, this.authListener);
   }
+
 
   @Override
   public ServletContext getServletContext() {

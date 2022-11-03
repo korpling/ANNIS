@@ -23,8 +23,6 @@ import java.util.Optional;
 import javax.servlet.ServletContext;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.Configuration;
-import org.corpus_tools.annis.auth.HttpBearerAuth;
 import org.corpus_tools.annis.gui.components.SettingsStorage;
 import org.corpus_tools.annis.gui.requesthandler.ResourceRequestHandler;
 import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
@@ -35,7 +33,6 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 /**
  *
@@ -176,27 +173,9 @@ public abstract class CommonUI extends AnnisBaseUI {
         return urlPrefix;
     }
     
-    protected abstract String getLastAccessToken();
+    public abstract ApiClient getClient();
 
-    public ApiClient getClient() {
-      
-      final ApiClient client = Configuration.getDefaultApiClient().setReadTimeout(0);
-      // Use the configuration to allow changing the path to the web-service
-      client.setBasePath(getConfig().getWebserviceUrl());
 
-      final Optional<OAuth2User> user = Helper.getUser(getSecurityContext());
-      String bearerToken = null;
-      if (user.isPresent()) {
-        bearerToken = getLastAccessToken();
-      }
-      final org.corpus_tools.annis.auth.Authentication auth =
-          client.getAuthentication("bearerAuth");
-      if (auth instanceof HttpBearerAuth) {
-        final HttpBearerAuth bearerAuth = (HttpBearerAuth) auth;
-        bearerAuth.setBearerToken(bearerToken);
-      }
-      return client;
-    }
 
     /**
      * Handle common errors like database/service connection problems and display a unified error

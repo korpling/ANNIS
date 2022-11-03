@@ -44,7 +44,7 @@ class ServiceStarterDesktopTest {
 
   @Test
   void testDesktopAuthConfigured() {
-    assertNotNull(ui.getLastAccessToken());
+    assertNotNull(ui.getAuthListener().getToken());
     SecurityContext ctx = ui.getSecurityContext();
     assertNotNull(ctx);
     Authentication auth = ctx.getAuthentication();
@@ -53,7 +53,7 @@ class ServiceStarterDesktopTest {
     assertTrue(auth.isAuthenticated());
     assertEquals("desktop", auth.getName());
     assertNull(auth.getDetails());
-    assertEquals(ui.getLastAccessToken(), auth.getCredentials());
+    assertEquals(ui.getAuthListener().getToken(), auth.getCredentials());
     assertTrue(auth.getPrincipal() instanceof OAuth2User);
   }
 
