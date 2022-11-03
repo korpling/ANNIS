@@ -10,6 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Show informative error message when segmentation in export does not exist
   instead of a generic stack trace
 
+### Fixed
+
+- Allow execution on macOS with Apple Silicon (M1/M2) using the Rosetta
+  emulation when starting the graphANNIS service process
+
 ## [4.9.9] - 2022-10-26
 
 ### Fixed
