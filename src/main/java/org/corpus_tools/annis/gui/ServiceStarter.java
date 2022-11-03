@@ -117,8 +117,21 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           // Start the process and read output/error stream in background threads
           log.info("Starting the bundled graphANNIS service with configuration file {}",
               serviceConfigFile.getAbsolutePath());
-          backgroundProcess = new ProcessBuilder(tmpExec.getAbsolutePath(), "--config",
-              serviceConfigFile.getAbsolutePath()).start();
+          ProcessBuilder backgroundProcessBuilder;
+
+          if (SystemUtils.IS_OS_MAC_OSX) {
+            // On MacOS has several processor architectors, but allows to emulate x86_64 processors
+            // with the Rosetta tool. We use the `arch` helper program to trigger emulation if
+            // necessary. This is necessary when Java support the native processor architecture and
+            // thus is not emulated yet.
+            backgroundProcessBuilder = new ProcessBuilder("arch", "-x86_64",
+                tmpExec.getAbsolutePath(), "--config", serviceConfigFile.getAbsolutePath());
+
+          } else {
+            backgroundProcessBuilder = new ProcessBuilder(tmpExec.getAbsolutePath(), "--config",
+                serviceConfigFile.getAbsolutePath());
+          }
+          backgroundProcess = backgroundProcessBuilder.start();
 
           // Create threads that read from the output and error streams and add the messages to
           // our log
@@ -147,11 +160,11 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
    */
   private Optional<String> executablePathForSystem() {
     Optional<String> execPath = Optional.empty();
-    if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
+    if (SystemUtils.IS_OS_MAC_OSX) {
+      execPath = Optional.of("darwin/graphannis-webservice.osx");
+    } else if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
       if (SystemUtils.IS_OS_LINUX) {
         execPath = Optional.of("linux-x86-64/graphannis-webservice");
-      } else if (SystemUtils.IS_OS_MAC_OSX) {
-        execPath = Optional.of("darwin/graphannis-webservice.osx");
       } else if (SystemUtils.IS_OS_WINDOWS) {
         execPath = Optional.of("win32-x86-64/graphannis-webservice.exe");
       }
