@@ -33,7 +33,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -183,10 +182,10 @@ public class CorpusBrowserPanel extends Panel {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
     try {
-      final List<Annotation> nodeAnnos = api.nodeAnnotations(corpus, true, true).stream()
+      final List<Annotation> nodeAnnos = api.nodeAnnotations(corpus, true, true)
           .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
               && !Objects.equals(a.getKey().getName(), "tok"))
-          .collect(Collectors.toList());
+          .collectList().block();
 
       final List<Annotation> metaAnnos = new LinkedList<>(nodeAnnos);
 
@@ -194,19 +193,16 @@ public class CorpusBrowserPanel extends Panel {
       nodeAnnos.removeIf(anno -> metaAnnoKeys.contains(anno.getKey()));
       metaAnnos.removeIf(anno -> !metaAnnoKeys.contains(anno.getKey()));
 
-      final List<Component> components = api.components(corpus, "Dominance", null);
+      final List<Component> components =
+          api.components(corpus, "Dominance", null).collectList().block();
       final List<Annotation> allEdgeAnnos = new LinkedList<>();
       final Map<Component, List<Annotation>> edgeAnnosByComponent = new LinkedHashMap<>();
-      components.addAll(api.components(corpus, "Pointing", null));
+      components.addAll(api.components(corpus, "Pointing", null).collectList().block());
       for (Component c : components) {
-        try {
           List<Annotation> annos = api.edgeAnnotations(corpus, c.getType().getValue(), c.getLayer(),
-              c.getName(), true, true);
+              c.getName(), true, true).collectList().block();
           edgeAnnosByComponent.put(c, annos);
           allEdgeAnnos.addAll(annos);
-        } catch (ApiException ex) {
-          // Ignore any not found errors
-        }
       }
 
       getUI().access(() -> {
