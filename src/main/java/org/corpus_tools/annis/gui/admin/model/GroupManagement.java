@@ -26,6 +26,7 @@ import org.corpus_tools.annis.api.model.Group;
 import org.corpus_tools.annis.gui.CaseSensitiveOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * A model for groups.
@@ -52,7 +53,7 @@ public class GroupManagement implements Serializable {
       try {
         api.putGroup(newGroup.getName(), newGroup);
         groups.put(newGroup.getName(), newGroup);
-      } catch (ApiException ex) {
+      } catch (WebClientResponseException ex) {
         log.warn("Could not update group", ex);
       }
 
@@ -65,7 +66,7 @@ public class GroupManagement implements Serializable {
       try {
         api.deleteGroup(groupName);
         groups.remove(groupName);
-      } catch (ApiException ex) {
+      } catch (WebClientResponseException ex) {
         log.warn("Could not update group", ex);
       }
 

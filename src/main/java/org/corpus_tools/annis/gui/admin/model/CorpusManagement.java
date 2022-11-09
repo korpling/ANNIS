@@ -16,8 +16,6 @@ package org.corpus_tools.annis.gui.admin.model;
 import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.util.TreeSet;
-import javax.ws.rs.core.Response;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.ServiceQueryException;
@@ -51,10 +49,10 @@ public class CorpusManagement implements Serializable {
       CorporaApi api = new CorporaApi(clientProvider.getClient());
       try {
         api.deleteCorpus(corpusName);
-      } catch (ApiException ex) {
-        if (ex.getCode() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+      } catch (WebClientResponseException ex) {
+        if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
           throw new CriticalServiceQueryException("You are not authorized to delete a corpus");
-        } else if (ex.getCode() == Response.Status.NOT_FOUND.getStatusCode()) {
+        } else if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
           throw new ServiceQueryException("Corpus with name " + corpusName + " not found");
         } else {
           log.error(null, ex);
