@@ -46,6 +46,7 @@ import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /*
  * @author martin klotz (martin.klotz@hu-berlin.de)
@@ -335,14 +336,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         try {
             List<Annotation> atts = new LinkedList<>();
             for (String corpus : corpusSelection) {
-                atts.addAll(api.nodeAnnotations(corpus, true, false));
+              atts.addAll(api.nodeAnnotations(corpus, true, false).collectList().block());
             }
             for (Annotation a : atts) {
                 if (a.getKey().getName().equals(meta)) {
                     result.add(a.getVal());
                 }
             }
-        } catch (ApiException ex) {
+          } catch (WebClientResponseException ex) {
             log.error(null, ex);
         }
 
@@ -356,11 +357,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
         try {
             for (String corpus : corpusSelection) {
-                for (Annotation a : api.nodeAnnotations(corpus, false, false)) {
+              for (Annotation a : api.nodeAnnotations(corpus, false, false).collectList().block()) {
                     result.add(a.getKey().getName());
                 }
             }
-        } catch (ApiException ex) {
+          } catch (WebClientResponseException ex) {
             log.error(null, ex);
         }
         result.add("tok");

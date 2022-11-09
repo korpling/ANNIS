@@ -43,6 +43,7 @@ import org.corpus_tools.annis.gui.beans.CorpusBrowserEntry;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -199,10 +200,14 @@ public class CorpusBrowserPanel extends Panel {
       final Map<Component, List<Annotation>> edgeAnnosByComponent = new LinkedHashMap<>();
       components.addAll(api.components(corpus, "Pointing", null).collectList().block());
       for (Component c : components) {
+        try {
           List<Annotation> annos = api.edgeAnnotations(corpus, c.getType().getValue(), c.getLayer(),
               c.getName(), true, true).collectList().block();
           edgeAnnosByComponent.put(c, annos);
           allEdgeAnnos.addAll(annos);
+        } catch (WebClientResponseException ex) {
+          // Ignore any not found errors
+        }
       }
 
       getUI().access(() -> {

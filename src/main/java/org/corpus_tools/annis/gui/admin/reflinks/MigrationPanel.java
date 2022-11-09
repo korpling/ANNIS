@@ -304,7 +304,7 @@ public class MigrationPanel extends Panel
     ApiClient apiClient = Helper.getClient(ui);
     CorporaApi corporaApi = new CorporaApi(apiClient);
     SearchApi searchApi = new SearchApi(apiClient);
-    Set<String> knownCorpora = new HashSet<>(corporaApi.listCorpora());
+    Set<String> knownCorpora = new HashSet<>(corporaApi.listCorpora().collectList().block());
 
     Optional<OkHttpClient> client = createClient(serviceURL, username, password);
 

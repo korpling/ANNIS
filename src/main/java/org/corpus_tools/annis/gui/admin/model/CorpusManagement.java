@@ -23,6 +23,8 @@ import org.corpus_tools.annis.gui.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.ServiceQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * A model that handles the corpus list
@@ -69,9 +71,9 @@ public class CorpusManagement implements Serializable {
 
       CorporaApi api = new CorporaApi(clientProvider.getClient());
       try {
-        corpora.addAll(api.listCorpora());
-      } catch (ApiException ex) {
-        if (ex.getCode() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+        corpora.addAll(api.listCorpora().collectList().block());
+      } catch (WebClientResponseException ex) {
+        if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
           throw new CriticalServiceQueryException("You are not authorized to get the corpus list.");
         } else {
           log.error(null, ex);

@@ -9,19 +9,17 @@ import static org.mockito.Mockito.when;
 
 import java.awt.FontFormatException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
-import org.corpus_tools.annis.gui.visualizers.component.pdf.PDFPanel;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.samples.SampleGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
 
 class PDFPanelTest {
 
@@ -51,7 +49,7 @@ class PDFPanelTest {
     // Make sure the document has an assigned PDF file
     CorporaApi api = mock(CorporaApi.class);
     when(api.listFiles(anyString(), anyString()))
-        .thenReturn(Arrays.asList("notapdf.webm", "test.pdf"));
+        .thenReturn(Flux.just("notapdf.webm", "test.pdf"));
 
     assertEquals("/context/Binary?toplevelCorpusName=rootCorpus&file=test.pdf",
         fixture.getBinaryPath(api));
@@ -67,7 +65,7 @@ class PDFPanelTest {
 
     // Make sure the document has an assigned PDF file
     CorporaApi api = mock(CorporaApi.class);
-    when(api.listFiles(anyString(), anyString())).thenReturn(new LinkedList<>());
+    when(api.listFiles(anyString(), anyString())).thenReturn(Flux.just());
 
     assertEquals("", fixture.getBinaryPath(api));
   }

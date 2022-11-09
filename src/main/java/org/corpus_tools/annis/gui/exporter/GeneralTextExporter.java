@@ -232,7 +232,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
     List<Annotation> attributes = new LinkedList<>();
   
     for (String corpus : corpora) {
-      attributes.addAll(api.nodeAnnotations(corpus, false, false));
+      attributes.addAll(api.nodeAnnotations(corpus, false, false).collectList().block());
     }
   
     for (Annotation a : attributes) {

@@ -16,7 +16,6 @@ import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
-import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.CorpusConfigurationViewTimelineStrategy.StrategyEnum;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
@@ -76,15 +75,12 @@ public class ExportHelper {
     }
 
     // Get all segmentation names
-    Set<String> segNames = new TreeSet<>();
-    for (Component c : corporaApi.components(firstCorpusName,
-        AnnotationComponentType.ORDERING.getValue(), null)) {
-      if (!c.getName().isEmpty() && !"annis".equals(c.getLayer())) {
-        segNames.add(c.getName());
-      }
-    }
+    List<String> segNames = corporaApi.components(firstCorpusName,
+        AnnotationComponentType.ORDERING.getValue(), null)
+        .filter(c -> !c.getName().isEmpty() && !"annis".equals(c.getLayer())).map(c -> c.getName())
+        .collectList().block();
 
-    recreateTimeline(p, timelineStrategy, segNames, config);
+    recreateTimeline(p, timelineStrategy, new TreeSet<>(segNames), config);
   }
 
   private static void recreateTimeline(SaltProject p, StrategyEnum timelineStrategy,
@@ -143,7 +139,7 @@ public class ExportHelper {
         subgraphQuery.setSegmentation(args.get(SEGMENTATION_KEY));
       }
 
-      File graphML = corporaApi.subgraphForNodes(corpusNameForMatch, subgraphQuery);
+      File graphML = corporaApi.subgraphForNodes(corpusNameForMatch, subgraphQuery).block();
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
       SaltProject p = documentGraphToProject(docGraph, corpusPathForMatch);
