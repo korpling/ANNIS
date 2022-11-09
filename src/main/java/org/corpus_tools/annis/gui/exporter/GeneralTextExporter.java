@@ -173,7 +173,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
       query.setQuery(queryAnnisQL);
 
       final AtomicInteger offset = new AtomicInteger();
-      File matches = searchApi.find(query);
+      File matches = searchApi.find(query).block();
       // 2. iterate over all matches and get the sub-graph for them
       try (LineIterator lines = FileUtils.lineIterator(matches, StandardCharsets.UTF_8.name())) {
         while (lines.hasNext()) {

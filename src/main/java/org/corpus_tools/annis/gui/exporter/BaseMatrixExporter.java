@@ -142,7 +142,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     query.setQueryLanguage(queryLanguage);
     query.setQuery(queryAnnisQL);
     try {
-      File matches = searchApi.find(query);
+      File matches = searchApi.find(query).block();
 
       // Get the node count for the query by parsing it
       List<QueryAttributeDescription> nodeDescriptions =

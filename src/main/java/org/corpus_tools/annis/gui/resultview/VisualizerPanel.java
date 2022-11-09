@@ -40,7 +40,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
@@ -69,6 +68,7 @@ import org.corpus_tools.salt.core.SNode;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * Controls the visibility of visualizer plugins and provides some control methods for the media
@@ -401,7 +401,8 @@ public class VisualizerPanel extends CssLayout
       String documentNodeName = Joiner.on('/').join(documentPathRaw);
       String aql = Helper.buildDocumentQuery(documentNodeName, nodeAnnoFilter, useRawText);
 
-      File graphML = api.subgraphForQuery(documentPathDecoded.get(0), aql, QueryLanguage.AQL, null);
+      File graphML =
+          api.subgraphForQuery(documentPathDecoded.get(0), aql, QueryLanguage.AQL, null).block();
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
@@ -415,7 +416,7 @@ public class VisualizerPanel extends CssLayout
         log.error("Could not map GraphML to Salt", ex);
         ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
       }
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       log.error("General remote service exception", e);
     }
     return null;

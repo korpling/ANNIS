@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
@@ -45,6 +44,8 @@ import org.corpus_tools.annis.gui.objects.DocumentBrowserConfig;
 import org.corpus_tools.annis.gui.objects.Visualizer;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -61,7 +62,7 @@ public class DocBrowserPanel extends Panel {
 
       try {
         File graphML = api.subgraphForQuery(corpus, "annis:node_type=\"corpus\"",
-            QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+            QueryLanguage.AQL, AnnotationComponentType.PARTOF).block();
         SCorpusGraph graph = CorpusGraphMapper.map(graphML);
         List<SDocument> docs = graph.getDocuments();
 
@@ -86,7 +87,7 @@ public class DocBrowserPanel extends Panel {
           table.setDocuments(docs);
         });
 
-      } catch (ApiException | IOException | XMLStreamException ex) {
+      } catch (WebClientResponseException | IOException | XMLStreamException ex) {
         ui.access(() -> {
            ExceptionDialog.show(ex, ui);
         });
@@ -170,17 +171,17 @@ public class DocBrowserPanel extends Panel {
     try {
       File result =
           api.getFile(getCorpus(),
-          urlPathEscape.escape(getCorpus()) + "/document_browser.json");
+              urlPathEscape.escape(getCorpus()) + "/document_browser.json").block();
       try(FileInputStream is = new FileInputStream(result)) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         DocumentBrowserConfig config = mapper.readValue(is, DocumentBrowserConfig.class);
         return config;
       }
-    } catch (ApiException ex) {
-      if (ex.getCode() != 404) {
-      ExceptionDialog
-          .show(ex, "Could not get the document browser configuration file from the backend.", ui);
+    } catch (WebClientResponseException ex) {
+      if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
+        ExceptionDialog.show(ex,
+            "Could not get the document browser configuration file from the backend.", ui);
       }
     }
     catch (IOException ex) {

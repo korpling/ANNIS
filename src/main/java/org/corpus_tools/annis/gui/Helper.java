@@ -112,6 +112,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -526,7 +527,7 @@ public class Helper {
     q.setOffset(0);
 
     q.setQueryLanguage(QueryLanguage.AQL);
-    final File findResult = search.find(q);
+    final File findResult = search.find(q).block();
     if (findResult != null && findResult.isFile())
       try {
         try (Stream<String> lines = Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
@@ -717,9 +718,9 @@ public class Helper {
             + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
       }
       final File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL,
-          AnnotationComponentType.PARTOF);
+          AnnotationComponentType.PARTOF).block();
       return CorpusGraphMapper.map(graphML);
-    } catch (ApiException | XMLStreamException | IOException ex) {
+    } catch (WebClientResponseException | XMLStreamException | IOException ex) {
       log.error(null, ex);
       ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
     }
@@ -745,7 +746,7 @@ public class Helper {
       final File graphML = api.subgraphForQuery(toplevelCorpusName,
           "annis:node_type=\"corpus\" _ident_ annis:doc=/"
               + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/",
-          QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+          QueryLanguage.AQL, AnnotationComponentType.PARTOF).block();
 
       final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
 
@@ -753,7 +754,7 @@ public class Helper {
         result.addAll(n.getMetaAnnotations());
       }
 
-    } catch (ApiException | XMLStreamException | IOException ex) {
+    } catch (WebClientResponseException | XMLStreamException | IOException ex) {
       ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata for document", ui));
     }
 

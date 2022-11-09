@@ -36,7 +36,6 @@ import java.util.Map;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
@@ -58,6 +57,7 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * Represents a global controller for the doc browser feature.
@@ -200,7 +200,7 @@ public class DocBrowserController implements Serializable {
 
       // Build a query that includes all (possible filtered by name) node of the document
       String aql = Helper.buildDocumentQuery(documentNodeName, nodeAnnoFilter, useRawText);
-      File graphML = api.subgraphForQuery(corpus, aql, QueryLanguage.AQL, null);
+      File graphML = api.subgraphForQuery(corpus, aql, QueryLanguage.AQL, null).block();
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
       doc.setDocumentGraph(docGraph);
@@ -208,7 +208,7 @@ public class DocBrowserController implements Serializable {
       if (useRawText) {
         input.setRawText(new RawTextWrapper(docGraph));
       }
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       log.error("General remote service exception", e);
     } catch (XMLStreamException | IOException ex) {
       log.error("Could not map GraphML to Salt", ex);
