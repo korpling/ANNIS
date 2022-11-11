@@ -320,7 +320,7 @@ public class TigerQueryBuilderCanvas extends Panel {
     if (corpusSelection != null) {
       for (String corpus : corpusSelection) {
         try {
-          for (Annotation anno : api.nodeAnnotations(corpus, false, true).collectList().block()) {
+          for (Annotation anno : api.nodeAnnotations(corpus, false, true).toIterable()) {
             result.add(anno.getKey().getName());
           }
         } catch (WebClientResponseException ex) {

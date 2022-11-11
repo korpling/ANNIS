@@ -351,21 +351,21 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
     }
 
     public Set<String> getAvailableAnnotationNames() {
-        Set<String> result = new TreeSet<>();
-        // get current corpus selection
-        Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
-        CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
-        try {
-            for (String corpus : corpusSelection) {
-              for (Annotation a : api.nodeAnnotations(corpus, false, false).collectList().block()) {
-                    result.add(a.getKey().getName());
-                }
-            }
-          } catch (WebClientResponseException ex) {
-            log.error(null, ex);
+      Set<String> result = new TreeSet<>();
+      // get current corpus selection
+      Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
+      CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
+      try {
+        for (String corpus : corpusSelection) {
+          for (Annotation a : api.nodeAnnotations(corpus, false, false).toIterable()) {
+            result.add(a.getKey().getName());
+          }
         }
-        result.add("tok");
-        return result;
+      } catch (WebClientResponseException ex) {
+        log.error(null, ex);
+      }
+      result.add("tok");
+      return result;
     }
 
     public Set<String> getAvailableMetaNames() {

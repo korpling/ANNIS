@@ -24,11 +24,11 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * Inits the wrapper for the pdf visualization. Neccesary steps for this are:
@@ -101,15 +101,14 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     String corpusName = corpusPath.get(0);
 
     try {
-      List<String> files = api.listFiles(corpusName, Joiner.on('/').join(corpusPath));
-      for (String f : files) {
+      for (String f : api.listFiles(corpusName, Joiner.on('/').join(corpusPath)).toIterable()) {
         if (f.endsWith(".pdf")) {
           // Create an URL how to featch the PDF file
           return input.getContextPath() + "/Binary?" + "toplevelCorpusName="
               + urlParamEscape.escape(corpusName) + "&file=" + urlParamEscape.escape(f);
         }
       }
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       ExceptionDialog.show(e, input.getUI());
     }
 
