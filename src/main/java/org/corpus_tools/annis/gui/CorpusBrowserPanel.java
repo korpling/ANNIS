@@ -33,7 +33,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
@@ -351,7 +350,7 @@ public class CorpusBrowserPanel extends Panel {
 
       });
 
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       getUI().access(() -> {
         ExceptionDialog.show(e, "Error fetching corpus annotations", getUI());
       });

@@ -62,7 +62,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
 import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -487,15 +486,15 @@ public class Helper {
   }
 
   public static Set<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui)
-      throws ApiException {
+      throws WebClientResponseException {
     final CorporaApi api = new CorporaApi(getClient(ui));
     final SearchApi search = new SearchApi(getClient(ui));
 
     final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos =
-        api.nodeAnnotations(corpus, false, true).stream()
+        api.nodeAnnotations(corpus, false, true)
             .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
                 && !Objects.equals(a.getKey().getName(), "tok"))
-            .collect(Collectors.toList());
+            .collectList().block();
 
     final Set<AnnoKey> metaAnnos = new HashSet<>();
     // Check for each annotation if its actually a meta-annotation
@@ -511,7 +510,7 @@ public class Helper {
   }
 
   private static boolean annotationIsMetadata(String corpus, String annotationName,
-      SearchApi search) throws ApiException {
+      SearchApi search) throws WebClientResponseException {
     if (!validQNamePattern.matcher(annotationName).matches()) {
       return false;
     }
@@ -645,8 +644,8 @@ public class Helper {
     final CorporaApi api = new CorporaApi(getClient(ui));
 
     try {
-      corpusConfig = api.corpusConfiguration(corpus);
-    } catch (final ApiException ex) {
+      corpusConfig = api.corpusConfiguration(corpus).block();
+    } catch (final WebClientResponseException ex) {
       ui.access(() -> ExceptionDialog.show(ex, ERROR_MESSAGE_CORPUS_PROPS_HEADER, ui));
     }
 

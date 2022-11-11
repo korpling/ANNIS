@@ -36,7 +36,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.Annotation;
@@ -52,6 +51,7 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 public abstract class GeneralTextExporter implements ExporterPlugin, Serializable {
 
@@ -197,7 +197,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
       return null;
 
-    } catch (ApiException | IOException | XMLStreamException ex) {
+    } catch (WebClientResponseException | IOException | XMLStreamException ex) {
       return ex;
     }
   }
@@ -226,7 +226,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
    * @throws ApiException
    */
   protected List<String> getAllAnnotationsAsExporterKey(Collection<String> corpora,
-      CorporaApi api) throws ApiException {
+      CorporaApi api) throws WebClientResponseException {
     LinkedList<String> keys = new LinkedList<>();
     keys.add("tok");
     List<Annotation> attributes = new LinkedList<>();

@@ -13,7 +13,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
@@ -29,6 +28,7 @@ import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 public class ExportHelper {
 
@@ -51,7 +51,7 @@ public class ExportHelper {
 
   private static void recreateTimelineIfNecessary(SaltProject p, CorporaApi corporaApi,
       Map<String, CorpusConfiguration> corpusConfigs)
-      throws ApiException, UnsupportedEncodingException {
+      throws WebClientResponseException, UnsupportedEncodingException {
 
 
     Set<String> corpusNames = Helper.getToplevelCorpusNames(p);
@@ -119,7 +119,7 @@ public class ExportHelper {
   protected static Optional<SaltProject> getSubgraphForMatch(String match, CorporaApi corporaApi,
       int contextLeft, int contextRight, Map<String, String> args,
       Map<String, CorpusConfiguration> corpusConfigs)
-      throws ApiException, IOException, XMLStreamException {
+      throws WebClientResponseException, IOException, XMLStreamException {
 
     // iterate over all matches and get the sub-graph for a group of matches
     Match parsedMatch = Match.parseFromString(match);

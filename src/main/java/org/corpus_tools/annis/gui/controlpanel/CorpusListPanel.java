@@ -42,7 +42,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
@@ -54,6 +53,7 @@ import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.vaadin.extension.gridscroll.GridScrollExtension;
 
 /**
@@ -80,7 +80,7 @@ public class CorpusListPanel extends VerticalLayout {
         // query in background
         CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
-        List<String> corpora = api.listCorpora();
+        List<String> corpora = api.listCorpora().collectList().block();
 
         // update the GUI
         ui.access(() -> {
@@ -299,7 +299,7 @@ public class CorpusListPanel extends VerticalLayout {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
     try {
-      List<String> corpora = api.listCorpora();
+      List<String> corpora = api.listCorpora().collectList().block();
       availableCorpora = new ListDataProvider<>(corpora);
       availableCorpora.setFilter(filter);
       tblCorpora.setDataProvider(availableCorpora);
@@ -322,7 +322,7 @@ public class CorpusListPanel extends VerticalLayout {
       }
 
 
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       ExceptionDialog.show(e, "Could not get corpus list", getUI());
     }
 

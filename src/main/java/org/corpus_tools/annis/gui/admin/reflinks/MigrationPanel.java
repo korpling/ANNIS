@@ -39,7 +39,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.gui.AnnisUI;
@@ -48,6 +47,7 @@ import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class MigrationPanel extends Panel
@@ -94,7 +94,7 @@ public class MigrationPanel extends Panel
       Background.runWithCallback(() -> {
         try {
           return migrateUrlShortener(url, username, password, skip, failedQueries);
-        } catch (ApiException | IOException ex) {
+        } catch (WebClientResponseException | IOException ex) {
           ExceptionDialog.show(ex, "Migrating URL shortener table failed", ui);
           return 0;
         }
@@ -292,7 +292,7 @@ public class MigrationPanel extends Panel
 
   private int migrateUrlShortener(String serviceURL, String username, String password,
       boolean skipExisting, Multimap<QueryStatus, URLShortenerDefinition> failedQueries)
-      throws ApiException, IOException {
+      throws WebClientResponseException, IOException {
 
 
     int successfulQueries = 0;

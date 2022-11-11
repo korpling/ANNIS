@@ -24,7 +24,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.CountExtra;
 import org.corpus_tools.annis.api.model.CountQuery;
@@ -42,6 +41,8 @@ import org.joda.time.format.DateTimeFormatterBuilder;
 import org.joda.time.format.DateTimeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class URLShortenerDefinition {
@@ -182,11 +183,12 @@ public class URLShortenerDefinition {
   }
 
   private QueryStatus testFind(SearchApi searchApi, OkHttpClient client,
-      HttpUrl annisSearchServiceBaseUrl) throws IOException, ApiException {
+      HttpUrl annisSearchServiceBaseUrl) throws IOException, WebClientResponseException {
 
     // Create a file with the matches according to the new graphANNIS based implementation
     File matchesGraphANNISFile = searchApi.find(new FindQuery().query(query.getQuery())
-        .corpora(new LinkedList<>(query.getCorpora())).queryLanguage(query.getApiQueryLanguage()));
+        .corpora(new LinkedList<>(query.getCorpora())).queryLanguage(query.getApiQueryLanguage()))
+        .block();
 
 
     HttpUrl findUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("find")
@@ -284,12 +286,13 @@ public class URLShortenerDefinition {
 
 
   private QueryStatus testCountAndFind(SearchApi searchApi, OkHttpClient client,
-      HttpUrl annisSearchServiceBaseUrl) throws IOException, ApiException {
+      HttpUrl annisSearchServiceBaseUrl) throws IOException, WebClientResponseException {
     try {
       // check count first (also warmup for the corpus)
       int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
       int countGraphANNIS = searchApi.count(new CountQuery().query(query.getQuery())
           .queryLanguage(query.getApiQueryLanguage()).corpora(new LinkedList<>(query.getCorpora())))
+          .block()
           .getMatchCount();
       if (countGraphANNIS != countLegacy) {
         this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
@@ -300,8 +303,9 @@ public class URLShortenerDefinition {
         // When count is the same and non-empty test if the returned IDs are the same
         return testFind(searchApi, client, annisSearchServiceBaseUrl);
       }
-    } catch (ApiException ex) {
-      if (ex.getCode() == 400 && this.query.getQueryLanguage() == QueryLanguage.AQL) {
+    } catch (WebClientResponseException ex) {
+      if (ex.getStatusCode() == HttpStatus.BAD_REQUEST
+          && this.query.getQueryLanguage() == QueryLanguage.AQL) {
         // Bad requests means the query was invalid, return error instead of throwing exception
         this.errorMsg = ex.toString();
         return QueryStatus.FAILED;
@@ -328,8 +332,9 @@ public class URLShortenerDefinition {
       }
 
       return status;
-    } catch (ApiException ex) {
-      if (ex.getCode() == 408 || ex.getCode() == 504) {
+    } catch (WebClientResponseException ex) {
+      if (ex.getStatusCode() == HttpStatus.REQUEST_TIMEOUT
+          || ex.getStatusCode() == HttpStatus.GATEWAY_TIMEOUT) {
         this.errorMsg = "Timeout in graphANNIS";
         return QueryStatus.TIMEOUT;
       } else {

@@ -19,10 +19,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.apache.commons.lang3.tuple.Pair;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.FrequencyQuery;
-import org.corpus_tools.annis.api.model.FrequencyQueryDefinition;
+import org.corpus_tools.annis.api.model.FrequencyQueryDefinitionInner;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.QueryController;
@@ -31,6 +30,7 @@ import org.corpus_tools.annis.gui.objects.FrequencyTableEntry;
 import org.corpus_tools.salt.util.SaltUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -69,9 +69,9 @@ public class FrequencyBackgroundJob implements Callable<List<FrequencyTableRow>>
       frequencyQuery.setQuery(query.getQuery());
       frequencyQuery.setCorpora(new LinkedList<>(query.getCorpora()));
       frequencyQuery.setQueryLanguage(query.getApiQueryLanguage());
-      List<FrequencyQueryDefinition> freqDef = new LinkedList<FrequencyQueryDefinition>();
+      List<FrequencyQueryDefinitionInner> freqDef = new LinkedList<FrequencyQueryDefinitionInner>();
       for (FrequencyTableEntry e : query.getFrequencyDefinition()) {
-        FrequencyQueryDefinition d = new FrequencyQueryDefinition();
+        FrequencyQueryDefinitionInner d = new FrequencyQueryDefinitionInner();
         d.setNodeRef(e.getReferencedNode());
         switch (e.getType()) {
           case span:
@@ -91,8 +91,8 @@ public class FrequencyBackgroundJob implements Callable<List<FrequencyTableRow>>
         freqDef.add(d);
       }
       frequencyQuery.setDefinition(freqDef);
-      result = api.frequency(frequencyQuery);
-    } catch (final ApiException ex) {
+      result = api.frequency(frequencyQuery).collectList().block();
+    } catch (final WebClientResponseException ex) {
       ui.access(() -> queryController.reportServiceException(ex, true));
     }
     return result;

@@ -21,7 +21,6 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.util.List;
 import org.apache.tika.Tika;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.VisualizationToggle;
@@ -32,6 +31,7 @@ import org.corpus_tools.annis.gui.media.MediaController;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -61,7 +61,8 @@ public class VideoVisualizer extends AbstractVisualizer { // NO_UCD (unused code
     CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
     try {
       List<String> files =
-          api.listFiles(corpusName, Joiner.on('/').join(Lists.reverse(corpusPath)));
+          api.listFiles(corpusName, Joiner.on('/').join(Lists.reverse(corpusPath))).collectList()
+              .block();
       for (String f : files) {
         String guessedMimeType = tika.detect(f);
         if (guessedMimeType != null && guessedMimeType.startsWith("video/")) {
@@ -71,7 +72,7 @@ public class VideoVisualizer extends AbstractVisualizer { // NO_UCD (unused code
           mimeType = guessedMimeType;
         }
       }
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       ExceptionDialog.show(e, UI.getCurrent());
     }
 

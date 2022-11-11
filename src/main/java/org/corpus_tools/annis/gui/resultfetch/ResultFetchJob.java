@@ -14,6 +14,7 @@
 package org.corpus_tools.annis.gui.resultfetch;
 
 import com.google.common.base.Joiner;
+import com.google.gson.Gson;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -24,8 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.JSON;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.BadRequestError;
@@ -49,6 +48,8 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * A thread that queries for the matches, fetches the the subgraph for the matches and updates the
@@ -98,7 +99,7 @@ public class ResultFetchJob implements Runnable {
       q.setLimit(query.getLimit());
       q.setQueryLanguage(query.getApiQueryLanguage());
       q.setOrder(query.getOrder());
-      File findResult = search.find(q);
+      File findResult = search.find(q).block();
       try (Stream<String> findResultLines =
           Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
         findResultLines.forEachOrdered(line -> {
@@ -150,14 +151,15 @@ public class ResultFetchJob implements Runnable {
         }
       } // end if no results
 
-    } catch (final ApiException ex) {
+    } catch (final WebClientResponseException ex) {
       ui.access(() -> {
         if (resultPanel != null && resultPanel.getPaging() != null) {
           PagingComponent paging = resultPanel.getPaging();
 
-          if (ex.getCode() == 400) {
-            JSON json = new JSON();
-            BadRequestError error = json.deserialize(ex.getResponseBody(), BadRequestError.class);
+          if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+            Gson json = new Gson();
+            BadRequestError error =
+                json.fromJson(ex.getResponseBodyAsString(), BadRequestError.class);
 
             String errMsg = "";
             if (error.getAqLSyntaxError() != null) {
@@ -168,9 +170,9 @@ public class ResultFetchJob implements Runnable {
             }
 
             paging.setInfo("parsing error: " + errMsg);
-          } else if (ex.getCode() == 504) {
+          } else if (ex.getStatusCode() == HttpStatus.GATEWAY_TIMEOUT) {
             paging.setInfo("Timeout: query execution took too long");
-          } else if (ex.getCode() == 403) {
+          } else if (ex.getStatusCode() == HttpStatus.FORBIDDEN) {
             paging.setInfo("Not authorized to query this corpus.");
           } else {
             ExceptionDialog.show(ex, ui);
@@ -185,13 +187,13 @@ public class ResultFetchJob implements Runnable {
   }
 
   private SaltProject createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber,
-      CorporaApi api) throws ApiException {
+      CorporaApi api) throws WebClientResponseException {
     List<String> corpusPathRaw = Helper.getCorpusPath(m.getSaltIDs().get(0), false);
     List<String> corpusPathDecoded = Helper.getCorpusPath(m.getSaltIDs().get(0), true);
     final SaltProject p = SaltFactory.createSaltProject();
 
     if (!corpusPathRaw.isEmpty()) {
-      File graphML = api.subgraphForNodes(corpusPathDecoded.get(0), arg);
+      File graphML = api.subgraphForNodes(corpusPathDecoded.get(0), arg).block();
       try {
 
         final SCorpusGraph cg = p.createCorpusGraph();

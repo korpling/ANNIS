@@ -15,6 +15,7 @@ package org.corpus_tools.annis.gui;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gson.Gson;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.FontAwesome;
@@ -37,19 +38,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
-import okhttp3.Call;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.JSON;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.CountQuery;
-import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.controller.CountCallback;
 import org.corpus_tools.annis.gui.controller.ExportBackgroundJob;
 import org.corpus_tools.annis.gui.controller.FrequencyBackgroundJob;
 import org.corpus_tools.annis.gui.controller.SpecificPagingCallback;
+import org.corpus_tools.annis.gui.controller.ValidateCallback;
 import org.corpus_tools.annis.gui.controlpanel.QueryPanel;
 import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.frequency.FrequencyQueryPanel;
@@ -74,6 +72,7 @@ import org.corpus_tools.annis.gui.visualizers.IFrameResourceMap;
 import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * A controller to modifiy the query UI state. s
@@ -429,11 +428,12 @@ public class QueryController implements Serializable {
       countQuery.setQuery(displayedQuery.getQuery());
       countQuery.setQueryLanguage(displayedQuery.getApiQueryLanguage());
       try {
-        Call call = api.countAsync(countQuery,
-            new CountCallback(newResultView, displayedQuery.getLimit(), annisUI));
+        CountCallback callback =
+            new CountCallback(newResultView, displayedQuery.getLimit(), annisUI);
+        api.count(countQuery).single().subscribe(callback);
 
-        state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, call);
-      } catch (ApiException ex) {
+        state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, callback);
+      } catch (WebClientResponseException ex) {
         ExceptionDialog.show(ex, ui);
       }
     }
@@ -492,17 +492,19 @@ public class QueryController implements Serializable {
    * @param showNotification If true a notification is shown instead of only displaying the error in
    *        the status label.
    */
-  public void reportServiceException(ApiException ex, boolean showNotification) {
+  public void reportServiceException(WebClientResponseException ex, boolean showNotification) {
     QueryPanel qp = searchView.getControlPanel().getQueryPanel();
 
     String caption = null;
     String description = null;
 
     if (!ui.handleCommonError(ex, "execute query")) {
-      switch (ex.getCode()) {
-        case 400:
+      switch (ex.getStatusCode()) {
+        case BAD_REQUEST:
+
+          Gson gson = new Gson();
           BadRequestError error =
-              JSON.createGson().create().fromJson(ex.getResponseBody(), BadRequestError.class);
+              gson.fromJson(ex.getResponseBodyAsString(), BadRequestError.class);
 
           caption = "Parsing error";
           if (error.getAqLSyntaxError() != null) {
@@ -517,12 +519,12 @@ public class QueryController implements Serializable {
           qp.setError(error);
           qp.setStatus(description);
           break;
-        case 504:
+        case GATEWAY_TIMEOUT:
           caption = "Timeout";
           description = "Query execution took too long.";
           qp.setStatus(caption + ": " + description);
           break;
-        case 403:
+        case FORBIDDEN:
           if (!Helper.getUser(ui.getSecurityContext()).isPresent()) {
             // not logged in
             qp.setStatus("You don't have the access rights to query this corpus. "
@@ -620,36 +622,12 @@ public class QueryController implements Serializable {
     String query = state.getAql().getValue();
     if (query == null || query.isEmpty()) {
       qp.setStatus("Empty query");
-
     } else {
       // validate query
-      UI ui = UI.getCurrent();
-      Background.runWithCallback(() -> {
-        SearchApi api = new SearchApi(Helper.getClient(ui));
-        return api.nodeDescriptions(query, org.corpus_tools.annis.api.model.QueryLanguage.AQL);
-      }, new FutureCallback<List<QueryAttributeDescription>>() {
-
-        @Override
-        public void onSuccess(List<QueryAttributeDescription> nodes) {
-          qp.setNodes(nodes);
-
-          if (state.getSelectedCorpora() == null || state.getSelectedCorpora().isEmpty()) {
-            qp.setStatus("Please select a corpus from the list below, then click on \"Search\".");
-          } else {
-            qp.setStatus("Valid query, click on \"Search\" to start searching.");
-          }
-
-        }
-
-        @Override
-        public void onFailure(Throwable t) {
-          if (t instanceof ApiException) {
-            reportServiceException((ApiException) t, false);
-          }
-        }
-
-      });
-
+      final UI ui = UI.getCurrent();
+      SearchApi api = new SearchApi(Helper.getClient(ui));
+      api.nodeDescriptions(query, org.corpus_tools.annis.api.model.QueryLanguage.AQL)
+          .subscribe(new ValidateCallback(qp, this, ui));
 
     }
   }

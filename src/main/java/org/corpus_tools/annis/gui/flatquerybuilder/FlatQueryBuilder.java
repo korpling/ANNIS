@@ -34,7 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
@@ -379,7 +378,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                 }
             }
 
-        } catch (ApiException ex) {
+          } catch (WebClientResponseException ex) {
             log.error(null, ex);
         }
 

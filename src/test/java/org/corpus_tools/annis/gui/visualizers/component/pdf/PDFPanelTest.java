@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.awt.FontFormatException;
 import java.io.IOException;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
@@ -19,6 +18,7 @@ import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.samples.SampleGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
 
 class PDFPanelTest {
@@ -39,7 +39,7 @@ class PDFPanelTest {
   }
 
   @Test
-  void testBinaryPathOneFile() throws ApiException {
+  void testBinaryPathOneFile() throws WebClientResponseException {
     SCorpusGraph corpusGraph = SampleGenerator.createCorpusStructure();
     SDocument doc = corpusGraph.getDocuments().get(0);
     
@@ -56,7 +56,7 @@ class PDFPanelTest {
   }
 
   @Test
-  void testBinaryPathNoFile() throws ApiException {
+  void testBinaryPathNoFile() throws WebClientResponseException {
     SCorpusGraph corpusGraph = SampleGenerator.createCorpusStructure();
     SDocument doc = corpusGraph.getDocuments().get(0);
 
@@ -71,7 +71,7 @@ class PDFPanelTest {
   }
 
   @Test
-  void testBinaryPathApiExceptionThrown() throws ApiException
+  void testBinaryPathApiExceptionThrown() throws WebClientResponseException
   {
     SCorpusGraph corpusGraph = SampleGenerator.createCorpusStructure();
     SDocument doc = corpusGraph.getDocuments().get(0);
@@ -84,7 +84,7 @@ class PDFPanelTest {
     // Make sure the document has an assigned PDF file
     CorporaApi api = mock(CorporaApi.class);
     when(api.listFiles(anyString(), anyString()))
-        .thenThrow(new ApiException("Invalid Network Access"));
+        .thenThrow(new WebClientResponseException(500, "Invalid Network Access", null, null, null));
 
     assertEquals("", fixture.getBinaryPath(api));
     verify(ui).addWindow(any(ExceptionDialog.class));

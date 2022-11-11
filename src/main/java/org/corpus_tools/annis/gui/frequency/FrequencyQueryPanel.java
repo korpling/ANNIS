@@ -43,7 +43,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
@@ -54,6 +53,7 @@ import org.corpus_tools.annis.gui.objects.FrequencyQuery;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -239,7 +239,7 @@ public class FrequencyQueryPanel extends VerticalLayout
         try {
           nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue(),
               FrequencyQueryPanel.this.state.getQueryLanguage());
-        } catch (ApiException e) {
+        } catch (WebClientResponseException e) {
           // Ignore
         }
         nr = Math.min(nr, nodes.size() - 1);
@@ -447,7 +447,7 @@ public class FrequencyQueryPanel extends VerticalLayout
           }
         }
       }
-    } catch (ApiException ex) {
+    } catch (WebClientResponseException ex) {
       // non-valid query, ignore
     }
 
@@ -466,13 +466,14 @@ public class FrequencyQueryPanel extends VerticalLayout
   }
 
   private List<QueryAttributeDescription> parseQuery(String query, QueryLanguage queryLanguage)
-      throws ApiException {
+      throws WebClientResponseException {
     if (query == null || query.isEmpty()) {
       return new LinkedList<>();
     }
     // let the service parse the query
     SearchApi api = new SearchApi(Helper.getClient(UI.getCurrent()));
-    List<QueryAttributeDescription> nodes = api.nodeDescriptions(query, queryLanguage);
+    List<QueryAttributeDescription> nodes =
+        api.nodeDescriptions(query, queryLanguage).collectList().block();
     return nodes;
 
   }

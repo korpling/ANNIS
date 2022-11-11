@@ -123,30 +123,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                type: string
         "200":
-          description: Job was finished successfully and result can be downloaded from the body
-        "303":
-          description: Job was finished successfully
+          description: Job was finished successfully. The body contains the messages from the import.
           content:
             application/json:
               schema:
-                type: array
+                type: string
                 description: The messages produced by the background job.
-                example:
-                  [
-                    "started import of corpus GUM",
-                    "reading GraphML",
-                    "Error during import of GUM: corpus already exists",
-                  ]
-                items:
-                  type: string
         "410":
           description: Job failed
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                type: string
         "404":
           description: Job not found
 
