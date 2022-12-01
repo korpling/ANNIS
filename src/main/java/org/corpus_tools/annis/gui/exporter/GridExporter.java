@@ -28,6 +28,7 @@ import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SStructuredNode;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SAnnotation;
@@ -37,6 +38,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GridExporter extends GeneralTextExporter { // NO_UCD (unused code)
+
+  private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GridExporter.class);
 
     private static class Span {
 
@@ -111,7 +114,14 @@ public class GridExporter extends GeneralTextExporter { // NO_UCD (unused code)
 
                     List<SToken> coveredTokens = graph.getOverlappedTokens(resolveNode);
                     if (coveredTokens == null || coveredTokens.isEmpty()) {
-                        break;
+                      if (resolveNode instanceof SStructuredNode) {
+                        log.warn(
+                            "Did not find any covered token for node {} in match {}. "
+                                + "The node will not be included in the grid export.",
+                            resolveNode.getId(), offset + 1);
+
+                      }
+                      continue;
                     }
                     coveredTokens = graph.getSortedTokenByText(coveredTokens);
 
@@ -128,6 +138,13 @@ public class GridExporter extends GeneralTextExporter { // NO_UCD (unused code)
                                 new Span(left_token_idx, right_token_idx, resolveAnnotation.getValue().toString()));
 
                     }
+                }
+
+                if (annos.isEmpty()) {
+                  log.warn(
+                      "No node in the match {} was connected to a token. "
+                          + "The match will be empty in the grid exporter",
+                      offset + 1);
                 }
 
                 for (String k : keys) {
