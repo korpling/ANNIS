@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.ServiceQueryException;
+import org.corpus_tools.api.PatchedCorporaApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -67,9 +68,9 @@ public class CorpusManagement implements Serializable {
     if (clientProvider != null) {
       corpora.clear();
 
-      CorporaApi api = new CorporaApi(clientProvider.getClient());
+      PatchedCorporaApi api = new PatchedCorporaApi(clientProvider.getClient());
       try {
-        corpora.addAll(api.listCorpora().collectList().block());
+        corpora.addAll(api.listCorporaAsMono().block());
       } catch (WebClientResponseException ex) {
         if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
           throw new CriticalServiceQueryException("You are not authorized to get the corpus list.");

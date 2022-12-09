@@ -39,13 +39,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
+import org.corpus_tools.api.PatchedCorporaApi;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -302,9 +302,9 @@ public class MigrationPanel extends Panel
         .addPathSegment("query").addPathSegment("search").build();
 
     ApiClient apiClient = Helper.getClient(ui);
-    CorporaApi corporaApi = new CorporaApi(apiClient);
+    PatchedCorporaApi corporaApi = new PatchedCorporaApi(apiClient);
     SearchApi searchApi = new SearchApi(apiClient);
-    Set<String> knownCorpora = new HashSet<>(corporaApi.listCorpora().collectList().block());
+    Set<String> knownCorpora = new HashSet<>(corporaApi.listCorporaAsMono().block());
 
     Optional<OkHttpClient> client = createClient(serviceURL, username, password);
 
