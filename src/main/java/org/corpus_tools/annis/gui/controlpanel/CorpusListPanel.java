@@ -42,7 +42,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CorpusBrowserPanel;
@@ -52,6 +51,7 @@ import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
+import org.corpus_tools.api.PatchedCorporaApi;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.vaadin.extension.gridscroll.GridScrollExtension;
@@ -78,9 +78,9 @@ public class CorpusListPanel extends VerticalLayout {
 
       try {
         // query in background
-        CorporaApi api = new CorporaApi(Helper.getClient(ui));
+        PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
 
-        List<String> corpora = api.listCorpora().collectList().block();
+        List<String> corpora = api.listCorporaAsMono().block();
 
         // update the GUI
         ui.access(() -> {
@@ -296,10 +296,10 @@ public class CorpusListPanel extends VerticalLayout {
 
     // Get the initial corpus list, this must become before the binder is set,
     // to make sure any selected value is also an item.
-    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+    PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
 
     try {
-      List<String> corpora = api.listCorpora().collectList().block();
+      List<String> corpora = api.listCorporaAsMono().block();
       availableCorpora = new ListDataProvider<>(corpora);
       availableCorpora.setFilter(filter);
       tblCorpora.setDataProvider(availableCorpora);
