@@ -176,8 +176,6 @@ public abstract class CommonUI extends AnnisBaseUI {
     
     public abstract ApiClient getClient();
 
-
-
     /**
      * Handle common errors like database/service connection problems and display a unified error
      * message.

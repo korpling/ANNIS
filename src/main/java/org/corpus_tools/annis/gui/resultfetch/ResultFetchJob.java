@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
@@ -48,8 +47,12 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 /**
  * A thread that queries for the matches, fetches the the subgraph for the matches and updates the
@@ -76,7 +79,6 @@ public class ResultFetchJob implements Runnable {
   @Override
   public void run() {
 
-    SearchApi search = new SearchApi(Helper.getClient(ui));
     CorporaApi corpora = new CorporaApi(Helper.getClient(ui));
 
     // holds the ids of the matches.
@@ -99,7 +101,14 @@ public class ResultFetchJob implements Runnable {
       q.setLimit(query.getLimit());
       q.setQueryLanguage(query.getApiQueryLanguage());
       q.setOrder(query.getOrder());
-      File findResult = search.find(q).block();
+
+      Flux<DataBuffer> response = ui.getWebClient().post().uri("/search/find")
+          .accept(MediaType.TEXT_PLAIN).retrieve()
+          .bodyToFlux(DataBuffer.class);
+      
+      File findResult = File.createTempFile("annis-result", ".txt");
+      DataBufferUtils.write(response, findResult.toPath()).block();
+
       try (Stream<String> findResultLines =
           Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
         findResultLines.forEachOrdered(line -> {
@@ -152,6 +161,7 @@ public class ResultFetchJob implements Runnable {
       } // end if no results
 
     } catch (final WebClientResponseException ex) {
+      log.error("Could execute find query", ex);
       ui.access(() -> {
         if (resultPanel != null && resultPanel.getPaging() != null) {
           PagingComponent paging = resultPanel.getPaging();
