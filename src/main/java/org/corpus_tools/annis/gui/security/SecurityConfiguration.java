@@ -84,13 +84,14 @@ public class SecurityConfiguration {
   @Bean
   WebClient webClient(UIConfig config,
       Optional<OAuth2AuthorizedClientManager> authorizedClientManager) {
-    Optional<ServletOAuth2AuthorizedClientExchangeFilterFunction> filter = authorizedClientManager.map(acm -> {
-      ServletOAuth2AuthorizedClientExchangeFilterFunction result =
-          new ServletOAuth2AuthorizedClientExchangeFilterFunction(acm);
+    Optional<ServletOAuth2AuthorizedClientExchangeFilterFunction> filter =
+        authorizedClientManager.map(acm -> {
+          ServletOAuth2AuthorizedClientExchangeFilterFunction result =
+              new ServletOAuth2AuthorizedClientExchangeFilterFunction(acm);
 
-      result.setDefaultClientRegistrationId("annis");
-      return result;
-    });
+          result.setDefaultClientRegistrationId("annis");
+          return result;
+        });
     WebClient.Builder builder = WebClient.builder().baseUrl(config.getWebserviceUrl());
     if (filter.isPresent()) {
       builder = builder.filter(filter.get());
