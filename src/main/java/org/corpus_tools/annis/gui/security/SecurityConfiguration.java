@@ -85,15 +85,15 @@ public class SecurityConfiguration {
   WebClient webClient(UIConfig config,
       Optional<OAuth2AuthorizedClientManager> authorizedClientManager) {
     Optional<ServletOAuth2AuthorizedClientExchangeFilterFunction> filter = authorizedClientManager.map(acm -> {
-      ServletOAuth2AuthorizedClientExchangeFilterFunction filter =
+      ServletOAuth2AuthorizedClientExchangeFilterFunction result =
           new ServletOAuth2AuthorizedClientExchangeFilterFunction(acm);
 
-          filter.setDefaultClientRegistrationId("annis");
-      return filter;
+      result.setDefaultClientRegistrationId("annis");
+      return result;
     });
-    WebClientBuilder builder = WebClient.builder().baseUrl(config.getWebserviceUrl());
-    if (filter.isSome()) {
-      builder = builder.config.getWebserviceUrl();
+    WebClient.Builder builder = WebClient.builder().baseUrl(config.getWebserviceUrl());
+    if (filter.isPresent()) {
+      builder = builder.filter(filter.get());
     }
     return builder.build();
   }
