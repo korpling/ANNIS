@@ -15,20 +15,8 @@ package org.corpus_tools.annis.gui.visualizers.component.rst;
 
 import com.vaadin.ui.Panel;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
+
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.MatchedNodeColors;
 import org.corpus_tools.annis.gui.components.CssRenderInfo;
@@ -36,16 +24,14 @@ import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.widgets.JITWrapper;
 import org.corpus_tools.annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import org.corpus_tools.salt.SALT_TYPE;
-import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SStructure;
-import org.corpus_tools.salt.common.STextualDS;
-import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.*;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SProcessingAnnotation;
 import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.graph.Relation;
 import org.corpus_tools.salt.util.DataSourceSequence;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -148,6 +134,9 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   private Map<String, String> mappings;
 
   private String namespace;
+
+  // For manual cycle handling
+  private Set<SNode> visitedNodes;
 
   private final Map<SToken, Integer> token2index = new HashMap<>();
 
@@ -288,7 +277,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     // token data structures are not needed
     if (currNode instanceof SToken) {
       return false;
-    } else if (Helper.checkSLayer(namespace, currNode)) {
+    } else if (Helper.checkSLayer(namespace, currNode) && !visitedNodes.contains(currNode)) {
+      visitedNodes.add(currNode);
       return true;
     }
 
@@ -699,6 +689,9 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
               if (currNode instanceof SToken) {
                 return false;
               }
+              if (sentences.contains((SStructure) currNode)) {
+                return false;
+              }
 
               return true;
             }
@@ -720,7 +713,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
                 }
               }
             }
-          });
+          }, false);
 
       // decorate segments with sentence number
       int i = 1;
@@ -729,10 +722,12 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
         i++;
       }
 
-      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
+      visitedNodes = new HashSet<SNode>();
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this, false);
     } else {
       log.debug("does not find an annotation which matched {}", ANNOTATION_KEY);
-      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
+      visitedNodes = new HashSet<SNode>();
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this, false);
     }
 
     return result.toString();
