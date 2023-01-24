@@ -549,6 +549,9 @@
 			if (json.data && json.data.signals) {
 				signals = signals.concat(json.data.signals);
 			}
+			if (json.data && json.data.secondarySignals) {
+				signals = signals.concat(json.data.secondarySignals);
+			}
 
 			if (json.children) {
 				for (var i = 0; i < json.children.length; i++) {
@@ -649,7 +652,8 @@
 
 					if (edgeType === RST) {
 						drawBezierCurve(from, to, config);
-						plotRSTLabel(from, to, annotation, config, tokenCount);
+						var labelElt = plotRSTLabel(from, to, annotation, config);
+						plotSignalBadge(labelElt, from, to, config, tokenCount, false);
 					}
 
 					if (edgeType === MULTINUC) {
@@ -669,6 +673,27 @@
 				// attach this button to a div that will keep it in place during scroll.
 				// If this button ever breaks in the future, look here.
 				document.getElementById(config.container).parentNode.parentNode.parentNode.appendChild(showSignalsButton);
+			}
+		}
+
+		/**
+		 * Plot secondary edges.
+		 */
+		function plotSecondaryEdges(config) {
+			var nodes = config.nodes;
+			var configCopy = Object.assign({}, config);
+			configCopy.edgeLabelColor = "#34ebde";
+			configCopy.dim = config.dim * -1;
+			var tokenCount = [];
+
+			for (var nodeId in nodes) {
+				var secondaryEdges = nodes[nodeId].data.secondaryEdges;
+				for (var i = 0; i < secondaryEdges.length; i++) {
+					var edge = secondaryEdges[i];
+					drawBezierCurve(nodes[edge.from], nodes[edge.to], configCopy);
+					var label = plotRSTLabel(nodes[edge.from], nodes[edge.to], edge.annotation, configCopy, tokenCount);
+					plotSignalBadge(label, nodes[edge.from], nodes[edge.to], config, tokenCount, true)
+				}
 			}
 		}
 
@@ -701,7 +726,12 @@
 		}
 
 		function drawBezierCurve(source, target, config) {
-			var from = source.pos, to = target.pos, context = config.context, fromX = getTopCenter(config, source), toX = getTopCenter(config, target), controllPoint = {};
+			var from = source.pos;
+			var to = target.pos;
+			var context = config.context;
+			var fromX = getTopCenter(config, source);
+			var toX = getTopCenter(config, target);
+			var controllPoint = {};
 
 			if (fromX != toX) {
 				controllPoint.x = (fromX + toX) / 2;
@@ -782,7 +812,7 @@
 		/**
 		 *
 		 */
-		function plotRSTLabel(source, target, annotation, config, tokenCount) {
+		function plotRSTLabel(source, target, annotation, config) {
 			var fromX = getTopCenter(config, source);
 			var toX = getTopCenter(config, target);
 			var from = source.pos;
@@ -795,21 +825,27 @@
 			controlPoint = {};
 			controlPoint.x = (source.pos.x + target.pos.x) / 2;
 			controlPoint.y = from.y - 2 * config.dim;
+			if (config.dim < 0) {
+				controlPoint.y -= config.labelSize * 1.2;
+			}
 
 			label.style.top = controlPoint.y + "px";
 			label.style.left = controlPoint.x + "px";
 			label.style.fontSize = config.labelSize + "px";
 			label.style.width = label.clientWidth + "px";
 			label.style.color = config.edgeLabelColor;
+			return label;
+		}
 
-			// add signal badge and list, if signals are present
-			var signals = source.data.signals;
-			if (signals && signals.length > 0) {
-				var signalBadge = createSignalBadge(signals);
-				var signalListElt = createSignalList(config, target, signals, signalBadge, tokenCount);
-				label.appendChild(signalListElt);
-				label.appendChild(signalBadge);
+		function plotSignalBadge(label, source, target, config, tokenCount, secondary) {
+			var signals = secondary ? source.data.secondarySignals : source.data.signals;
+			if (!signals || signals.length === 0) {
+				return;
 			}
+			var signalBadge = createSignalBadge(signals);
+			var signalListElt = createSignalList(config, target, signals, signalBadge, tokenCount);
+			label.appendChild(signalListElt);
+			label.appendChild(signalBadge);
 		}
 
 		var DOMINANCE = "edge";
@@ -855,6 +891,7 @@
 				injectStyles(this.config);
 				plotNodes(this.config);
 				plotEdges(this.config);
+				plotSecondaryEdges(this.config);
 			}
 		};
 
