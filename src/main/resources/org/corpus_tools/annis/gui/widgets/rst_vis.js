@@ -692,7 +692,7 @@
 					var edge = secondaryEdges[i];
 					drawBezierCurve(nodes[edge.from], nodes[edge.to], configCopy);
 					var label = plotRSTLabel(nodes[edge.from], nodes[edge.to], edge.annotation, configCopy, tokenCount);
-					plotSignalBadge(label, nodes[edge.from], nodes[edge.to], config, tokenCount, true)
+					plotSignalBadge(label, nodes[edge.from], nodes[edge.to], config, tokenCount, true);
 				}
 			}
 		}
