@@ -167,42 +167,42 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
    */
   private TreeSet<SStructure> sentences = new TreeSet<SStructure>(
           new Comparator<SStructure>() {
-      private int getStartPosition(SStructure s) {
-        List<SRelation<SNode,SNode>> out = s.getGraph().getOutRelations(s.getId());
+    private int getStartPosition(SStructure s) {
+      List<SRelation<SNode,SNode>> out = s.getGraph().getOutRelations(s.getId());
 
-        for (SRelation e : out) {
-          if (e != null && e.getTarget() instanceof SToken) {
-            SToken tok = ((SToken) ((SRelation) e).getTarget());
+      for (SRelation e : out) {
+        if (e != null && e.getTarget() instanceof SToken) {
+          SToken tok = ((SToken) ((SRelation) e).getTarget());
 
-            RelannisNodeFeature feat =
-                    (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          RelannisNodeFeature feat =
+                  (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-            return (int) feat.getLeftToken();
-          }
-        }
-
-        RelannisNodeFeature feat =
-                (RelannisNodeFeature) s.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
-        return (int) feat.getLeftToken();
-      }
-
-      @Override
-      public int compare(SStructure t1, SStructure t2) {
-        int t1Idx = getStartPosition(t1);
-        int t2Idx = getStartPosition(t2);
-
-        if (t1Idx < t2Idx) {
-          return -1;
-        }
-
-        if (t1Idx == t2Idx) {
-          return 0;
-        } else {
-          return 1;
+          return (int) feat.getLeftToken();
         }
       }
-    });
+
+      RelannisNodeFeature feat =
+              (RelannisNodeFeature) s.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+      return (int) feat.getLeftToken();
+    }
+
+    @Override
+    public int compare(SStructure t1, SStructure t2) {
+      int t1Idx = getStartPosition(t1);
+      int t2Idx = getStartPosition(t2);
+
+      if (t1Idx < t2Idx) {
+        return -1;
+      }
+
+      if (t1Idx == t2Idx) {
+        return 0;
+      } else {
+        return 1;
+      }
+    }
+  });
 
   private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
