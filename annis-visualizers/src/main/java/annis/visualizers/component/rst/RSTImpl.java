@@ -19,10 +19,27 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.HashSet;
 
 import org.corpus_tools.salt.SALT_TYPE;
-import org.corpus_tools.salt.common.*;
+import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SStructure;
+import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.SToken;
+import org.corpus_tools.salt.common.SPointingRelation;
+import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SGraph.GRAPH_TRAVERSE_TYPE;
@@ -150,42 +167,42 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
    */
   private TreeSet<SStructure> sentences = new TreeSet<SStructure>(
           new Comparator<SStructure>() {
-            private int getStartPosition(SStructure s) {
-              List<SRelation<SNode,SNode>> out = s.getGraph().getOutRelations(s.getId());
+      private int getStartPosition(SStructure s) {
+        List<SRelation<SNode,SNode>> out = s.getGraph().getOutRelations(s.getId());
 
-              for (SRelation e : out) {
-                if (e != null && e.getTarget() instanceof SToken) {
-                  SToken tok = ((SToken) ((SRelation) e).getTarget());
+        for (SRelation e : out) {
+          if (e != null && e.getTarget() instanceof SToken) {
+            SToken tok = ((SToken) ((SRelation) e).getTarget());
 
-                  RelannisNodeFeature feat =
-                          (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            RelannisNodeFeature feat =
+                    (RelannisNodeFeature) tok.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-                  return (int) feat.getLeftToken();
-                }
-              }
+            return (int) feat.getLeftToken();
+          }
+        }
 
-              RelannisNodeFeature feat =
-                      (RelannisNodeFeature) s.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        RelannisNodeFeature feat =
+                (RelannisNodeFeature) s.getFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-              return (int) feat.getLeftToken();
-            }
+        return (int) feat.getLeftToken();
+      }
 
-            @Override
-            public int compare(SStructure t1, SStructure t2) {
-              int t1Idx = getStartPosition(t1);
-              int t2Idx = getStartPosition(t2);
+      @Override
+      public int compare(SStructure t1, SStructure t2) {
+        int t1Idx = getStartPosition(t1);
+        int t2Idx = getStartPosition(t2);
 
-              if (t1Idx < t2Idx) {
-                return -1;
-              }
+        if (t1Idx < t2Idx) {
+          return -1;
+        }
 
-              if (t1Idx == t2Idx) {
-                return 0;
-              } else {
-                return 1;
-              }
-            }
-          });
+        if (t1Idx == t2Idx) {
+          return 0;
+        } else {
+          return 1;
+        }
+      }
+    });
 
   private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
@@ -255,39 +272,39 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       // collect all sentence and sort them.
       graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
               "getSentences", new GraphTraverseHandler() {
-                @Override
-                public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-                                        String traversalId, SNode currNode, SRelation sRelation,
-                                        SNode fromNode, long order) {
-                  if (currNode instanceof SStructure
-                          && isSegment(currNode)
-                          && !isSignalNode(currNode)) {
-                    sentences.add((SStructure) currNode);
-                  }
-                }
+          @Override
+          public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
+                                  String traversalId, SNode currNode, SRelation sRelation,
+                                  SNode fromNode, long order) {
+            if (currNode instanceof SStructure
+                    && isSegment(currNode)
+                    && !isSignalNode(currNode)) {
+              sentences.add((SStructure) currNode);
+            }
+          }
 
-                @Override
-                public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
-                                     String traversalId, SNode currNode, SRelation edge,
-                                     SNode fromNode,
-                                     long order) {
-                }
+          @Override
+          public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
+                               String traversalId, SNode currNode, SRelation edge,
+                               SNode fromNode,
+                               long order) {
+          }
 
-                @Override
-                public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-                                               String traversalId, SRelation edge, SNode currNode, long order) {
+          @Override
+          public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
+                                         String traversalId, SRelation edge, SNode currNode, long order) {
 
-                  // token are not needed
-                  if (currNode instanceof SToken) {
-                    return false;
-                  }
-                  if (sentences.contains((SStructure) currNode)) {
-                    return false;
-                  }
+            // token are not needed
+            if (currNode instanceof SToken) {
+              return false;
+            }
+            if (sentences.contains((SStructure) currNode)) {
+              return false;
+            }
 
-                  return true;
-                }
-              }, false);
+            return true;
+          }
+        }, false);
 
       //decorate segments with sentence number
       int i = 1;
@@ -455,7 +472,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   }
 
   private JSONObject appendChild(JSONObject root, JSONObject node,
-                                 SNode currSnode) {
+          SNode currSnode) {
     try {
       // is set to true, when currNode is reached by an rst edge
       boolean isAppendedToParent = false;
@@ -548,8 +565,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   @Override
   public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-                          String traversalId,
-                          SNode currNode, SRelation sRelation, SNode fromNode, long order) {
+          String traversalId,
+          SNode currNode, SRelation sRelation, SNode fromNode, long order) {
 
     st.push(createJsonEntry(currNode));
 
@@ -557,7 +574,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   @Override
   public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                       SNode currNode, SRelation edge, SNode fromNode, long order) {
+          SNode currNode, SRelation edge, SNode fromNode, long order) {
     assert st.size() > 0;
 
     if (st.size() == 1) {
@@ -575,11 +592,12 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   @Override
   public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-                                 String traversalId, SRelation incomingEdge, SNode currNode, long order) {
+          String traversalId, SRelation incomingEdge, SNode currNode, long order) {
     // token data structures are not needed
     if (currNode instanceof SToken) {
       return false;
-    } else if (CommonHelper.checkSLayer(namespace, currNode) && !visitedNodes.contains(currNode)) {
+    }
+    else if (CommonHelper.checkSLayer(namespace, currNode) && !visitedNodes.contains(currNode)) {
       visitedNodes.add(currNode);
       return true;
     }
@@ -592,8 +610,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     JSONArray array = parent.has(key) ? parent.getJSONArray(key) : null;
     if(array == null)
     {
-      array = new JSONArray();
-      parent.put(key, array);
+        array = new JSONArray();
+        parent.put(key, array);
     }
     return array;
   }
@@ -637,7 +655,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     log.error("{} instead of {}",
             sSequences.get(0).getDataSource().getClass().getName(),
             STextualDS.class
-                    .getName());
+            .getName());
 
 
     return null;
