@@ -65,7 +65,7 @@
 	<repositories>
 		<repository>
 			<id>korpling</id>
-			<url>http://korpling.german.hu-berlin.de/maven2/</url>
+			<url>https://korpling.german.hu-berlin.de/maven2/</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
@@ -87,7 +87,7 @@
 
 	<properties>
 		<servlet.version>3.0.1</servlet.version>
-		<vaadin.version>7.7.30</vaadin.version>
+		<vaadin.version>7.7.37</vaadin.version>
 	</properties>
 
 	<reporting>
