@@ -1,3 +1,17 @@
+Version 3.7.0
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/62?closed=1
+
+[Fixed Bugs]
+ #746 Ensure Compatibilty with PostgreSQL 14 by updating the JDBC driver
+ #747 Update ANNIS 3 dependencies (Jetty, Vaadin, Spring) to the newest bug fix release
+ #650 Fix typo and outdated info in PostgreSQL tips
+
+[Enhancements]
+ #608 Show signals in RST visualizer
+
 Version 3.6.0
 =============
 
