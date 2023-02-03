@@ -62,15 +62,22 @@ public class SubcorpusConstraintWhereClause extends TableAccessStrategyFactory
           boolean needsCorpusRef = false;
           for (Join j : copyNodes[left].getOutgoingJoins()) {
             if (j.getTarget() != null && j.getTarget().getId() == copyNodes[right].getId()) {
-              if ((j instanceof RankTableJoin || j instanceof Identical)) {
-                // we definitly don't have to apply this join
+              if (j instanceof Identical) {
+                // we definitly don't have to apply this join because node IDs
+                // are unique over all corpora.
                 needsCorpusRef = false;
                 break;
-              } else {
-                // there is at least one actual join between this nodes, assume we
-                // need a corpus_ref join for now
-                needsCorpusRef = true;
+              } else if (j instanceof RankTableJoin) {
+                // We only have to apply this join if there is more than one corpus selected.
+                // For a single corpus, we the rank ID is already unique and we don't need the join
+                if (corpusList.size() == 1) {
+                  needsCorpusRef = false;
+                  break;
+                }
               }
+              // there is at least one actual join between this nodes, assume we
+              // need a corpus_ref join for now
+              needsCorpusRef = true;
             }
           }
 
