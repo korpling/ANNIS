@@ -1,3 +1,5 @@
 {
-    "java.configuration.updateBuildConfiguration": "automatic"
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.format.settings.url": "https://raw.githubusercontent.com/hexatomic/hexatomic/develop/releng/ide/eclipse-java-hexatomic-style.xml",
+    "java.compile.nullAnalysis.mode": "automatic"
 }
