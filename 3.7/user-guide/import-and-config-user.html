@@ -4,45 +4,27 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>User Configuration - ANNIS User Guide</title>
-        
-        
-
-
         <!-- Custom HTML head -->
-        
-
-
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        
         <link rel="icon" href="favicon.svg">
-        
-        
         <link rel="shortcut icon" href="favicon.png">
-        
         <link rel="stylesheet" href="css/variables.css">
         <link rel="stylesheet" href="css/general.css">
         <link rel="stylesheet" href="css/chrome.css">
         <link rel="stylesheet" href="css/print.css" media="print">
-
         <!-- Fonts -->
         <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
-        
         <link rel="stylesheet" href="fonts/fonts.css">
-        
-
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="highlight.css">
         <link rel="stylesheet" href="tomorrow-night.css">
         <link rel="stylesheet" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
-        
-
-        
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +83,6 @@
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                
                 <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky bordered">
                     <div class="left-buttons">
@@ -118,11 +99,9 @@
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        
                         <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
-                        
                     </div>
 
                     <h1 class="menu-title">ANNIS User Guide</h1>
@@ -131,14 +110,12 @@
                         <a href="print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        
                     </div>
                 </div>
 
-                
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -146,8 +123,6 @@
                         </ul>
                     </div>
                 </div>
-                
-
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
                 <script type="text/javascript">
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
@@ -159,7 +134,7 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#user-configuration" id="user-configuration">User Configuration</a></h1>
+                        <h1 id="user-configuration"><a class="header" href="#user-configuration">User Configuration</a></h1>
 <p>ANNIS has an authentication system which allows to handle multiple users
 which will see different corpora depending on which groups the user is part
 of. Behind the scenes ANNIS uses the <a href="http://shiro.apache.org/">Apache Shiro</a> security framework. Per default ANNIS uses a file based authentication and
@@ -168,7 +143,7 @@ layout are evaluated. This section will discuss how to manage this configuration
 Additionally, the administrator can also directly adjust the contents of the conf/
 shiro.ini configuration file. This allows a much more individual configuration
 and the usage of external authorization services like LDAP.</p>
-<h2><a class="header" href="#configuration-file-location" id="configuration-file-location">Configuration file location</a></h2>
+<h2 id="configuration-file-location"><a class="header" href="#configuration-file-location">Configuration file location</a></h2>
 <p>There is a central location where the user configuration files are stored.
 Configure the path to this location in the <code>conf/shiro.info</code> configuration file of
 the ANNIS back-end service. The default path is <code>/etc/annis/user_config/</code> and
@@ -177,7 +152,7 @@ can be changed in the back-end configuration file.</p>
 confManager = annis.security.ANNISUserConfigurationManager
 confManager.resourcePath=/etc/annis/user_config/
 </code></pre>
-<h2><a class="header" href="#user-and-group-files" id="user-and-group-files">User and group files</a></h2>
+<h2 id="user-and-group-files"><a class="header" href="#user-and-group-files">User and group files</a></h2>
 <ol>
 <li>Create a file &quot;groups&quot; in the user-configuration directory (e.g. <code>/etc/annis/user_config/groups</code>)</li>
 </ol>
@@ -221,18 +196,18 @@ Password to hash (confirm):
 $shiro1$SHA-256$1$kRMX+Et6w7XJgwSEAgq9nw==$sQOgObXsQdO76wnNxvN0aesvTSPoBsd/2bjxasydB+I=
 </code></pre>
 <p>The last line is what you have to insert into the password field.</p>
-<h3><a class="header" href="#anonymous-and-user-group" id="anonymous-and-user-group">&quot;anonymous&quot; and &quot;user&quot; group</a></h3>
+<h3 id="anonymous-and-user-group"><a class="header" href="#anonymous-and-user-group">&quot;anonymous&quot; and &quot;user&quot; group</a></h3>
 <p>The special group <code>anonymous</code> is used for non logged-in users. Thus every corpus listed here is available for everyone without (and with) login. In addition the group &quot;user&quot; is added to
 every user that is logged in.</p>
-<h3><a class="header" href="#advanced-permissions" id="advanced-permissions">Advanced permissions</a></h3>
+<h3 id="advanced-permissions"><a class="header" href="#advanced-permissions">Advanced permissions</a></h3>
 <p>The following permissions can be granted to individual users. Wildcards (&quot;*&quot;) can be used
 as described in the <a href="https://shiro.apache.org/permissions.html">Apache Shiro documentation</a>.</p>
-<h4><a class="header" href="#administration" id="administration">Administration</a></h4>
+<h4 id="administration"><a class="header" href="#administration">Administration</a></h4>
 <p>If you want to have an administrator user just add</p>
 <pre><code>admin:*
 </code></pre>
 <p>to it's permissions. For more fine-grained control (e.g. for the web service users) you can specify the actual action. You can always use &quot;*&quot; wildcard instead of the corpus name to allow the specific action for any corpus.</p>
-<table><thead><tr><th>permission</th><th>description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>permission</th><th>description</th></tr></thead><tbody>
 <tr><td>admin:import:<strong>{corpusname}</strong></td><td>Allow to import and overwrite a corpus with a specific name.</td></tr>
 <tr><td>admin:query-import:finished</td><td>Allow to check if an import has finished.</td></tr>
 <tr><td>admin:query-import:running</td><td>Allow to list the currently running imports.</td></tr>
@@ -240,86 +215,58 @@ as described in the <a href="https://shiro.apache.org/permissions.html">Apache S
 <tr><td>admin:read:user</td><td>Allow get the information about a user (like groups or additionally permissions).</td></tr>
 <tr><td>admin:write:adminuser</td><td>Additional permission to update or create users with adminstration rights (thus having an extra permission thats starts &quot;admin:&quot;).</td></tr>
 </tbody></table>
-<h4><a class="header" href="#querying" id="querying">Querying</a></h4>
+</div>
+<h4 id="querying"><a class="header" href="#querying">Querying</a></h4>
 <p>Every user that is part of a group that contains a corpus always get these permissions for a corpus automatically. If you want to allow a user to access only a certain functionality 
 you can add more fine grained permissions. E.g.
 \verbatim
 query:count:*
 \endverbatim
 allows a user to count on all corpora but won't allow him to fetch the annotation graphs. For users that use the graphical user interface and not the service directly you should always grant a user all query permissions for a corpus. Otherwise he the user interface might not function as expected.</p>
-<table><thead><tr><th>permission</th><th>description</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>permission</th><th>description</th></tr></thead><tbody>
 <tr><td>query:show:<strong>{corpusname}</strong></td><td>Allow to show information about a specific corpus.</td></tr>
 <tr><td>query:count:<strong>{corpusname}</strong></td><td>Allow to count on a specific corpus.</td></tr>
 <tr><td>query:find:<strong>{corpusname}</strong></td><td>Allow to find matches on a specific corpus.</td></tr>
 <tr><td>query:subgraph:<strong>{corpusname}</strong></td><td>Allow to query annotated subgraphs and complete annotated graphs on a specific corpus.</td></tr>
 <tr><td>query:binary:<strong>{corpusname}</strong></td><td>Allow to get the  binary files of a specific corpus.</td></tr>
 </tbody></table>
-
+</div>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                        
                             <a rel="prev" href="import-and-config-instances.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                        
-
-                        
                             <a rel="next" href="import-and-config-admin-web.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
-                        
-
                         <div style="clear: both"></div>
                     </nav>
                 </div>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                
                     <a rel="prev" href="import-and-config-instances.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                
-
-                
                     <a rel="next" href="import-and-config-admin-web.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
-                
             </nav>
 
         </div>
 
-        
-
-        
-
-        
-
-        
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
-        
-
-        
-
-        
         <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
-        
-
         <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
         <script src="book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
-        
-
-        
-
     </body>
 </html>

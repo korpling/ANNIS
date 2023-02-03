@@ -4,45 +4,27 @@
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>Corpus queries - ANNIS Developer Guide</title>
-        
-        
-
-
         <!-- Custom HTML head -->
-        
-
-
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="theme-color" content="#ffffff" />
 
-        
         <link rel="icon" href="../favicon.svg">
-        
-        
         <link rel="shortcut icon" href="../favicon.png">
-        
         <link rel="stylesheet" href="../css/variables.css">
         <link rel="stylesheet" href="../css/general.css">
         <link rel="stylesheet" href="../css/chrome.css">
         <link rel="stylesheet" href="../css/print.css" media="print">
-
         <!-- Fonts -->
         <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
-        
         <link rel="stylesheet" href="../fonts/fonts.css">
-        
-
         <!-- Highlight.js Stylesheets -->
         <link rel="stylesheet" href="../highlight.css">
         <link rel="stylesheet" href="../tomorrow-night.css">
         <link rel="stylesheet" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
-        
-
-        
     </head>
     <body>
         <!-- Provide site root to javascript -->
@@ -101,7 +83,6 @@
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                
                 <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky bordered">
                     <div class="left-buttons">
@@ -118,11 +99,9 @@
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        
                         <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
-                        
                     </div>
 
                     <h1 class="menu-title">ANNIS Developer Guide</h1>
@@ -131,14 +110,12 @@
                         <a href="../print.html" title="Print this book" aria-label="Print this book">
                             <i id="print-button" class="fa fa-print"></i>
                         </a>
-                        
                     </div>
                 </div>
 
-                
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -146,8 +123,6 @@
                         </ul>
                     </div>
                 </div>
-                
-
                 <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
                 <script type="text/javascript">
                     document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
@@ -159,21 +134,21 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#corpus-queries" id="corpus-queries">Corpus queries</a></h1>
+                        <h1 id="corpus-queries"><a class="header" href="#corpus-queries">Corpus queries</a></h1>
 <p>Interface defining the REST API calls that ANNIS provides for querying the data. </p>
 <p>All paths for this part of the service start with the &quot;annis/query/&quot; prefix.</p>
-<h2><a class="header" href="#count-matches-of-a-query" id="count-matches-of-a-query"><em>Count</em> matches of a query</a></h2>
-<h3><a class="header" href="#paths" id="paths">Path(s)</a></h3>
+<h2 id="count-matches-of-a-query"><a class="header" href="#count-matches-of-a-query"><em>Count</em> matches of a query</a></h2>
+<h3 id="paths"><a class="header" href="#paths">Path(s)</a></h3>
 <ol>
 <li><code>GET</code> annis/query/search/count</li>
 </ol>
-<h3><a class="header" href="#parameters" id="parameters">Parameters</a></h3>
+<h3 id="parameters"><a class="header" href="#parameters">Parameters</a></h3>
 <ul>
 <li><code>q</code> - The query in the ANNIS Query Language (AQL)</li>
 <li><code>corpora</code> - A comma separated list of corpus names </li>
 </ul>
-<h3><a class="header" href="#responses" id="responses">Responses</a></h3>
-<h4><a class="header" href="#code-200" id="code-200">Code 200</a></h4>
+<h3 id="responses"><a class="header" href="#responses">Responses</a></h3>
+<h4 id="code-200"><a class="header" href="#code-200">Code 200</a></h4>
 <p>Produces an XML representation of the total matches and the number of documents that contain matches (<code>application/xml</code>):</p>
 <pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
 &lt;matchAndDocumentCount&gt;
@@ -183,12 +158,12 @@
   &lt;matchCount&gt;399&lt;/matchCount&gt;
 &lt;/matchAndDocumentCount&gt;
 </code></pre>
-<h2><a class="header" href="#find-matches-for-a-given-query" id="find-matches-for-a-given-query"><em>Find</em> matches for a given query</a></h2>
-<h3><a class="header" href="#paths-1" id="paths-1">Path(s)</a></h3>
+<h2 id="find-matches-for-a-given-query"><a class="header" href="#find-matches-for-a-given-query"><em>Find</em> matches for a given query</a></h2>
+<h3 id="paths-1"><a class="header" href="#paths-1">Path(s)</a></h3>
 <ol>
 <li><code>GET</code> annis/query/search/find </li>
 </ol>
-<h3><a class="header" href="#parameters-1" id="parameters-1">Parameters</a></h3>
+<h3 id="parameters-1"><a class="header" href="#parameters-1">Parameters</a></h3>
 <ul>
 <li><code>q</code> - The query in the ANNIS Query Language (AQL)</li>
 <li><code>corpora</code> - A comma separated list of corpus names </li>
@@ -196,8 +171,8 @@
 <li><code>limit</code> - Optional limit of the number of returned matches. Set to -1 if unlimited. Default is -1. </li>
 <li><code>order</code> - Optional order how the results should be sorted. Can be either &quot;normal&quot;, &quot;random&quot; or &quot;inverted&quot; &quot;normal&quot; is the default ordering, &quot;inverted&quot; inverses the default ordering and &quot;random&quot; is a non-stable (thus you will get different results for the same offset and limit) random ordering. </li>
 </ul>
-<h3><a class="header" href="#responses-1" id="responses-1">Responses</a></h3>
-<h4><a class="header" href="#code-200-1" id="code-200-1">Code 200</a></h4>
+<h3 id="responses-1"><a class="header" href="#responses-1">Responses</a></h3>
+<h4 id="code-200-1"><a class="header" href="#code-200-1">Code 200</a></h4>
 <p>A list of the match identifiers for the query.</p>
 <p>Can produce the MIME type <code>application/xml</code> in the following format</p>
 <pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
@@ -231,12 +206,12 @@ salt:/pcc2/11299/#tok_3 tiger::pos::salt:/pcc2/11299/#tok_4
 </code></pre>
 <p>In this format, there is one line per match and each ID is separated by space.
 An ID can be prefixed by the fully qualified annotation name (which is separated with '::' from the ID).</p>
-<h2><a class="header" href="#get-a-subgraph-from-a-set-of-matched-salt-ids" id="get-a-subgraph-from-a-set-of-matched-salt-ids">Get a <em>subgraph</em> from a set of (matched) Salt IDs</a></h2>
-<h3><a class="header" href="#paths-2" id="paths-2">Path(s)</a></h3>
+<h2 id="get-a-subgraph-from-a-set-of-matched-salt-ids"><a class="header" href="#get-a-subgraph-from-a-set-of-matched-salt-ids">Get a <em>subgraph</em> from a set of (matched) Salt IDs</a></h2>
+<h3 id="paths-2"><a class="header" href="#paths-2">Path(s)</a></h3>
 <ol>
 <li><code>POST</code> annis/query/search/subgraph</li>
 </ol>
-<h3><a class="header" href="#request-body" id="request-body">Request body</a></h3>
+<h3 id="request-body"><a class="header" href="#request-body">Request body</a></h3>
 <p>Consumes <code>application/xml</code>:</p>
 <pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
 &lt;match-group&gt;
@@ -268,31 +243,31 @@ salt:/pcc2/11299/#tok_2 tiger::pos::salt:/pcc2/11299/#tok_3
 salt:/pcc2/11299/#tok_3 tiger::pos::salt:/pcc2/11299/#tok_4
 </code></pre>
 <p>One line per match, each ID is separated by space. An ID can be prepended by the fully qualified annotation name (which is separated with '::' from the ID).</p>
-<h3><a class="header" href="#parameters-2" id="parameters-2">Parameters</a></h3>
+<h3 id="parameters-2"><a class="header" href="#parameters-2">Parameters</a></h3>
 <ul>
 <li><code>segmentation</code> - Optional parameter for segmentation layer on which the context is applied. Leave empty for token layer (which is default).</li>
 <li><code>left</code> - Optional parameter for the left context size, default is 0.</li>
 <li><code>right</code> - Optional parameter for the right context size, default is 0.</li>
 <li><code>filter</code> - Optional parameter with value &quot;all&quot; or &quot;token&quot;. If &quot;token&quot; only token will be fetched. Default is &quot;all&quot;. </li>
 </ul>
-<h3><a class="header" href="#responses-2" id="responses-2">Responses</a></h3>
-<h4><a class="header" href="#code-200-2" id="code-200-2">Code 200</a></h4>
+<h3 id="responses-2"><a class="header" href="#responses-2">Responses</a></h3>
+<h4 id="code-200-2"><a class="header" href="#code-200-2">Code 200</a></h4>
 <p>Returns a representation of the <a href="http://corpus-tools.org/salt/">Salt</a> annotation graph in the EMF XMI format and with MIME type <code>application/xml</code> or <code>application/xmi+xml</code>. </p>
-<h2><a class="header" href="#get-the-annotation-graph-of-a-complete-document" id="get-the-annotation-graph-of-a-complete-document">Get the annotation <em>graph</em> of a complete document</a></h2>
-<h3><a class="header" href="#paths-3" id="paths-3">Path(s)</a></h3>
+<h2 id="get-the-annotation-graph-of-a-complete-document"><a class="header" href="#get-the-annotation-graph-of-a-complete-document">Get the annotation <em>graph</em> of a complete document</a></h2>
+<h3 id="paths-3"><a class="header" href="#paths-3">Path(s)</a></h3>
 <ol>
 <li><code>GET</code> annis/query/graph/<strong>{top}</strong>/<strong>{doc}</strong></li>
 </ol>
 <p><strong>{top}</strong> is the toplevel corpus name of the document and <strong>{doc}</strong> the document name. </p>
-<h3><a class="header" href="#parameters-3" id="parameters-3">Parameters</a></h3>
+<h3 id="parameters-3"><a class="header" href="#parameters-3">Parameters</a></h3>
 <ul>
 <li><code>filternodeanno</code> - 	A comma seperated list of node annotations which are used as a filter for the graph. Only nodes having one of the annotations are included in the result. </li>
 </ul>
-<h3><a class="header" href="#responses-3" id="responses-3">Responses</a></h3>
-<h4><a class="header" href="#code-200-3" id="code-200-3">Code 200</a></h4>
+<h3 id="responses-3"><a class="header" href="#responses-3">Responses</a></h3>
+<h4 id="code-200-3"><a class="header" href="#code-200-3">Code 200</a></h4>
 <p>Returns a representation of the <a href="http://corpus-tools.org/salt/">Salt</a> annotation graph in the EMF XMI format and with MIME type <code>application/xml</code> or <code>application/xmi+xml</code>. </p>
-<h2><a class="header" href="#get-the-content-a-binary-object-for-a-specific-document" id="get-the-content-a-binary-object-for-a-specific-document">Get the content a <em>binary</em> object for a specific document</a></h2>
-<h3><a class="header" href="#paths-4" id="paths-4">Path(s)</a></h3>
+<h2 id="get-the-content-a-binary-object-for-a-specific-document"><a class="header" href="#get-the-content-a-binary-object-for-a-specific-document">Get the content a <em>binary</em> object for a specific document</a></h2>
+<h3 id="paths-4"><a class="header" href="#paths-4">Path(s)</a></h3>
 <ol>
 <li><code>GET</code> annis/query/corpora/<strong>{top}</strong>/<strong>{document}</strong>/binary </li>
 <li><code>GET</code> annis/query/corpora/<strong>{top}</strong>/<strong>{document}</strong>/binary/<strong>{offset}</strong>/<strong>{length}</strong></li>
@@ -313,8 +288,8 @@ In the latter case, you can specify the <strong>{offset}</strong> and the <stron
 <li><strong>{offset}</strong> - Defines the offset from the the binary chunk starts (in bytes).</li>
 <li><strong>{length}</strong> - Defines the length of the binary chunk (in bytes).</li>
 </ul>
-<h3><a class="header" href="#responses-4" id="responses-4">Responses</a></h3>
-<h4><a class="header" href="#code-200-4" id="code-200-4">Code 200</a></h4>
+<h3 id="responses-4"><a class="header" href="#responses-4">Responses</a></h3>
+<h4 id="code-200-4"><a class="header" href="#code-200-4">Code 200</a></h4>
 <p>A binary stream that contains the file content. If path variant 2 and 4 is used only a subset of the file is returned. 
 Path variant 1 and 3 always return the complete file.</p>
 
@@ -322,67 +297,38 @@ Path variant 1 and 3 always return the complete file.</p>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                        
                             <a rel="prev" href="../rest-api/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
-                        
-
-                        
                             <a rel="next" href="../rest-api/admin.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
-                        
-
                         <div style="clear: both"></div>
                     </nav>
                 </div>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                
                     <a rel="prev" href="../rest-api/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
-                
-
-                
                     <a rel="next" href="../rest-api/admin.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
-                
             </nav>
 
         </div>
 
-        
-
-        
-
-        
-
-        
         <script type="text/javascript">
             window.playground_copyable = true;
         </script>
-        
-
-        
-
-        
         <script src="../elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="../mark.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="../searcher.js" type="text/javascript" charset="utf-8"></script>
-        
-
         <script src="../clipboard.min.js" type="text/javascript" charset="utf-8"></script>
         <script src="../highlight.js" type="text/javascript" charset="utf-8"></script>
         <script src="../book.js" type="text/javascript" charset="utf-8"></script>
 
         <!-- Custom JS scripts -->
-        
-
-        
-
     </body>
 </html>
