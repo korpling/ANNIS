@@ -12,7 +12,7 @@ haven't done so yet.
 Upgrading the ANNIS service is more complex than deploying the user interface WAR file.
 Therefore a Python script is available for an automatic upgrade. This script needs as least Python 3.2.
 
-1. Download the [latest version of the script](https://raw.githubusercontent.com/korpling/ANNIS/master/Misc/upgrade_service.py). 
+1. Download the [latest version of the script](https://raw.githubusercontent.com/korpling/ANNIS/annis3/master/Misc/upgrade_service.py). 
 2. Download the new ANNIS release files (`annis-service-<VERSION>.tar.gz` and `annis-gui-<VERSION>.war`) 
 3. Run the script 
    ~~~bash
