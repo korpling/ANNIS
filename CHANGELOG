@@ -1,3 +1,12 @@
+Version 3.7.1
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/milestone/64?closed=1
+
+[Fixed Bugs]
+ #813 Missing join on corpus reference when multiple corpora are selected
+
 Version 3.7.0
 =============
 
