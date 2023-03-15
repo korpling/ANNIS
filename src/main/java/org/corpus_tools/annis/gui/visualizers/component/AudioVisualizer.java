@@ -65,10 +65,18 @@ public class AudioVisualizer extends AbstractVisualizer { // NO_UCD (unused code
       for (String f : files) {
         String guessedMimeType = tika.detect(f);
         if (guessedMimeType != null && guessedMimeType.startsWith("audio/")) {
+
+          // Replace standard wav mime type by one our audio player actually understands
+          if ("audio/vnd.wave".equals(guessedMimeType)) {
+            mimeType = "audio/wav";
+          } else {
+            mimeType = guessedMimeType;
+          }
+
           binaryServletPath =
               input.getContextPath() + "/Binary?" + "file=" + urlParamEscape.escape(f)
                   + "&toplevelCorpusName=" + urlParamEscape.escape(corpusName);
-          mimeType = guessedMimeType;
+
         }
       }
     } catch (ApiException e) {
