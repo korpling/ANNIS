@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.10.1
-date-released: 2022-12-01
+version: 4.10.2
+date-released: 2023-03-15
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -316,21 +316,19 @@ references:
   repository-code: https://gitbox.apache.org/repos/asf?p=logging-log4j2.git/log4j-to-slf4j
 - type: software
   title: Apache Tika core
-  version: 1.24.1
+  version: 2.7.0
   abbreviation: org.apache.tika:tika-core
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Tika_core
     directory.
   authors:
   - name: Rida Benjelloun
-  - name: Keith Bennett
   - name: Mark Harwood
   - name: Ken Krugler
   - name: Chris A. Mattmann
   - name: Michael McCandless
   - name: Dave Meikle
   - name: Sami Siren
-  - name: Jukka Zitting
   - name: Nick Burch
   - name: Maxim Valyanskiy
   - name: Oleg Tikhonov
@@ -338,6 +336,11 @@ references:
   - name: Tyler Palsulich
   - name: Tim Allison
   - name: Konstantin Gribov
+  - name: Tilman Hausherr
+  - name: Jukka Zitting
+  - name: Julien Nioche
+  - name: Keith Bennett
+  - name: Niall Pemberton
   repository-code: https://github.com/apache/tika/tika-core
 - type: software
   title: AspectJ Weaver
