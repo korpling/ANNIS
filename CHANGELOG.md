@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [4.10.2] - 2023-03-15
 
+### Fixed
+
+- Audio visualizer for .wav types was not playing the file due to a MIME type
+  mixup (#815)
+- Updated to graphANNIS bugfix version 2.4.3
+
 ## [4.10.1] - 2022-12-01
 
 ### Fixed
