@@ -37,6 +37,7 @@ import org.corpus_tools.annis.gui.widgets.JITWrapper;
 import org.corpus_tools.annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SStructure;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
@@ -285,8 +286,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   @Override
   public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
       SRelation incomingEdge, SNode currNode, long order) {
-    // token data structures are not needed
-    if (currNode instanceof SToken) {
+    // token data structures are not needed and we also ignore any pointing relations
+    if (currNode instanceof SToken || incomingEdge instanceof SPointingRelation) {
       return false;
     } else if (Helper.checkSLayer(namespace, currNode)) {
       return true;
@@ -695,8 +696,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
             public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
                 SRelation edge, SNode currNode, long order) {
 
-              // token are not needed
-              if (currNode instanceof SToken) {
+              // token are not needed and we also ignore any pointing relations
+              if (currNode instanceof SToken || edge instanceof SPointingRelation) {
                 return false;
               }
 
