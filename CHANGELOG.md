@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Ignore pointing relations when traversing the graph in the RST visualizer. If
+we include pointing relations and they create cycles, this would result in an
+error.
+
 ## [4.10.2] - 2023-03-15
 
 ### Fixed
