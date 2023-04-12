@@ -946,10 +946,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       for (Relation mirror : mirrorRelations)
 
       {
-        if (mirror != rel && mirror instanceof SRelation)
+        if (mirror != rel && mirror instanceof SDominanceRelation)
         {
           // check layer
-          SRelation mirrorRel = (SRelation) mirror;
+          SDominanceRelation mirrorRel = (SDominanceRelation) mirror;
 
           Set<SLayer> mirrorLayers = mirrorRel.getLayers();
           if (mirrorLayers != null)
