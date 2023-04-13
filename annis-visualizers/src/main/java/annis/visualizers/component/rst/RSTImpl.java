@@ -22,6 +22,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.Stack;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.HashSet;
+
 
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -159,6 +161,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   private Set<SNode> visitedNodes;
 
+  private Map<String, List<SPointingRelation>> secondaryEdges;
+
 
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
@@ -265,7 +269,16 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       }
     }
 
-
+    secondaryEdges = new HashMap<>();
+    for (SRelation r : graph.getRelations()) {
+      if (r instanceof SPointingRelation && r.getAnnotation("default_ns", "relname") != null) {
+        String key = r.getSource().getId();
+        if (!secondaryEdges.containsKey(key)) {
+          secondaryEdges.put(key, new ArrayList<>());
+        }
+        secondaryEdges.get(key).add((SPointingRelation) r);
+      }
+    }
 
     if (rootSNodes.size() > 0) {
 
@@ -295,7 +308,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
                                          String traversalId, SRelation edge, SNode currNode, long order) {
 
             // token are not needed
-            if (currNode instanceof SToken) {
+            if (currNode instanceof SToken || edge instanceof SPointingRelation) {
               return false;
             }
             if (sentences.contains((SStructure) currNode)) {
@@ -343,6 +356,35 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     }
     signal.put("indexes", indexes);
     return signal;
+  }
+
+  private JSONArray jsonizeSecondarySignals(SNode currNode) {
+    JSONArray secondarySignals = new JSONArray();
+    // for each incoming relation
+    for (SRelation<SNode, SNode> relation : currNode.getOutRelations()) {
+      // if we have an SPointingRelation
+      if (SPointingRelation.class.isInstance(relation)) {
+        // then we need to find the SNode that dominates both this and the target. Note the target
+        SNode target = relation.getTarget();
+
+        for (SRelation<SNode, SNode> r : currNode.getInRelations()) {
+          // Loop over every signal node dominating this node
+          SNode possibleSignalNode = r.getSource();
+          // Make sure it's a secondary signal node
+          if (!isSecondarySignalNode(possibleSignalNode)) {
+            continue;
+          }
+          // If we find a dominance relation headed from this node that reaches the SPointingRelation's target,
+          // we've got the signal node we're looking for
+          for (SRelation<SNode, SNode> r2 : possibleSignalNode.getOutRelations()) {
+            if (SDominanceRelation.class.isInstance(r2) && r2.getTarget().equals(target)) {
+              secondarySignals.put(jsonizeSignalNode(possibleSignalNode));
+            }
+          }
+        }
+      }
+    }
+    return secondarySignals;
   }
 
   private JSONObject createJsonEntry(SNode currNode) {
@@ -400,41 +442,11 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       }
     }
 
-    // add secondary signals
-    JSONArray secondarySignals = new JSONArray();
-    // for each incoming relation
-    for (SRelation<SNode, SNode> relation : currNode.getOutRelations()) {
-      // if we have an SPointingRelation
-      if (SPointingRelation.class.isInstance(relation)) {
-        // then we need to find the SNode that dominates both this and the target. Note the target
-        SNode target = relation.getTarget();
-
-        for (SRelation<SNode, SNode> r : currNode.getInRelations()) {
-          // Loop over every signal node dominating this node
-          SNode possibleSignalNode = r.getSource();
-          // Make sure it's a secondary signal node
-          if (!isSecondarySignalNode(possibleSignalNode)) {
-            continue;
-          }
-          // If we find a dominance relation headed from this node that reaches the SPointingRelation's target,
-          // we've got the signal node we're looking for
-          for (SRelation<SNode, SNode> r2 : possibleSignalNode.getOutRelations()) {
-            if (SDominanceRelation.class.isInstance(r2) && r2.getTarget().equals(target)) {
-              secondarySignals.put(jsonizeSignalNode(possibleSignalNode));
-            }
-          }
-        }
-      }
-    }
-    if (secondarySignals.length() > 0) {
-      data.put("secondarySignals", secondarySignals);
-    }
-
-    // add secondary edges
+    // add secondary signals and edges
+    JSONArray secondarySignals = jsonizeSecondarySignals(currNode);
     JSONArray secEdges = jsonizeSecondaryEdges(currNode);
-    if (secEdges != null) {
-      data.put("secondaryEdges", secEdges);
-    }
+    data.put("secondarySignals", secondarySignals);
+    data.put("secondaryEdges", secEdges);
 
     // build unique id, cause is used for an unique html element id.
     jsonData.put("id", getUniStrId(currNode));
@@ -483,7 +495,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
         for (SRelation<SNode, SNode> e : in) {
           // Don't follow SPointingRelations for secondary edges
-          if (hasRSTType(e) && !SPointingRelation.class.isInstance(e)) {
+          if (hasRSTType(e) && SDominanceRelation.class.isInstance(e)) {
             JSONObject tmp;
 
 
@@ -516,43 +528,39 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   }
 
   private JSONArray jsonizeSecondaryEdges(SNode node) throws JSONException {
-    List<SRelation<SNode, SNode>> out = node.getGraph().getOutRelations(node.getId());
-    String type;
     Set<SAnnotation> annos;
     JSONArray edgeData = new JSONArray();
 
-    if (out == null) {
+    if (!secondaryEdges.containsKey(node.getId())) {
       return edgeData;
     }
 
-    for (SRelation<SNode, SNode> edge : out) {
-      if (edge.getTarget() instanceof SToken) {
-        continue;
-      }
-      // Skip non-secondary edges
-      if (! (SPointingRelation.class.isInstance(edge) && edge.getType().equals("rst"))) {
-        continue;
-      }
+    List<SPointingRelation> secEdges = secondaryEdges.get(node.getId());
 
-      type = ((SRelation) edge).getType();
-      String sTypeAsString = "edge";
-      if (type != null && !type.isEmpty()) {
-        sTypeAsString = type;
-      }
-
+    for (SRelation edge : secEdges) {
       JSONObject jsonEdge = new JSONObject();
       edgeData.put(jsonEdge);
 
+      String sTypeAsString = "edge";
+      if (edge.getType() != null && !edge.getType().isEmpty()) {
+        sTypeAsString = edge.getType();
+      }
+
+      boolean reverse = edge.getAnnotation("default_ns", "reverse") != null;
+
       jsonEdge.put("sType", sTypeAsString);
-      jsonEdge.put("from", getUniStrId(node));
-      jsonEdge.put("to", getUniStrId((SNode) ((SRelation) edge).getTarget()));
+      String from = getUniStrId(node);
+      String to = getUniStrId((SNode) edge.getTarget());
+      jsonEdge.put("from", reverse ? to : from);
+      jsonEdge.put("to", reverse ? from : to);
+      jsonEdge.put("reversed", reverse);
 
       annos = edge.getAnnotations();
 
       if (annos != null) {
         for (SAnnotation anno : annos) {
-          // Exclude is_signaled annotations, which we don't want to visualize
-          if (!anno.getName().equals("is_signaled")) {
+          // Exclude is_signaled and reversed annotations, which we don't want to visualize
+          if (!anno.getName().equals("is_signaled") && !anno.getName().equals("reverse")) {
             getOrCreateArray(jsonEdge, "annotation").put(anno.getValue_STEXT());
           }
         }
@@ -594,7 +602,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId, SRelation incomingEdge, SNode currNode, long order) {
     // token data structures are not needed
-    if (currNode instanceof SToken) {
+    if (currNode instanceof SToken || incomingEdge instanceof SPointingRelation) {
       return false;
     }
     else if (CommonHelper.checkSLayer(namespace, currNode) && !visitedNodes.contains(currNode)) {

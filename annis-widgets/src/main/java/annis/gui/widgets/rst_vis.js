@@ -653,7 +653,7 @@
 					if (edgeType === RST) {
 						drawBezierCurve(from, to, config);
 						var labelElt = plotRSTLabel(from, to, annotation, config);
-						plotSignalBadge(labelElt, from, to, config, tokenCount, false);
+						plotSignalBadge(labelElt, from, to, config, tokenCount, false, false);
 					}
 
 					if (edgeType === MULTINUC) {
@@ -692,7 +692,7 @@
 					var edge = secondaryEdges[i];
 					drawBezierCurve(nodes[edge.from], nodes[edge.to], configCopy);
 					var label = plotRSTLabel(nodes[edge.from], nodes[edge.to], edge.annotation, configCopy, tokenCount);
-					plotSignalBadge(label, nodes[edge.from], nodes[edge.to], config, tokenCount, true);
+					plotSignalBadge(label, nodes[edge.from], nodes[edge.to], config, tokenCount, true, edge.reversed);
 				}
 			}
 		}
@@ -837,8 +837,8 @@
 			return label;
 		}
 
-		function plotSignalBadge(label, source, target, config, tokenCount, secondary) {
-			var signals = secondary ? source.data.secondarySignals : source.data.signals;
+		function plotSignalBadge(label, source, target, config, tokenCount, secondary, reversed) {
+			var signals = secondary ? (reversed ? target : source).data.secondarySignals : source.data.signals;
 			if (!signals || signals.length === 0) {
 				return;
 			}
