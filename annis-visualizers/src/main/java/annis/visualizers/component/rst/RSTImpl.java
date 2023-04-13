@@ -161,7 +161,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   private Set<SNode> visitedNodes;
 
-  private Map<String, List<SPointingRelation>> secondaryEdges;
+  private Map<String, List<SStructure>> secondaryEdges;
 
 
   /**
@@ -243,6 +243,10 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     this.getContent().setSizeUndefined();
   }
 
+  private boolean isSecondaryEdgeNode(SNode sNode) {
+    return sNode.getAnnotation("sec", "relname") != null;
+  }
+
   private boolean isSignalNode(SNode sNode) {
     return sNode.getAnnotation("default_ns", "signal_type") != null;
   }
@@ -264,19 +268,27 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
     for (SNode sNode : rootSNodes) {
       if (CommonHelper.checkSLayer(namespace, sNode)
-              && !isSignalNode(sNode)) {
+              && !isSignalNode(sNode)
+              && !isSecondaryEdgeNode(sNode)) {
         rstRoots.add(sNode);
       }
     }
 
     secondaryEdges = new HashMap<>();
-    for (SRelation r : graph.getRelations()) {
-      if (r instanceof SPointingRelation && r.getAnnotation("default_ns", "relname") != null) {
-        String key = r.getSource().getId();
+    for (SNode n : graph.getNodes()) {
+      if (n.getAnnotation("sec", "relname") != null) {
+        String key = null;
+        for (SRelation r : n.getOutRelations()) {
+          SAnnotation ann = r.getAnnotation("default_ns", "end");
+          if (r instanceof SDominanceRelation && ann != null && ann.getValue().equals("source")) {
+            key = r.getTarget().getId();
+          }
+        }
+
         if (!secondaryEdges.containsKey(key)) {
           secondaryEdges.put(key, new ArrayList<>());
         }
-        secondaryEdges.get(key).add((SPointingRelation) r);
+        secondaryEdges.get(key).add((SStructure) n);
       }
     }
 
@@ -291,7 +303,8 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
                                   SNode fromNode, long order) {
             if (currNode instanceof SStructure
                     && isSegment(currNode)
-                    && !isSignalNode(currNode)) {
+                    && !isSignalNode(currNode)
+                    && !isSecondaryEdgeNode(currNode)) {
               sentences.add((SStructure) currNode);
             }
           }
@@ -361,27 +374,11 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   private JSONArray jsonizeSecondarySignals(SNode currNode) {
     JSONArray secondarySignals = new JSONArray();
     // for each incoming relation
-    for (SRelation<SNode, SNode> relation : currNode.getOutRelations()) {
-      // if we have an SPointingRelation
-      if (SPointingRelation.class.isInstance(relation)) {
-        // then we need to find the SNode that dominates both this and the target. Note the target
-        SNode target = relation.getTarget();
+    for (SRelation<SNode, SNode> relation : currNode.getInRelations()) {
 
-        for (SRelation<SNode, SNode> r : currNode.getInRelations()) {
-          // Loop over every signal node dominating this node
-          SNode possibleSignalNode = r.getSource();
-          // Make sure it's a secondary signal node
-          if (!isSecondarySignalNode(possibleSignalNode)) {
-            continue;
-          }
-          // If we find a dominance relation headed from this node that reaches the SPointingRelation's target,
-          // we've got the signal node we're looking for
-          for (SRelation<SNode, SNode> r2 : possibleSignalNode.getOutRelations()) {
-            if (SDominanceRelation.class.isInstance(r2) && r2.getTarget().equals(target)) {
-              secondarySignals.put(jsonizeSignalNode(possibleSignalNode));
-            }
-          }
-        }
+      SNode source = relation.getSource();
+      if (source.getAnnotation("sec", "signaled_relation") != null) {
+        secondarySignals.put(jsonizeSignalNode(source));
       }
     }
     return secondarySignals;
@@ -535,25 +532,29 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       return edgeData;
     }
 
-    List<SPointingRelation> secEdges = secondaryEdges.get(node.getId());
+    List<SStructure> secEdges = secondaryEdges.get(node.getId());
 
-    for (SRelation edge : secEdges) {
+    for (SStructure edge : secEdges) {
       JSONObject jsonEdge = new JSONObject();
       edgeData.put(jsonEdge);
 
-      String sTypeAsString = "edge";
-      if (edge.getType() != null && !edge.getType().isEmpty()) {
-        sTypeAsString = edge.getType();
-      }
-
-      boolean reverse = edge.getAnnotation("default_ns", "reverse") != null;
-
-      jsonEdge.put("sType", sTypeAsString);
+      jsonEdge.put("sType", "rst");
       String from = getUniStrId(node);
-      String to = getUniStrId((SNode) edge.getTarget());
-      jsonEdge.put("from", reverse ? to : from);
-      jsonEdge.put("to", reverse ? from : to);
-      jsonEdge.put("reversed", reverse);
+      SNode toNode = null;
+      for (SRelation r : edge.getOutRelations()) {
+        SAnnotation ann = r.getAnnotation("default_ns", "end");
+        if (r instanceof SDominanceRelation && ann != null && ann.getValue().equals("target")) {
+          toNode = (SNode) r.getTarget();
+        }
+      }
+      if (toNode == null) {
+        // This shouldn't happen!
+        log.error("Couldn't determine a target node for a secondary edge!");
+        continue;
+      }
+      String to = getUniStrId(toNode);
+      jsonEdge.put("from", from);
+      jsonEdge.put("to", to);
 
       annos = edge.getAnnotations();
 
