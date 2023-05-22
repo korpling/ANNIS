@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisBaseUI;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +30,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 class HTMLVisTest {
 
@@ -44,14 +45,14 @@ class HTMLVisTest {
   }
 
   @Test
-  void testWebFontInjection() throws ApiException, IOException {
+  void testWebFontInjection() throws WebClientResponseException, IOException {
     AnnisBaseUI ui = mock(AnnisBaseUI.class);
     CorporaApi api = mock(CorporaApi.class);
 
     File jsonFile = File.createTempFile("test", ".fonts.json");
     FileUtils.writeStringToFile(jsonFile, "{\"web-fonts\": [" + "{" + "\"name\": \"FancyFont\", "
         + "\"sources\": {\"format\":\"url\"}}" + "]}", StandardCharsets.UTF_8);
-    when(api.getFile("rootCorpus", "rootCorpus/test.fonts.json")).thenReturn(jsonFile);
+    when(api.getFile("rootCorpus", "rootCorpus/test.fonts.json")).thenReturn(Mono.just(jsonFile));
 
     fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
 
@@ -61,7 +62,7 @@ class HTMLVisTest {
   }
 
   @Test
-  void testWebFontInjectionErrorHandling() throws ApiException, IOException {
+  void testWebFontInjectionErrorHandling() throws WebClientResponseException, IOException {
     AnnisBaseUI ui = mock(AnnisBaseUI.class);
     Page page = mock(Page.class);
     CorporaApi api = mock(CorporaApi.class);
@@ -72,14 +73,15 @@ class HTMLVisTest {
     // Create invalid JSON file
     File jsonFile = File.createTempFile("test", ".fonts.json");
     FileUtils.writeStringToFile(jsonFile, "{\"web-fonts\"}", StandardCharsets.UTF_8);
-    when(api.getFile("rootCorpus", "rootCorpus/test.fonts.json")).thenReturn(jsonFile);
+    when(api.getFile("rootCorpus", "rootCorpus/test.fonts.json")).thenReturn(Mono.just(jsonFile));
 
     fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
     verify(ui, Mockito.never()).injectUniqueCSS(any());
 
     
     // Don't return a file from the API
-    when(api.getFile(any(), any())).thenThrow(new ApiException(500, "Server error"));
+    when(api.getFile(any(), any()))
+        .thenThrow(new WebClientResponseException(500, "Server error", null, null, null));
 
     fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
 

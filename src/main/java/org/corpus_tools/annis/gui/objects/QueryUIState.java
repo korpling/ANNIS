@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
-import okhttp3.Call;
+import org.apache.http.concurrent.Cancellable;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.exporter.CSVExporter;
@@ -79,7 +79,7 @@ public class QueryUIState implements Serializable {
 
   private transient Map<QueryType, Future<?>> executedTasks;
 
-  private transient Map<QueryType, Call> executedCalls;
+  private transient Map<QueryType, Cancellable> executedCalls;
 
   private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition =
       new BeanContainer<>(UserGeneratedFrequencyEntry.class);
@@ -110,7 +110,7 @@ public class QueryUIState implements Serializable {
     return executedTasks;
   }
 
-  public Map<QueryType, Call> getExecutedCalls() {
+  public Map<QueryType, Cancellable> getExecutedCalls() {
     return executedCalls;
   }
 

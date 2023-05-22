@@ -76,7 +76,8 @@ public class CSVExporter extends BaseMatrixExporter {
      *
      */
     @Override
-    public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args, int matchNumber, int nodeCount)
+    public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args,
+        int matchNumber, long nodeCount)
             throws IOException, IllegalArgumentException {
         // first match
         if (matchNumber == 0) {

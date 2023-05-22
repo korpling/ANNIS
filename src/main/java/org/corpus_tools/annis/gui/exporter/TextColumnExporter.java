@@ -280,7 +280,8 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
      *            returned for the user query
      */
     @Override
-    public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args, int recordNumber, int nodeCount)
+    public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args,
+        int recordNumber, long nodeCount)
             throws IOException {
         String currSpeakerName = "";
         String prevSpeakerName = "";
@@ -294,7 +295,7 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
             filterNumbersSetByUser.clear();
             filterNumbersIsEmpty = true;
             listOfMetakeys.clear();
-            adjacencyMatrix = new int[nodeCount][nodeCount];
+            adjacencyMatrix = new int[(int) nodeCount][(int) nodeCount];
             matrixIsFilled = false;
             singleMatchesGlobal.clear();
             orderedMatchNumbersGlobal.clear();

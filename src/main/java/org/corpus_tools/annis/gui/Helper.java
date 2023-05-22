@@ -62,7 +62,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
 import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
@@ -112,6 +111,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -486,15 +486,15 @@ public class Helper {
   }
 
   public static Set<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui)
-      throws ApiException {
+      throws WebClientResponseException {
     final CorporaApi api = new CorporaApi(getClient(ui));
     final SearchApi search = new SearchApi(getClient(ui));
 
     final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos =
-        api.nodeAnnotations(corpus, false, true).stream()
+        api.nodeAnnotations(corpus, false, true)
             .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
                 && !Objects.equals(a.getKey().getName(), "tok"))
-            .collect(Collectors.toList());
+            .collectList().block();
 
     final Set<AnnoKey> metaAnnos = new HashSet<>();
     // Check for each annotation if its actually a meta-annotation
@@ -510,7 +510,7 @@ public class Helper {
   }
 
   private static boolean annotationIsMetadata(String corpus, String annotationName,
-      SearchApi search) throws ApiException {
+      SearchApi search) throws WebClientResponseException {
     if (!validQNamePattern.matcher(annotationName).matches()) {
       return false;
     }
@@ -526,7 +526,7 @@ public class Helper {
     q.setOffset(0);
 
     q.setQueryLanguage(QueryLanguage.AQL);
-    final File findResult = search.find(q);
+    final File findResult = search.find(q).block();
     if (findResult != null && findResult.isFile())
       try {
         try (Stream<String> lines = Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
@@ -644,8 +644,8 @@ public class Helper {
     final CorporaApi api = new CorporaApi(getClient(ui));
 
     try {
-      corpusConfig = api.corpusConfiguration(corpus);
-    } catch (final ApiException ex) {
+      corpusConfig = api.corpusConfiguration(corpus).block();
+    } catch (final WebClientResponseException ex) {
       ui.access(() -> ExceptionDialog.show(ex, ERROR_MESSAGE_CORPUS_PROPS_HEADER, ui));
     }
 
@@ -717,9 +717,9 @@ public class Helper {
             + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
       }
       final File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL,
-          AnnotationComponentType.PARTOF);
+          AnnotationComponentType.PARTOF).block();
       return CorpusGraphMapper.map(graphML);
-    } catch (ApiException | XMLStreamException | IOException ex) {
+    } catch (WebClientResponseException | XMLStreamException | IOException ex) {
       log.error(null, ex);
       ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
     }
@@ -745,7 +745,7 @@ public class Helper {
       final File graphML = api.subgraphForQuery(toplevelCorpusName,
           "annis:node_type=\"corpus\" _ident_ annis:doc=/"
               + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/",
-          QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+          QueryLanguage.AQL, AnnotationComponentType.PARTOF).block();
 
       final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
 
@@ -753,7 +753,7 @@ public class Helper {
         result.addAll(n.getMetaAnnotations());
       }
 
-    } catch (ApiException | XMLStreamException | IOException ex) {
+    } catch (WebClientResponseException | XMLStreamException | IOException ex) {
       ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata for document", ui));
     }
 

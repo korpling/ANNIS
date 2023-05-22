@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.ExampleQuery;
@@ -43,6 +42,7 @@ import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * Wraps the auto generated queries.
@@ -113,7 +113,7 @@ public class ExampleQueriesPanel extends CssLayout {
         try {
             if (corpusNames != null && !corpusNames.isEmpty()) {
                 for (String c : corpusNames) {
-                    CorpusConfiguration config = api.corpusConfiguration(c);
+                  CorpusConfiguration config = api.corpusConfiguration(c).block();
                     if(config.getExampleQueries() != null) {
                         for (ExampleQuery q : config.getExampleQueries()) {
                             Entry e = new Entry();
@@ -124,7 +124,7 @@ public class ExampleQueriesPanel extends CssLayout {
                     }
                 }
             }
-        } catch (ApiException ex) {
+          } catch (WebClientResponseException ex) {
             log.error("problems with getting example queries from remote for {}", corpusNames, ex);
         }
         return result;

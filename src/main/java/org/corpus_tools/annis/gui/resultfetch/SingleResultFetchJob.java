@@ -76,7 +76,7 @@ public class SingleResultFetchJob implements Callable<SaltProject>
     SCorpusGraph cg = p.createCorpusGraph();
 
     if (!corpusPath.isEmpty()) {
-      File graphML = api.subgraphForNodes(corpusPath.get(0), subgraphQuery);
+      File graphML = api.subgraphForNodes(corpusPath.get(0), subgraphQuery).block();
       URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
       SDocument doc = cg.createDocument(docURI);
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);

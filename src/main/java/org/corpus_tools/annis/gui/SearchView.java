@@ -46,8 +46,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.controlpanel.ControlPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserController;
@@ -62,7 +60,9 @@ import org.corpus_tools.annis.gui.objects.PagedResultQuery;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
+import org.corpus_tools.api.PatchedCorporaApi;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * The view which shows the search interface.
@@ -239,13 +239,13 @@ public class SearchView extends GridLayout
                 selectedCorpora.addAll(Arrays.asList(cids));
             }
 
-            // filter by actually avaible user corpora in order not to get any exception
+            // filter by actually available user corpora in order not to get any exception
             // later
-            CorporaApi api = new CorporaApi(Helper.getClient(ui));
+            PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
             try {
-              List<String> userCorpora = api.listCorpora();
+              List<String> userCorpora = api.listCorporaAsMono().block();
               selectedCorpora.retainAll(userCorpora);
-            } catch (ApiException ex) {
+            } catch (WebClientResponseException ex) {
               log.error("Could not get list of corpora", ex);
             }
 
@@ -290,10 +290,11 @@ public class SearchView extends GridLayout
             Set<String> corpora = new TreeSet<String>(Arrays.asList(originalCorpusNames));
             // Remove all corpora we don't have the access right to
             try {
-                CorporaApi api = new CorporaApi(Helper.getClient(ui));
-                Set<String> availableCorpora = new HashSet<>(api.listCorpora());
+              PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
+                Set<String> availableCorpora =
+                    new HashSet<>(api.listCorporaAsMono().block());
                 corpora.removeIf(c -> !availableCorpora.contains(c));
-            } catch (ApiException e) {
+              } catch (WebClientResponseException e) {
                 ExceptionDialog.show(e, "Could not get corpus list", ui);
             }
 

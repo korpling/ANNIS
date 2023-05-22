@@ -45,7 +45,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.io.IOUtils;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisBaseUI;
 import org.corpus_tools.annis.gui.Helper;
@@ -60,7 +59,9 @@ import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -433,13 +434,13 @@ public class HTMLVis extends AbstractVisualizer {
       inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
     } else {
       try {
-        File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".css");
+        File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".css").block();
         f.deleteOnExit();
 
         inStreamCSSRaw = new FileInputStream(f);
 
-      } catch (ApiException ex) {
-        if (ex.getCode() != 404) {
+      } catch (WebClientResponseException ex) {
+        if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
           log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
           ui.access(() -> {
             Notification.show("Could not retrieve the HTML visualizer web-font configuration file",
@@ -471,7 +472,7 @@ public class HTMLVis extends AbstractVisualizer {
       CorporaApi api) {
 
     try {
-      File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".fonts.json");
+      File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".fonts.json").block();
       f.deleteOnExit();
       try (FileInputStream inStreamJSON = new FileInputStream(f)) {
         ObjectMapper mapper = createJsonMapper();
@@ -490,8 +491,8 @@ public class HTMLVis extends AbstractVisualizer {
       }
     } catch (IOException ex) {
       log.error("Unexpected input/output exception", ex);
-    } catch (ApiException ex) {
-      if (ex.getCode() != 404) {
+    } catch (WebClientResponseException ex) {
+      if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
         log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
         ui.access(() -> {
           new Notification("Could not retrieve the HTML visualizer web-font configuration file",
@@ -548,10 +549,10 @@ public class HTMLVis extends AbstractVisualizer {
 
       CorporaApi api = new CorporaApi(Helper.getClient(ui));
       try {
-        File file = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".config");
+        File file = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".config").block();
         inStreamConfigRaw = new FileInputStream(file);
-      } catch (ApiException e) {
-        if (e.getCode() != 404) {
+      } catch (WebClientResponseException e) {
+        if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
           log.error("Exception while getting the HTML visualizer configuration", e);
         }
       } catch (IOException e) {

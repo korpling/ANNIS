@@ -17,15 +17,14 @@ package org.corpus_tools.annis.gui.admin.model;
 import com.google.common.collect.ImmutableSet;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.AdministrationApi;
 import org.corpus_tools.annis.api.model.Group;
 import org.corpus_tools.annis.gui.CaseSensitiveOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * A model for groups.
@@ -52,7 +51,7 @@ public class GroupManagement implements Serializable {
       try {
         api.putGroup(newGroup.getName(), newGroup);
         groups.put(newGroup.getName(), newGroup);
-      } catch (ApiException ex) {
+      } catch (WebClientResponseException ex) {
         log.warn("Could not update group", ex);
       }
 
@@ -65,7 +64,7 @@ public class GroupManagement implements Serializable {
       try {
         api.deleteGroup(groupName);
         groups.remove(groupName);
-      } catch (ApiException ex) {
+      } catch (WebClientResponseException ex) {
         log.warn("Could not update group", ex);
       }
 
@@ -78,12 +77,11 @@ public class GroupManagement implements Serializable {
       groups.clear();
       try {
 
-        List<Group> list = api.listGroups();
-        for (Group g : list) {
+        for (Group g : api.listGroups().toIterable()) {
           groups.put(g.getName(), g);
         }
         return true;
-      } catch (ApiException ex) {
+      } catch (WebClientResponseException ex) {
         log.error("Could not get the list of groups", ex);
       }
     }

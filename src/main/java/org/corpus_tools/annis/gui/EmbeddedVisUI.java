@@ -16,7 +16,6 @@ package org.corpus_tools.annis.gui;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
-import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Widgetset;
@@ -31,10 +30,12 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -46,7 +47,6 @@ import java.util.Optional;
 import javax.servlet.ServletContext;
 import javax.xml.stream.XMLStreamException;
 import okhttp3.Request;
-import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -69,6 +69,7 @@ import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SNode;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,41 +85,57 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2Clien
 @Widgetset("org.corpus_tools.annis.gui.widgets.gwt.AnnisWidgetSet")
 public class EmbeddedVisUI extends CommonUI {
 
-  private class GraphMLLoaderCallback implements FutureCallback<File> {
+  private class GraphMLLoaderCallback implements org.reactivestreams.Subscriber<File> {
 
     private final String corpusNodeId;
     private final VisualizerPlugin visPlugin;
     private final Map<String, String[]> args;
+    private final UI ui;
 
     GraphMLLoaderCallback(String corpusNodeId, VisualizerPlugin visPlugin,
-        Map<String, String[]> args) {
+        Map<String, String[]> args, UI ui) {
       this.visPlugin = visPlugin;
       this.args = args;
       this.corpusNodeId = corpusNodeId;
+      this.ui = ui;
     }
 
-    @Override
-    public void onFailure(Throwable t) {
-      log.error("Could not query graph for embedded visualization.", t);
-      displayMessage("Could not query the result.", t.getMessage());
-    }
 
     @Override
-    public void onSuccess(File result) {
+    public void onNext(File item) {
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
         org.eclipse.emf.common.util.URI docURI =
             org.eclipse.emf.common.util.URI.createURI("salt:/" + corpusNodeId);
         SDocument doc = cg.createDocument(docURI);
-        SDocumentGraph docGraph = DocumentGraphMapper.map(result);
+        SDocumentGraph docGraph = DocumentGraphMapper.map(item);
         doc.setDocumentGraph(docGraph);
 
-        generateVisualizerFromDocument(doc, args, visPlugin);
+        ui.access(() -> generateVisualizerFromDocument(doc, args, visPlugin));
       } catch (IOException | XMLStreamException ex) {
         log.error("Could not parse GraphML", ex);
         displayMessage("Could not parse GraphML", ex.toString());
       }
+
+    }
+
+    @Override
+    public void onError(Throwable t) {
+      log.error("Could not query graph for embedded visualization.", t);
+      ui.access(() -> displayMessage("Could not query the result.", t.getMessage()));
+    }
+
+    @Override
+    public void onComplete() {
+      // Nothing to do
+    }
+
+
+    @Override
+    public void onSubscribe(Subscription s) {
+      // TODO Auto-generated method stub
+
     }
   }
 
@@ -229,10 +246,11 @@ public class EmbeddedVisUI extends CommonUI {
       boolean isUsingRawText = visPlugin.get().isUsingRawText();
       String aql = Helper.buildDocumentQuery(corpusNodeId, null, isUsingRawText);
 
-      Background.runWithCallback(
-          () -> api.subgraphForQuery(toplevelCorpus, aql, QueryLanguage.AQL, null),
-          new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args));
-
+      GraphMLLoaderCallback callback =
+          new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args, UI.getCurrent());
+      
+      api.subgraphForQuery(toplevelCorpus, aql, QueryLanguage.AQL, null).subscribe(callback);
+      
 
     } else {
       SubgraphWithContext subgraphQuery = new SubgraphWithContext();
@@ -245,9 +263,8 @@ public class EmbeddedVisUI extends CommonUI {
       } else {
         subgraphQuery.setSegmentation(null);
       }
-      Background.runWithCallback(
-          () -> api.subgraphForNodes(toplevelCorpus, subgraphQuery),
-          new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args));
+      GraphMLLoaderCallback callback = new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args, UI.getCurrent());
+      api.subgraphForNodes(toplevelCorpus, subgraphQuery).subscribe(callback);
     }
   }
 
@@ -362,36 +379,27 @@ public class EmbeddedVisUI extends CommonUI {
         final Map<String, String[]> argsCopy = new LinkedHashMap<>(args);
         Request request = new okhttp3.Request.Builder().url(uri.toASCIIString()).build();
 
-        Background.runWithCallback(() -> client.getHttpClient().newCall(request).execute(),
-            new FutureCallback<Response>() {
-              @Override
-              public void onFailure(Throwable t) {
-                log.error("Could not query Salt graph for embedded visualization.", t);
-                displayMessage("Could not query the result.", t.getMessage());
-              }
-
-              @Override
-              public void onSuccess(Response response) {
-                try {
-                  File tmpFile = File.createTempFile("embeddded-vis-fetched-result-", ".salt");
-                  try (FileOutputStream out = new FileOutputStream(tmpFile)) {
-                    IOUtils.copy(response.body().byteStream(), out);
-                  } catch (IOException ex) {
-                    log.error("Could not copy fetched GraphML file:", ex);
-                  }
-
-                  SDocument doc = SaltFactory.createSDocument();
-                  doc.loadDocumentGraph(
-                      org.eclipse.emf.common.util.URI.createFileURI(tmpFile.getAbsolutePath()));
-                  generateVisualizerFromDocument(doc, argsCopy, visPlugin);
-
+        final UI ui = UI.getCurrent();
+        client.getWebClient().get().uri(uri).retrieve().toEntity(InputStream.class)
+            .subscribe(body -> ui.access(() -> {
+              try {
+                File tmpFile = File.createTempFile("embeddded-vis-fetched-result-", ".salt");
+                try (FileOutputStream out = new FileOutputStream(tmpFile)) {
+                  IOUtils.copy(body.getBody(), out);
                 } catch (IOException ex) {
-                  log.error("Could not parse Salt XML", ex);
-                  displayMessage("Could not parse Salt XML", ex.toString());
+                  log.error("Could not copy fetched GraphML file:", ex);
                 }
-              }
 
-            });
+                SDocument doc = SaltFactory.createSDocument();
+                doc.loadDocumentGraph(
+                    org.eclipse.emf.common.util.URI.createFileURI(tmpFile.getAbsolutePath()));
+                generateVisualizerFromDocument(doc, argsCopy, visPlugin);
+
+              } catch (IOException ex) {
+                log.error("Could not parse Salt XML", ex);
+                displayMessage("Could not parse Salt XML", ex.toString());
+              }
+            }));
       } else {
         displayMessage("Unknown visualizer \"" + visName + "\"",
             "This ANNIS instance does not know the given visualizer.");

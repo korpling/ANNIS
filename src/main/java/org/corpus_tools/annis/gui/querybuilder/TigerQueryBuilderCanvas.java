@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.gui.Helper;
@@ -42,6 +41,7 @@ import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.widgets.GripDragComponent;
 import org.corpus_tools.annis.gui.widgets.SimpleCanvas;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -320,10 +320,10 @@ public class TigerQueryBuilderCanvas extends Panel {
     if (corpusSelection != null) {
       for (String corpus : corpusSelection) {
         try {
-          for (Annotation anno : api.nodeAnnotations(corpus, false, true)) {
+          for (Annotation anno : api.nodeAnnotations(corpus, false, true).toIterable()) {
             result.add(anno.getKey().getName());
           }
-        } catch (ApiException ex) {
+        } catch (WebClientResponseException ex) {
           log.error("Could not get node annotations for corpus " + corpus, ex);
         }
       }

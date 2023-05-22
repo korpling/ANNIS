@@ -34,7 +34,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
@@ -46,6 +45,7 @@ import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /*
  * @author martin klotz (martin.klotz@hu-berlin.de)
@@ -335,14 +335,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         try {
             List<Annotation> atts = new LinkedList<>();
             for (String corpus : corpusSelection) {
-                atts.addAll(api.nodeAnnotations(corpus, true, false));
+              atts.addAll(api.nodeAnnotations(corpus, true, false).collectList().block());
             }
             for (Annotation a : atts) {
                 if (a.getKey().getName().equals(meta)) {
                     result.add(a.getVal());
                 }
             }
-        } catch (ApiException ex) {
+          } catch (WebClientResponseException ex) {
             log.error(null, ex);
         }
 
@@ -350,21 +350,21 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
     }
 
     public Set<String> getAvailableAnnotationNames() {
-        Set<String> result = new TreeSet<>();
-        // get current corpus selection
-        Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
-        CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
-        try {
-            for (String corpus : corpusSelection) {
-                for (Annotation a : api.nodeAnnotations(corpus, false, false)) {
-                    result.add(a.getKey().getName());
-                }
-            }
-        } catch (ApiException ex) {
-            log.error(null, ex);
+      Set<String> result = new TreeSet<>();
+      // get current corpus selection
+      Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
+      CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
+      try {
+        for (String corpus : corpusSelection) {
+          for (Annotation a : api.nodeAnnotations(corpus, false, false).toIterable()) {
+            result.add(a.getKey().getName());
+          }
         }
-        result.add("tok");
-        return result;
+      } catch (WebClientResponseException ex) {
+        log.error(null, ex);
+      }
+      result.add("tok");
+      return result;
     }
 
     public Set<String> getAvailableMetaNames() {
@@ -378,7 +378,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                 }
             }
 
-        } catch (ApiException ex) {
+          } catch (WebClientResponseException ex) {
             log.error(null, ex);
         }
 

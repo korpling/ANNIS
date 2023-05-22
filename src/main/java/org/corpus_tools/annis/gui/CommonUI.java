@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Optional;
 import javax.servlet.ServletContext;
 import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.gui.components.SettingsStorage;
 import org.corpus_tools.annis.gui.requesthandler.ResourceRequestHandler;
 import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
@@ -30,9 +29,11 @@ import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -175,8 +176,6 @@ public abstract class CommonUI extends AnnisBaseUI {
     
     public abstract ApiClient getClient();
 
-
-
     /**
      * Handle common errors like database/service connection problems and display a unified error
      * message.
@@ -194,10 +193,10 @@ public abstract class CommonUI extends AnnisBaseUI {
           rootCause = rootCause.getCause();
         }
 
-        if (rootCause instanceof ApiException) {
-          ApiException apiEx = (ApiException) rootCause;
+        if (rootCause instanceof WebClientResponseException) {
+          WebClientResponseException apiEx = (WebClientResponseException) rootCause;
 
-          if (apiEx.getCode() == 503) {
+          if (apiEx.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
             // database connection error
             Notification n = new Notification(
                 "Can't execute " + (action == null ? "" : "\"" + action + "\"")
@@ -214,7 +213,7 @@ public abstract class CommonUI extends AnnisBaseUI {
 
             n.show(this.getPage());
             return true;
-          } else if (apiEx.getCode() == 401) {
+          } else if (apiEx.getStatusCode() == HttpStatus.UNAUTHORIZED) {
             redirectToLogin();
             return true;
           }

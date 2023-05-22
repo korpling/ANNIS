@@ -32,13 +32,11 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
-import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -48,6 +46,8 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.hibernate.cache.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * An abstract base class for exporters that use Salt subgraphs to some kind of matrix output
@@ -71,7 +71,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
    * @param args
    * @param offset
    */
-  private void processFirstPass(SaltProject p, Map<String, String> args, int offset, int nodeCount)
+  private void processFirstPass(SaltProject p, Map<String, String> args, int offset, long nodeCount)
       throws IOException {
     int recordNumber = offset;
     if (p != null && p.getCorpusGraphs() != null) {
@@ -92,11 +92,11 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     for (String corpus : corpora) {
       try {
         if (corporaApi.components(corpus, AnnotationComponentType.ORDERING.getValue(), segmentation)
-            .isEmpty()) {
+            .count().block() == 0) {
           return false;
         }
-      } catch (ApiException ex) {
-        if (ex.getCode() == 403) {
+      } catch (WebClientResponseException ex) {
+        if (ex.getStatusCode() == HttpStatus.FORBIDDEN) {
           log.debug("Did not have access rights to query segmentation names for corpus", ex);
         } else {
           log.warn("Could not query segmentation names for corpus", ex);
@@ -142,12 +142,10 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     query.setQueryLanguage(queryLanguage);
     query.setQuery(queryAnnisQL);
     try {
-      File matches = searchApi.find(query);
+      File matches = searchApi.find(query).block();
 
       // Get the node count for the query by parsing it
-      List<QueryAttributeDescription> nodeDescriptions =
-          searchApi.nodeDescriptions(queryAnnisQL, queryLanguage);
-      Integer nodeCount = nodeDescriptions.size();
+      Long nodeCount = searchApi.nodeDescriptions(queryAnnisQL, queryLanguage).count().block();
 
       List<Integer> listOfKeys = new ArrayList<>();
 
@@ -211,7 +209,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
 
       return null;
 
-    } catch (ApiException | IOException | CacheException | IllegalStateException
+    } catch (WebClientResponseException | IOException | CacheException | IllegalStateException
         | ClassCastException | XMLStreamException ex) {
       return ex;
     }
@@ -219,7 +217,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   }
 
   public abstract void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args,
-      int recordNumber, int nodeCount) throws IOException;
+      int recordNumber, long nodeCount) throws IOException;
 
   /**
    * Specifies the ending of export file.

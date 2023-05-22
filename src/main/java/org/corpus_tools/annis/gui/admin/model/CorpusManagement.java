@@ -16,13 +16,14 @@ package org.corpus_tools.annis.gui.admin.model;
 import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.util.TreeSet;
-import javax.ws.rs.core.Response;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.ServiceQueryException;
+import org.corpus_tools.api.PatchedCorporaApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * A model that handles the corpus list
@@ -49,10 +50,10 @@ public class CorpusManagement implements Serializable {
       CorporaApi api = new CorporaApi(clientProvider.getClient());
       try {
         api.deleteCorpus(corpusName);
-      } catch (ApiException ex) {
-        if (ex.getCode() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+      } catch (WebClientResponseException ex) {
+        if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
           throw new CriticalServiceQueryException("You are not authorized to delete a corpus");
-        } else if (ex.getCode() == Response.Status.NOT_FOUND.getStatusCode()) {
+        } else if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
           throw new ServiceQueryException("Corpus with name " + corpusName + " not found");
         } else {
           log.error(null, ex);
@@ -67,11 +68,11 @@ public class CorpusManagement implements Serializable {
     if (clientProvider != null) {
       corpora.clear();
 
-      CorporaApi api = new CorporaApi(clientProvider.getClient());
+      PatchedCorporaApi api = new PatchedCorporaApi(clientProvider.getClient());
       try {
-        corpora.addAll(api.listCorpora());
-      } catch (ApiException ex) {
-        if (ex.getCode() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+        corpora.addAll(api.listCorporaAsMono().block());
+      } catch (WebClientResponseException ex) {
+        if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
           throw new CriticalServiceQueryException("You are not authorized to get the corpus list.");
         } else {
           log.error(null, ex);

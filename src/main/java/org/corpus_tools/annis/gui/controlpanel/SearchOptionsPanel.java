@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
@@ -46,6 +45,8 @@ import org.corpus_tools.annis.gui.objects.CorpusConfigMap;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -140,13 +141,14 @@ public class SearchOptionsPanel extends FormLayout {
     for (String corpus : corpora) {
       try {
         // Get all ordering components
-        for(Component c : corporaApi.components(corpus, AnnotationComponentType.ORDERING.getValue(), null)) {
+        for (Component c : corporaApi
+            .components(corpus, AnnotationComponentType.ORDERING.getValue(), null).toIterable()) {
           if (!c.getName().isEmpty() && !"annis".equals(c.getLayer())) {
             segNames.add(c.getName());
           }
         }
-      } catch (ApiException ex) {
-        if (ex.getCode() == 403) {
+      } catch (WebClientResponseException ex) {
+        if (ex.getStatusCode() == HttpStatus.FORBIDDEN) {
           log.debug("Did not have access rights to query segmentation names for corpus", ex);
         } else {
           log.warn("Could not query segmentation names for corpus", ex);

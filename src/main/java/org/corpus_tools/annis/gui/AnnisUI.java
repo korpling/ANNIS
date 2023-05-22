@@ -53,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * GUI for searching in corpora.
@@ -91,6 +92,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   @Autowired
   private UIConfig config;
+
+  @Autowired
+  private WebClient webClient;
+
 
   private final AuthenticationSuccessListener authListener;
 
@@ -262,6 +267,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Override
   public ApiClient getClient() {
     return new AutoTokenRefreshClient(this, this.getAuthListener());
+  }
+
+  public WebClient getWebClient() {
+    return webClient;
   }
 
 

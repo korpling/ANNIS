@@ -1,13 +1,24 @@
 package org.corpus_tools.annis.gui.security;
 
+import java.util.Optional;
+import org.corpus_tools.annis.gui.UIConfig;
 import org.springframework.boot.autoconfigure.condition.NoneNestedConditions;
 import org.springframework.boot.autoconfigure.security.oauth2.client.ClientsConfiguredCondition;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizedClientManager;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServletOAuth2AuthorizedClientExchangeFilterFunction;
+import org.springframework.web.reactive.function.client.WebClient;
 
 
 @Configuration
@@ -51,7 +62,7 @@ public class SecurityConfiguration {
     public void configure(WebSecurity web) {
       ignoreVaadinWebSecurity(web);
     }
-    
+
   }
 
   @EnableWebSecurity
@@ -68,6 +79,40 @@ public class SecurityConfiguration {
     public void configure(WebSecurity web) {
       ignoreVaadinWebSecurity(web);
     }
+  }
+
+  @Bean
+  WebClient webClient(UIConfig config,
+      Optional<OAuth2AuthorizedClientManager> authorizedClientManager) {
+    Optional<ServletOAuth2AuthorizedClientExchangeFilterFunction> filter =
+        authorizedClientManager.map(acm -> {
+          ServletOAuth2AuthorizedClientExchangeFilterFunction result =
+              new ServletOAuth2AuthorizedClientExchangeFilterFunction(acm);
+
+          result.setDefaultClientRegistrationId("annis");
+          return result;
+        });
+    WebClient.Builder builder = WebClient.builder().baseUrl(config.getWebserviceUrl());
+    if (filter.isPresent()) {
+      builder = builder.filter(filter.get());
+    }
+    return builder.build();
+  }
+
+  @Bean
+  @Conditional(ClientsConfiguredCondition.class)
+  public OAuth2AuthorizedClientManager authorizedClientManager(
+      ClientRegistrationRepository clientRegistrationRepository,
+      OAuth2AuthorizedClientRepository authorizedClientRepository) {
+
+    OAuth2AuthorizedClientProvider authorizedClientProvider =
+        OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build();
+
+    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+        new DefaultOAuth2AuthorizedClientManager(clientRegistrationRepository,
+            authorizedClientRepository);
+    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+    return authorizedClientManager;
   }
 
   private static void ignoreVaadinWebSecurity(WebSecurity web) {

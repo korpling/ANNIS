@@ -11,17 +11,17 @@ import java.awt.FontFormatException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
-import org.corpus_tools.annis.gui.visualizers.component.pdf.PDFPanel;
+import org.corpus_tools.api.PatchedCorporaApi;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.samples.SampleGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
 
 class PDFPanelTest {
 
@@ -41,7 +41,7 @@ class PDFPanelTest {
   }
 
   @Test
-  void testBinaryPathOneFile() throws ApiException {
+  void testBinaryPathOneFile() throws WebClientResponseException {
     SCorpusGraph corpusGraph = SampleGenerator.createCorpusStructure();
     SDocument doc = corpusGraph.getDocuments().get(0);
     
@@ -49,16 +49,16 @@ class PDFPanelTest {
     when(input.getContextPath()).thenReturn("/context");
 
     // Make sure the document has an assigned PDF file
-    CorporaApi api = mock(CorporaApi.class);
-    when(api.listFiles(anyString(), anyString()))
-        .thenReturn(Arrays.asList("notapdf.webm", "test.pdf"));
+    PatchedCorporaApi api = mock(PatchedCorporaApi.class);
+    when(api.listFilesAsMono(anyString(), anyString()))
+        .thenReturn(Mono.just(Arrays.asList("notapdf.webm", "test.pdf")));
 
     assertEquals("/context/Binary?toplevelCorpusName=rootCorpus&file=test.pdf",
         fixture.getBinaryPath(api));
   }
 
   @Test
-  void testBinaryPathNoFile() throws ApiException {
+  void testBinaryPathNoFile() throws WebClientResponseException {
     SCorpusGraph corpusGraph = SampleGenerator.createCorpusStructure();
     SDocument doc = corpusGraph.getDocuments().get(0);
 
@@ -66,14 +66,14 @@ class PDFPanelTest {
     when(input.getContextPath()).thenReturn("/context");
 
     // Make sure the document has an assigned PDF file
-    CorporaApi api = mock(CorporaApi.class);
-    when(api.listFiles(anyString(), anyString())).thenReturn(new LinkedList<>());
+    PatchedCorporaApi api = mock(PatchedCorporaApi.class);
+    when(api.listFilesAsMono(anyString(), anyString())).thenReturn(Mono.just(new LinkedList<>()));
 
     assertEquals("", fixture.getBinaryPath(api));
   }
 
   @Test
-  void testBinaryPathApiExceptionThrown() throws ApiException
+  void testBinaryPathApiExceptionThrown() throws WebClientResponseException
   {
     SCorpusGraph corpusGraph = SampleGenerator.createCorpusStructure();
     SDocument doc = corpusGraph.getDocuments().get(0);
@@ -84,9 +84,9 @@ class PDFPanelTest {
     when(input.getUI()).thenReturn(ui);
 
     // Make sure the document has an assigned PDF file
-    CorporaApi api = mock(CorporaApi.class);
-    when(api.listFiles(anyString(), anyString()))
-        .thenThrow(new ApiException("Invalid Network Access"));
+    PatchedCorporaApi api = mock(PatchedCorporaApi.class);
+    when(api.listFilesAsMono(anyString(), anyString()))
+        .thenThrow(new WebClientResponseException(500, "Invalid Network Access", null, null, null));
 
     assertEquals("", fixture.getBinaryPath(api));
     verify(ui).addWindow(any(ExceptionDialog.class));
