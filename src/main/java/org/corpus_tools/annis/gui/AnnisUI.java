@@ -45,7 +45,6 @@ import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.querybuilder.QueryBuilderPlugin;
 import org.corpus_tools.annis.gui.requesthandler.BinaryRequestHandler;
 import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
-import org.corpus_tools.annis.gui.security.AutoTokenRefreshClient;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
 import org.slf4j.LoggerFactory;
@@ -266,7 +265,9 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   @Override
   public ApiClient getClient() {
-    return new AutoTokenRefreshClient(this, this.getAuthListener());
+    ApiClient result = new ApiClient(webClient);
+    result.setBasePath(getConfig().getWebserviceUrl());
+    return result;
   }
 
   public WebClient getWebClient() {

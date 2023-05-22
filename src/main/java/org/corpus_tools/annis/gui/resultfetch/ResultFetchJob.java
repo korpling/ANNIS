@@ -102,7 +102,8 @@ public class ResultFetchJob implements Runnable {
       q.setQueryLanguage(query.getApiQueryLanguage());
       q.setOrder(query.getOrder());
 
-      Flux<DataBuffer> response = ui.getWebClient().post().uri("/search/find")
+      Flux<DataBuffer> response =
+          ui.getWebClient().post().uri(ui.getConfig().getWebserviceUrl() + "/search/find")
           .accept(MediaType.TEXT_PLAIN).retrieve()
           .bodyToFlux(DataBuffer.class);
       
