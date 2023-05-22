@@ -427,20 +427,6 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.corpus-tools</groupId>
-            <artifactId>salt-api</artifactId>
-            <version>3.4.2</version>
-            <exclusions>
-                <!-- Salt uses non-GWT version of Guava, which will fail with our widgetset -->
-                <exclusion>
-                    <groupId>com.google.guava</groupId>
-                    <artifactId>guava</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
