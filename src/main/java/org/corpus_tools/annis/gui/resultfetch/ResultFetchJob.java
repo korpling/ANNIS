@@ -102,11 +102,12 @@ public class ResultFetchJob implements Runnable {
       q.setQueryLanguage(query.getApiQueryLanguage());
       q.setOrder(query.getOrder());
 
+
       Flux<DataBuffer> response =
           ui.getWebClient().post().uri(ui.getConfig().getWebserviceUrl() + "/search/find")
-          .accept(MediaType.TEXT_PLAIN).retrieve()
-          .bodyToFlux(DataBuffer.class);
-      
+              .contentType(MediaType.APPLICATION_JSON).bodyValue(q).accept(MediaType.TEXT_PLAIN)
+              .retrieve().bodyToFlux(DataBuffer.class);
+
       File findResult = File.createTempFile("annis-result", ".txt");
       DataBufferUtils.write(response, findResult.toPath()).block();
 
@@ -162,7 +163,7 @@ public class ResultFetchJob implements Runnable {
       } // end if no results
 
     } catch (final WebClientResponseException ex) {
-      log.error("Could execute find query", ex);
+      log.error("Could not execute find query", ex);
       ui.access(() -> {
         if (resultPanel != null && resultPanel.getPaging() != null) {
           PagingComponent paging = resultPanel.getPaging();
@@ -192,7 +193,7 @@ public class ResultFetchJob implements Runnable {
 
         }
       });
-    } catch(IOException ex) {
+    } catch (IOException ex) {
       ui.access(() -> ExceptionDialog.show(ex, ui));
     }
   }
