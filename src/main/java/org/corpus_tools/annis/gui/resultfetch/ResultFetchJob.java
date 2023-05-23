@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
@@ -78,8 +77,6 @@ public class ResultFetchJob implements Runnable {
 
   @Override
   public void run() {
-
-    CorporaApi corpora = new CorporaApi(Helper.getClient(ui));
 
     // holds the ids of the matches.
     MatchGroup result = new MatchGroup();
@@ -150,7 +147,7 @@ public class ResultFetchJob implements Runnable {
           arg.setSegmentation(query.getSegmentation());
           arg.setNodeIds(m.getSaltIDs().stream().collect(Collectors.toList()));
 
-          SaltProject p = createSaltFromMatch(m, arg, current, corpora);
+          SaltProject p = createSaltFromMatch(m, arg, current);
           ui.access(() -> resultPanel.addQueryResult(query, p, matchList));
 
 
@@ -198,14 +195,22 @@ public class ResultFetchJob implements Runnable {
     }
   }
 
-  private SaltProject createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber,
-      CorporaApi api) throws WebClientResponseException {
+  private SaltProject createSaltFromMatch(Match m, SubgraphWithContext arg, int currentMatchNumber) throws WebClientResponseException, IOException {
     List<String> corpusPathRaw = Helper.getCorpusPath(m.getSaltIDs().get(0), false);
     List<String> corpusPathDecoded = Helper.getCorpusPath(m.getSaltIDs().get(0), true);
     final SaltProject p = SaltFactory.createSaltProject();
 
     if (!corpusPathRaw.isEmpty()) {
-      File graphML = api.subgraphForNodes(corpusPathDecoded.get(0), arg).block();
+      Flux<DataBuffer> response =
+          ui.getWebClient().post()
+              .uri(ui.getConfig().getWebserviceUrl() + "/corpora/{corpus}/subgraph",
+                  corpusPathDecoded.get(0))
+              .contentType(MediaType.APPLICATION_JSON).bodyValue(arg)
+              .accept(MediaType.APPLICATION_XML)
+              .retrieve().bodyToFlux(DataBuffer.class);
+      File graphML = File.createTempFile("annis-subgraph", ".salt");
+      DataBufferUtils.write(response, graphML.toPath()).block();
+
       try {
 
         final SCorpusGraph cg = p.createCorpusGraph();
