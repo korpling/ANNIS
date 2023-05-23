@@ -309,7 +309,6 @@
                                 <dateLibrary>java8</dateLibrary>
                                 <openApiNullable>false</openApiNullable>
                                 <generateClientAsBean>true</generateClientAsBean>
-                                <withXml>true</withXml>
                             </configOptions>
                             <additionalProperties>serializableModel=true</additionalProperties>
                         </configuration>
