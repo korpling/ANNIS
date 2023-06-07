@@ -271,6 +271,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
               && !isSignalNode(sNode)
               && !isSecondaryEdgeNode(sNode)) {
         rstRoots.add(sNode);
+
       }
     }
 
@@ -362,7 +363,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     signal.put("subtype", node.getAnnotation("default_ns", "signal_subtype").getValue());
     JSONArray indexes = new JSONArray();
     SAnnotation indexesAnn = node.getAnnotation("default_ns", "signal_indexes");
-    if (indexesAnn != null) {
+    if (indexesAnn != null && ((String) indexesAnn.getValue()).length() > 0) {
       for (String index : ((String) indexesAnn.getValue()).split(" ")) {
         indexes.put(index);
       }
