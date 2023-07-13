@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
-import org.apache.http.concurrent.Cancellable;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.exporter.CSVExporter;
@@ -34,6 +33,7 @@ import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.frequency.UserGeneratedFrequencyEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reactor.core.Disposable;
 
 /**
  * Helper class to bundle all query relevant state information of the UI.
@@ -79,7 +79,7 @@ public class QueryUIState implements Serializable {
 
   private transient Map<QueryType, Future<?>> executedTasks;
 
-  private transient Map<QueryType, Cancellable> executedCalls;
+  private transient Map<QueryType, Disposable> executedCalls;
 
   private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition =
       new BeanContainer<>(UserGeneratedFrequencyEntry.class);
@@ -110,7 +110,7 @@ public class QueryUIState implements Serializable {
     return executedTasks;
   }
 
-  public Map<QueryType, Cancellable> getExecutedCalls() {
+  public Map<QueryType, Disposable> getExecutedCalls() {
     return executedCalls;
   }
 

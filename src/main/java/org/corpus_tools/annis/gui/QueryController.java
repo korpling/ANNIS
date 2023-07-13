@@ -73,6 +73,7 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.Disposable;
 
 /**
  * A controller to modifiy the query UI state. s
@@ -430,9 +431,19 @@ public class QueryController implements Serializable {
       try {
         CountCallback callback =
             new CountCallback(newResultView, displayedQuery.getLimit(), annisUI);
-        api.count(countQuery).single().subscribe(callback);
+        Disposable countDisposable = api.count(countQuery).doOnNext(callback).doOnError(t -> {
+          annisUI.access(() -> {
+            annisUI.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
+            if (t instanceof WebClientResponseException) {
+              annisUI.getQueryController().reportServiceException((WebClientResponseException) t,
+                  true);
+            } else {
+              log.error("Could not get count result", t);
+            }
+          });
+        }).single().subscribe();
 
-        state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, callback);
+        state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, countDisposable);
       } catch (WebClientResponseException ex) {
         ExceptionDialog.show(ex, ui);
       }

@@ -13,22 +13,20 @@
  */
 package org.corpus_tools.annis.gui.controller;
 
-import org.apache.http.concurrent.Cancellable;
+import java.util.function.Consumer;
 import org.corpus_tools.annis.api.model.CountExtra;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
-import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CountCallback implements Subscriber<CountExtra>, Cancellable {
+public class CountCallback implements Consumer<CountExtra> {
 
   private static final Logger log = LoggerFactory.getLogger(CountCallback.class);
 
@@ -42,14 +40,8 @@ public class CountCallback implements Subscriber<CountExtra>, Cancellable {
     this.pageSize = pageSize;
     this.ui = ui;
   }
-
   @Override
-  public void onSubscribe(Subscription s) {
-    this.subscription = s;
-  }
-
-  @Override
-  public void onNext(CountExtra result) {
+  public void accept(CountExtra result) {
     ui.access(() -> {
       ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
 
@@ -63,37 +55,7 @@ public class CountCallback implements Subscriber<CountExtra>, Cancellable {
       }
       ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
     });
-  }
 
-  @Override
-    public void onError(Throwable t) {
-      ui.access(() -> {
-        ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
-        if (t instanceof WebClientResponseException) {
-          ui.getQueryController().reportServiceException((WebClientResponseException) t, true);
-        } else {
-          log.error("Could not get count result", t);
-        }
-      });
-    }
-
-  @Override
-  public void onComplete() {
-    // nothing to do
-  }
-
-  public Subscription getSubscription() {
-    return subscription;
-  }
-
-  @Override
-  public boolean cancel() {
-    if (subscription == null) {
-      return false;
-    } else {
-      subscription.cancel();
-      return true;
-    }
   }
 
 }
