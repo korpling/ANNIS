@@ -13,9 +13,10 @@
  */
 package org.corpus_tools.annis.gui;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.gson.Gson;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.FontAwesome;
@@ -513,9 +514,15 @@ public class QueryController implements Serializable {
       switch (ex.getStatusCode()) {
         case BAD_REQUEST:
 
-          Gson gson = new Gson();
-          BadRequestError error =
-              gson.fromJson(ex.getResponseBodyAsString(), BadRequestError.class);
+          ObjectMapper mapper = new ObjectMapper();
+          BadRequestError error = new BadRequestError();
+          try {
+            error = mapper.readValue(ex.getResponseBodyAsString(), BadRequestError.class);
+          } catch (JsonProcessingException parseEx) {
+            ui.access(() -> {
+              ExceptionDialog.show(parseEx, "Could not parse response from server", ui);
+            });
+          }
 
           caption = "Parsing error";
           if (error.getAqLSyntaxError() != null) {
