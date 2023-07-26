@@ -718,7 +718,12 @@ public class Helper {
       }
       final File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL,
           AnnotationComponentType.PARTOF);
-      return CorpusGraphMapper.map(graphML);
+      SCorpusGraph result = CorpusGraphMapper.map(graphML);
+      if (Files.deleteIfExists(graphML.toPath())) {
+        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+            graphML.getPath());
+      }
+      return result;
     } catch (ApiException | XMLStreamException | IOException ex) {
       log.error(null, ex);
       ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
@@ -748,6 +753,10 @@ public class Helper {
           QueryLanguage.AQL, AnnotationComponentType.PARTOF);
 
       final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
+      if (Files.deleteIfExists(graphML.toPath())) {
+        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+            graphML.getPath());
+      }
 
       for (final SNode n : cg.getNodes()) {
         result.addAll(n.getMetaAnnotations());
