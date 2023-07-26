@@ -28,6 +28,7 @@ import com.vaadin.v7.ui.themes.ChameleonTheme;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
@@ -45,12 +46,16 @@ import org.corpus_tools.annis.gui.objects.DocumentBrowserConfig;
 import org.corpus_tools.annis.gui.objects.Visualizer;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class DocBrowserPanel extends Panel {
+
+  private static final Logger log = LoggerFactory.getLogger(DocBrowserPanel.class);
 
   private class LoadingDocs implements Runnable {
 
@@ -63,6 +68,10 @@ public class DocBrowserPanel extends Panel {
         File graphML = api.subgraphForQuery(corpus, "annis:node_type=\"corpus\"",
             QueryLanguage.AQL, AnnotationComponentType.PARTOF);
         SCorpusGraph graph = CorpusGraphMapper.map(graphML);
+        if (Files.deleteIfExists(graphML.toPath())) {
+          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+              graphML.getPath());
+        }
         List<SDocument> docs = graph.getDocuments();
 
         ui.access(() -> {

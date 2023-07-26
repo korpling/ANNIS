@@ -28,6 +28,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -408,6 +409,10 @@ public class VisualizerPanel extends CssLayout
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(documentPathRaw));
         SDocument doc = cg.createDocument(docURI);
         SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+        if (Files.deleteIfExists(graphML.toPath())) {
+          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+              graphML.getPath());
+        }
         doc.setDocumentGraph(docGraph);
 
         return p;
