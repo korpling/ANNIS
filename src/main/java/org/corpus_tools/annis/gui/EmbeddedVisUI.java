@@ -37,6 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -112,6 +113,11 @@ public class EmbeddedVisUI extends CommonUI {
             org.eclipse.emf.common.util.URI.createURI("salt:/" + corpusNodeId);
         SDocument doc = cg.createDocument(docURI);
         SDocumentGraph docGraph = DocumentGraphMapper.map(result);
+        if (Files.deleteIfExists(result.toPath())) {
+          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+              result.getPath());
+        }
+
         doc.setDocumentGraph(docGraph);
 
         generateVisualizerFromDocument(doc, args, visPlugin);

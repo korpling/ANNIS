@@ -199,6 +199,10 @@ public class ResultFetchJob implements Runnable {
         if (corpusPathRaw.size() > 1) {
           SDocument doc = cg.createDocument(docURI);
           SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+          if (Files.deleteIfExists(graphML.toPath())) {
+            log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+                graphML.getPath());
+          }
           doc.setDocumentGraph(docGraph);
           Helper.addMatchToDocumentGraph(m, doc.getDocumentGraph());
         } else if (corpusPathRaw.size() == 1) {

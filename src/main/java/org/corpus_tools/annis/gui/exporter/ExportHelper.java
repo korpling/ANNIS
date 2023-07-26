@@ -6,6 +6,7 @@ import com.google.common.base.Joiner;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,10 +31,15 @@ import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ExportHelper {
 
   public static final String SEGMENTATION_KEY = "segmentation";
+
+  private static final Logger log = LoggerFactory.getLogger(ExportHelper.class);
+
 
   private ExportHelper() {
     // Class with static helper functions should not be instantiated
@@ -146,10 +152,14 @@ public class ExportHelper {
       File graphML = corporaApi.subgraphForNodes(corpusNameForMatch, subgraphQuery);
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+      if (Files.deleteIfExists(graphML.toPath())) {
+        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+            graphML.getPath());
+      }
+
       SaltProject p = documentGraphToProject(docGraph, corpusPathForMatch);
       Helper.addMatchToDocumentGraph(parsedMatch, docGraph);
       recreateTimelineIfNecessary(p, corporaApi, corpusConfigs);
-
 
       return Optional.of(p);
     }
