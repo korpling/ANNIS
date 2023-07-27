@@ -42,6 +42,7 @@ import org.corpus_tools.annis.gui.admin.reflinks.ReferenceLinkEditor;
 import org.corpus_tools.annis.gui.admin.view.UIView;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  *
@@ -284,6 +285,11 @@ public class AdminView extends VerticalLayout
   @Override
   public ApiClient getClient() {
     return ui.getClient();
+  }
+
+  @Override
+  public WebClient getWebClient() {
+    return ui.getWebClient();
   }
 
 }

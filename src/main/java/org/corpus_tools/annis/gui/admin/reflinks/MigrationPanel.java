@@ -45,7 +45,7 @@ import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
-import org.corpus_tools.api.PatchedCorporaApi;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -302,9 +302,10 @@ public class MigrationPanel extends Panel
         .addPathSegment("query").addPathSegment("search").build();
 
     ApiClient apiClient = Helper.getClient(ui);
-    PatchedCorporaApi corporaApi = new PatchedCorporaApi(apiClient);
     SearchApi searchApi = new SearchApi(apiClient);
-    Set<String> knownCorpora = new HashSet<>(corporaApi.listCorporaAsMono().block());
+    List<String> queriedCorpora = ui.getWebClient().get().uri("/corpora").retrieve()
+        .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
+    Set<String> knownCorpora = new HashSet<>(queriedCorpora);
 
     Optional<OkHttpClient> client = createClient(serviceURL, username, password);
 

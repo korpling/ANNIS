@@ -116,7 +116,7 @@ public class ExampleQueriesPanel extends CssLayout {
             if (corpusNames != null && !corpusNames.isEmpty()) {
                 for (String c : corpusNames) {
                   CorpusConfiguration config =
-                      client.get().uri("/corpora/{corpus}/configuration/", c).retrieve()
+                      client.get().uri("/corpora/{corpus}/configuration", c).retrieve()
                           .bodyToMono(CorpusConfiguration.class).block();
                     if(config.getExampleQueries() != null) {
                         for (ExampleQuery q : config.getExampleQueries()) {

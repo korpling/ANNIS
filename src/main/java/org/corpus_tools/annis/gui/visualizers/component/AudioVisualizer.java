@@ -29,8 +29,9 @@ import org.corpus_tools.annis.gui.components.medialement.MediaElementPlayer;
 import org.corpus_tools.annis.gui.media.MediaController;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
-import org.corpus_tools.api.PatchedCorporaApi;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -58,10 +59,14 @@ public class AudioVisualizer extends AbstractVisualizer { // NO_UCD (unused code
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
 
-    PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(input.getUI()));
+    WebClient client = input.getUI().getWebClient();
     try {
-      List<String> files =
-          api.listFilesAsMono(corpusName, Joiner.on('/').join(Lists.reverse(corpusPath))).block();
+      List<String> files = client.get()
+          .uri(ub -> ub.path("/corpora/{corpus}/files")
+              .queryParam("node", Joiner.on('/').join(Lists.reverse(corpusPath))).build(corpusName))
+          .retrieve()
+          .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
+
       for (String f : files) {
         String guessedMimeType = tika.detect(f);
         if (guessedMimeType != null && guessedMimeType.startsWith("audio/")) {

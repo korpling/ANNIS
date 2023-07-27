@@ -17,6 +17,7 @@ import static org.corpus_tools.annis.gui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 import static org.corpus_tools.annis.gui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.vaadin.annotations.JavaScript;
@@ -27,7 +28,8 @@ import java.util.UUID;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
-import org.corpus_tools.api.PatchedCorporaApi;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -87,13 +89,13 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     setSizeUndefined();
 
     // set the state
-    getState().binaryURL = getBinaryPath(new PatchedCorporaApi(Helper.getClient(input.getUI())));
+    getState().binaryURL = getBinaryPath(input.getUI().getWebClient());
     getState().pdfID = getPDF_ID();
     getState().firstPage = firstPage;
     getState().lastPage = lastPage;
   }
 
-  protected String getBinaryPath(PatchedCorporaApi api) {
+  protected String getBinaryPath(WebClient client) {
     List<String> corpusPath =
         Helper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
@@ -101,7 +103,12 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     String corpusName = corpusPath.get(0);
 
     try {
-      for (String f : api.listFilesAsMono(corpusName, Joiner.on('/').join(corpusPath)).block()) {
+      List<String> files = client.get()
+          .uri(ub -> ub.path("/corpora/{corpus}/files")
+              .queryParam("node", Joiner.on('/').join(Lists.reverse(corpusPath))).build(corpusName))
+          .retrieve().bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
+
+      for (String f : files) {
         if (f.endsWith(".pdf")) {
           // Create an URL how to featch the PDF file
           return input.getContextPath() + "/Binary?" + "toplevelCorpusName="

@@ -2,32 +2,45 @@ package org.corpus_tools.annis.gui.visualizers.component.pdf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.awt.FontFormatException;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedList;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
-import org.corpus_tools.api.PatchedCorporaApi;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.samples.SampleGenerator;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 class PDFPanelTest {
 
   VisualizerInput input;
-
   PDFPanel fixture;
+  WebClient client;
+
+  static MockWebServer mockServer;
+
+  @BeforeAll
+  static void setUpClass() throws IOException {
+    mockServer = new MockWebServer();
+    mockServer.start();
+  }
+
+  @AfterAll
+  static void tearDownClass() throws IOException {
+    mockServer.shutdown();
+  }
 
   @BeforeEach
   void setup() throws FontFormatException, IOException {
@@ -38,6 +51,9 @@ class PDFPanelTest {
 
     // Create PDFPanel object to test
     fixture = new PDFPanel(input, "-1");
+
+    String baseUrl = String.format("http://localhost:%s", mockServer.getPort());
+    client = WebClient.create(baseUrl);
   }
 
   @Test
@@ -49,12 +65,11 @@ class PDFPanelTest {
     when(input.getContextPath()).thenReturn("/context");
 
     // Make sure the document has an assigned PDF file
-    PatchedCorporaApi api = mock(PatchedCorporaApi.class);
-    when(api.listFilesAsMono(anyString(), anyString()))
-        .thenReturn(Mono.just(Arrays.asList("notapdf.webm", "test.pdf")));
+    mockServer.enqueue(new MockResponse().setBody("[\"notapdf.webm\", \"test.pdf\"]")
+        .addHeader("Content-Type", "application/json"));
 
     assertEquals("/context/Binary?toplevelCorpusName=rootCorpus&file=test.pdf",
-        fixture.getBinaryPath(api));
+        fixture.getBinaryPath(client));
   }
 
   @Test
@@ -66,10 +81,10 @@ class PDFPanelTest {
     when(input.getContextPath()).thenReturn("/context");
 
     // Make sure the document has an assigned PDF file
-    PatchedCorporaApi api = mock(PatchedCorporaApi.class);
-    when(api.listFilesAsMono(anyString(), anyString())).thenReturn(Mono.just(new LinkedList<>()));
+    mockServer
+        .enqueue(new MockResponse().setBody("[]").addHeader("Content-Type", "application/json"));
 
-    assertEquals("", fixture.getBinaryPath(api));
+    assertEquals("", fixture.getBinaryPath(client));
   }
 
   @Test
@@ -84,11 +99,9 @@ class PDFPanelTest {
     when(input.getUI()).thenReturn(ui);
 
     // Make sure the document has an assigned PDF file
-    PatchedCorporaApi api = mock(PatchedCorporaApi.class);
-    when(api.listFilesAsMono(anyString(), anyString()))
-        .thenThrow(new WebClientResponseException(500, "Invalid Network Access", null, null, null));
+    mockServer.enqueue(new MockResponse().setResponseCode(500).setBody("Invalid Network Access"));
 
-    assertEquals("", fixture.getBinaryPath(api));
+    assertEquals("", fixture.getBinaryPath(client));
     verify(ui).addWindow(any(ExceptionDialog.class));
   }
 
