@@ -17,13 +17,13 @@ import com.google.common.collect.ImmutableList;
 import java.io.Serializable;
 import java.util.List;
 import java.util.TreeSet;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.ServiceQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -48,9 +48,10 @@ public class CorpusManagement implements Serializable {
   public void delete(String corpusName)
       throws CriticalServiceQueryException, ServiceQueryException {
     if (clientProvider != null) {
-      CorporaApi api = new CorporaApi(clientProvider.getClient());
+      WebClient client = clientProvider.getWebClient();
       try {
-        api.deleteCorpus(corpusName);
+        client.delete().uri("/corpora/{corpus}", corpusName).retrieve().bodyToMono(Void.class)
+            .block();
       } catch (WebClientResponseException ex) {
         if (ex.getStatusCode() == HttpStatus.UNAUTHORIZED) {
           throw new CriticalServiceQueryException("You are not authorized to delete a corpus");
