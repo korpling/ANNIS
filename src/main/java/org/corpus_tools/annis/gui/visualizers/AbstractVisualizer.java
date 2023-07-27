@@ -14,10 +14,10 @@
 package org.corpus_tools.annis.gui.visualizers;
 
 import com.vaadin.ui.Component;
-import com.vaadin.ui.UI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.salt.core.SNode;
 
 /**
@@ -36,7 +36,7 @@ public abstract class AbstractVisualizer implements VisualizerPlugin, FilteringV
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
-      String toplevelCorpusId, Map<String, String> mappings, UI ui) {
+      String toplevelCorpusId, Map<String, String> mappings, CommonUI ui) {
     return null;
   }
 

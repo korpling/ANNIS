@@ -24,7 +24,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import java.io.File;
 import java.io.IOException;
@@ -41,12 +40,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.api.model.VisualizerRule.VisibilityEnum;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
@@ -69,7 +68,12 @@ import org.corpus_tools.salt.core.SNode;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 /**
  * Controls the visibility of visualizer plugins and provides some control methods for the media
@@ -394,22 +398,32 @@ public class VisualizerPanel extends CssLayout
   }
 
 
-  private SaltProject getDocument(List<String> nodeAnnoFilter, boolean useRawText, UI ui) {
+  private SaltProject getDocument(List<String> nodeAnnoFilter, boolean useRawText, CommonUI ui) {
 
     try {
-      CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      WebClient client = ui.getWebClient();
       // Reconstruct the document node name from the raw path of the match
       String documentNodeName = Joiner.on('/').join(documentPathRaw);
       String aql = Helper.buildDocumentQuery(documentNodeName, nodeAnnoFilter, useRawText);
 
-      File graphML =
-          api.subgraphForQuery(documentPathDecoded.get(0), aql, QueryLanguage.AQL, null).block();
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(documentPathRaw));
         SDocument doc = cg.createDocument(docURI);
+
+        File graphML = File.createTempFile("annis-subgraph", ".salt");
+        Flux<DataBuffer> response = client.get()
+            .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+                .queryParam("query", aql).queryParam("query_language", QueryLanguage.AQL)
+                .build(documentPathDecoded.get(0)))
+            .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
+        DataBufferUtils.write(response, graphML.toPath()).block();
         SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+        if (Files.deleteIfExists(graphML.toPath())) {
+          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+              graphML.getPath());
+        }
         if (Files.deleteIfExists(graphML.toPath())) {
           log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
               graphML.getPath());

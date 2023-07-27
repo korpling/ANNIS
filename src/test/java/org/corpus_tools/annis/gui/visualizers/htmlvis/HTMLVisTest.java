@@ -19,42 +19,53 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.vaadin.server.Page;
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import org.apache.commons.io.FileUtils;
-import org.corpus_tools.annis.api.CorporaApi;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 import org.corpus_tools.annis.gui.AnnisBaseUI;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.core.publisher.Mono;
 
 class HTMLVisTest {
 
-  private static final Logger log = LoggerFactory.getLogger(HTMLVisTest.class);
   private HTMLVis fixture;
+
+  static MockWebServer mockServer;
+  WebClient client;
+
+  @BeforeAll
+  static void setUpClass() throws IOException {
+    mockServer = new MockWebServer();
+    mockServer.start();
+  }
+
+  @AfterAll
+  static void tearDownClass() throws IOException {
+    mockServer.shutdown();
+  }
 
   @BeforeEach
   public void setup() {
 
     fixture = new HTMLVis();
+    String baseUrl = String.format("http://localhost:%s", mockServer.getPort());
+    client = WebClient.create(baseUrl);
   }
 
   @Test
   void testWebFontInjection() throws WebClientResponseException, IOException {
     AnnisBaseUI ui = mock(AnnisBaseUI.class);
-    CorporaApi api = mock(CorporaApi.class);
 
-    File jsonFile = File.createTempFile("test", ".fonts.json");
-    FileUtils.writeStringToFile(jsonFile, "{\"web-fonts\": [" + "{" + "\"name\": \"FancyFont\", "
-        + "\"sources\": {\"format\":\"url\"}}" + "]}", StandardCharsets.UTF_8);
-    when(api.getFile("rootCorpus", "rootCorpus/test.fonts.json")).thenReturn(Mono.just(jsonFile));
+    mockServer.enqueue(new MockResponse().setBody("{\"web-fonts\": [" + "{" + "\"name\": \"FancyFont\", "
+        + "\"sources\": {\"format\":\"url\"}}" + "]}")
+        .addHeader("Content-Type", "application/json"));
 
-    fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
+    fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, client);
 
     verify(ui).injectUniqueCSS(
         "@font-face {\n" + "  font-family: 'FancyFont';\n" + "  font-weight: '400';\n"
@@ -65,25 +76,22 @@ class HTMLVisTest {
   void testWebFontInjectionErrorHandling() throws WebClientResponseException, IOException {
     AnnisBaseUI ui = mock(AnnisBaseUI.class);
     Page page = mock(Page.class);
-    CorporaApi api = mock(CorporaApi.class);
 
     when(page.getUI()).thenReturn(ui);
     when(ui.getPage()).thenReturn(page);
 
-    // Create invalid JSON file
-    File jsonFile = File.createTempFile("test", ".fonts.json");
-    FileUtils.writeStringToFile(jsonFile, "{\"web-fonts\"}", StandardCharsets.UTF_8);
-    when(api.getFile("rootCorpus", "rootCorpus/test.fonts.json")).thenReturn(Mono.just(jsonFile));
+    mockServer.enqueue(new MockResponse().setBody("{\"web-fonts\"}")
+        .addHeader("Content-Type", "application/json"));
+    
 
-    fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
+    fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, client);
     verify(ui, Mockito.never()).injectUniqueCSS(any());
 
     
     // Don't return a file from the API
-    when(api.getFile(any(), any()))
-        .thenThrow(new WebClientResponseException(500, "Server error", null, null, null));
+    mockServer.enqueue(new MockResponse().setBody("Server error").setResponseCode(500));
 
-    fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, api);
+    fixture.injectWebFonts("test", "rootCorpus", "rootCorpus", ui, client);
 
     verify(ui, Mockito.never()).injectUniqueCSS(any());
   }
