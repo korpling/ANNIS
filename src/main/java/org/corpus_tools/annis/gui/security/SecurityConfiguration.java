@@ -103,7 +103,8 @@ public class SecurityConfiguration {
     Optional<Authentication> desktopUserToken = serviceStarter.getDesktopUserToken();
     if(desktopUserToken.isPresent()) {
     	//  Use the static provided token to authenticate against the REST service 
-    	builder = builder.defaultHeader("Authorization", desktopUserToken.get().getCredentials().toString());
+        builder = builder.defaultHeader("Authorization",
+            "Bearer " + desktopUserToken.get().getCredentials().toString());
     }
     else {
     	// Use the token that can be acquired by logging in
