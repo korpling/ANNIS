@@ -57,8 +57,6 @@ import org.corpus_tools.annis.gui.docbrowser.DocBrowserController;
 import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.annis.gui.objects.Match;
 import org.corpus_tools.annis.gui.objects.RawTextWrapper;
-import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
-import org.corpus_tools.annis.gui.security.AutoTokenRefreshClient;
 import org.corpus_tools.annis.gui.util.ANNISFontIcon;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
@@ -74,6 +72,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  *
@@ -179,16 +178,15 @@ public class EmbeddedVisUI extends CommonUI {
 
   @Autowired(required = false)
   private transient OAuth2ClientProperties oauth2Clients;
+  
+  @Autowired
+  private WebClient webClient;
 
   @Autowired
   private UIConfig config;
 
-  private final AuthenticationSuccessListener authListener;
-
-  @Autowired
-  public EmbeddedVisUI(ServiceStarter serviceStarter, AuthenticationSuccessListener authListener) {
-    super(URL_PREFIX, serviceStarter, authListener);
-    this.authListener = authListener;
+  public EmbeddedVisUI(ServiceStarter serviceStarter) {
+    super(URL_PREFIX, serviceStarter);
   }
 
   private void displayGeneralHelp() {
@@ -503,11 +501,12 @@ public class EmbeddedVisUI extends CommonUI {
     }
   }
   
-  @Override
-  public ApiClient getClient() {
-    return new AutoTokenRefreshClient(this, this.authListener);
-  }
-
+	@Override
+	public ApiClient getClient() {
+		ApiClient result = new ApiClient(webClient);
+		result.setBasePath(getConfig().getWebserviceUrl());
+		return result;
+	}
 
   @Override
   public ServletContext getServletContext() {

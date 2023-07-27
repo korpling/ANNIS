@@ -217,7 +217,7 @@ public class SearchView extends GridLayout
         lastEvaluatedFragment = "";
         evaluateFragment(Page.getCurrent().getUriFragment());
 
-        if (config.isLoginOnStart() && toolbar != null && !Helper.getUser(ui.getSecurityContext()).isPresent()) {
+        if (config.isLoginOnStart() && toolbar != null && !Helper.getUser().isPresent()) {
             toolbar.showLoginWindow();
         }
 
@@ -299,7 +299,7 @@ public class SearchView extends GridLayout
             }
 
             if (corpora.isEmpty()) {
-                if (!Helper.getUser(ui.getSecurityContext()).isPresent() && toolbar != null) {
+                if (!Helper.getUser().isPresent() && toolbar != null) {
                     // not logged in, show login window
                     toolbar.showLoginWindow();
                 } else {

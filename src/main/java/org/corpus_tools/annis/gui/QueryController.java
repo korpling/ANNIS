@@ -543,7 +543,7 @@ public class QueryController implements Serializable {
           qp.setStatus(caption + ": " + description);
           break;
         case FORBIDDEN:
-          if (!Helper.getUser(ui.getSecurityContext()).isPresent()) {
+          if (!Helper.getUser().isPresent()) {
             // not logged in
             qp.setStatus("You don't have the access rights to query this corpus. "
                 + "You might want to login to access more corpora.");

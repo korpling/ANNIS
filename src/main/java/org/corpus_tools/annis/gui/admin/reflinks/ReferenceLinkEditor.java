@@ -171,7 +171,7 @@ public class ReferenceLinkEditor extends Panel {
 
     }
 
-    Optional<OAuth2User> user = Helper.getUser(getUI());
+    Optional<OAuth2User> user = Helper.getUser();
     if (user.isPresent()) {
       Set<String> roles = Helper.getUserRoles(user.get());
       if (roles.contains("admin")) {

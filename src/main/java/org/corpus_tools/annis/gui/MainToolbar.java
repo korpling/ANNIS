@@ -359,7 +359,7 @@ public class MainToolbar extends HorizontalLayout
   }
 
   public boolean isLoggedIn() {
-    return Helper.getUser(UI.getCurrent()).isPresent();
+    return Helper.getUser().isPresent();
   }
 
   void notifiyQueryStarted() {
@@ -447,7 +447,7 @@ public class MainToolbar extends HorizontalLayout
 
     if (target == NavigationTarget.ADMIN) {
       // check in background if display is necessary
-      updateAdministratorButtonVisibility(Helper.getUser(ui));
+      updateAdministratorButtonVisibility(Helper.getUser());
     } else if (target != null) {
       btNavigate.setVisible(true);
       btNavigate.setCaption(target.caption);
@@ -503,7 +503,7 @@ public class MainToolbar extends HorizontalLayout
       btNavigate.setVisible(false);
     }
 
-    Optional<OAuth2User> user = Helper.getUser(UI.getCurrent());
+    Optional<OAuth2User> user = Helper.getUser();
     if (user.isPresent()) {
       // logged in
       String displayName = Helper.getDisplayName(user.get());

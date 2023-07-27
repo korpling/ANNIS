@@ -1,7 +1,10 @@
 package org.corpus_tools.annis.gui.security;
 
 import java.util.Optional;
+
+import org.corpus_tools.annis.gui.ServiceStarter;
 import org.corpus_tools.annis.gui.UIConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.NoneNestedConditions;
 import org.springframework.boot.autoconfigure.security.oauth2.client.ClientsConfiguredCondition;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +14,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProvider;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientProviderBuilder;
@@ -30,7 +34,7 @@ public class SecurityConfiguration {
   public static final String ROLES_CLAIM = "https://corpus-tools.org/annis/roles";
 
   public static final String FRAGMENT_TO_RESTORE = "ANNIS_FRAGENT_TO_RESTORE";
-
+  
 
   private static class NoClientsConfiguredCondition extends NoneNestedConditions {
     NoClientsConfiguredCondition() {
@@ -83,19 +87,28 @@ public class SecurityConfiguration {
 
   @Bean
   WebClient webClient(UIConfig config,
-      Optional<OAuth2AuthorizedClientManager> authorizedClientManager) {
-    Optional<ServletOAuth2AuthorizedClientExchangeFilterFunction> filter =
-        authorizedClientManager.map(acm -> {
-          ServletOAuth2AuthorizedClientExchangeFilterFunction result =
-              new ServletOAuth2AuthorizedClientExchangeFilterFunction(acm);
+      Optional<OAuth2AuthorizedClientManager> authorizedClientManager, ServiceStarter serviceStarter) {
 
-          result.setDefaultClientRegistrationId("annis");
-          return result;
-        });
     WebClient.Builder builder = WebClient.builder().baseUrl(config.getWebserviceUrl());
-    if (filter.isPresent()) {
-      builder = builder.filter(filter.get());
+    Optional<Authentication> desktopUserToken = serviceStarter.getDesktopUserToken();
+    if(desktopUserToken.isPresent()) {
+    	//  Use the static provided token to authenticate against the REST service 
+    	builder = builder.defaultHeader("Authorization", desktopUserToken.get().getCredentials().toString());
     }
+    else {
+    	// Use the token that can be acquired by logging in
+        Optional<ServletOAuth2AuthorizedClientExchangeFilterFunction> filter =
+                authorizedClientManager.map(acm -> {
+                  ServletOAuth2AuthorizedClientExchangeFilterFunction result =
+                      new ServletOAuth2AuthorizedClientExchangeFilterFunction(acm);
+//                  result.setDefaultClientRegistrationId("keycloak");
+                  return result;
+                });
+        if (filter.isPresent()) {
+          builder = builder.filter(filter.get());
+        }
+    }
+    
     return builder.build();
   }
 

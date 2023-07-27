@@ -43,6 +43,7 @@ import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.LoginListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.reactive.function.client.WebClientResponseException;

@@ -46,7 +46,7 @@ public class UrlShortener {
       UrlShortenerEntry entry = new UrlShortenerEntry();
       entry.setId(UUID.randomUUID());
       entry.setUrl(localURL);
-      Optional<OAuth2User> user = Helper.getUser(ui);
+      Optional<OAuth2User> user = Helper.getUser();
       if (user.isPresent()) {
         entry.setOwner(Helper.getDisplayName(user.get()));
       } else {

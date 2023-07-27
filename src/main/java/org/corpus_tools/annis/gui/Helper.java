@@ -776,13 +776,9 @@ public class Helper {
     }
     return "";
   }
-
-  public static Optional<OAuth2User> getUser(UI ui) {
-    if (ui instanceof AnnisUI) {
-      return Helper.getUser(((AnnisUI) ui).getSecurityContext());
-    } else {
-      return Helper.getUser(SecurityContextHolder.getContext());
-    }
+  
+  public static Optional<OAuth2User> getUser() {
+	  return Helper.getUser(SecurityContextHolder.getContext());
   }
 
   public static Optional<OAuth2User> getUser(SecurityContext context) {

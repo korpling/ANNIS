@@ -53,6 +53,8 @@ import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.api.PatchedCorporaApi;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.vaadin.extension.gridscroll.GridScrollExtension;
 
@@ -314,7 +316,7 @@ public class CorpusListPanel extends VerticalLayout {
       }
 
       
-      if (corpora.isEmpty() && Helper.getUser(ui.getSecurityContext()).isPresent()) {
+      if (corpora.isEmpty() && Helper.getUser(SecurityContextHolder.getContext()).isPresent()) {
         Notification.show(
             "No corpora found. Please login "
                 + "(use button at upper right corner) to see more corpora.",

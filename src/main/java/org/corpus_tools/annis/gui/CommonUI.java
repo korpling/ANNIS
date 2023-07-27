@@ -24,7 +24,6 @@ import javax.servlet.ServletContext;
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.gui.components.SettingsStorage;
 import org.corpus_tools.annis.gui.requesthandler.ResourceRequestHandler;
-import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,18 +49,14 @@ public abstract class CommonUI extends AnnisBaseUI {
 
     private InstanceConfig instanceConfig;
 
-    private SecurityContext securityContext;
-
-    protected CommonUI(String urlPrefix, ServiceStarter serviceStarter,
-        AuthenticationSuccessListener authListener) {
-        this.urlPrefix = urlPrefix;
-        Optional<Authentication> desktopAuth = serviceStarter.getDesktopUserToken();
-        if (desktopAuth.isPresent()) {
-          // Login the provided desktop user
-          getSecurityContext().setAuthentication(desktopAuth.get());
-          authListener.setToken(desktopAuth.get().getCredentials().toString());
-        }
-    }
+	protected CommonUI(String urlPrefix, ServiceStarter serviceStarter) {
+		this.urlPrefix = urlPrefix;
+		Optional<Authentication> userToken = serviceStarter.getDesktopUserToken();
+		if(userToken.isPresent()) {
+			// Login with the static desktop token
+			SecurityContextHolder.getContext().setAuthentication(userToken.get());
+		}
+	}
 
 
     public InstanceConfig getInstanceConfig() {
@@ -223,13 +218,6 @@ public abstract class CommonUI extends AnnisBaseUI {
     }
 
     public abstract ServletContext getServletContext();
-
-    public SecurityContext getSecurityContext() {
-      if (this.securityContext == null) {
-        this.securityContext = SecurityContextHolder.getContext();
-      }
-      return securityContext;
-    }
 
     public abstract OAuth2ClientProperties getOauth2ClientProperties();
 
