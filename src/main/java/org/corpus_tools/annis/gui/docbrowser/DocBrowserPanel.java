@@ -47,8 +47,13 @@ import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 /**
  *
@@ -63,11 +68,18 @@ public class DocBrowserPanel extends Panel {
     @Override
     public void run() {
 
-      CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      WebClient client = ui.getWebClient();
 
       try {
-        File graphML = api.subgraphForQuery(corpus, "annis:node_type=\"corpus\"",
-            QueryLanguage.AQL, AnnotationComponentType.PARTOF).block();
+        File graphML = File.createTempFile("annis-subgraph", ".salt");
+        Flux<DataBuffer> response = client.get()
+            .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+                .queryParam("query", "annis:node_type=\"corpus\"")
+                .queryParam("query_language", QueryLanguage.AQL)
+                .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
+                .build(corpus))
+            .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
+        DataBufferUtils.write(response, graphML.toPath()).block();
         SCorpusGraph graph = CorpusGraphMapper.map(graphML);
         if (Files.deleteIfExists(graphML.toPath())) {
           log.debug("Could not delete temporary SaltXML file {} because it does not exist.",

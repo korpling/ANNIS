@@ -14,13 +14,12 @@
 package org.corpus_tools.annis.gui.resultfetch;
 
 import com.google.common.base.Joiner;
-import com.vaadin.ui.UI;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.Callable;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.annis.gui.objects.Match;
@@ -33,6 +32,11 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
 /**
  * Fetches a result which contains only one subgraph. This single query always follows a normal
@@ -53,9 +57,9 @@ public class SingleResultFetchJob implements Callable<SaltProject>
 
   private final PagedResultQuery query;
 
-  private final UI ui;
+  private final CommonUI ui;
 
-  public SingleResultFetchJob(Match match, PagedResultQuery query, UI ui) {
+  public SingleResultFetchJob(Match match, PagedResultQuery query, CommonUI ui) {
     this.match = match;
     this.query = query;
     this.ui = ui;
@@ -63,7 +67,7 @@ public class SingleResultFetchJob implements Callable<SaltProject>
 
   @Override
   public SaltProject call() throws Exception {
-    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+    WebClient client = ui.getWebClient();
 
     if (Thread.interrupted()) {
       return null;
@@ -81,7 +85,12 @@ public class SingleResultFetchJob implements Callable<SaltProject>
     SCorpusGraph cg = p.createCorpusGraph();
 
     if (!corpusPath.isEmpty()) {
-      File graphML = api.subgraphForNodes(corpusPath.get(0), subgraphQuery).block();
+      File graphML = File.createTempFile("annis-subgraph", ".salt");
+      Flux<DataBuffer> response = client.post()
+          .uri("/corpora/{corpus}/subgraph", corpusPath.get(0))
+          .accept(MediaType.APPLICATION_XML).bodyValue(subgraphQuery).retrieve()
+          .bodyToFlux(DataBuffer.class);
+      DataBufferUtils.write(response, graphML.toPath()).block();
       URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
       SDocument doc = cg.createDocument(docURI);
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);

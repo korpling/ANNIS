@@ -14,13 +14,13 @@
 package org.corpus_tools.annis.gui.exporter;
 
 import com.google.common.eventbus.EventBus;
-import com.vaadin.ui.UI;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.corpus_tools.annis.gui.CommonUI;
 
 /**
  *
@@ -30,7 +30,7 @@ public interface ExporterPlugin {
   public Exception convertText(String query, QueryLanguage queryLanguage, int contextLeft,
       int contextRight, Set<String> corpora, List<String> keys, String args, boolean alignmc,
       Writer out, EventBus eventBus,
-      Map<String, CorpusConfiguration> corpusConfigs, UI ui);
+      Map<String, CorpusConfiguration> corpusConfigs, CommonUI ui);
 
   public String getFileEnding();
 

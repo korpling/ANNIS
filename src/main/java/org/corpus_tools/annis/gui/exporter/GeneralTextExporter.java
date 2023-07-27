@@ -36,12 +36,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
+import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
@@ -142,7 +144,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft,
       int contextRight, Set<String> corpora, List<String> keys, String argsAsString,
       boolean alignmc, Writer out, EventBus eventBus,
-      Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
+      Map<String, CorpusConfiguration> corpusConfigs, CommonUI ui) {
     try {
 
       CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
@@ -178,7 +180,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
       try (LineIterator lines = FileUtils.lineIterator(matches, StandardCharsets.UTF_8.name())) {
         while (lines.hasNext()) {
           String currentLine = lines.nextLine();
-          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
+          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, ui.getWebClient(),
               contextLeft, contextRight, args, corpusConfigs);
           if (p.isPresent()) {
             int currentOffset = offset.getAndIncrement();

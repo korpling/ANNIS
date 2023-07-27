@@ -38,6 +38,7 @@ import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
@@ -110,7 +111,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft,
       int contextRight, Set<String> corpora, List<String> keys, String argsAsString,
       boolean alignmc, Writer out, EventBus eventBus,
-      Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
+      Map<String, CorpusConfiguration> corpusConfigs, CommonUI ui) {
 
 
 
@@ -152,13 +153,12 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       Collections.sort(listOfKeys);
 
       // First pass: iterate over all matches and get the sub-graph for them
-      CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
       int progress = 0;
       try (LineIterator lines = FileUtils.lineIterator(matches, StandardCharsets.UTF_8.name())) {
         int recordNumber = 0;
         while (lines.hasNext()) {
           String currentLine = lines.nextLine();
-          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
+          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, ui.getWebClient(),
               contextLeft, contextRight, args, corpusConfigs);
           if (p.isPresent()) {
             processFirstPass(p.get(), args, recordNumber++, nodeCount);
@@ -185,7 +185,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       try (LineIterator lines = FileUtils.lineIterator(matches, StandardCharsets.UTF_8.name())) {
         while (lines.hasNext()) {
           String currentLine = lines.nextLine();
-          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
+          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, ui.getWebClient(),
               contextLeft, contextRight, args, corpusConfigs);
           if (p.isPresent()) {
             for (SCorpusGraph cg : p.get().getCorpusGraphs()) {

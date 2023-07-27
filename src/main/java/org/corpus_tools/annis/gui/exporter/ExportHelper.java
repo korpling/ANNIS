@@ -14,8 +14,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
+import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.CorpusConfigurationViewTimelineStrategy.StrategyEnum;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
@@ -31,7 +31,12 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 public class ExportHelper {
 
@@ -55,7 +60,7 @@ public class ExportHelper {
     return p;
   }
 
-  private static void recreateTimelineIfNecessary(SaltProject p, CorporaApi corporaApi,
+  private static void recreateTimelineIfNecessary(SaltProject p, WebClient client,
       Map<String, CorpusConfiguration> corpusConfigs)
       throws WebClientResponseException, UnsupportedEncodingException {
 
@@ -81,8 +86,10 @@ public class ExportHelper {
     }
 
     // Get all segmentation names
-    List<String> segNames = corporaApi.components(firstCorpusName,
-        AnnotationComponentType.ORDERING.getValue(), null)
+    List<String> segNames = client.get()
+        .uri(ub -> ub.path("/corpora/{corpus}/components")
+            .queryParam("type", AnnotationComponentType.ORDERING.getValue()).build(firstCorpusName))
+        .retrieve().bodyToFlux(Component.class)
         .filter(c -> !c.getName().isEmpty() && !"annis".equals(c.getLayer())).map(c -> c.getName())
         .collectList().block();
 
@@ -122,7 +129,7 @@ public class ExportHelper {
     }
   }
 
-  protected static Optional<SaltProject> getSubgraphForMatch(String match, CorporaApi corporaApi,
+  protected static Optional<SaltProject> getSubgraphForMatch(String match, WebClient client,
       int contextLeft, int contextRight, Map<String, String> args,
       Map<String, CorpusConfiguration> corpusConfigs)
       throws WebClientResponseException, IOException, XMLStreamException {
@@ -145,7 +152,12 @@ public class ExportHelper {
         subgraphQuery.setSegmentation(args.get(SEGMENTATION_KEY));
       }
 
-      File graphML = corporaApi.subgraphForNodes(corpusNameForMatch, subgraphQuery).block();
+      File graphML = File.createTempFile("annis-subgraph", ".salt");
+      Flux<DataBuffer> response = client.post()
+          .uri("/corpora/{corpus}/subgraph", corpusNameForMatch)
+          .accept(MediaType.APPLICATION_XML).bodyValue(subgraphQuery).retrieve()
+          .bodyToFlux(DataBuffer.class);
+      DataBufferUtils.write(response, graphML.toPath()).block();
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
       if (Files.deleteIfExists(graphML.toPath())) {
@@ -155,7 +167,7 @@ public class ExportHelper {
 
       SaltProject p = documentGraphToProject(docGraph, corpusPathForMatch);
       Helper.addMatchToDocumentGraph(parsedMatch, docGraph);
-      recreateTimelineIfNecessary(p, corporaApi, corpusConfigs);
+      recreateTimelineIfNecessary(p, client, corpusConfigs);
 
       return Optional.of(p);
     }

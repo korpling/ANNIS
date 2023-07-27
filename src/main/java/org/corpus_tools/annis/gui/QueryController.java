@@ -221,7 +221,6 @@ public class QueryController implements Serializable {
 
     newQuery.setOffset(offset);
 
-    UI ui = UI.getCurrent();
     Background.runWithCallback(new SingleResultFetchJob(match, newQuery, ui),
         new FutureCallback<SaltProject>() {
 
