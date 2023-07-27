@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,14 +33,12 @@ import java.util.Set;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
-import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
+import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -47,8 +46,13 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.hibernate.cache.CacheException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 /**
  * An abstract base class for exporters that use Salt subgraphs to some kind of matrix output
@@ -88,12 +92,17 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
   }
 
   private static boolean segmentationNameIsValid(Collection<String> corpora, String segmentation,
-      UI ui) {
-    CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
+      CommonUI ui) {
+    WebClient client = ui.getWebClient();
     for (String corpus : corpora) {
       try {
-        if (corporaApi.components(corpus, AnnotationComponentType.ORDERING.getValue(), segmentation)
-            .count().block() == 0) {
+        Long matchingSegmentations = client.get()
+            .uri(ub -> ub.path("/corpora/{corpus}/components")
+                .queryParam("type", AnnotationComponentType.ORDERING.getValue())
+                .queryParam("name", segmentation).build(corpus))
+            .retrieve().bodyToFlux(org.corpus_tools.annis.api.model.Component.class).count()
+            .block();
+        if (matchingSegmentations == null || matchingSegmentations == 0) {
           return false;
         }
       } catch (WebClientResponseException ex) {
@@ -126,7 +135,7 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       args.put(key, val);
     }
 
-    SearchApi searchApi = new SearchApi(Helper.getClient(ui));
+    WebClient client = ui.getWebClient();
 
     // Do some validity checks of the arguments, like a segmentation must exist on all selected
     // corpora
@@ -143,10 +152,19 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
     query.setQueryLanguage(queryLanguage);
     query.setQuery(queryAnnisQL);
     try {
-      File matches = searchApi.find(query).block();
+
+      Flux<DataBuffer> response = ui.getWebClient().post().uri("/search/find")
+          .contentType(MediaType.APPLICATION_JSON).bodyValue(query).accept(MediaType.TEXT_PLAIN)
+          .retrieve().bodyToFlux(DataBuffer.class);
+
+      File matches = File.createTempFile("annis-result", ".txt");
+      DataBufferUtils.write(response, matches.toPath()).block();
 
       // Get the node count for the query by parsing it
-      Long nodeCount = searchApi.nodeDescriptions(queryAnnisQL, queryLanguage).count().block();
+      Long nodeCount = client.get()
+          .uri(ub -> ub.path("/search/node-descriptions").queryParam("query", queryAnnisQL)
+              .queryParam("query_language", queryLanguage).build())
+          .retrieve().bodyToFlux(QueryAttributeDescription.class).count().block();
 
       List<Integer> listOfKeys = new ArrayList<>();
 
@@ -206,6 +224,8 @@ public abstract class BaseMatrixExporter implements ExporterPlugin, Serializable
       }
 
       out.append("\n");
+
+      Files.deleteIfExists(matches.toPath());
 
       return null;
 

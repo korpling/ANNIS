@@ -94,10 +94,7 @@ public class SingleResultFetchJob implements Callable<SaltProject>
       URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
       SDocument doc = cg.createDocument(docURI);
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-      if (Files.deleteIfExists(graphML.toPath())) {
-        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-            graphML.getPath());
-      }
+      Files.deleteIfExists(graphML.toPath());
       doc.setDocumentGraph(docGraph);
       Helper.addMatchToDocumentGraph(match, doc.getDocumentGraph());
     }

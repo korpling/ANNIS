@@ -110,10 +110,7 @@ public class EmbeddedVisUI extends CommonUI {
             org.eclipse.emf.common.util.URI.createURI("salt:/" + corpusNodeId);
         SDocument doc = cg.createDocument(docURI);
         SDocumentGraph docGraph = DocumentGraphMapper.map(item);
-        if (Files.deleteIfExists(item.toPath())) {
-          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-              item.getPath());
-        }
+        Files.deleteIfExists(item.toPath());
         doc.setDocumentGraph(docGraph);
         ui.access(() -> generateVisualizerFromDocument(doc, args, visPlugin));
       } catch (IOException | XMLStreamException ex) {

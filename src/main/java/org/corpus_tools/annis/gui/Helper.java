@@ -751,10 +751,7 @@ public class Helper {
             .retrieve().bodyToFlux(DataBuffer.class);
         DataBufferUtils.write(response, graphML.toPath()).block();
         SCorpusGraph result = CorpusGraphMapper.map(graphML);
-        if (Files.deleteIfExists(graphML.toPath())) {
-          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-              graphML.getPath());
-        }
+        Files.deleteIfExists(graphML.toPath());
         return result;
       } catch (WebClientResponseException | XMLStreamException | IOException ex) {
         log.error(null, ex);
@@ -796,10 +793,7 @@ public class Helper {
                 .bodyToFlux(DataBuffer.class);
         DataBufferUtils.write(response, graphML.toPath()).block();
         final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
-        if (Files.deleteIfExists(graphML.toPath())) {
-          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-              graphML.getPath());
-        }
+        Files.deleteIfExists(graphML.toPath());
         for (final SNode n : cg.getNodes()) {
           result.addAll(n.getMetaAnnotations());
         }

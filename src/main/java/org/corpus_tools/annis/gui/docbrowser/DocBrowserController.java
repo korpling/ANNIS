@@ -215,10 +215,7 @@ public class DocBrowserController implements Serializable {
       DataBufferUtils.write(response, graphML.toPath()).block();
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-      if (Files.deleteIfExists(graphML.toPath())) {
-        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-            graphML.getPath());
-      }
+      Files.deleteIfExists(graphML.toPath());
 
       doc.setDocumentGraph(docGraph);
       input.setResult(doc);

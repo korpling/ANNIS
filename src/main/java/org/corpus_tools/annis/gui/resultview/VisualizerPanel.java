@@ -420,14 +420,7 @@ public class VisualizerPanel extends CssLayout
             .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
         DataBufferUtils.write(response, graphML.toPath()).block();
         SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-        if (Files.deleteIfExists(graphML.toPath())) {
-          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-              graphML.getPath());
-        }
-        if (Files.deleteIfExists(graphML.toPath())) {
-          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-              graphML.getPath());
-        }
+        Files.deleteIfExists(graphML.toPath());
         doc.setDocumentGraph(docGraph);
 
         return p;
