@@ -34,18 +34,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.List;
-import org.corpus_tools.annis.api.AdministrationApi;
 import org.corpus_tools.annis.api.model.ImportResult;
 import org.corpus_tools.annis.api.model.Job;
 import org.corpus_tools.annis.api.model.Job.StatusEnum;
 import org.corpus_tools.annis.gui.Background;
-import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.LoginListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -56,13 +57,13 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
     Upload.StartedListener, Upload.Receiver, LoginListener {
 
   private class WaitForFinishRunner implements Runnable {
-    private final UI ui;
+    private final CommonUI ui;
     private final String uuid;
 
     private int currentMessageIndex = 0;
     private Gson json;
 
-    public WaitForFinishRunner(String uuid, UI ui) {
+    public WaitForFinishRunner(String uuid, CommonUI ui) {
       this.ui = ui;
       this.uuid = uuid;
       this.json = new Gson();
@@ -91,13 +92,14 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
 
     @Override
     public void run() {
-      AdministrationApi api = new AdministrationApi(Helper.getClient(ui));
+      WebClient client = ui.getWebClient();
       // check the overall status
       Job job = null;
       try {
         do {
           job = null;
-          ResponseEntity<String> response = api.getJobWithHttpInfo(uuid).block();
+          ResponseEntity<String> response =
+              client.get().uri("/jobs/{uuid}", uuid).retrieve().toEntity(String.class).block();
 
 
           // If the response type returns an object of type Job, get it here
@@ -289,19 +291,23 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
     }
   }
 
-  private void startImport() {
-
-    AdministrationApi api = new AdministrationApi(Helper.getClient(UI.getCurrent()));
+  private void startImport(CommonUI ui) {
     try {
-      ResponseEntity<ImportResult> response =
-          api.importPostWithHttpInfo(temporaryCorpusFile, cbOverwrite.getValue()).block();
+      FileSystemResource fileResource = new FileSystemResource(temporaryCorpusFile);
+      ResponseEntity<ImportResult> response = ui.getWebClient().post()
+          .uri(ub -> ub.path("/import").queryParam("override_existing", cbOverwrite.getValue())
+              .build())
+          .body(BodyInserters.fromResource(fileResource)).retrieve()
+          .toEntity(ImportResult.class).block();
 
-
-      if (response.getStatusCode() == HttpStatus.ACCEPTED) {
+      if (response == null) {
+        upload.setEnabled(true);
+        progress.setVisible(false);
+        appendMessage("Could not start import.");
+      } else if (response.getStatusCode() == HttpStatus.ACCEPTED) {
         String uuid = response.getBody().getUuid();
         appendMessage("Import requested, update UUID is " + uuid);
 
-        UI ui = UI.getCurrent();
         Background.run(new WaitForFinishRunner(uuid, ui));
 
       } else {
@@ -334,9 +340,11 @@ public class ImportPanel extends Panel implements Upload.ProgressListener, Uploa
 
   @Override
   public void uploadFinished(Upload.FinishedEvent event) {
-
-    appendMessage("Finished upload, starting import");
-    startImport();
+    UI ui = UI.getCurrent();
+    if (ui instanceof CommonUI) {
+      appendMessage("Finished upload, starting import");
+      startImport((CommonUI) ui);
+    }
   }
 
   @Override
