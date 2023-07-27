@@ -34,13 +34,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.Annotation;
-import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.widgets.GripDragComponent;
 import org.corpus_tools.annis.gui.widgets.SimpleCanvas;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -312,22 +312,32 @@ public class TigerQueryBuilderCanvas extends Panel {
   public Set<String> getAvailableAnnotationNames() {
     Set<String> result = new TreeSet<>();
 
-    CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
+    UI ui = UI.getCurrent();
+    if (ui instanceof CommonUI) {
+      WebClient client = ((CommonUI) ui).getWebClient();
+      // get current corpus selection
+      Collection<String> corpusSelection = controller.getState().getSelectedCorpora();
 
-    // get current corpus selection
-    Collection<String> corpusSelection = controller.getState().getSelectedCorpora();
-
-    if (corpusSelection != null) {
-      for (String corpus : corpusSelection) {
-        try {
-          for (Annotation anno : api.nodeAnnotations(corpus, false, true).toIterable()) {
-            result.add(anno.getKey().getName());
+      if (corpusSelection != null) {
+        for (String corpus : corpusSelection) {
+          try {
+            Iterable<Annotation> allAnnotations = client.get()
+                .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
+                    .queryParam("list_values", false).queryParam("only_most_frequent_values", true)
+                    .build(corpus))
+                .retrieve().bodyToFlux(Annotation.class).toIterable();
+            for (Annotation anno : allAnnotations) {
+              result.add(anno.getKey().getName());
+            }
+          } catch (WebClientResponseException ex) {
+            log.error("Could not get node annotations for corpus " + corpus, ex);
           }
-        } catch (WebClientResponseException ex) {
-          log.error("Could not get node annotations for corpus " + corpus, ex);
         }
       }
+
     }
+
+
     return result;
   }
 

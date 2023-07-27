@@ -35,9 +35,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.QueryController;
@@ -46,6 +46,7 @@ import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /*
@@ -330,23 +331,30 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
 
     public Collection<String> getAvailableAnnotationLevels(String meta) {
         Collection<String> result = new TreeSet<>();
-        CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
-        // get current corpus selection
-        Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
-        try {
+        UI ui = UI.getCurrent();
+        if (ui instanceof CommonUI) {
+          WebClient client = ((CommonUI) ui).getWebClient();
+          // get current corpus selection
+          Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
+          try {
             List<Annotation> atts = new LinkedList<>();
             for (String corpus : corpusSelection) {
-              atts.addAll(api.nodeAnnotations(corpus, true, false).collectList().block());
+              List<Annotation> allAnnotations = client.get()
+                  .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
+                      .queryParam("list_values", true)
+                      .queryParam("only_most_frequent_values", false).build(corpus))
+                  .retrieve().bodyToFlux(Annotation.class).collectList().block();
+              atts.addAll(allAnnotations);
             }
             for (Annotation a : atts) {
-                if (a.getKey().getName().equals(meta)) {
-                    result.add(a.getVal());
-                }
+              if (a.getKey().getName().equals(meta)) {
+                result.add(a.getVal());
+              }
             }
           } catch (WebClientResponseException ex) {
             log.error(null, ex);
+          }
         }
-
         return result;
     }
 
@@ -354,16 +362,25 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
       Set<String> result = new TreeSet<>();
       // get current corpus selection
       Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
-      CorporaApi api = new CorporaApi(Helper.getClient(UI.getCurrent()));
-      try {
-        for (String corpus : corpusSelection) {
-          for (Annotation a : api.nodeAnnotations(corpus, false, false).toIterable()) {
-            result.add(a.getKey().getName());
+      UI ui = UI.getCurrent();
+      if (ui instanceof CommonUI) {
+        WebClient client = ((CommonUI) ui).getWebClient();
+        try {
+          for (String corpus : corpusSelection) {
+            Iterable<Annotation> allAnnotations = client.get()
+                .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
+                    .queryParam("list_values", false).queryParam("only_most_frequent_values", false)
+                    .build(corpus))
+                .retrieve().bodyToFlux(Annotation.class).toIterable();
+            for (Annotation a : allAnnotations) {
+              result.add(a.getKey().getName());
+            }
           }
+        } catch (WebClientResponseException ex) {
+          log.error(null, ex);
         }
-      } catch (WebClientResponseException ex) {
-        log.error(null, ex);
       }
+
       result.add("tok");
       return result;
     }
