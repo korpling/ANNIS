@@ -51,10 +51,10 @@ import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.corpus_tools.api.PatchedCorporaApi;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.vaadin.extension.gridscroll.GridScrollExtension;
 
@@ -80,9 +80,9 @@ public class CorpusListPanel extends VerticalLayout {
 
       try {
         // query in background
-        PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
-
-        List<String> corpora = api.listCorporaAsMono().block();
+        WebClient client = ui.getWebClient();
+        List<String> corpora = client.get().uri("/corpora").retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
 
         // update the GUI
         ui.access(() -> {
@@ -298,9 +298,6 @@ public class CorpusListPanel extends VerticalLayout {
 
     // Get the initial corpus list, this must become before the binder is set,
     // to make sure any selected value is also an item.
-    PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
-
-
     try {
       List<String> corpora = ui.getWebClient().get().uri("/corpora").retrieve()
           .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();

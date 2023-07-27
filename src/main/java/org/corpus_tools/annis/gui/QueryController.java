@@ -39,10 +39,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.CountExtra;
 import org.corpus_tools.annis.api.model.CountQuery;
+import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.controller.CountCallback;
 import org.corpus_tools.annis.gui.controller.ExportBackgroundJob;
@@ -73,6 +74,7 @@ import org.corpus_tools.annis.gui.visualizers.IFrameResourceMap;
 import org.corpus_tools.salt.common.SaltProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.Disposable;
 
@@ -424,15 +426,20 @@ public class QueryController implements Serializable {
       // start count query
       searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
 
-      SearchApi api = new SearchApi(Helper.getClient(ui));
       CountQuery countQuery = new CountQuery();
       countQuery.setCorpora(new LinkedList<>(displayedQuery.getCorpora()));
       countQuery.setQuery(displayedQuery.getQuery());
       countQuery.setQueryLanguage(displayedQuery.getApiQueryLanguage());
+
+      WebClient client = ((AnnisUI) ui).getWebClient();
+
       try {
         CountCallback callback =
             new CountCallback(newResultView, displayedQuery.getLimit(), annisUI);
-        Disposable countDisposable = api.count(countQuery).doOnNext(callback).doOnError(t -> {
+        Disposable countDisposable =
+            client.post().uri("/search/count").bodyValue(countQuery).retrieve()
+                .bodyToMono(CountExtra.class).doOnNext(callback)
+                .doOnError(t -> {
           annisUI.access(() -> {
             annisUI.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
             if (t instanceof WebClientResponseException) {
@@ -642,9 +649,12 @@ public class QueryController implements Serializable {
       qp.setStatus("Empty query");
     } else {
       // validate query
-      final UI ui = UI.getCurrent();
-      SearchApi api = new SearchApi(Helper.getClient(ui));
-      api.nodeDescriptions(query, org.corpus_tools.annis.api.model.QueryLanguage.AQL)
+      WebClient client = ui.getWebClient();
+
+      client.get()
+          .uri(ub -> ub.path("/search/node-descriptions").queryParam("query", query).build())
+          .retrieve()
+          .bodyToFlux(QueryAttributeDescription.class)
           .subscribe(new ValidateCallback(qp, this, ui));
 
     }

@@ -60,8 +60,8 @@ import org.corpus_tools.annis.gui.objects.PagedResultQuery;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
-import org.corpus_tools.api.PatchedCorporaApi;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -241,9 +241,9 @@ public class SearchView extends GridLayout
 
             // filter by actually available user corpora in order not to get any exception
             // later
-            PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
             try {
-              List<String> userCorpora = api.listCorporaAsMono().block();
+              List<String> userCorpora = ui.getWebClient().get().uri("/corpora").retrieve()
+                  .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
               selectedCorpora.retainAll(userCorpora);
             } catch (WebClientResponseException ex) {
               log.error("Could not get list of corpora", ex);
@@ -278,125 +278,118 @@ public class SearchView extends GridLayout
     }
 
     private void evaluateFragment(String fragment) {
-        // do nothing if not changed
-        if (fragment == null || fragment.isEmpty() || fragment.equals(lastEvaluatedFragment)) {
-            return;
+      // do nothing if not changed
+      if (fragment == null || fragment.isEmpty() || fragment.equals(lastEvaluatedFragment)) {
+        return;
+      }
+
+      Map<String, String> args = Helper.parseFragment(fragment);
+
+      if (args.containsKey("c")) {
+        String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
+        Set<String> corpora = new TreeSet<String>(Arrays.asList(originalCorpusNames));
+        // Remove all corpora we don't have the access right to
+        try {
+          List<String> availableCorporaList = ui.getWebClient().get().uri("/corpora").retrieve()
+              .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
+          HashSet<String> availableCorpora = new HashSet<>(availableCorporaList);
+          corpora.removeIf(c -> !availableCorpora.contains(c));
+        } catch (WebClientResponseException e) {
+          ExceptionDialog.show(e, "Could not get corpus list", ui);
         }
 
-        Map<String, String> args = Helper.parseFragment(fragment);
+        if (corpora.isEmpty()) {
+          if (!Helper.getUser().isPresent() && toolbar != null) {
+            // not logged in, show login window
+            toolbar.showLoginWindow();
+          } else {
+            // already logged in or no login system available, just display a message
+            new Notification("Linked corpus does not exist",
+                "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
+                    + " in ANNIS.</p>" + "<h2>possible reasons are:</h2>" + "<ul>"
+                    + "<li>that it has not been imported yet,</li>"
+                    + "<li>you don't have the access rights to see this corpus,</li>"
+                    + "<li>or the ANNIS service is not running.</li>" + "</ul>"
+                    + "<p>Please ask the responsible person of the site that contained "
+                    + "the link to import the corpus.</p></div>",
+                Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
 
-        if (args.containsKey("c")) {
-            String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
-            Set<String> corpora = new TreeSet<String>(Arrays.asList(originalCorpusNames));
-            // Remove all corpora we don't have the access right to
-            try {
-              PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
-                Set<String> availableCorpora =
-                    new HashSet<>(api.listCorporaAsMono().block());
-                corpora.removeIf(c -> !availableCorpora.contains(c));
-              } catch (WebClientResponseException e) {
-                ExceptionDialog.show(e, "Could not get corpus list", ui);
+          }
+        } // end if corpus list returned from service is empty
+        else {
+          if (args.containsKey("c") && args.size() == 1) {
+            // special case: we were called from outside and should only select,
+            // but not query, the selected corpora
+            Query q = new Query();
+            q.setCorpora(corpora);
+            q.setQuery("");
+            ui.getQueryController().setQuery(q);
+          } else if (args.get("cl") != null && args.get("cr") != null) {
+            // make sure the properties are not overwritten by the background process
+            getControlPanel().getSearchOptions().setUpdateStateFromConfig(false);
+
+            DisplayedResultQuery query =
+                QueryGenerator.displayed().left(Integer.parseInt(args.get("cl")))
+                    .right(Integer.parseInt(args.get("cr"))).offset(Integer.parseInt(args.get("s")))
+                    .limit(Integer.parseInt(args.get("l"))).segmentation(args.get("seg"))
+                    .baseText(args.get("bt")).query(args.get("q")).corpora(corpora).build();
+
+            if (query.getBaseText() == null && query.getSegmentation() != null) {
+              // if no explicit visible segmentation was given use the same as the context
+              query.setBaseText(query.getSegmentation());
+            }
+            if (query.getBaseText() != null && query.getBaseText().isEmpty()) {
+              // empty string means "null"
+              query.setBaseText(null);
             }
 
-            if (corpora.isEmpty()) {
-                if (!Helper.getUser().isPresent() && toolbar != null) {
-                    // not logged in, show login window
-                    toolbar.showLoginWindow();
-                } else {
-                    // already logged in or no login system available, just display a message
-                    new Notification("Linked corpus does not exist",
-                            "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
-                                    + " in ANNIS.</p>" + "<h2>possible reasons are:</h2>" + "<ul>"
-                                    + "<li>that it has not been imported yet,</li>"
-                                    + "<li>you don't have the access rights to see this corpus,</li>"
-                                    + "<li>or the ANNIS service is not running.</li>" + "</ul>"
-                                    + "<p>Please ask the responsible person of the site that contained "
-                                    + "the link to import the corpus.</p></div>",
-                            Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-
+            String matchSelectionRaw = args.get("m");
+            if (matchSelectionRaw != null) {
+              for (String selectedMatchNr : Splitter.on(',').omitEmptyStrings().trimResults()
+                  .split(matchSelectionRaw)) {
+                try {
+                  long nr = Long.parseLong(selectedMatchNr);
+                  query.getSelectedMatches().add(nr);
+                } catch (NumberFormatException ex) {
+                  log.warn("Invalid long provided as selected match", ex);
                 }
-            } // end if corpus list returned from service is empty
-            else {
-                if (args.containsKey("c") && args.size() == 1) {
-                    // special case: we were called from outside and should only select,
-                    // but not query, the selected corpora
-                    Query q = new Query();
-                    q.setCorpora(corpora);
-                    q.setQuery("");
-                    ui.getQueryController().setQuery(q);
-                } else if (args.get("cl") != null && args.get("cr") != null) {
-                    // make sure the properties are not overwritten by the background process
-                    getControlPanel().getSearchOptions().setUpdateStateFromConfig(false);
+              }
+            }
 
-                    DisplayedResultQuery query = QueryGenerator.displayed()
-                            .left(Integer.parseInt(args.get("cl")))
-                            .right(Integer.parseInt(args.get("cr")))
-                            .offset(Integer.parseInt(args.get("s")))
-                            .limit(Integer.parseInt(args.get("l"))).segmentation(args.get("seg"))
-                            .baseText(args.get("bt")).query(args.get("q")).corpora(corpora).build();
+            if (args.get("o") != null) {
+              try {
+                query.setOrder(DisplayedResultQuery.parseOrderFromCitationFragment(args.get("0")));
+              } catch (IllegalArgumentException ex) {
+                log.warn("Could not parse query fragment argument for order", ex);
+              }
+            }
 
-                    if (query.getBaseText() == null && query.getSegmentation() != null) {
-                        // if no explicit visible segmentation was given use the same as the context
-                        query.setBaseText(query.getSegmentation());
-                    }
-                    if (query.getBaseText() != null && query.getBaseText().isEmpty()) {
-                        // empty string means "null"
-                        query.setBaseText(null);
-                    }
+            if (args.get("ql") != null) {
+              try {
+                query.setQueryLanguage(QueryLanguage.valueOf(args.get("ql").toUpperCase()));
+              } catch (IllegalArgumentException ex) {
+                log.warn("Could not parse query fragment argument for the query language", ex);
+              }
+            }
 
-                    String matchSelectionRaw = args.get("m");
-                    if (matchSelectionRaw != null) {
-                        for (String selectedMatchNr : Splitter.on(',').omitEmptyStrings()
-                                .trimResults().split(matchSelectionRaw)) {
-                            try {
-                                long nr = Long.parseLong(selectedMatchNr);
-                                query.getSelectedMatches().add(nr);
-                            } catch (NumberFormatException ex) {
-                                log.warn("Invalid long provided as selected match", ex);
-                            }
-                        }
-                    }
-
-                    if (args.get("o") != null) {
-                        try {
-                          query.setOrder(
-                              DisplayedResultQuery.parseOrderFromCitationFragment(args.get("0")));
-                        } catch (IllegalArgumentException ex) {
-                            log.warn("Could not parse query fragment argument for order", ex);
-                        }
-                    }
-
-                    if (args.get("ql") != null) {
-                        try {
-                            query.setQueryLanguage(
-                                    QueryLanguage.valueOf(args.get("ql").toUpperCase()));
-                        } catch (IllegalArgumentException ex) {
-                            log.warn(
-                                    "Could not parse query fragment argument for the query language",
-                                    ex);
-                        }
-                    }
-
-                    // full query with given context
-                    ui.getQueryController().setQuery(query);
-                    ui.getQueryController().executeSearch(true, false);
-                } else if (args.get("q") != null) {
-                    QueryLanguage ql = QueryLanguage.AQL;
-                    if (args.get("ql") != null) {
-                        try {
-                            ql = QueryLanguage.valueOf(args.get("ql").toUpperCase());
-                        } catch (IllegalArgumentException ex) {
-                            log.warn(
-                                    "Could not parse query fragment argument for the query language",
-                                    ex);
-                        }
-                    }
-                    // use default context
-                    ui.getQueryController().setQuery(new Query(args.get("q"), ql, corpora));
-                    ui.getQueryController().executeSearch(true, true);
-                }
-            } // end if corpus list from server was non-empty
-        } // end if there is a corpus definition
+            // full query with given context
+            ui.getQueryController().setQuery(query);
+            ui.getQueryController().executeSearch(true, false);
+          } else if (args.get("q") != null) {
+            QueryLanguage ql = QueryLanguage.AQL;
+            if (args.get("ql") != null) {
+              try {
+                ql = QueryLanguage.valueOf(args.get("ql").toUpperCase());
+              } catch (IllegalArgumentException ex) {
+                log.warn("Could not parse query fragment argument for the query language", ex);
+              }
+            }
+            // use default context
+            ui.getQueryController().setQuery(new Query(args.get("q"), ql, corpora));
+            ui.getQueryController().executeSearch(true, true);
+          }
+        } // end if corpus list from server was non-empty
+      } // end if there is a corpus definition
     }
 
     public ControlPanel getControlPanel() {

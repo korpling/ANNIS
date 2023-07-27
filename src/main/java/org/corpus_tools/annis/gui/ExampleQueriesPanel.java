@@ -31,7 +31,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.ExampleQuery;
 import org.corpus_tools.annis.gui.controlpanel.ControlPanel;
@@ -42,6 +41,7 @@ import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -66,7 +66,9 @@ public class ExampleQueriesPanel extends CssLayout {
         public void run() {
             final List<Entry> result = new LinkedList<>();
             try {
-                result.addAll(loadExamplesFromRemote(selectedCorpora, ui));
+              if (ui instanceof CommonUI) {
+                result.addAll(loadExamplesFromRemote(selectedCorpora, (CommonUI) ui));
+              }
             } finally {
                 ui.access(() -> {
                     loadingIndicator.setVisible(false);
@@ -106,14 +108,16 @@ public class ExampleQueriesPanel extends CssLayout {
      * @param corpusNames Specifies the corpora example queries are fetched for. If it is null or
      *        empty all available example queries are fetched.
      */
-    private static List<Entry> loadExamplesFromRemote(Set<String> corpusNames, UI ui) {
+    private static List<Entry> loadExamplesFromRemote(Set<String> corpusNames, CommonUI ui) {
 
         List<Entry> result = new LinkedList<>();
-        CorporaApi api = new CorporaApi(Helper.getClient(ui));
+        WebClient client = ui.getWebClient();
         try {
             if (corpusNames != null && !corpusNames.isEmpty()) {
                 for (String c : corpusNames) {
-                  CorpusConfiguration config = api.corpusConfiguration(c).block();
+                  CorpusConfiguration config =
+                      client.get().uri("/corpora/{corpus}/configuration/", c).retrieve()
+                          .bodyToMono(CorpusConfiguration.class).block();
                     if(config.getExampleQueries() != null) {
                         for (ExampleQuery q : config.getExampleQueries()) {
                             Entry e = new Entry();
