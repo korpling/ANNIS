@@ -50,8 +50,6 @@ import javax.xml.stream.XMLStreamException;
 import okhttp3.Request;
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserController;
@@ -73,6 +71,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 
 /**
@@ -103,6 +102,7 @@ public class EmbeddedVisUI extends CommonUI {
 
     @Override
     public void onNext(File item) {
+
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
@@ -230,12 +230,9 @@ public class EmbeddedVisUI extends CommonUI {
       return;
     }
 
-    ApiClient client = getClient();
-
     displayLoadingIndicator();
 
     // Create a subgraph query
-    CorporaApi api = new CorporaApi(client);
     Match match = Match.parseFromString(args.get(KEY_MATCH)[0]);
     String matchId = match.getSaltIDs().get(0);
     List<String> corpusPathRaw = Helper.getCorpusPath(matchId, false);
@@ -251,7 +248,11 @@ public class EmbeddedVisUI extends CommonUI {
       GraphMLLoaderCallback callback =
           new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args, UI.getCurrent());
       
-      api.subgraphForQuery(toplevelCorpus, aql, QueryLanguage.AQL, null).subscribe(callback);
+      webClient.get()
+          .uri(ub -> ub.path("/corpora/{corpus}/subgraph-for-query").queryParam("query", aql)
+              .build(toplevelCorpus))
+          .retrieve().bodyToMono(new ParameterizedTypeReference<File>() {}).subscribe(callback);
+
       
 
     } else {
@@ -266,7 +267,8 @@ public class EmbeddedVisUI extends CommonUI {
         subgraphQuery.setSegmentation(null);
       }
       GraphMLLoaderCallback callback = new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args, UI.getCurrent());
-      api.subgraphForNodes(toplevelCorpus, subgraphQuery).subscribe(callback);
+      webClient.post().uri("/corpora/{corpus}/subgraph", toplevelCorpus).bodyValue(subgraphQuery)
+          .retrieve().bodyToMono(new ParameterizedTypeReference<File>() {}).subscribe(callback);
     }
   }
 

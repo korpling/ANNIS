@@ -31,7 +31,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
@@ -40,12 +39,14 @@ import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.objects.CorpusConfigMap;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -135,14 +136,18 @@ public class SearchOptionsPanel extends FormLayout {
   public static final List<Integer> PREDEFINED_CONTEXTS = ImmutableList.of(0, 1, 2, 5, 10, 20);
 
 
-  private static List<String> getSegmentationNamesFromService(Collection<String> corpora, UI ui) {
+  private static List<String> getSegmentationNamesFromService(Collection<String> corpora,
+      CommonUI ui) {
     List<String> segNames = new ArrayList<>();
-    CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
+    WebClient client = ui.getWebClient();
     for (String corpus : corpora) {
       try {
         // Get all ordering components
-        for (Component c : corporaApi
-            .components(corpus, AnnotationComponentType.ORDERING.getValue(), null).toIterable()) {
+        List<Component> orderingComponents = client.get()
+            .uri(ub -> ub.path("/corpora/{corpus}/components")
+                .queryParam("type", AnnotationComponentType.ORDERING.getValue()).build(corpus))
+            .retrieve().bodyToFlux(Component.class).collectList().block();
+        for (Component c : orderingComponents) {
           if (!c.getName().isEmpty() && !"annis".equals(c.getLayer())) {
             segNames.add(c.getName());
           }
