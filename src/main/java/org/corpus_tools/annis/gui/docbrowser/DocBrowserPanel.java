@@ -25,20 +25,18 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.util.filter.SimpleStringFilter;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.graphml.CorpusGraphMapper;
 import org.corpus_tools.annis.gui.objects.DocumentBrowserConfig;
@@ -187,13 +185,14 @@ public class DocBrowserPanel extends Panel {
     textVis.setDisplayName("full text");
     textVis.setVisType("raw_text");
     defaultConfig.setVisualizers(Arrays.asList(new Visualizer(textVis)));
-    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+    WebClient client = ui.getWebClient();
 
     try {
-      File result =
-          api.getFile(getCorpus(),
-              urlPathEscape.escape(getCorpus()) + "/document_browser.json").block();
-      try(FileInputStream is = new FileInputStream(result)) {
+      byte[] response = client.get()
+          .uri("/corpora/{corpus}/files/{name}", getCorpus(),
+              urlPathEscape.escape(getCorpus()) + "/document_browser.json")
+          .retrieve().bodyToMono(byte[].class).block();
+      try (ByteArrayInputStream is = new ByteArrayInputStream(response)) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         DocumentBrowserConfig config = mapper.readValue(is, DocumentBrowserConfig.class);
