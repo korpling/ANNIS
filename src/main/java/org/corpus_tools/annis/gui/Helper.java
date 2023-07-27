@@ -490,7 +490,7 @@ public class Helper {
   }
 
   public static Set<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui)
-      throws WebClientResponseException {
+      throws WebClientResponseException, IOException {
     final Set<AnnoKey> metaAnnos = new HashSet<>();
 
     if (ui instanceof CommonUI) {
@@ -521,7 +521,7 @@ public class Helper {
   }
 
   private static boolean annotationIsMetadata(String corpus, String annotationName, CommonUI ui)
-      throws WebClientResponseException {
+      throws WebClientResponseException, IOException {
     WebClient client = ui.getWebClient();
     if (!validQNamePattern.matcher(annotationName).matches()) {
       return false;
@@ -539,8 +539,11 @@ public class Helper {
 
     q.setQueryLanguage(QueryLanguage.AQL);
 
-    final File findResult =
-        client.post().uri("/search/find").bodyValue(q).retrieve().bodyToMono(File.class).block();
+    File findResult = File.createTempFile("annis-find", ".txt");
+    Flux<DataBuffer> response = client.post().uri("/search/find").bodyValue(q).retrieve()
+        .bodyToFlux(DataBuffer.class);
+    DataBufferUtils.write(response, findResult.toPath()).block();
+
     if (findResult != null && findResult.isFile())
       try {
         try (Stream<String> lines = Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
@@ -551,6 +554,8 @@ public class Helper {
         }
       } catch (final IOException ex) {
         log.error("Error when accessing file with find results", ex);
+      } finally {
+        Files.delete(findResult.toPath());
       }
     return false;
   }

@@ -26,6 +26,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.ui.NativeSelect;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -378,7 +379,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
                 }
             }
 
-          } catch (WebClientResponseException ex) {
+          } catch (WebClientResponseException | IOException ex) {
             log.error(null, ex);
         }
 

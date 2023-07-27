@@ -22,6 +22,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -33,7 +34,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
@@ -42,6 +42,7 @@ import org.corpus_tools.annis.gui.beans.CorpusBrowserEntry;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -163,9 +164,11 @@ public class CorpusBrowserPanel extends Panel {
 
     final UI ui = getUI();
 
-    Background.run(() -> {
-      fetchAnnotationsInBackground(ui);
-    });
+    if (ui instanceof CommonUI) {
+      Background.run(() -> {
+        fetchAnnotationsInBackground((CommonUI) ui);
+      });
+    }
   }
 
   private boolean canExcludeNamespace(Collection<Annotation> annos) {
@@ -178,11 +181,15 @@ public class CorpusBrowserPanel extends Panel {
     return true;
   }
 
-  private void fetchAnnotationsInBackground(UI ui) {
-    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+  private void fetchAnnotationsInBackground(CommonUI ui) {
+
+    WebClient client = ui.getWebClient();
 
     try {
-      final List<Annotation> nodeAnnos = api.nodeAnnotations(corpus, true, true)
+      List<Annotation> nodeAnnos = client.get()
+          .uri(ub -> ub.path("/corpora/{corpus}/node-annotations").queryParam("list_values", true)
+              .queryParam("only_most_frequent_values", true).build(corpus))
+          .retrieve().bodyToFlux(Annotation.class)
           .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
               && !Objects.equals(a.getKey().getName(), "tok"))
           .collectList().block();
@@ -193,15 +200,33 @@ public class CorpusBrowserPanel extends Panel {
       nodeAnnos.removeIf(anno -> metaAnnoKeys.contains(anno.getKey()));
       metaAnnos.removeIf(anno -> !metaAnnoKeys.contains(anno.getKey()));
 
-      final List<Component> components =
-          api.components(corpus, "Dominance", null).collectList().block();
+      List<Component> dominanceComponents =
+          client
+              .get().uri(ub -> ub.path("/corpora/{corpus}/components")
+                  .queryParam("type", "Dominance").build(corpus))
+              .retrieve().bodyToFlux(Component.class).collectList().block();
+      List<Component> pointingComponents =
+          client.get().uri(ub -> ub.path("/corpora/{corpus}/components")
+              .queryParam("type", "Pointing").build(corpus)).retrieve().bodyToFlux(Component.class)
+              .collectList().block();
+      List<Component> components = new LinkedList<>();
+      components.addAll(dominanceComponents);
+      components.addAll(pointingComponents);
+
       final List<Annotation> allEdgeAnnos = new LinkedList<>();
       final Map<Component, List<Annotation>> edgeAnnosByComponent = new LinkedHashMap<>();
-      components.addAll(api.components(corpus, "Pointing", null).collectList().block());
       for (Component c : components) {
         try {
-          List<Annotation> annos = api.edgeAnnotations(corpus, c.getType().getValue(), c.getLayer(),
-              c.getName(), true, true).collectList().block();
+          List<Annotation> annos =
+              client.get()
+                  .uri(ub -> ub
+                      .path("/corpora/{corpus}/edge-annotations/{type}/{layer}/{name}/")
+                      .queryParam("list_values", true).queryParam("only_most_frequent_values", true)
+                      .build(corpus, c.getType().getValue(), c.getLayer(), c.getName()))
+
+                  .retrieve()
+                  .bodyToFlux(Annotation.class).collectList()
+                  .block();
           edgeAnnosByComponent.put(c, annos);
           allEdgeAnnos.addAll(annos);
         } catch (WebClientResponseException ex) {
@@ -350,7 +375,7 @@ public class CorpusBrowserPanel extends Panel {
 
       });
 
-    } catch (WebClientResponseException e) {
+    } catch (WebClientResponseException | IOException e) {
       getUI().access(() -> {
         ExceptionDialog.show(e, "Error fetching corpus annotations", getUI());
       });
