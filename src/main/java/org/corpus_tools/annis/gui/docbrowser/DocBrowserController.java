@@ -29,6 +29,7 @@ import com.vaadin.ui.VerticalLayout;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -203,6 +204,11 @@ public class DocBrowserController implements Serializable {
       File graphML = api.subgraphForQuery(corpus, aql, QueryLanguage.AQL, null).block();
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+      if (Files.deleteIfExists(graphML.toPath())) {
+        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+            graphML.getPath());
+      }
+
       doc.setDocumentGraph(docGraph);
       input.setResult(doc);
       if (useRawText) {

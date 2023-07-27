@@ -745,7 +745,12 @@ public class Helper {
             .accept(MediaType.APPLICATION_XML)
             .retrieve().bodyToFlux(DataBuffer.class);
         DataBufferUtils.write(response, graphML.toPath()).block();
-        return CorpusGraphMapper.map(graphML);
+        SCorpusGraph result = CorpusGraphMapper.map(graphML);
+        if (Files.deleteIfExists(graphML.toPath())) {
+          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+              graphML.getPath());
+        }
+        return result;
       } catch (WebClientResponseException | XMLStreamException | IOException ex) {
         log.error(null, ex);
         ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
@@ -786,7 +791,10 @@ public class Helper {
                 .bodyToFlux(DataBuffer.class);
         DataBufferUtils.write(response, graphML.toPath()).block();
         final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
-
+        if (Files.deleteIfExists(graphML.toPath())) {
+          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+              graphML.getPath());
+        }
         for (final SNode n : cg.getNodes()) {
           result.addAll(n.getMetaAnnotations());
         }
@@ -794,11 +802,7 @@ public class Helper {
       } catch (WebClientResponseException | XMLStreamException | IOException ex) {
         ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata for document", ui));
       }
-
-
     }
-
-
     return result;
   }
 

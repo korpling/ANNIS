@@ -16,6 +16,7 @@ package org.corpus_tools.annis.gui.resultfetch;
 import com.google.common.base.Joiner;
 import com.vaadin.ui.UI;
 import java.io.File;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.corpus_tools.annis.api.CorporaApi;
@@ -30,6 +31,8 @@ import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fetches a result which contains only one subgraph. This single query always follows a normal
@@ -43,6 +46,8 @@ import org.eclipse.emf.common.util.URI;
  */
 public class SingleResultFetchJob implements Callable<SaltProject>
 {
+
+  private static final Logger log = LoggerFactory.getLogger(SingleResultFetchJob.class);
 
   private final Match match;
 
@@ -80,6 +85,10 @@ public class SingleResultFetchJob implements Callable<SaltProject>
       URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPath));
       SDocument doc = cg.createDocument(docURI);
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
+      if (Files.deleteIfExists(graphML.toPath())) {
+        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
+            graphML.getPath());
+      }
       doc.setDocumentGraph(docGraph);
       Helper.addMatchToDocumentGraph(match, doc.getDocumentGraph());
     }

@@ -5,11 +5,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.10.3] - 2023-07-26
+
 ### Fixed
 
 - Ignore pointing relations when traversing the graph in the RST visualizer. If
 we include pointing relations and they create cycles, this would result in an
 error.
+- Delete temporary files when exporting/fetching results.
 
 ## [4.10.2] - 2023-03-15
 
@@ -1287,7 +1290,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.10.2...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.10.3...HEAD
+[4.10.3]: https://github.com/korpling/ANNIS/compare/v4.10.2...v4.10.3
 [4.10.2]: https://github.com/korpling/ANNIS/compare/v4.10.1...v4.10.2
 [4.10.1]: https://github.com/korpling/ANNIS/compare/v4.10.0...v4.10.1
 [4.10.0]: https://github.com/korpling/ANNIS/compare/v4.9.9...v4.10.0
