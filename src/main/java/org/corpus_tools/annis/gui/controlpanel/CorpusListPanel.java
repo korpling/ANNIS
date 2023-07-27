@@ -53,7 +53,7 @@ import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.api.PatchedCorporaApi;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContext;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.vaadin.extension.gridscroll.GridScrollExtension;
@@ -300,8 +300,10 @@ public class CorpusListPanel extends VerticalLayout {
     // to make sure any selected value is also an item.
     PatchedCorporaApi api = new PatchedCorporaApi(Helper.getClient(ui));
 
+
     try {
-      List<String> corpora = api.listCorporaAsMono().block();
+      List<String> corpora = ui.getWebClient().get().uri("/corpora").retrieve()
+          .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
       availableCorpora = new ListDataProvider<>(corpora);
       availableCorpora.setFilter(filter);
       tblCorpora.setDataProvider(availableCorpora);

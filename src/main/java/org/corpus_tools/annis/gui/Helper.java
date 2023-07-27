@@ -62,9 +62,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
 import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.AnnoKey;
+import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
@@ -105,13 +104,18 @@ import org.corpus_tools.salt.core.SRelation;
 import org.corpus_tools.salt.graph.Label;
 import org.corpus_tools.salt.util.DataSourceSequence;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.StandardClaimNames;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 /**
  *
@@ -487,30 +491,38 @@ public class Helper {
 
   public static Set<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui)
       throws WebClientResponseException {
-    final CorporaApi api = new CorporaApi(getClient(ui));
-    final SearchApi search = new SearchApi(getClient(ui));
-
-    final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos =
-        api.nodeAnnotations(corpus, false, true)
-            .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
-                && !Objects.equals(a.getKey().getName(), "tok"))
-            .collectList().block();
-
     final Set<AnnoKey> metaAnnos = new HashSet<>();
-    // Check for each annotation if its actually a meta-annotation
-    for (final org.corpus_tools.annis.api.model.Annotation a : nodeAnnos) {
 
-      String annotationName = getQName(a.getKey());
-      if (annotationIsMetadata(corpus, annotationName, search)) {
-        metaAnnos.add(a.getKey());
+    if (ui instanceof CommonUI) {
+      CommonUI commonUI = (CommonUI) ui;
+
+      WebClient client = commonUI.getWebClient();
+
+      final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos =
+          client.get()
+              .uri(
+                  uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
+                      .queryParam("list_values", false)
+                      .queryParam("only_most_frequent_values", true).build(corpus))
+              .retrieve().bodyToFlux(Annotation.class)
+              .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
+                  && !Objects.equals(a.getKey().getName(), "tok"))
+              .collectList().block();
+      // Check for each annotation if its actually a meta-annotation
+      for (final org.corpus_tools.annis.api.model.Annotation a : nodeAnnos) {
+        String annotationName = getQName(a.getKey());
+        if (annotationIsMetadata(corpus, annotationName, commonUI)) {
+          metaAnnos.add(a.getKey());
+        }
       }
     }
 
     return metaAnnos;
   }
 
-  private static boolean annotationIsMetadata(String corpus, String annotationName,
-      SearchApi search) throws WebClientResponseException {
+  private static boolean annotationIsMetadata(String corpus, String annotationName, CommonUI ui)
+      throws WebClientResponseException {
+    WebClient client = ui.getWebClient();
     if (!validQNamePattern.matcher(annotationName).matches()) {
       return false;
     }
@@ -526,7 +538,9 @@ public class Helper {
     q.setOffset(0);
 
     q.setQueryLanguage(QueryLanguage.AQL);
-    final File findResult = search.find(q).block();
+
+    final File findResult =
+        client.post().uri("/search/find").bodyValue(q).retrieve().bodyToMono(File.class).block();
     if (findResult != null && findResult.isFile())
       try {
         try (Stream<String> lines = Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
@@ -637,19 +651,23 @@ public class Helper {
           "please select at least one corpus and execute query again",
           Notification.Type.WARNING_MESSAGE);
       return null;
+    } else if (ui instanceof CommonUI) {
+      CommonUI commonUI = (CommonUI) ui;
+      CorpusConfiguration corpusConfig = new CorpusConfiguration();
+
+      WebClient client = commonUI.getWebClient();
+
+      try {
+        corpusConfig = client.get().uri("/corpora/{corpus}/configuration", corpus).retrieve()
+            .bodyToMono(CorpusConfiguration.class).block();
+      } catch (final WebClientResponseException ex) {
+        ui.access(() -> ExceptionDialog.show(ex, ERROR_MESSAGE_CORPUS_PROPS_HEADER, ui));
+      }
+
+      return corpusConfig;
+    } else {
+      return null;
     }
-
-    CorpusConfiguration corpusConfig = new CorpusConfiguration();
-
-    final CorporaApi api = new CorporaApi(getClient(ui));
-
-    try {
-      corpusConfig = api.corpusConfiguration(corpus).block();
-    } catch (final WebClientResponseException ex) {
-      ui.access(() -> ExceptionDialog.show(ex, ERROR_MESSAGE_CORPUS_PROPS_HEADER, ui));
-    }
-
-    return corpusConfig;
   }
 
 
@@ -700,30 +718,39 @@ public class Helper {
    */
   public static SCorpusGraph getMetaData(final String toplevelCorpusName,
       final Optional<String> documentName, final UI ui) {
-    final SearchApi api = new SearchApi(Helper.getClient(ui));
 
-    try {
+    if (ui instanceof CommonUI) {
+      CommonUI commonUI = (CommonUI) ui;
+      WebClient client = commonUI.getWebClient();
+      try {
 
-      // Get the corpus graph and with it the meta data on the corpus/document nodes
-      String aql;
-      if (documentName.isPresent()) {
-        aql = "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
-            + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get()) + "/)" + " |"
-            + "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
-            + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get())
-            + "/ @* annis:node_type=\"corpus\")";
-      } else {
-        aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=/"
-            + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
+        // Get the corpus graph and with it the meta data on the corpus/document nodes
+        String aql;
+        if (documentName.isPresent()) {
+          aql = "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
+              + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get()) + "/)" + " |"
+              + "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
+              + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get())
+              + "/ @* annis:node_type=\"corpus\")";
+        } else {
+          aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=/"
+              + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
+        }
+        File graphML = File.createTempFile("annis-subgraph", ".salt");
+        Flux<DataBuffer> response = client.get()
+            .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+                .queryParam("query", aql).queryParam("query_language", QueryLanguage.AQL)
+                .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
+                .build(toplevelCorpusName))
+            .accept(MediaType.APPLICATION_XML)
+            .retrieve().bodyToFlux(DataBuffer.class);
+        DataBufferUtils.write(response, graphML.toPath()).block();
+        return CorpusGraphMapper.map(graphML);
+      } catch (WebClientResponseException | XMLStreamException | IOException ex) {
+        log.error(null, ex);
+        ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
       }
-      final File graphML = api.subgraphForQuery(toplevelCorpusName, aql, QueryLanguage.AQL,
-          AnnotationComponentType.PARTOF).block();
-      return CorpusGraphMapper.map(graphML);
-    } catch (WebClientResponseException | XMLStreamException | IOException ex) {
-      log.error(null, ex);
-      ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
     }
-
     return SaltFactory.createSCorpusGraph();
   }
 
@@ -737,25 +764,40 @@ public class Helper {
   public static List<SMetaAnnotation> getMetaDataDoc(final String toplevelCorpusName,
       final String documentName, final UI ui) {
     final List<SMetaAnnotation> result = new ArrayList<>();
-    final SearchApi api = new SearchApi(Helper.getClient(ui));
+    if (ui instanceof CommonUI) {
+      CommonUI commonUI = (CommonUI) ui;
+      WebClient client = commonUI.getWebClient();
 
-    try {
+      try {
 
-      // Get the corpus graph and with it the meta data on the corpus/document nodes
-      final File graphML = api.subgraphForQuery(toplevelCorpusName,
-          "annis:node_type=\"corpus\" _ident_ annis:doc=/"
-              + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/",
-          QueryLanguage.AQL, AnnotationComponentType.PARTOF).block();
+        // Get the corpus graph and with it the meta data on the corpus/document nodes
+        File graphML = File.createTempFile("annis-subgraph", ".salt");
+        Flux<DataBuffer> response =
+            client.get()
+                .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+                    .queryParam("query",
+                        "annis:node_type=\"corpus\" _ident_ annis:doc=/"
+                            + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/")
+                    .queryParam("query_language", QueryLanguage.AQL)
+                    .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
+                    .build(toplevelCorpusName))
+                .accept(MediaType.APPLICATION_XML)
+                .retrieve()
+                .bodyToFlux(DataBuffer.class);
+        DataBufferUtils.write(response, graphML.toPath()).block();
+        final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
 
-      final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
+        for (final SNode n : cg.getNodes()) {
+          result.addAll(n.getMetaAnnotations());
+        }
 
-      for (final SNode n : cg.getNodes()) {
-        result.addAll(n.getMetaAnnotations());
+      } catch (WebClientResponseException | XMLStreamException | IOException ex) {
+        ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata for document", ui));
       }
 
-    } catch (WebClientResponseException | XMLStreamException | IOException ex) {
-      ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata for document", ui));
+
     }
+
 
     return result;
   }
@@ -776,9 +818,9 @@ public class Helper {
     }
     return "";
   }
-  
+
   public static Optional<OAuth2User> getUser() {
-	  return Helper.getUser(SecurityContextHolder.getContext());
+    return Helper.getUser(SecurityContextHolder.getContext());
   }
 
   public static Optional<OAuth2User> getUser(SecurityContext context) {

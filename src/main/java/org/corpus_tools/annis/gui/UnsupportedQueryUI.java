@@ -131,4 +131,9 @@ public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
 		result.setBasePath(getConfig().getWebserviceUrl());
 		return result;
 	}
+
+    @Override
+    public WebClient getWebClient() {
+      return webClient;
+    }
 }

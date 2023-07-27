@@ -120,7 +120,7 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           ProcessBuilder backgroundProcessBuilder;
 
           if (SystemUtils.IS_OS_MAC_OSX) {
-            // On MacOS has several processor architectors, but allows to emulate x86_64 processors
+            // On MacOS has several processor architectures, but allows to emulate x86_64 processors
             // with the Rosetta tool. We use the `arch` helper program to trigger emulation if
             // necessary. This is necessary when Java support the native processor architecture and
             // thus is not emulated yet.
@@ -137,11 +137,6 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           // our log
           this.tReaderOut = createOutputWatcherThread(backgroundProcess.getInputStream(), false);
           this.tReaderErr = createOutputWatcherThread(backgroundProcess.getErrorStream(), true);
-
-          // Use the provided service configuration to get the correct port
-          TomlMapper mapper = new TomlMapper();
-          Map<?, ?> parsedServiceConfig = mapper.readValue(serviceConfigFile, Map.class);
-          config.setWebserviceUrl(getServiceURL(parsedServiceConfig));
         }
       }
     } catch (final IOException ex) {
@@ -208,21 +203,8 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   }
 
 
-  protected String getServiceURL(Map<?, ?> serviceConfig) {
-    long port = 5711l;
-    Object bindSection = serviceConfig.get("bind");
-    if (bindSection instanceof Map) {
-      @SuppressWarnings("rawtypes")
-      Object portRaw = ((Map) bindSection).get("port");
-      if (portRaw instanceof Long) {
-        port = (Long) portRaw;
-      }
-    }
-    return "http://localhost:" + port + "/v1";
-  }
-
   @SuppressWarnings("unchecked")
-  protected File getServiceConfig() throws IOException {
+  public File getServiceConfig() throws IOException {
     File existingConfigFile = new File(config.getWebserviceConfig());
 
     final TomlMapper mapper = new TomlMapper();

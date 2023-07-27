@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.ServletContext;
-
 import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.admin.AdminView;
@@ -265,6 +264,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     return result;
   }
 
+  @Override
   public WebClient getWebClient() {
     return webClient;
   }

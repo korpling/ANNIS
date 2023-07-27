@@ -25,14 +25,13 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.IOUtils;
-import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.CommonUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -95,28 +94,19 @@ public class BinaryRequestHandler implements RequestHandler {
 
     // Proxy the whole request, including any HTTP headers (e.g. used for range requests) to the
     // REST endpoint.
+    WebClient client = ui.getWebClient();
 
-    CorporaApi api = new CorporaApi(ui.getClient());
-    ApiClient client = api.getApiClient();
-
-    final String[] localVarAccepts = {"default"};
-    List<MediaType> localVarAccept = client.selectHeaderAccept(localVarAccepts);
-
-
-    final String[] localVarContentTypes = {};
-    MediaType localVarContentType = client.selectHeaderContentType(localVarContentTypes);
-   
     // Execute the call and return the response
     try {
-      ResponseEntity<DataBuffer> proxyResponse = client.getWebClient().get()
-          .uri("/corpora/{top}/files/{path}", toplevelCorpusName, filePath)
-          .accept(localVarAccept.toArray(new MediaType[0])).headers(httpHeaders -> {
+      ResponseEntity<DataBuffer> proxyResponse = client.get()
+          .uri("/corpora/{top}/files/{path}",
+              toplevelCorpusName, filePath)
+          .accept(MediaType.ALL).headers(httpHeaders -> {
             Enumeration<String> originalHeaderNames = request.getHeaderNames();
             while (originalHeaderNames.hasMoreElements()) {
               String headerName = originalHeaderNames.nextElement();
               String headerValue = request.getHeader(headerName);
               httpHeaders.set(headerName, headerValue);
-              httpHeaders.set("Content-Type", localVarContentType.toString());
             }
           }).retrieve().toEntity(DataBuffer.class).block();
 

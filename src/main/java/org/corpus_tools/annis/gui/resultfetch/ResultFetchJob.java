@@ -101,7 +101,7 @@ public class ResultFetchJob implements Runnable {
 
 
       Flux<DataBuffer> response =
-          ui.getWebClient().post().uri(ui.getConfig().getWebserviceUrl() + "/search/find")
+          ui.getWebClient().post().uri("/search/find")
               .contentType(MediaType.APPLICATION_JSON).bodyValue(q).accept(MediaType.TEXT_PLAIN)
               .retrieve().bodyToFlux(DataBuffer.class);
 
@@ -203,7 +203,7 @@ public class ResultFetchJob implements Runnable {
     if (!corpusPathRaw.isEmpty()) {
       Flux<DataBuffer> response =
           ui.getWebClient().post()
-              .uri(ui.getConfig().getWebserviceUrl() + "/corpora/{corpus}/subgraph",
+              .uri("/corpora/{corpus}/subgraph",
                   corpusPathDecoded.get(0))
               .contentType(MediaType.APPLICATION_JSON).bodyValue(arg)
               .accept(MediaType.APPLICATION_XML)

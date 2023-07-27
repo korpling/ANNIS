@@ -44,7 +44,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 
@@ -68,7 +67,7 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
 	 * desktop.
 	 */
 	@Override
-	protected File getServiceConfig() throws IOException {
+    public File getServiceConfig() throws IOException {
 		TomlMapper mapper = new TomlMapper();
 		@SuppressWarnings("unchecked")
 		Map<Object, Object> config = mapper.readValue(super.getServiceConfig(), Map.class);

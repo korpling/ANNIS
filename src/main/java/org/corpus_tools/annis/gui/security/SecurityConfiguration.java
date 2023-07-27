@@ -1,10 +1,12 @@
 package org.corpus_tools.annis.gui.security;
 
+import com.fasterxml.jackson.dataformat.toml.TomlMapper;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
-
 import org.corpus_tools.annis.gui.ServiceStarter;
 import org.corpus_tools.annis.gui.UIConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.NoneNestedConditions;
 import org.springframework.boot.autoconfigure.security.oauth2.client.ClientsConfiguredCondition;
 import org.springframework.context.annotation.Bean;
@@ -87,9 +89,17 @@ public class SecurityConfiguration {
 
   @Bean
   WebClient webClient(UIConfig config,
-      Optional<OAuth2AuthorizedClientManager> authorizedClientManager, ServiceStarter serviceStarter) {
+      Optional<OAuth2AuthorizedClientManager> authorizedClientManager,
+      ServiceStarter serviceStarter) throws IOException {
 
-    WebClient.Builder builder = WebClient.builder().baseUrl(config.getWebserviceUrl());
+
+    // Use the provided service configuration to get the correct port of the graphANNIS service
+    File serviceConfigFile = serviceStarter.getServiceConfig();
+    TomlMapper mapper = new TomlMapper();
+    Map<?, ?> parsedServiceConfig = mapper.readValue(serviceConfigFile, Map.class);
+    String serviceURL = getServiceURL(parsedServiceConfig);
+
+    WebClient.Builder builder = WebClient.builder().baseUrl(serviceURL);
     Optional<Authentication> desktopUserToken = serviceStarter.getDesktopUserToken();
     if(desktopUserToken.isPresent()) {
     	//  Use the static provided token to authenticate against the REST service 
@@ -110,6 +120,19 @@ public class SecurityConfiguration {
     }
     
     return builder.build();
+  }
+
+  private static String getServiceURL(Map<?, ?> serviceConfig) {
+    long port = 5711l;
+    Object bindSection = serviceConfig.get("bind");
+    if (bindSection instanceof Map) {
+      @SuppressWarnings("rawtypes")
+      Object portRaw = ((Map) bindSection).get("port");
+      if (portRaw instanceof Long) {
+        port = (Long) portRaw;
+      }
+    }
+    return "http://localhost:" + port + "/v1";
   }
 
   @Bean

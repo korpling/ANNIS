@@ -508,6 +508,11 @@ public class EmbeddedVisUI extends CommonUI {
 		return result;
 	}
 
+    @Override
+    public WebClient getWebClient() {
+      return webClient;
+    }
+
   @Override
   public ServletContext getServletContext() {
     return servletContext;

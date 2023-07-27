@@ -30,8 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -170,6 +170,8 @@ public abstract class CommonUI extends AnnisBaseUI {
     }
     
     public abstract ApiClient getClient();
+
+    public abstract WebClient getWebClient();
 
     /**
      * Handle common errors like database/service connection problems and display a unified error
