@@ -315,7 +315,6 @@ public class QueryController implements Serializable {
 
     addHistoryEntry(query);
 
-    UI ui = UI.getCurrent();
     FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, this, query, panel);
 
     freqFuture = Background.call(job);

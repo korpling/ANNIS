@@ -43,16 +43,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.WeakHashMap;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.api.model.QueryLanguage;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.objects.FrequencyQuery;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -467,14 +468,21 @@ public class FrequencyQueryPanel extends VerticalLayout
 
   private List<QueryAttributeDescription> parseQuery(String query, QueryLanguage queryLanguage)
       throws WebClientResponseException {
-    if (query == null || query.isEmpty()) {
+
+    UI ui = UI.getCurrent();
+    if (query == null || query.isEmpty() || !(ui instanceof CommonUI)) {
       return new LinkedList<>();
     }
     // let the service parse the query
-    SearchApi api = new SearchApi(Helper.getClient(UI.getCurrent()));
+    WebClient client = ((CommonUI) ui).getWebClient();
     List<QueryAttributeDescription> nodes =
-        api.nodeDescriptions(query, queryLanguage).collectList().block();
+        client.get()
+            .uri(ub -> ub.path("/search/node-descriptions").queryParam("query", query)
+            .queryParam("query_language", queryLanguage).build())
+            .retrieve().bodyToFlux(QueryAttributeDescription.class).collectList().block();
     return nodes;
+    
+  
 
   }
 

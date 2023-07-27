@@ -13,23 +13,19 @@
  */
 package org.corpus_tools.annis.gui.controller;
 
-import com.vaadin.ui.UI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import org.apache.commons.lang3.tuple.Pair;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.FrequencyQuery;
 import org.corpus_tools.annis.api.model.FrequencyQueryDefinitionInner;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
-import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.frequency.FrequencyQueryPanel;
 import org.corpus_tools.annis.gui.objects.FrequencyTableEntry;
 import org.corpus_tools.salt.util.SaltUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -37,15 +33,14 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
 public class FrequencyBackgroundJob implements Callable<List<FrequencyTableRow>> {
-  private static final Logger log = LoggerFactory.getLogger(FrequencyBackgroundJob.class);
 
-  private final UI ui;
+  private final CommonUI ui;
   private final QueryController queryController;
   private final org.corpus_tools.annis.gui.objects.FrequencyQuery query;
 
   private final FrequencyQueryPanel panel;
 
-  public FrequencyBackgroundJob(UI ui, QueryController queryController,
+  public FrequencyBackgroundJob(CommonUI ui, QueryController queryController,
       org.corpus_tools.annis.gui.objects.FrequencyQuery query,
       FrequencyQueryPanel panel) {
     this.ui = ui;
@@ -63,7 +58,7 @@ public class FrequencyBackgroundJob implements Callable<List<FrequencyTableRow>>
 
   private List<FrequencyTableRow> loadBeans() {
     List<FrequencyTableRow> result = new ArrayList<>();
-    SearchApi api = new SearchApi(Helper.getClient(ui));
+
     try {
       FrequencyQuery frequencyQuery = new FrequencyQuery();
       frequencyQuery.setQuery(query.getQuery());
@@ -91,7 +86,8 @@ public class FrequencyBackgroundJob implements Callable<List<FrequencyTableRow>>
         freqDef.add(d);
       }
       frequencyQuery.setDefinition(freqDef);
-      result = api.frequency(frequencyQuery).collectList().block();
+      result = ui.getWebClient().post().uri("/search/frequency").bodyValue(frequencyQuery)
+          .retrieve().bodyToFlux(FrequencyTableRow.class).collectList().block();
     } catch (final WebClientResponseException ex) {
       ui.access(() -> queryController.reportServiceException(ex, true));
     }
