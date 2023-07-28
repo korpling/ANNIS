@@ -16,7 +16,6 @@
 package org.corpus_tools.annis.gui.admin.model;
 
 import java.io.Serializable;
-import org.apache.catalina.WebResource;
 import org.corpus_tools.annis.ApiClient;
 import org.springframework.web.reactive.function.client.WebClient;
 

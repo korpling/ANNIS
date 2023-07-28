@@ -19,11 +19,11 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
-import org.corpus_tools.annis.api.AdministrationApi;
 import org.corpus_tools.annis.api.model.Group;
 import org.corpus_tools.annis.gui.CaseSensitiveOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
@@ -47,9 +47,10 @@ public class GroupManagement implements Serializable {
 
   public void createOrUpdateGroup(Group newGroup) {
     if (apiClientProvider != null) {
-      AdministrationApi api = new AdministrationApi(apiClientProvider.getClient());
+      WebClient client = apiClientProvider.getWebClient();
       try {
-        api.putGroup(newGroup.getName(), newGroup);
+        client.put().uri("/groups/{name}", newGroup.getName()).bodyValue(newGroup).retrieve()
+            .bodyToMono(Void.class).block();
         groups.put(newGroup.getName(), newGroup);
       } catch (WebClientResponseException ex) {
         log.warn("Could not update group", ex);
@@ -60,9 +61,9 @@ public class GroupManagement implements Serializable {
 
   public void deleteGroup(String groupName) {
     if (apiClientProvider != null) {
-      AdministrationApi api = new AdministrationApi(apiClientProvider.getClient());
+      WebClient client = apiClientProvider.getWebClient();
       try {
-        api.deleteGroup(groupName);
+        client.delete().uri("/groups/{name}", groupName).retrieve().bodyToMono(Void.class).block();
         groups.remove(groupName);
       } catch (WebClientResponseException ex) {
         log.warn("Could not update group", ex);
@@ -73,11 +74,12 @@ public class GroupManagement implements Serializable {
 
   public boolean fetchFromService() {
     if (apiClientProvider != null) {
-      AdministrationApi api = new AdministrationApi(apiClientProvider.getClient());
+      WebClient client = apiClientProvider.getWebClient();
       groups.clear();
       try {
-
-        for (Group g : api.listGroups().toIterable()) {
+        Iterable<Group> remoteGroups =
+            client.get().uri("/groups").retrieve().bodyToFlux(Group.class).toIterable();
+        for (Group g : remoteGroups) {
           groups.put(g.getName(), g);
         }
         return true;
