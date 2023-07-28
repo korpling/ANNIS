@@ -30,156 +30,158 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class SecurityConfiguration {
 
-	private static final String LOGOUT_URL = "/logout";
-	private static final String LOGOUT_SUCCESS_URL = "/";
+  private static final String LOGOUT_URL = "/logout";
+  private static final String LOGOUT_SUCCESS_URL = "/";
 
-	public static final String ROLES_CLAIM = "https://corpus-tools.org/annis/roles";
+  public static final String ROLES_CLAIM = "https://corpus-tools.org/annis/roles";
 
-	public static final String FRAGMENT_TO_RESTORE = "ANNIS_FRAGENT_TO_RESTORE";
+  public static final String FRAGMENT_TO_RESTORE = "ANNIS_FRAGENT_TO_RESTORE";
 
-	private static class NoClientsConfiguredCondition extends NoneNestedConditions {
-		NoClientsConfiguredCondition() {
-			super(ConfigurationPhase.REGISTER_BEAN);
-		}
+  private static class NoClientsConfiguredCondition extends NoneNestedConditions {
+    NoClientsConfiguredCondition() {
+      super(ConfigurationPhase.REGISTER_BEAN);
+    }
 
-		@Conditional(ClientsConfiguredCondition.class)
-		static class ClientsConfigured { // NO_UCD (unused code)
-		}
-	}
+    @Conditional(ClientsConfiguredCondition.class)
+    static class ClientsConfigured { // NO_UCD (unused code)
+    }
+  }
 
-	@EnableWebSecurity
-	@Conditional(ClientsConfiguredCondition.class)
-	public static class OAuth2LoginSecurityConfig {
+  @EnableWebSecurity
+  @Conditional(ClientsConfiguredCondition.class)
+  public static class OAuth2LoginSecurityConfig {
 
-		@Bean
-		public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-			configureHttpVaadinSecurity(http);
-			// Configure logout
-			http.logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
-					// Configure OAuth2 for login
-					.and().oauth2Login();
-			return http.build();
-		}
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+      configureHttpVaadinSecurity(http);
+      // Configure logout
+      http.logout().logoutUrl(LOGOUT_URL).logoutSuccessUrl(LOGOUT_SUCCESS_URL)
+          // Configure OAuth2 for login
+          .and().oauth2Login();
+      return http.build();
+    }
 
-		@Bean
-		public WebSecurityCustomizer webSecurityCustomizer() {
-			return SecurityConfiguration::ignoreVaadinWebSecurity;
-		}
-	}
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+      return SecurityConfiguration::ignoreVaadinWebSecurity;
+    }
+  }
 
-	@EnableWebSecurity
-	@Conditional(NoClientsConfiguredCondition.class)
-	public static class NoLoginSecurityConfig {
+  @EnableWebSecurity
+  @Conditional(NoClientsConfiguredCondition.class)
+  public static class NoLoginSecurityConfig {
 
-		@Bean
-		public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-			configureHttpVaadinSecurity(http);
-			return http.build();
-		}
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+      configureHttpVaadinSecurity(http);
+      return http.build();
+    }
 
-		@Bean
-		public WebSecurityCustomizer webSecurityCustomizer() {
-			return SecurityConfiguration::ignoreVaadinWebSecurity;
-		}
-	}
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+      return SecurityConfiguration::ignoreVaadinWebSecurity;
+    }
+  }
 
-	@Bean
-	WebClient webClient(UIConfig config, Optional<OAuth2AuthorizedClientManager> authorizedClientManager,
-			ServiceStarter serviceStarter) throws IOException {
+  @Bean
+  WebClient webClient(UIConfig config, ServiceStarter serviceStarter,
+      Optional<ClientRegistrationRepository> clientRegistrationRepository,
+      Optional<OAuth2AuthorizedClientRepository> authorizedClientRepository) throws IOException {
 
-		// Use the provided service configuration to get the correct port of the
-		// graphANNIS service
-		File serviceConfigFile = serviceStarter.getServiceConfig();
-		TomlMapper mapper = new TomlMapper();
-		Map<?, ?> parsedServiceConfig = mapper.readValue(serviceConfigFile, Map.class);
-		String serviceURL = getServiceURL(parsedServiceConfig);
+    // Use the provided service configuration to get the correct port of the
+    // graphANNIS service
+    File serviceConfigFile = serviceStarter.getServiceConfig();
+    TomlMapper mapper = new TomlMapper();
+    Map<?, ?> parsedServiceConfig = mapper.readValue(serviceConfigFile, Map.class);
+    String serviceURL = getServiceURL(parsedServiceConfig);
 
-		WebClient.Builder builder = WebClient.builder().baseUrl(serviceURL);
-		Optional<Authentication> desktopUserToken = serviceStarter.getDesktopUserToken();
-		if (desktopUserToken.isPresent()) {
-			// Use the static provided token to authenticate against the REST service
-			builder = builder.defaultHeader("Authorization",
-					"Bearer " + desktopUserToken.get().getCredentials().toString());
-		} else if (authorizedClientManager.isPresent()) {
-			OAuth2AuthorizedClientManager acm = authorizedClientManager.get();
-			// Use the token that can be acquired by logging in
-			ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(
-					acm);
-			filter.setDefaultOAuth2AuthorizedClient(true);
-			filter.setDefaultClientRegistrationId("keycloak");
-			builder = builder.filter(filter);
-		}
+    WebClient.Builder builder = WebClient.builder().baseUrl(serviceURL);
+    Optional<Authentication> desktopUserToken = serviceStarter.getDesktopUserToken();
+    if (desktopUserToken.isPresent()) {
+      // Use the static provided token to authenticate against the REST service
+      builder = builder.defaultHeader("Authorization",
+          "Bearer " + desktopUserToken.get().getCredentials().toString());
+    } else if (clientRegistrationRepository.isPresent() && authorizedClientRepository.isPresent()) {
+      // Use the token that can be acquired by logging in
+      ServletOAuth2AuthorizedClientExchangeFilterFunction filter =
+          new ServletOAuth2AuthorizedClientExchangeFilterFunction(
+              clientRegistrationRepository.get(), authorizedClientRepository.get());
 
-		return builder.build();
-	}
+      filter.setDefaultOAuth2AuthorizedClient(true);
+      builder = builder.filter(filter);
+    }
 
-	private static String getServiceURL(Map<?, ?> serviceConfig) {
-		long port = 5711l;
-		Object bindSection = serviceConfig.get("bind");
-		if (bindSection instanceof Map) {
-			@SuppressWarnings("rawtypes")
-			Object portRaw = ((Map) bindSection).get("port");
-			if (portRaw instanceof Long) {
-				port = (Long) portRaw;
-			}
-		}
-		return "http://localhost:" + port + "/v1";
-	}
+    return builder.build();
+  }
 
-	@Bean
-	@Conditional(ClientsConfiguredCondition.class)
-	public OAuth2AuthorizedClientManager authorizedClientManager(
-			ClientRegistrationRepository clientRegistrationRepository,
-			OAuth2AuthorizedClientRepository authorizedClientRepository) {
+  private static String getServiceURL(Map<?, ?> serviceConfig) {
+    long port = 5711l;
+    Object bindSection = serviceConfig.get("bind");
+    if (bindSection instanceof Map) {
+      @SuppressWarnings("rawtypes")
+      Object portRaw = ((Map) bindSection).get("port");
+      if (portRaw instanceof Long) {
+        port = (Long) portRaw;
+      }
+    }
+    return "http://localhost:" + port + "/v1";
+  }
 
-		OAuth2AuthorizedClientProvider authorizedClientProvider = OAuth2AuthorizedClientProviderBuilder.builder()
-				.clientCredentials().build();
+  @Bean
+  @Conditional(ClientsConfiguredCondition.class)
+  public OAuth2AuthorizedClientManager authorizedClientManager(
+      ClientRegistrationRepository clientRegistrationRepository,
+      OAuth2AuthorizedClientRepository authorizedClientRepository) {
 
-		DefaultOAuth2AuthorizedClientManager authorizedClientManager = new DefaultOAuth2AuthorizedClientManager(
-				clientRegistrationRepository, authorizedClientRepository);
-		authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
-		return authorizedClientManager;
-	}
+    OAuth2AuthorizedClientProvider authorizedClientProvider =
+        OAuth2AuthorizedClientProviderBuilder.builder().clientCredentials().build();
 
-	private static void ignoreVaadinWebSecurity(WebSecurity web) {
-		web.ignoring().antMatchers(
-				// client-side JS code
-				"/VAADIN/**",
+    DefaultOAuth2AuthorizedClientManager authorizedClientManager =
+        new DefaultOAuth2AuthorizedClientManager(clientRegistrationRepository,
+            authorizedClientRepository);
+    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+    return authorizedClientManager;
+  }
 
-				// the standard favicon URI
-				"/favicon.ico",
+  private static void ignoreVaadinWebSecurity(WebSecurity web) {
+    web.ignoring().antMatchers(
+        // client-side JS code
+        "/VAADIN/**",
 
-				// web application manifest
-				"/manifest.webmanifest", "/sw.js", "/offline-page.html",
+        // the standard favicon URI
+        "/favicon.ico",
 
-				// icons and images
-				"/icons/**", "/images/**");
+        // web application manifest
+        "/manifest.webmanifest", "/sw.js", "/offline-page.html",
 
-	}
+        // icons and images
+        "/icons/**", "/images/**");
 
-	private static void configureHttpVaadinSecurity(HttpSecurity http) throws Exception {
-		http
-				// Allow all internal Vaadin requests.
-				.authorizeRequests().antMatchers("/PUSH/**").permitAll().antMatchers("/UIDL/**").permitAll()
-				.antMatchers("/HEARTBEAT/**").permitAll().antMatchers("/**").permitAll()
+  }
 
-				// Restrict access to our application.
-				.and().authorizeRequests().anyRequest().authenticated()
+  private static void configureHttpVaadinSecurity(HttpSecurity http) throws Exception {
+    http
+        // Allow all internal Vaadin requests.
+        .authorizeRequests().antMatchers("/PUSH/**").permitAll().antMatchers("/UIDL/**").permitAll()
+        .antMatchers("/HEARTBEAT/**").permitAll().antMatchers("/**").permitAll()
 
-				// Not using Spring CSRF protection here because Vaadin also has a
-				// Cross-site request forgery protection running.
-				// Spring will try to enforce an additional layer on the filtered resources,
-				// which conflicts
-				// with the Vaadin CSRF protection and makes the frontend unusable.
-				// Disabling Spring CSRF is therefore safe, as long as Vaadin CSRF protection is
-				// activated
-				// (which it is per default).
-				// Also see
-				// https://vaadin.com/blog/filter-based-spring-security-in-vaadin-applications
-				// for an explanation from the Vaadin developers.
-				.and().csrf().disable();
+        // Restrict access to our application.
+        .and().authorizeRequests().anyRequest().authenticated()
 
-		// We depend on IFrames embedded into the application
-		http.headers().frameOptions().sameOrigin();
-	}
+        // Not using Spring CSRF protection here because Vaadin also has a
+        // Cross-site request forgery protection running.
+        // Spring will try to enforce an additional layer on the filtered resources,
+        // which conflicts
+        // with the Vaadin CSRF protection and makes the frontend unusable.
+        // Disabling Spring CSRF is therefore safe, as long as Vaadin CSRF protection is
+        // activated
+        // (which it is per default).
+        // Also see
+        // https://vaadin.com/blog/filter-based-spring-security-in-vaadin-applications
+        // for an explanation from the Vaadin developers.
+        .and().csrf().disable();
+
+    // We depend on IFrames embedded into the application
+    http.headers().frameOptions().sameOrigin();
+  }
 }

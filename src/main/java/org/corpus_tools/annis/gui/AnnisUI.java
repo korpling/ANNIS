@@ -27,6 +27,7 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.Component;
 import java.io.IOException;
@@ -61,7 +62,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Theme("annis")
 @Widgetset("org.corpus_tools.annis.gui.widgets.gwt.AnnisWidgetSet")
 @SpringUI(path = "/*")
-@Push(value = PushMode.AUTOMATIC)
+@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
 public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListener {
 
   private static final Profiles DESKTOP_PROFILES = Profiles.of("desktop & !test");

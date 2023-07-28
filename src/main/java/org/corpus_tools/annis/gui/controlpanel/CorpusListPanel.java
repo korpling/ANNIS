@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CorpusBrowserPanel;
 import org.corpus_tools.annis.gui.CorpusSet;
 import org.corpus_tools.annis.gui.Helper;
@@ -51,10 +50,8 @@ import org.corpus_tools.annis.gui.IDGenerator;
 import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.vaadin.extension.gridscroll.GridScrollExtension;
 
@@ -68,8 +65,6 @@ public class CorpusListPanel extends VerticalLayout {
   private static final String COMPACT_COLUMN_CLASS = "compact-column";
 
   private static final long serialVersionUID = -6395601812288089382L;
-
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorpusListPanel.class);
 
   private static final Resource INFO_ICON = VaadinIcons.INFO_CIRCLE;
 
@@ -235,7 +230,7 @@ public class CorpusListPanel extends VerticalLayout {
     nameColumn.setExpandRatio(10);
     nameColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
     nameColumn.setResizable(false);
-    
+
     selectedColumn =
         tblCorpora.addColumn(corpus -> ui.getQueryState().getSelectedCorpora().contains(corpus));
     selectedColumn.setHidden(true);
@@ -272,7 +267,7 @@ public class CorpusListPanel extends VerticalLayout {
         }
       }
 
-      
+
       if (corpora.isEmpty() && Helper.getUser(SecurityContextHolder.getContext()).isPresent()) {
         Notification.show(
             "No corpora found. Please login "
@@ -348,27 +343,29 @@ public class CorpusListPanel extends VerticalLayout {
   public void updateCorpusSetList(boolean showLoginMessage) {
     if (ui != null) {
       ui.clearCorpusConfigCache();
-    }
-    
-    ui.getWebClient().get().uri("/corpora").retrieve()
-    .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).subscribe(corpora -> {
-    	ui.access(() -> {
-    		availableCorpora = new ListDataProvider<>(corpora);
-            availableCorpora.setFilter(filter);
-            HashSet<String> oldSelectedItems = new HashSet<>(tblCorpora.getSelectedItems());
-            tblCorpora.setDataProvider(availableCorpora);
-            // reset the selected items
-            tblCorpora.asMultiSelect().setValue(oldSelectedItems);
 
-            if (showLoginMessage) {
-              if (corpora.isEmpty()) {
-                Notification.show(
-                    "No corpora found. Please login "
-                        + "(use button at upper right corner) to see more corpora.",
-                    Notification.Type.HUMANIZED_MESSAGE);
+
+
+      ui.getWebClient().get().uri("/corpora").retrieve()
+          .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).subscribe(corpora -> {
+            ui.access(() -> {
+              availableCorpora = new ListDataProvider<>(corpora);
+              availableCorpora.setFilter(filter);
+              HashSet<String> oldSelectedItems = new HashSet<>(tblCorpora.getSelectedItems());
+              tblCorpora.setDataProvider(availableCorpora);
+              // reset the selected items
+              tblCorpora.asMultiSelect().setValue(oldSelectedItems);
+
+              if (showLoginMessage) {
+                if (corpora.isEmpty()) {
+                  Notification.show(
+                      "No corpora found. Please login "
+                          + "(use button at upper right corner) to see more corpora.",
+                      Notification.Type.HUMANIZED_MESSAGE);
+                }
               }
-            }
-    	});
-    });
+            });
+          });
+    }
   }
 }
