@@ -37,7 +37,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
@@ -233,7 +232,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
    * @param corpora The corpora to query
    * @param api An API object used to perform the lookup
    * @return A list of annotation names.
-   * @throws ApiException
+   * @throws WebClientResponseException
    */
   protected List<String> getAllAnnotationsAsExporterKey(Collection<String> corpora,
       WebClient client) throws WebClientResponseException {
