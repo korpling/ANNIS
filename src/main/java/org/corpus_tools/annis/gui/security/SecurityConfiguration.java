@@ -100,17 +100,14 @@ public class SecurityConfiguration {
 			// Use the static provided token to authenticate against the REST service
 			builder = builder.defaultHeader("Authorization",
 					"Bearer " + desktopUserToken.get().getCredentials().toString());
-		} else {
+		} else if (authorizedClientManager.isPresent()) {
+			OAuth2AuthorizedClientManager acm = authorizedClientManager.get();
 			// Use the token that can be acquired by logging in
-			Optional<ServletOAuth2AuthorizedClientExchangeFilterFunction> filter = authorizedClientManager.map(acm -> {
-				ServletOAuth2AuthorizedClientExchangeFilterFunction result = new ServletOAuth2AuthorizedClientExchangeFilterFunction(
-						acm);
-//                  result.setDefaultClientRegistrationId("keycloak");
-				return result;
-			});
-			if (filter.isPresent()) {
-				builder = builder.filter(filter.get());
-			}
+			ServletOAuth2AuthorizedClientExchangeFilterFunction filter = new ServletOAuth2AuthorizedClientExchangeFilterFunction(
+					acm);
+			filter.setDefaultOAuth2AuthorizedClient(true);
+			filter.setDefaultClientRegistrationId("keycloak");
+			builder = builder.filter(filter);
 		}
 
 		return builder.build();
