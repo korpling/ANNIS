@@ -67,48 +67,6 @@ public class CorpusListPanel extends VerticalLayout {
 
   private static final String COMPACT_COLUMN_CLASS = "compact-column";
 
-  private class CorpusListUpdater implements Runnable {
-
-    private final boolean showLoginMessage;
-
-    public CorpusListUpdater(boolean showLoginMessage) {
-      this.showLoginMessage = showLoginMessage;
-    }
-
-    @Override
-    public void run() {
-
-      try {
-        // query in background
-        WebClient client = ui.getWebClient();
-        List<String> corpora = client.get().uri("/corpora").retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
-
-        // update the GUI
-        ui.access(() -> {
-          availableCorpora = new ListDataProvider<>(corpora);
-          availableCorpora.setFilter(filter);
-          HashSet<String> oldSelectedItems = new HashSet<>(tblCorpora.getSelectedItems());
-          tblCorpora.setDataProvider(availableCorpora);
-          // reset the selected items
-          tblCorpora.asMultiSelect().setValue(oldSelectedItems);
-
-          if (showLoginMessage) {
-            if (corpora.isEmpty()) {
-              Notification.show(
-                  "No corpora found. Please login "
-                      + "(use button at upper right corner) to see more corpora.",
-                  Notification.Type.HUMANIZED_MESSAGE);
-            }
-          }
-        });
-      } catch (Throwable ex) {
-        log.warn("Could not get corpus list", ex);
-      }
-
-    }
-  }
-
   private static final long serialVersionUID = -6395601812288089382L;
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorpusListPanel.class);
@@ -391,7 +349,26 @@ public class CorpusListPanel extends VerticalLayout {
     if (ui != null) {
       ui.clearCorpusConfigCache();
     }
-    CorpusListUpdater updater = new CorpusListUpdater(showLoginMessage);
-    Background.run(updater);
+    
+    ui.getWebClient().get().uri("/corpora").retrieve()
+    .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).subscribe(corpora -> {
+    	ui.access(() -> {
+    		availableCorpora = new ListDataProvider<>(corpora);
+            availableCorpora.setFilter(filter);
+            HashSet<String> oldSelectedItems = new HashSet<>(tblCorpora.getSelectedItems());
+            tblCorpora.setDataProvider(availableCorpora);
+            // reset the selected items
+            tblCorpora.asMultiSelect().setValue(oldSelectedItems);
+
+            if (showLoginMessage) {
+              if (corpora.isEmpty()) {
+                Notification.show(
+                    "No corpora found. Please login "
+                        + "(use button at upper right corner) to see more corpora.",
+                    Notification.Type.HUMANIZED_MESSAGE);
+              }
+            }
+    	});
+    });
   }
 }
