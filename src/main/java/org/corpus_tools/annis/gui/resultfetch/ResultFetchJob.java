@@ -150,7 +150,8 @@ public class ResultFetchJob implements Runnable {
           arg.setNodeIds(m.getSaltIDs().stream().collect(Collectors.toList()));
 
           SaltProject p = createSaltFromMatch(m, arg, current);
-          ui.access(() -> resultPanel.addQueryResult(query, p, matchList));
+          ui.access(() -> resultPanel.addQueryResult(query, p, matchList,
+              Helper.getCorpusConfigurationMap(q.getCorpora(), ui.getWebClient()).block()));
 
 
           if (Thread.interrupted()) {

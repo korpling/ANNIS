@@ -114,6 +114,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 /**
  *
@@ -668,6 +670,20 @@ public class Helper {
     } else {
       return null;
     }
+  }
+
+  public static Mono<Map<String, CorpusConfiguration>> getCorpusConfigurationMap(
+      Collection<String> corpora, WebClient client) {
+    Mono<Map<String, CorpusConfiguration>> corpusConfigs =
+        Flux.fromIterable(corpora).flatMap(
+        corpus -> {
+          Mono<CorpusConfiguration> result =
+              client.get().uri("/corpora/{corpus}/configuration", corpus).retrieve()
+              .bodyToMono(CorpusConfiguration.class);
+          return result.zipWith(Mono.just(corpus));
+        }
+        ).collectMap(Tuple2::getT2, Tuple2::getT1);
+    return corpusConfigs;
   }
 
 

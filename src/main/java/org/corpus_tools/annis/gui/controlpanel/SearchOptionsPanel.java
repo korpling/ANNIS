@@ -42,13 +42,13 @@ import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 /**
  *
@@ -347,14 +347,7 @@ public class SearchOptionsPanel extends FormLayout {
 
       // Fetch the corpus configuration for all involved corpora
       Mono<Map<String, CorpusConfiguration>> corpusConfigs =
-          Flux.fromIterable(corpora).flatMap(
-          corpus -> {
-            Mono<CorpusConfiguration> result =
-                client.get().uri("/corpora/{corpus}/configuration", corpus).retrieve()
-                .bodyToMono(CorpusConfiguration.class);
-            return result.zipWith(Mono.just(corpus));
-          }
-      ).collectMap(Tuple2::getT2, Tuple2::getT1);
+          Helper.getCorpusConfigurationMap(corpora, client);
       // Update the UI when results are ready
       corpusConfigs.subscribe(result -> ui.access(() -> {
         setLoadingState(false);

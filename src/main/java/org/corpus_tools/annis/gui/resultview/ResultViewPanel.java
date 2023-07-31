@@ -22,12 +22,10 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import java.io.UnsupportedEncodingException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -40,7 +38,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
-import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.IDGenerator;
@@ -112,8 +109,6 @@ public class ResultViewPanel extends VerticalLayout {
 
   private static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
-  private final Map<HashSet<SingleResolverRequest>, LinkedHashSet<VisualizerRule>> cacheResolver;
-
   private final PagingComponent paging;
 
   private final MenuItem miTokAnnos;
@@ -148,9 +143,6 @@ public class ResultViewPanel extends VerticalLayout {
     this.tokenAnnoVisible = new TreeMap<>();
     this.controller = ui.getQueryController();
     this.initialQuery = initialQuery;
-
-    cacheResolver = Collections.synchronizedMap(
-        new HashMap<HashSet<SingleResolverRequest>, LinkedHashSet<VisualizerRule>>());
 
     resultPanelList = Collections.synchronizedList(new LinkedList<AbstractComponent>());
 
@@ -189,20 +181,22 @@ public class ResultViewPanel extends VerticalLayout {
     setExpandRatio(paging, 0.0f);
   }
 
-  public void addQueryResult(PagedResultQuery q, SaltProject p, List<Match> allMatches) {
+  public void addQueryResult(PagedResultQuery q, SaltProject p, List<Match> allMatches,
+      Map<String, CorpusConfiguration> corpusConfigs) {
 
     if (q == null) {
       return;
     }
 
     try {
-      updateVariables(p);
+      updateVariables(p, corpusConfigs);
       if (p.getCorpusGraphs().isEmpty()) {
         p.createCorpusGraph();
       }
       SCorpusGraph corpusGraph = p.getCorpusGraphs().get(0);
       AbstractComponent newPanel =
-          createSingleResultPanel(corpusGraph, currentResults, q.getOffset(), allMatches);
+          createSingleResultPanel(corpusGraph, currentResults, q.getOffset(), allMatches,
+              corpusConfigs);
       currentResults += 1;
 
       int numberOfResults = allMatches.size();
@@ -246,7 +240,7 @@ public class ResultViewPanel extends VerticalLayout {
 
 
   private AbstractComponent createSingleResultPanel(SCorpusGraph corpusGraph, int localMatchIndex,
-      long globalOffset, List<Match> allMatches) {
+      long globalOffset, List<Match> allMatches, Map<String, CorpusConfiguration> corpusConfigs) {
     Match m = new Match();
     if (allMatches != null && localMatchIndex >= 0 && localMatchIndex < allMatches.size()) {
       m = allMatches.get(localMatchIndex);
@@ -259,7 +253,7 @@ public class ResultViewPanel extends VerticalLayout {
         .findFirst();
     if (doc.isPresent()) {
       panel = new SingleResultPanel(doc.get(), m, localMatchIndex + globalOffset,
-          new ResolverProviderImpl(cacheResolver), sui, getVisibleTokenAnnos(), segmentationName,
+          corpusConfigs, sui, getVisibleTokenAnnos(), segmentationName,
           controller, initialQuery);
     } else {
       Set<String> matchedCorpora = new LinkedHashSet<>();
@@ -434,7 +428,8 @@ public class ResultViewPanel extends VerticalLayout {
     } // end iterate for segmentation layer
   }
 
-  private void updateVariables(SaltProject p) throws UnsupportedEncodingException {
+  private void updateVariables(SaltProject p, Map<String, CorpusConfiguration> corpusConfigMap)
+      throws UnsupportedEncodingException {
     segmentationLayerSet.addAll(getSegmentationNames(p));
     tokenAnnotationLevelSet.addAll(Helper.getTokenAnnotationLevelSet(p));
     Set<String> hiddenTokenAnnos = null;
@@ -443,7 +438,7 @@ public class ResultViewPanel extends VerticalLayout {
 
     for (String corpusName : corpusNames) {
 
-      CorpusConfiguration corpusConfig = Helper.getCorpusConfig(corpusName, UI.getCurrent());
+      CorpusConfiguration corpusConfig = corpusConfigMap.get(corpusName);
 
       if (corpusConfig != null && corpusConfig.getView() != null
           && corpusConfig.getView().getHiddenAnnos() != null) {

@@ -15,8 +15,10 @@ package org.corpus_tools.annis.gui;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.FutureCallback;
+import com.google.gson.Gson;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.FontAwesome;
@@ -29,6 +31,7 @@ import com.vaadin.v7.data.Property;
 import com.vaadin.v7.data.util.BeanContainer;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -39,12 +42,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.CountExtra;
 import org.corpus_tools.annis.api.model.CountQuery;
+import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
+import org.corpus_tools.annis.api.model.SubgraphWithContext;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
+import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditorState.ParseError;
 import org.corpus_tools.annis.gui.controller.CountCallback;
 import org.corpus_tools.annis.gui.controller.ExportBackgroundJob;
 import org.corpus_tools.annis.gui.controller.FrequencyBackgroundJob;
@@ -66,17 +73,27 @@ import org.corpus_tools.annis.gui.objects.PagedResultQuery;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.corpus_tools.annis.gui.resultfetch.ResultFetchJob;
+import org.corpus_tools.annis.gui.paging.PagingComponent;
 import org.corpus_tools.annis.gui.resultfetch.SingleResultFetchJob;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
 import org.corpus_tools.annis.gui.resultview.VisualizerContextChanger;
 import org.corpus_tools.annis.gui.visualizers.IFrameResourceMap;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SaltProject;
+import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple3;
 
 /**
  * A controller to modifiy the query UI state. s
@@ -161,8 +178,7 @@ public class QueryController implements Serializable {
       queryCopy = new DisplayedResultQuery((DisplayedResultQuery) q);
     } else if (q instanceof ContextualizedQuery) {
       queryCopy = new ContextualizedQuery((ContextualizedQuery) q);
-    }
-    else {
+    } else {
       queryCopy = new Query(q);
     }
 
@@ -269,9 +285,8 @@ public class QueryController implements Serializable {
 
     addHistoryEntry(query);
 
-    Optional<ExporterPlugin> exporterImpl =
-        ui.getExporterPlugins().stream().filter((e) -> e.getClass().equals(query.getExporter()))
-            .findAny();
+    Optional<ExporterPlugin> exporterImpl = ui.getExporterPlugins().stream()
+        .filter((e) -> e.getClass().equals(query.getExporter())).findAny();
 
     UI ui = UI.getCurrent();
     if (exporterImpl.isPresent() && ui instanceof AnnisUI) {
@@ -383,9 +398,6 @@ public class QueryController implements Serializable {
     addHistoryEntry(displayedQuery);
 
 
-    //
-    // begin execute match fetching
-    //
     ResultViewPanel oldPanel = searchView.getLastSelectedResultView();
     if (replaceOldTab) {
       // remove old panel from view
@@ -394,11 +406,9 @@ public class QueryController implements Serializable {
 
     if (ui instanceof AnnisUI) {
       AnnisUI annisUI = (AnnisUI) ui;
-      ResultViewPanel newResultView =
-          new ResultViewPanel(annisUI, displayedQuery);
-      newResultView.getPaging()
-          .addCallback(
-              new SpecificPagingCallback(annisUI, searchView, newResultView, displayedQuery));
+      ResultViewPanel newResultView = new ResultViewPanel(annisUI, displayedQuery);
+      newResultView.getPaging().addCallback(
+          new SpecificPagingCallback(annisUI, searchView, newResultView, displayedQuery));
 
       TabSheet.Tab newTab;
 
@@ -412,47 +422,140 @@ public class QueryController implements Serializable {
 
       searchView.getMainTab().setSelectedTab(newResultView);
       searchView.notifiyQueryStarted();
+      fetchFindResults(displayedQuery, newResultView, annisUI);
+      fetchCountResults(displayedQuery, newResultView, annisUI);
+    }
+  }
 
-      Background.run(new ResultFetchJob(displayedQuery, newResultView, annisUI));
+  private void fetchFindResults(PagedResultQuery query, ResultViewPanel resultPanel,
+      AnnisUI ui) {
+    resultPanel.showMatchSearchInProgress(query.getSegmentation());
 
-      //
-      // end execute match fetching
-      //
-      //
-      // begin execute count
-      //
-      // start count query
-      searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
+    FindQuery q = new FindQuery();
+    q.setCorpora(new LinkedList<>(query.getCorpora()));
+    q.setQuery(query.getQuery());
+    q.setOffset((int) query.getOffset());
+    q.setLimit(query.getLimit());
+    q.setQueryLanguage(query.getApiQueryLanguage());
+    q.setOrder(query.getOrder());
 
-      CountQuery countQuery = new CountQuery();
-      countQuery.setCorpora(new LinkedList<>(displayedQuery.getCorpora()));
-      countQuery.setQuery(displayedQuery.getQuery());
-      countQuery.setQueryLanguage(displayedQuery.getApiQueryLanguage());
+    Mono<Map<String, CorpusConfiguration>> corpusConfigMap =
+        Helper.getCorpusConfigurationMap(q.getCorpora(), ui.getWebClient());
 
-      WebClient client = ((AnnisUI) ui).getWebClient();
+    // The default string decoder will split the result line by line
+    Flux<Match> matches = ui.getWebClient().post().uri("/search/find")
+        .contentType(MediaType.APPLICATION_JSON).bodyValue(q).accept(MediaType.TEXT_PLAIN)
+        .retrieve().bodyToFlux(String.class).map(Match::parseFromString);
+    // Get the subgraph for each match
+    Flux<Tuple3<SaltProject, Match, Map<String, CorpusConfiguration>>> subgraphs =
+        matches.flatMap(m -> {
+      SubgraphWithContext arg = new SubgraphWithContext();
+      arg.setLeft(query.getLeftContext());
+      arg.setRight(query.getRightContext());
+      arg.setSegmentation(query.getSegmentation());
+      arg.setNodeIds(m.getSaltIDs().stream().collect(Collectors.toList()));
+          return Mono.zip(createSaltFromMatch(m, arg), Mono.just(m), corpusConfigMap);
+    });
 
-      try {
-        CountCallback callback =
-            new CountCallback(newResultView, displayedQuery.getLimit(), annisUI);
-        Disposable countDisposable =
-            client.post().uri("/search/count").bodyValue(countQuery).retrieve()
-                .bodyToMono(CountExtra.class).doOnNext(callback)
-                .doOnError(t -> {
-          annisUI.access(() -> {
-            annisUI.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
-            if (t instanceof WebClientResponseException) {
-              annisUI.getQueryController().reportServiceException((WebClientResponseException) t,
-                  true);
+    subgraphs.doOnError(unknownException -> {
+
+      log.error("Could not execute find query", unknownException);
+      if (unknownException instanceof WebClientResponseException) {
+        WebClientResponseException ex = (WebClientResponseException) unknownException;
+        ui.access(() -> {
+          if (resultPanel != null && resultPanel.getPaging() != null) {
+            PagingComponent paging = resultPanel.getPaging();
+
+            if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+              Gson json = new Gson();
+              BadRequestError error =
+                  json.fromJson(ex.getResponseBodyAsString(), BadRequestError.class);
+
+              String errMsg = "";
+              if (error.getAqLSyntaxError() != null) {
+                errMsg = new ParseError(error.getAqLSyntaxError()).message;
+              }
+              if (error.getAqLSemanticError() != null) {
+                errMsg = new ParseError(error.getAqLSemanticError()).message;
+              }
+
+              paging.setInfo("parsing error: " + errMsg);
+            } else if (ex.getStatusCode() == HttpStatus.GATEWAY_TIMEOUT) {
+              paging.setInfo("Timeout: query execution took too long");
+            } else if (ex.getStatusCode() == HttpStatus.FORBIDDEN) {
+              paging.setInfo("Not authorized to query this corpus.");
             } else {
-              log.error("Could not get count result", t);
+              ExceptionDialog.show(ex, ui);
             }
-          });
-        }).single().subscribe();
+            resultPanel.showFinishedSubgraphSearch();
 
-        state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, countDisposable);
-      } catch (WebClientResponseException ex) {
-        ExceptionDialog.show(ex, ui);
+          }
+        });
       }
+    }).subscribe(tuple -> ui.access(() -> resultPanel.addQueryResult(query, tuple.getT1(),
+        Arrays.asList(tuple.getT2()), tuple.getT3())));
+
+  }
+
+  private Mono<SaltProject> createSaltFromMatch(Match m, SubgraphWithContext arg) {
+    List<String> corpusPathRaw = Helper.getCorpusPath(m.getSaltIDs().get(0), false);
+    List<String> corpusPathDecoded = Helper.getCorpusPath(m.getSaltIDs().get(0), true);
+
+    SaltProject p = SaltFactory.createSaltProject();
+    final SCorpusGraph cg = p.createCorpusGraph();
+
+    if (corpusPathRaw.size() == 1) {
+      // This match describes a corpus
+      cg.createCorpus(null, corpusPathRaw.get(0));
+    } else if (corpusPathRaw.size() > 1) {
+      // Get the document graph via a REST API call
+      Mono<SDocumentGraph> docGraph =
+          ui.getWebClient().post().uri("/corpora/{corpus}/subgraph", corpusPathDecoded.get(0))
+              .contentType(MediaType.APPLICATION_JSON).bodyValue(arg)
+              .accept(MediaType.APPLICATION_XML).retrieve().bodyToMono(SDocumentGraph.class);
+      // Add the received document graph to the Salt project
+      Mono<SaltProject> project = docGraph.flatMap(d -> {
+        URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(corpusPathRaw));
+        SDocument doc = cg.createDocument(docURI);
+        doc.setDocumentGraph(d);
+        Helper.addMatchToDocumentGraph(m, doc.getDocumentGraph());
+        return Mono.just(p);
+      });
+      return project;
+    }
+    return Mono.just(p);
+  }
+
+  private void fetchCountResults(DisplayedResultQuery displayedQuery, ResultViewPanel resultPanel,
+      AnnisUI ui) {
+
+    searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
+
+    CountQuery countQuery = new CountQuery();
+    countQuery.setCorpora(new LinkedList<>(displayedQuery.getCorpora()));
+    countQuery.setQuery(displayedQuery.getQuery());
+    countQuery.setQueryLanguage(displayedQuery.getApiQueryLanguage());
+
+    WebClient client = ((AnnisUI) ui).getWebClient();
+
+    try {
+      CountCallback callback = new CountCallback(resultPanel, displayedQuery.getLimit(), ui);
+      Disposable countDisposable = client.post().uri("/search/count").bodyValue(countQuery)
+          .retrieve().bodyToMono(CountExtra.class).doOnNext(callback).doOnError(t -> {
+            ui.access(() -> {
+              ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
+              if (t instanceof WebClientResponseException) {
+                ui.getQueryController().reportServiceException((WebClientResponseException) t,
+                    true);
+              } else {
+                log.error("Could not get count result", t);
+              }
+            });
+          }).single().subscribe();
+
+      state.getExecutedCalls().put(QueryUIState.QueryType.COUNT, countDisposable);
+    } catch (WebClientResponseException ex) {
+      ExceptionDialog.show(ex, ui);
     }
   }
 
@@ -466,10 +569,8 @@ public class QueryController implements Serializable {
         .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
         .queryLanguage(state.getQueryLanguageLegacy()).left(state.getLeftContext())
         .right(state.getRightContext()).segmentation(state.getVisibleBaseText().getValue())
-        .exporter(state.getExporter())
-        .annotations(state.getExportAnnotationKeys())
-        .param(state.getExportParameters()).alignmc(state.getAlignmc().getValue())
-        .build();
+        .exporter(state.getExporter()).annotations(state.getExportAnnotationKeys())
+        .param(state.getExportParameters()).alignmc(state.getAlignmc().getValue()).build();
   }
 
   private List<ResultViewPanel> getResultPanels() {
@@ -651,8 +752,7 @@ public class QueryController implements Serializable {
 
       client.get()
           .uri(ub -> ub.path("/search/node-descriptions").queryParam("query", query).build())
-          .retrieve()
-          .bodyToFlux(QueryAttributeDescription.class)
+          .retrieve().bodyToFlux(QueryAttributeDescription.class)
           .subscribe(new ValidateCallback(qp, this, ui));
 
     }
