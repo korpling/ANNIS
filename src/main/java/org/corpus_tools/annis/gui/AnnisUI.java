@@ -13,8 +13,6 @@
  */
 package org.corpus_tools.annis.gui;
 
-import static org.corpus_tools.annis.gui.Helper.DEFAULT_CONFIG;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
@@ -181,12 +179,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     if (corpusConfigCache != null) {
       config = corpusConfigCache.getIfPresent(corpus);
       if (config == null) {
-        if (corpus.equals(DEFAULT_CONFIG)) {
-          config = Helper.getDefaultCorpusConfig();
-        } else {
-          config = Helper.getCorpusConfig(corpus, AnnisUI.this);
-        }
-
+        config = Helper.getCorpusConfig(corpus, AnnisUI.this);
         corpusConfigCache.put(corpus, config);
       }
     }

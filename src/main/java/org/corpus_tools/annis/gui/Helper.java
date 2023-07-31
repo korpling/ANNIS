@@ -67,8 +67,6 @@ import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
-import org.corpus_tools.annis.api.model.CorpusConfigurationContext;
-import org.corpus_tools.annis.api.model.CorpusConfigurationView;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
@@ -375,9 +373,6 @@ public class Helper {
 
     }
   }
-
-  public final static String DEFAULT_CONFIG = "default-config";
-
   // the name of the web font class, the css class contains !important.
   public final static String CORPUS_FONT_FORCE = "corpus-font-force";
 
@@ -673,24 +668,6 @@ public class Helper {
     } else {
       return null;
     }
-  }
-
-
-  public static CorpusConfiguration getDefaultCorpusConfig() {
-
-    final CorpusConfiguration defaultCorpusConfig = new CorpusConfiguration();
-
-    defaultCorpusConfig.setView(new CorpusConfigurationView());
-    defaultCorpusConfig.setContext(new CorpusConfigurationContext());
-    defaultCorpusConfig.setExampleQueries(new LinkedList<>());
-    defaultCorpusConfig.setVisualizers(new LinkedList<>());
-
-    defaultCorpusConfig.getView().setPageSize(10);
-    defaultCorpusConfig.getContext().setDefault(5);
-    defaultCorpusConfig.getContext().setSizes(Arrays.asList(1, 2, 5, 10));
-    defaultCorpusConfig.getContext().setMax(Integer.MAX_VALUE);
-
-    return defaultCorpusConfig;
   }
 
 

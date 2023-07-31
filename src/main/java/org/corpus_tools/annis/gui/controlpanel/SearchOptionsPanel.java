@@ -25,7 +25,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -34,20 +36,19 @@ import java.util.stream.Collectors;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.CorpusConfigurationContext;
+import org.corpus_tools.annis.api.model.CorpusConfigurationView;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.FindQuery.OrderEnum;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Background;
-import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.objects.CorpusConfigMap;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 /**
  *
@@ -56,70 +57,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  */
 public class SearchOptionsPanel extends FormLayout {
 
-  private class CorpusConfigUpdater implements Runnable {
-
-    private final AnnisUI ui;
-    private final Collection<String> corpora;
-    private final boolean corpusSelectionChanged;
-    private final boolean setValues;
-
-    public CorpusConfigUpdater(AnnisUI ui, Collection<String> corpora,
-        boolean corpusSelectionChanged) {
-      this.ui = ui;
-      this.corpora = corpora;
-      this.corpusSelectionChanged = corpusSelectionChanged;
-      
-      this.setValues = corpusSelectionChanged && isUpdateStateFromConfig();
-    }
-
-    @Override
-    public void run() {
-      final List<String> segmentations = getSegmentationNamesFromService(corpora, ui);
-
-      final Set<String> corporaWithDefault = new TreeSet<>(corpora);
-      corporaWithDefault.add(DEFAULT_CONFIG);
-
-      final CorpusConfigMap corpusConfigs = new CorpusConfigMap();
-      for (String c : corporaWithDefault) {
-        corpusConfigs.put(c, ui.getCorpusConfigWithCache(c));
-      }
-
-      // if there are not any defaults create them
-      if (!corpusConfigs.containsConfig(DEFAULT_CONFIG)) {
-        corpusConfigs.put(DEFAULT_CONFIG, Helper.getDefaultCorpusConfig());
-      }
-
-      // update GUI
-      ui.access(() -> {
-        setLoadingState(false);
-
-        CorpusConfiguration c = mergeConfigs(corpora, corpusConfigs);
-
-        if (c.getContext().getMax() == null) {
-          maxContext.set(Integer.MAX_VALUE);
-        } else {
-          maxContext.set(c.getContext().getMax());
-        }
-
-        cbLeftContext.setItems(c.getContext().getSizes());
-        cbRightContext.setItems(c.getContext().getSizes());
-        cbSegmentation.setItems(segmentations);
-
-        if (setValues) {
-          cbLeftContext.setValue(c.getContext().getDefault());
-          cbRightContext.setValue(c.getContext().getDefault());
-          cbSegmentation.setValue(c.getContext().getSegmentation());
-          cbResultsPerPage.setValue(c.getView().getPageSize());
-        }
-
-        // reset if corpus selection has changed
-        if (corpusSelectionChanged) {
-          setUpdateStateFromConfig(true);
-        }
-      });
-    }
-
-  }
 
   /**
    * 
@@ -127,41 +64,12 @@ public class SearchOptionsPanel extends FormLayout {
   private static final long serialVersionUID = 7878445496945702778L;
 
   private static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
-  private static final String DEFAULT_CONFIG = "default-config";
 
   private static final Logger log = LoggerFactory.getLogger(SearchOptionsPanel.class);
   // TODO: make this configurable
   private static final List<Integer> PREDEFINED_PAGE_SIZES = ImmutableList.of(1, 2, 5, 10, 20, 25);
 
   public static final List<Integer> PREDEFINED_CONTEXTS = ImmutableList.of(0, 1, 2, 5, 10, 20);
-
-
-  private static List<String> getSegmentationNamesFromService(Collection<String> corpora,
-      CommonUI ui) {
-    List<String> segNames = new ArrayList<>();
-    WebClient client = ui.getWebClient();
-    for (String corpus : corpora) {
-      try {
-        // Get all ordering components
-        List<Component> orderingComponents = client.get()
-            .uri(ub -> ub.path("/corpora/{corpus}/components")
-                .queryParam("type", AnnotationComponentType.ORDERING.getValue()).build(corpus))
-            .retrieve().bodyToFlux(Component.class).collectList().block();
-        for (Component c : orderingComponents) {
-          if (!c.getName().isEmpty() && !"annis".equals(c.getLayer())) {
-            segNames.add(c.getName());
-          }
-        }
-      } catch (WebClientResponseException ex) {
-        if (ex.getStatusCode() == HttpStatus.FORBIDDEN) {
-          log.debug("Did not have access rights to query segmentation names for corpus", ex);
-        } else {
-          log.warn("Could not query segmentation names for corpus", ex);
-        }
-      }
-    }
-    return segNames;
-  }
 
   private final com.vaadin.ui.ComboBox<Integer> cbLeftContext;
 
@@ -306,8 +214,7 @@ public class SearchOptionsPanel extends FormLayout {
       cbLeftContext.addSelectionListener(event -> binder.setBean(state));
       cbRightContext.addSelectionListener(event -> binder.setBean(state));
 
-      Background
-          .run(new CorpusConfigUpdater(ui, new LinkedHashSet<>(state.getSelectedCorpora()), false));
+      fetchCorpusConfiguration(ui, new LinkedHashSet<>(state.getSelectedCorpora()), false);
     }
   }
 
@@ -317,27 +224,46 @@ public class SearchOptionsPanel extends FormLayout {
     return updateStateFromConfig;
   }
 
+  private static CorpusConfiguration createEmptyCorpusConfig() {
+
+    final CorpusConfiguration result = new CorpusConfiguration();
+
+    result.setView(new CorpusConfigurationView());
+    result.setContext(new CorpusConfigurationContext());
+    result.setExampleQueries(new LinkedList<>());
+    result.setVisualizers(new LinkedList<>());
+
+    result.getView().setPageSize(10);
+    result.getContext().setDefault(5);
+    result.getContext().setSizes(Arrays.asList(1, 2, 5, 10));
+    result.getContext().setMax(Integer.MAX_VALUE);
+
+    return result;
+  }
+
   /**
    * Builds a single config for selection of one or muliple corpora.
    *
    * @param corpora Specifies the combination of corpora, for which the config is calculated.
-   * @param corpusConfigurations A map containg the known corpus configurations.
-   * @return A new config which takes into account the segementation of all selected corpora.
+   * @param corpusConfigurations A map containing the known corpus configurations.
+   * @return A new config which takes into account the segmentation of all selected corpora.
    */
   private CorpusConfiguration mergeConfigs(Collection<String> corpora,
-      CorpusConfigMap corpusConfigurations) {
+      Map<String, CorpusConfiguration> corpusConfigurations) {
 
     List<CorpusConfiguration> selectedConfigs =
         corpora.stream().map(c -> corpusConfigurations.get(c)).filter(config -> config != null)
             .collect(Collectors.toList());
 
-    if (selectedConfigs.size() == 1) {
+    if (selectedConfigs.isEmpty()) {
+      return createEmptyCorpusConfig();
+    } else if (selectedConfigs.size() == 1) {
       // Directly return the single corpus configuration
       return selectedConfigs.get(0);
     }
 
     // Merge the configurations into one
-    CorpusConfiguration corpusConfig = Helper.getDefaultCorpusConfig();
+    CorpusConfiguration corpusConfig = createEmptyCorpusConfig();
 
     // Calculate merged context
     Optional<Integer> mergedDefaultCtx = selectedConfigs.stream()
@@ -401,6 +327,63 @@ public class SearchOptionsPanel extends FormLayout {
     this.updateStateFromConfig = updateStateFromConfig;
   }
 
+  private void fetchCorpusConfiguration(AnnisUI ui, Collection<String> corpora,
+      boolean corpusSelectionChanged) {
+    final boolean setValues = corpusSelectionChanged && isUpdateStateFromConfig();
+
+    WebClient client = ui.getWebClient();
+
+    // Fetch segmentations for all involved corpora
+    Mono<List<String>> segmentations = Flux.fromIterable(corpora).flatMap(
+        corpus ->
+      client.get()
+      .uri(ub -> ub.path("/corpora/{corpus}/components")
+          .queryParam("type", AnnotationComponentType.ORDERING.getValue()).build(corpus))
+      .retrieve().bodyToFlux(Component.class)
+      ).filter(
+          component -> !component.getName().isEmpty() && !"annis".equals(component.getLayer()))
+        .map(Component::getName).collectList();
+      segmentations.subscribe(result -> ui.access(() -> cbSegmentation.setItems(result)));
+
+      // Fetch the corpus configuration for all involved corpora
+      Mono<Map<String, CorpusConfiguration>> corpusConfigs =
+          Flux.fromIterable(corpora).flatMap(
+          corpus -> {
+            Mono<CorpusConfiguration> result =
+                client.get().uri("/corpora/{corpus}/configuration", corpus).retrieve()
+                .bodyToMono(CorpusConfiguration.class);
+            return result.zipWith(Mono.just(corpus));
+          }
+      ).collectMap(Tuple2::getT2, Tuple2::getT1);
+      // Update the UI when results are ready
+      corpusConfigs.subscribe(result -> ui.access(() -> {
+        setLoadingState(false);
+        CorpusConfiguration c = mergeConfigs(corpora, result);
+        if (c.getContext().getMax() == null) {
+          maxContext.set(Integer.MAX_VALUE);
+        } else {
+          maxContext.set(c.getContext().getMax());
+        }
+
+        cbLeftContext.setItems(c.getContext().getSizes());
+        cbRightContext.setItems(c.getContext().getSizes());
+
+
+        if (setValues) {
+          cbLeftContext.setValue(c.getContext().getDefault());
+          cbRightContext.setValue(c.getContext().getDefault());
+          cbSegmentation.setValue(c.getContext().getSegmentation());
+          cbResultsPerPage.setValue(c.getView().getPageSize());
+        }
+
+        // reset if corpus selection has changed
+        if (corpusSelectionChanged) {
+          setUpdateStateFromConfig(true);
+        }
+      }));
+  }
+
+
 
   public void updateSearchPanelConfigurationInBackground(final Collection<String> corpora) {
     setLoadingState(true);
@@ -412,7 +395,7 @@ public class SearchOptionsPanel extends FormLayout {
     UI ui = getUI();
     if (ui instanceof AnnisUI) {
       // reload the config in the background
-      Background.run(new CorpusConfigUpdater((AnnisUI) ui, corpora, true));
+      fetchCorpusConfiguration((AnnisUI) ui, corpora, true);
     }
   }
 
