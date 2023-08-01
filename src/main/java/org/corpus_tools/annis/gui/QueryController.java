@@ -422,12 +422,12 @@ public class QueryController implements Serializable {
 
       searchView.getMainTab().setSelectedTab(newResultView);
       searchView.notifiyQueryStarted();
-      fetchFindResults(displayedQuery, newResultView, annisUI);
+      executeFindSearch(displayedQuery, newResultView, annisUI);
       fetchCountResults(displayedQuery, newResultView, annisUI);
     }
   }
 
-  private void fetchFindResults(PagedResultQuery query, ResultViewPanel resultPanel,
+  public void executeFindSearch(PagedResultQuery query, ResultViewPanel resultPanel,
       AnnisUI ui) {
     resultPanel.showMatchSearchInProgress(query.getSegmentation());
 

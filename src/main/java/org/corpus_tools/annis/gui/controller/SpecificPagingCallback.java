@@ -13,17 +13,10 @@
  */
 package org.corpus_tools.annis.gui.controller;
 
-import java.util.concurrent.Future;
-
-import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.SearchView;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
-import org.corpus_tools.annis.gui.objects.PagedResultQuery;
-import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.paging.PagingCallback;
-import org.corpus_tools.annis.gui.resultfetch.ResultFetchJob;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
 
 /**
@@ -64,9 +57,7 @@ public class SpecificPagingCallback implements PagingCallback {
         if (panel != null) {
             searchView.updateFragment(newQuery);
             searchView.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
-            searchView.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
-            Future<?> future = Background.run(new ResultFetchJob(newQuery, panel, ui));
-            ui.getQueryState().getExecutedTasks().put(QueryUIState.QueryType.FIND, future);
+            ui.getQueryController().executeFindSearch(newQuery, panel, ui);
         }
     }
 
