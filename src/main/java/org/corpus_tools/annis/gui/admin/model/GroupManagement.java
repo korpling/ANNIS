@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import org.corpus_tools.annis.api.model.Group;
-import org.corpus_tools.annis.gui.CaseSensitiveOrder;
+import org.corpus_tools.annis.gui.converter.CaseSensitiveOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;

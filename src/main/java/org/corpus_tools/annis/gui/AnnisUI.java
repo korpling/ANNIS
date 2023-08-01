@@ -37,12 +37,15 @@ import javax.servlet.ServletContext;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.admin.AdminView;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
+import org.corpus_tools.annis.gui.components.MainToolbar;
+import org.corpus_tools.annis.gui.controller.QueryController;
 import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
-import org.corpus_tools.annis.gui.querybuilder.QueryBuilderPlugin;
+import org.corpus_tools.annis.gui.querybuilder.tiger.QueryBuilderPlugin;
 import org.corpus_tools.annis.gui.requesthandler.BinaryRequestHandler;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,11 +129,11 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     // make sure the toolbar is removed from the old view
     searchView.setToolbar(null);
     adminView.setToolbar(null);
-    toolbar.setSidebar(null);
+    toolbar.setSearchView(null);
 
     if (event.getNewView() == searchView) {
       searchView.setToolbar(toolbar);
-      toolbar.setSidebar(searchView);
+      toolbar.setSearchView(searchView);
       toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN, AnnisUI.this);
     } else if (event.getNewView() == adminView) {
       adminView.setToolbar(toolbar);

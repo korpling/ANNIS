@@ -17,6 +17,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Window;
 import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.gui.components.MetaDataPanel;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

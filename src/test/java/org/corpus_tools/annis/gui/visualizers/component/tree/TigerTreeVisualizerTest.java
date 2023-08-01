@@ -18,12 +18,10 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.servlet.ServletContext;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.UIConfig;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.objects.Match;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
-import org.corpus_tools.annis.gui.visualizers.component.tree.TigerTreeVisualizer;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocument;
@@ -37,7 +35,6 @@ class TigerTreeVisualizerTest {
 
   private AnnisUI ui;
   private VisualizerInput visInput;
-  private VisualizationToggle visToggle;
   private VaadinSession session;
   private ServletContext servletContext;
   private UIConfig config = new UIConfig();
@@ -52,7 +49,6 @@ class TigerTreeVisualizerTest {
 
     // Init mocks
     visInput = mock(VisualizerInput.class);
-    visToggle = mock(VisualizationToggle.class);
     ui = mock(AnnisUI.class);
     session = mock(VaadinSession.class);
     servletContext = mock(ServletContext.class);

@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.widgets.grid.AnnotationGrid;
@@ -78,7 +78,7 @@ public class GridTreeVisualizer extends AbstractVisualizer { // NO_UCD (unused c
     private VisualizerInput input;
     private SDocumentGraph graph;
 
-    public GridTreePanel(VisualizerInput visInput, VisualizationToggle visToggle) {
+    public GridTreePanel(VisualizerInput visInput, VisualizerPanel visPanel) {
 
       // nothing to render if no input is there
       if (visInput == null) {
@@ -376,8 +376,8 @@ public class GridTreeVisualizer extends AbstractVisualizer { // NO_UCD (unused c
   private static final long serialVersionUID = 2295569067592940440L;
 
   @Override
-  public Panel createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
-    return new GridTreePanel(visInput, visToggle);
+  public Panel createComponent(VisualizerInput visInput, VisualizerPanel visPanel) {
+    return new GridTreePanel(visInput, visPanel);
   }
 
   @Override

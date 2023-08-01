@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.ExportPanel;
+import org.corpus_tools.annis.gui.components.ExportPanel;
 import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.objects.ExportQuery;
 import org.springframework.web.reactive.function.client.WebClientResponseException;

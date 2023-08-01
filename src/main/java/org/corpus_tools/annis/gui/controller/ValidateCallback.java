@@ -4,7 +4,6 @@ import com.vaadin.ui.UI;
 import java.util.LinkedList;
 import java.util.List;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
-import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.controlpanel.QueryPanel;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;

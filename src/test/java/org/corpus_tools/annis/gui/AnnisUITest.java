@@ -55,6 +55,7 @@ import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserTable;
+import org.corpus_tools.annis.gui.objects.CorpusSet;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
 import org.corpus_tools.annis.gui.resultview.SingleCorpusResultPanel;
 import org.corpus_tools.annis.gui.resultview.SingleResultPanel;

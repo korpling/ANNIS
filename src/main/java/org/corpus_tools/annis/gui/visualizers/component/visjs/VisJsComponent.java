@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.gui.MatchedNodeColors;
+import org.corpus_tools.annis.gui.objects.MatchedNodeColors;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.component.grid.EventExtractor;
 import org.corpus_tools.salt.common.SDocument;

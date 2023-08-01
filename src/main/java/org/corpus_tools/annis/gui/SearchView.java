@@ -47,6 +47,8 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
+import org.corpus_tools.annis.gui.components.HelpPanel;
+import org.corpus_tools.annis.gui.components.MainToolbar;
 import org.corpus_tools.annis.gui.controlpanel.ControlPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserController;
 import org.corpus_tools.annis.gui.frequency.FrequencyQueryPanel;
@@ -56,10 +58,15 @@ import org.corpus_tools.annis.gui.media.MimeTypeErrorListener;
 import org.corpus_tools.annis.gui.media.PDFController;
 import org.corpus_tools.annis.gui.media.PDFControllerImpl;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
+import org.corpus_tools.annis.gui.objects.InstanceConfig;
 import org.corpus_tools.annis.gui.objects.PagedResultQuery;
 import org.corpus_tools.annis.gui.objects.Query;
+import org.corpus_tools.annis.gui.objects.QueryGenerator;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
+import org.corpus_tools.annis.gui.objects.SidebarState;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
+import org.corpus_tools.annis.gui.security.LoginListener;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -71,7 +78,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  */
 public class SearchView extends GridLayout
     implements View, MimeTypeErrorListener, Page.UriFragmentChangedListener,
-        TabSheet.CloseHandler, LoginListener, Sidebar, TabSheet.SelectedTabChangeListener {
+    TabSheet.CloseHandler, LoginListener, TabSheet.SelectedTabChangeListener {
 
     private class CitationRequestHandler implements RequestHandler {
 
@@ -570,7 +577,6 @@ public class SearchView extends GridLayout
                 ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
     }
 
-    @Override
     public void updateSidebarState(SidebarState state) {
         if (controlPanel != null && state != null) {
             controlPanel.setVisible(state.isSidebarVisible());

@@ -14,10 +14,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import javax.servlet.ServletContext;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.annis.gui.visualizers.IFrameResourceMap;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
-import org.corpus_tools.annis.gui.visualizers.iframe.AbstractIFrameVisualizer;
 import org.corpus_tools.annis.gui.widgets.AutoHeightIFrame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,7 @@ class AbstractIFrameVisualizerTest {
 
   private VisualizerInput visInput;
 
-  private VisualizationToggle visToggle;
+  private VisualizerPanel visPanel;
 
   private AnnisUI ui;
 
@@ -63,7 +62,7 @@ class AbstractIFrameVisualizerTest {
 
     // Init mocks
     visInput = mock(VisualizerInput.class);
-    visToggle = mock(VisualizationToggle.class);
+    visPanel = mock(VisualizerPanel.class);
     ui = mock(AnnisUI.class);
     session = mock(VaadinSession.class);
     servletContext = mock(ServletContext.class);
@@ -81,7 +80,7 @@ class AbstractIFrameVisualizerTest {
     // Test with trailing slash
     when(servletContext.getContextPath()).thenReturn("/somestring/");
 
-    Component component = vis.createComponent(visInput, visToggle);
+    Component component = vis.createComponent(visInput, visPanel);
     assertNotNull(component);
     assertTrue(component instanceof AutoHeightIFrame);
     if (component instanceof AutoHeightIFrame) {
@@ -94,7 +93,7 @@ class AbstractIFrameVisualizerTest {
     // Test without trailing slash
     when(servletContext.getContextPath()).thenReturn("/somestring");
 
-    component = vis.createComponent(visInput, visToggle);
+    component = vis.createComponent(visInput, visPanel);
     assertNotNull(component);
     assertTrue(component instanceof AutoHeightIFrame);
     if (component instanceof AutoHeightIFrame) {

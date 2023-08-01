@@ -23,9 +23,9 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.regex.Pattern;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.objects.RawTextWrapper;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.salt.common.STextualDS;
@@ -65,7 +65,7 @@ public class RawTextVisualizer extends AbstractVisualizer { // NO_UCD (test only
   private final Pattern whiteSpaceMatcher = Pattern.compile("^\\s+$");
 
   @Override
-  public Panel createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
+  public Panel createComponent(VisualizerInput visInput, VisualizerPanel visPanel) {
 
     // get config for alignment
     boolean vertical =

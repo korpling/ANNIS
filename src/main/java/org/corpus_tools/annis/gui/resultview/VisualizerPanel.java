@@ -46,8 +46,6 @@ import org.corpus_tools.annis.api.model.VisualizerRule.VisibilityEnum;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.annis.gui.media.MediaController;
@@ -55,6 +53,7 @@ import org.corpus_tools.annis.gui.media.MediaPlayer;
 import org.corpus_tools.annis.gui.media.PDFViewer;
 import org.corpus_tools.annis.gui.objects.Match;
 import org.corpus_tools.annis.gui.objects.RawTextWrapper;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.FilteringVisualizerPlugin;
 import org.corpus_tools.annis.gui.visualizers.LoadableVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
@@ -85,7 +84,7 @@ import reactor.core.publisher.Flux;
  */
 
 public class VisualizerPanel extends CssLayout
-    implements Button.ClickListener, VisualizationToggle {
+    implements Button.ClickListener {
   private class BackgroundJob implements Runnable {
 
     private final Future<Component> future;
@@ -490,7 +489,6 @@ public class VisualizerPanel extends CssLayout
     }
   }
 
-  @Override
   public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback) {
     if (visible) {
       loadVisualizer(callback);
@@ -508,7 +506,6 @@ public class VisualizerPanel extends CssLayout
   }
 
 
-  @Override
   public boolean visualizerIsVisible() {
     return vis != null && vis.isVisible();
   }

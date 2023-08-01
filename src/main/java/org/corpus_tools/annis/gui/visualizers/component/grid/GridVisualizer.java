@@ -14,9 +14,9 @@
 package org.corpus_tools.annis.gui.visualizers.component.grid;
 
 import java.util.List;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.media.MediaController;
 import org.corpus_tools.annis.gui.media.PDFController;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.salt.common.STextualDS;
@@ -58,7 +58,7 @@ public class GridVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
   private static final Logger log = LoggerFactory.getLogger(GridVisualizer.class);
 
   @Override
-  public GridComponent createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
+  public GridComponent createComponent(VisualizerInput visInput, VisualizerPanel visPanel) {
     MediaController mediaController =
         visInput.getUI().getSession().getAttribute(MediaController.class);
     PDFController pdfController = visInput.getUI().getSession().getAttribute(PDFController.class);

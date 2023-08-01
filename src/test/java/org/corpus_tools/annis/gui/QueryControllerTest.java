@@ -9,6 +9,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.corpus_tools.annis.gui.controller.QueryController;
 import org.corpus_tools.annis.gui.exporter.CSVExporter;
 import org.corpus_tools.annis.gui.exporter.TextColumnExporter;
 import org.corpus_tools.annis.gui.objects.ExportQuery;

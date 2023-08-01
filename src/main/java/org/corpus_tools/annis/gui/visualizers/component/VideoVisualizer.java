@@ -21,12 +21,12 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.util.List;
 import org.apache.tika.Tika;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.components.medialement.MediaElement;
 import org.corpus_tools.annis.gui.components.medialement.MediaElementPlayer;
 import org.corpus_tools.annis.gui.media.MediaController;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.springframework.core.ParameterizedTypeReference;
@@ -50,7 +50,7 @@ public class VideoVisualizer extends AbstractVisualizer { // NO_UCD (unused code
   private final Tika tika = new Tika();
 
   @Override
-  public MediaElementPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle) {
+  public MediaElementPlayer createComponent(VisualizerInput input, VisualizerPanel visPanel) {
     List<String> corpusPath =
         Helper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
@@ -85,7 +85,7 @@ public class VideoVisualizer extends AbstractVisualizer { // NO_UCD (unused code
 
     if (VaadinSession.getCurrent().getAttribute(MediaController.class) != null) {
       VaadinSession.getCurrent().getAttribute(MediaController.class).addMediaPlayer(player,
-          input.getId(), visToggle);
+          input.getId(), visPanel);
     }
 
     return player;

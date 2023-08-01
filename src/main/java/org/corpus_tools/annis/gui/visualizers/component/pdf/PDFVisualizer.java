@@ -13,14 +13,14 @@
  */
 package org.corpus_tools.annis.gui.visualizers.component.pdf;
 
-import static org.corpus_tools.annis.gui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
+import static org.corpus_tools.annis.gui.util.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Panel;
-import org.corpus_tools.annis.gui.PDFPageHelper;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.media.PDFController;
 import org.corpus_tools.annis.gui.media.PDFViewer;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
+import org.corpus_tools.annis.gui.util.PDFPageHelper;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.component.grid.GridVisualizer;
@@ -59,12 +59,12 @@ public class PDFVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
 
     VisualizerInput input;
 
-    VisualizationToggle visToggle;
+    VisualizerPanel visPanel;
 
     PDFPanel pdfPanel;
 
-    public PDFViewerImpl(VisualizerInput input, VisualizationToggle visToggle) {
-      this.visToggle = visToggle;
+    public PDFViewerImpl(VisualizerInput input, VisualizerPanel visPanel) {
+      this.visPanel = visPanel;
       this.input = input;
     }
 
@@ -93,7 +93,7 @@ public class PDFVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
       if (!this.isVisible()) {
         // set visible status
         this.setVisible(true);
-        visToggle.toggleVisualizer(true, null);
+        visPanel.toggleVisualizer(true, null);
       }
 
     }
@@ -107,7 +107,7 @@ public class PDFVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
   private final Logger log = LoggerFactory.getLogger(PDFVisualizer.class);
 
   @Override
-  public Panel createComponent(VisualizerInput input, VisualizationToggle visToggle) {
+  public Panel createComponent(VisualizerInput input, VisualizerPanel visPanel) {
 
     PDFViewer pdfViewer = null;
 
@@ -117,7 +117,7 @@ public class PDFVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
 
         VaadinSession session = VaadinSession.getCurrent();
         PDFController pdfController = session.getAttribute(PDFController.class);
-        pdfViewer = new PDFViewerImpl(input, visToggle);
+        pdfViewer = new PDFViewerImpl(input, visPanel);
         pdfController.addPDF(input.getId(), pdfViewer);
       }
 

@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpanningRelation;

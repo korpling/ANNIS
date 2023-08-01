@@ -44,9 +44,9 @@ import java.util.TreeSet;
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.gui.AnnisBaseUI;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.MatchedNodeColors;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.objects.MatchedNodeColors;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -91,7 +91,7 @@ public class HTMLVis extends AbstractVisualizer {
   private boolean hitMark = true;
 
   @Override
-  public Panel createComponent(VisualizerInput vi, VisualizationToggle vt) {
+  public Panel createComponent(VisualizerInput vi, VisualizerPanel visPanel) {
     Panel scrollPanel = new Panel();
     scrollPanel.setSizeFull();
     Label lblResult = new Label("ERROR", ContentMode.HTML);

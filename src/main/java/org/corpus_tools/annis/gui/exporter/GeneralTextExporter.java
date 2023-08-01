@@ -42,7 +42,7 @@ import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;

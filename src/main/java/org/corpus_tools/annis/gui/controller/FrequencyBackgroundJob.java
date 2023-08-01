@@ -22,7 +22,6 @@ import org.corpus_tools.annis.api.model.FrequencyQuery;
 import org.corpus_tools.annis.api.model.FrequencyQueryDefinitionInner;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.frequency.FrequencyQueryPanel;
 import org.corpus_tools.annis.gui.objects.FrequencyTableEntry;
 import org.corpus_tools.salt.util.SaltUtil;

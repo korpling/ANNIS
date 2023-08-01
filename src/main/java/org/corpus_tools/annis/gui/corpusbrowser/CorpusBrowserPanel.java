@@ -40,12 +40,12 @@ import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.ExampleTable;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.QueryController;
+import org.corpus_tools.annis.gui.components.ExampleTable;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
+import org.corpus_tools.annis.gui.controller.QueryController;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 

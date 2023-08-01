@@ -13,8 +13,8 @@
  */
 package org.corpus_tools.annis.gui.visualizers.component.pdf;
 
-import static org.corpus_tools.annis.gui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
-import static org.corpus_tools.annis.gui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
+import static org.corpus_tools.annis.gui.util.PDFPageHelper.PAGE_NO_VALID_NUMBER;
+import static org.corpus_tools.annis.gui.util.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -25,8 +25,8 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;

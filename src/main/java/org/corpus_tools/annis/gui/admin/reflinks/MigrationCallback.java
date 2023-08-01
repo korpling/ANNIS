@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.TreeMap;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
+import org.corpus_tools.annis.gui.util.Helper;
 
 final class MigrationCallback implements FutureCallback<Integer> {
 

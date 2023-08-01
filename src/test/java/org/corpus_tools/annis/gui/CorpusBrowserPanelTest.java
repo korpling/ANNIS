@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.corpus_tools.annis.gui.components.ExampleTable;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
 import org.corpus_tools.annis.gui.corpusbrowser.CorpusBrowserEntry;
 import org.corpus_tools.annis.gui.corpusbrowser.CorpusBrowserPanel;

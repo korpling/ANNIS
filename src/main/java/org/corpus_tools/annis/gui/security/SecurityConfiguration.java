@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.corpus_tools.annis.gui.ServiceStarter;
 import org.corpus_tools.annis.gui.UIConfig;
-import org.corpus_tools.annis.gui.resultfetch.DocumentGraphMessageConverter;
+import org.corpus_tools.annis.gui.controller.DocumentGraphMessageConverter;
 import org.springframework.boot.autoconfigure.condition.NoneNestedConditions;
 import org.springframework.boot.autoconfigure.security.oauth2.client.ClientsConfiguredCondition;
 import org.springframework.context.annotation.Bean;

@@ -39,6 +39,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
+import org.corpus_tools.annis.gui.objects.InstanceConfig;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 

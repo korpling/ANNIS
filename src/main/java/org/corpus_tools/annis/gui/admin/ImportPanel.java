@@ -39,7 +39,7 @@ import org.corpus_tools.annis.api.model.Job;
 import org.corpus_tools.annis.api.model.Job.StatusEnum;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.LoginListener;
+import org.corpus_tools.annis.gui.security.LoginListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;

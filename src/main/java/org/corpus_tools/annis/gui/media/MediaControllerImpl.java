@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.annis.gui.visualizers.LoadableVisualizer;
 import org.springframework.stereotype.Component;
 
@@ -76,9 +76,9 @@ public class MediaControllerImpl implements MediaController, Serializable {
    */
   private Map<String, MediaPlayer> lastUsedPlayer;
 
-  private Map<MediaPlayer, VisualizationToggle> visToggle;
+  private Map<MediaPlayer, VisualizerPanel> visPanels;
 
-  /** Since everone can call us asynchronously we need a locking mechanism */
+  /** Since everyone can call us asynchronously we need a locking mechanism */
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
   public MediaControllerImpl() {
@@ -86,14 +86,14 @@ public class MediaControllerImpl implements MediaController, Serializable {
     try {
       mediaPlayers = new TreeMap<String, List<MediaPlayer>>();
       lastUsedPlayer = new TreeMap<String, MediaPlayer>();
-      visToggle = new HashMap<MediaPlayer, VisualizationToggle>();
+      visPanels = new HashMap<>();
     } finally {
       lock.writeLock().unlock();
     }
   }
 
   @Override
-  public void addMediaPlayer(MediaPlayer player, String resultID, VisualizationToggle toggle) {
+  public void addMediaPlayer(MediaPlayer player, String resultID, VisualizerPanel visPanel) {
     // some sanity checks
     if (resultID == null) {
       return;
@@ -110,7 +110,7 @@ public class MediaControllerImpl implements MediaController, Serializable {
       List<MediaPlayer> playerList = mediaPlayers.get(resultID);
       playerList.add(player);
 
-      visToggle.put(player, toggle);
+      visPanels.put(player, visPanel);
     } finally {
       lock.writeLock().unlock();
     }
@@ -121,7 +121,7 @@ public class MediaControllerImpl implements MediaController, Serializable {
     lock.writeLock().lock();
     try {
       mediaPlayers.clear();
-      visToggle.clear();
+      visPanels.clear();
       lastUsedPlayer.clear();
     } finally {
       lock.writeLock().unlock();
@@ -133,9 +133,9 @@ public class MediaControllerImpl implements MediaController, Serializable {
     for (List<MediaPlayer> playersForID : mediaPlayers.values()) {
       for (MediaPlayer player : playersForID) {
         if (player != doNotCloseThisOne) {
-          VisualizationToggle t = visToggle.get(player);
-          if (t != null) {
-            t.toggleVisualizer(false, null);
+          VisualizerPanel p = visPanels.get(player);
+          if (p != null) {
+            p.toggleVisualizer(false, null);
           }
         }
       }
@@ -170,10 +170,10 @@ public class MediaControllerImpl implements MediaController, Serializable {
       if (player != null) {
         closeOtherPlayers(player);
 
-        VisualizationToggle t = visToggle.get(player);
-        if (t != null) {
+        VisualizerPanel p = visPanels.get(player);
+        if (p != null) {
           foundPlayer = true;
-          t.toggleVisualizer(true, new CallbackImpl(player, startTime, null));
+          p.toggleVisualizer(true, new CallbackImpl(player, startTime, null));
         }
 
       }
@@ -198,10 +198,10 @@ public class MediaControllerImpl implements MediaController, Serializable {
       if (player != null) {
         closeOtherPlayers(player);
 
-        VisualizationToggle t = visToggle.get(player);
-        if (t != null) {
+        VisualizerPanel p = visPanels.get(player);
+        if (p != null) {
           foundPlayer = true;
-          t.toggleVisualizer(true, new CallbackImpl(player, startTime, endTime));
+          p.toggleVisualizer(true, new CallbackImpl(player, startTime, endTime));
         }
       }
     } finally {

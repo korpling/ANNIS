@@ -11,9 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.servlet.ServletContext;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
-import org.corpus_tools.annis.gui.visualizers.iframe.CorefVisualizer;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SToken;
@@ -31,7 +29,6 @@ class CorefVisualizerTest {
 
   private AnnisUI ui;
   private VisualizerInput visInput;
-  private VisualizationToggle visToggle;
   private VaadinSession session;
   private ServletContext servletContext;
 
@@ -42,7 +39,6 @@ class CorefVisualizerTest {
 
     // Init mocks
     visInput = mock(VisualizerInput.class);
-    visToggle = mock(VisualizationToggle.class);
     ui = mock(AnnisUI.class);
     session = mock(VaadinSession.class);
     servletContext = mock(ServletContext.class);

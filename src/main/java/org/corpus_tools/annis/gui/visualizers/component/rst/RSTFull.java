@@ -13,7 +13,7 @@
  */
 package org.corpus_tools.annis.gui.visualizers.component.rst;
 
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.springframework.stereotype.Component;
@@ -34,7 +34,7 @@ public class RSTFull extends AbstractVisualizer { // NO_UCD (unused code)
   private static final long serialVersionUID = 1112108378282427967L;
 
   @Override
-  public RSTPanel createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
+  public RSTPanel createComponent(VisualizerInput visInput, VisualizerPanel visPanel) {
     return new RSTPanel(visInput);
   }
 

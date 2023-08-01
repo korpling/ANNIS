@@ -19,7 +19,7 @@ import com.google.common.collect.ComparisonChain;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-import org.corpus_tools.annis.gui.citation.CitationProvider;
+import org.corpus_tools.annis.gui.query_references.CitationProvider;
 
 /**
  *

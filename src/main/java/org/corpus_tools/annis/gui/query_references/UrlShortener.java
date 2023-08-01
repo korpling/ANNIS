@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.transaction.Transactional;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
