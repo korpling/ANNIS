@@ -26,6 +26,7 @@ import com.vaadin.v7.data.util.BeanItemContainer;
 import com.vaadin.v7.event.ItemClickEvent;
 import com.vaadin.v7.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.v7.ui.Table;
+import org.corpus_tools.annis.gui.citation.CitationLinkGenerator;
 import org.corpus_tools.annis.gui.objects.Query;
 
 /**

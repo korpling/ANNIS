@@ -2,7 +2,7 @@ package org.corpus_tools.annis.gui;
 
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.renderers.HtmlRenderer;
-import org.corpus_tools.annis.gui.beans.CorpusBrowserEntry;
+import org.corpus_tools.annis.gui.corpusbrowser.CorpusBrowserEntry;
 
 public class ExampleTable extends Grid<CorpusBrowserEntry> {
 

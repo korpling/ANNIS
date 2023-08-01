@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.corpus_tools.annis.gui;
+package org.corpus_tools.annis.gui.citation;
 
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.ui.Button;
@@ -22,7 +22,8 @@ import com.vaadin.ui.themes.ValoTheme;
 import com.vaadin.v7.ui.Table;
 import java.util.HashSet;
 import java.util.Set;
-import org.corpus_tools.annis.gui.beans.CitationProvider;
+import org.corpus_tools.annis.gui.AnnisUI;
+import org.corpus_tools.annis.gui.QueryGenerator;
 import org.corpus_tools.annis.gui.objects.ContextualizedQuery;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
 import org.corpus_tools.annis.gui.objects.Query;

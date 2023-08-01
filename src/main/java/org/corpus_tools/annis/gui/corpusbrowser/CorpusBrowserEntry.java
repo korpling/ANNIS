@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.corpus_tools.annis.gui.beans;
+package org.corpus_tools.annis.gui.corpusbrowser;
 
 import com.google.common.collect.ComparisonChain;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
+import org.corpus_tools.annis.gui.citation.CitationProvider;
 
 /**
  *

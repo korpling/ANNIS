@@ -11,7 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
-package org.corpus_tools.annis.gui;
+package org.corpus_tools.annis.gui.corpusbrowser;
 
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.event.selection.SelectionListener;
@@ -38,7 +38,11 @@ import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
-import org.corpus_tools.annis.gui.beans.CorpusBrowserEntry;
+import org.corpus_tools.annis.gui.Background;
+import org.corpus_tools.annis.gui.CommonUI;
+import org.corpus_tools.annis.gui.ExampleTable;
+import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.QueryController;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
