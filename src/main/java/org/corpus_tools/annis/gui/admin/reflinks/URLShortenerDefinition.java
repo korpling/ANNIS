@@ -24,7 +24,6 @@ import okhttp3.Request;
 import okhttp3.Response;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.CountExtra;
 import org.corpus_tools.annis.api.model.CountQuery;
 import org.corpus_tools.annis.api.model.FindQuery;
@@ -41,9 +40,13 @@ import org.joda.time.format.DateTimeFormatterBuilder;
 import org.joda.time.format.DateTimeParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Flux;
 
 public class URLShortenerDefinition {
 
@@ -182,30 +185,31 @@ public class URLShortenerDefinition {
     unknownCorpora.add(corpus);
   }
 
-  private QueryStatus testFind(SearchApi searchApi, OkHttpClient client,
+  private QueryStatus testFind(WebClient localClient, OkHttpClient legacyClient,
       HttpUrl annisSearchServiceBaseUrl) throws IOException, WebClientResponseException {
 
     // Create a file with the matches according to the new graphANNIS based implementation
-    File matchesGraphANNISFile = searchApi.find(new FindQuery().query(query.getQuery())
-        .corpora(new LinkedList<>(query.getCorpora())).queryLanguage(query.getApiQueryLanguage()))
-        .block();
+    FindQuery findQuery = new FindQuery().query(query.getQuery())
+        .corpora(new LinkedList<>(query.getCorpora())).queryLanguage(query.getApiQueryLanguage());
+    File findResult = File.createTempFile("annis-find", ".txt");
+    Flux<DataBuffer> matchesGraphANNISFile = localClient.post().uri("/search/find")
+        .bodyValue(findQuery).retrieve().bodyToFlux(DataBuffer.class);
+    DataBufferUtils.write(matchesGraphANNISFile, findResult.toPath());
 
 
-    HttpUrl findUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("find")
+    HttpUrl legacyFindUrl = annisSearchServiceBaseUrl.newBuilder().addPathSegment("find")
         .addQueryParameter("q", query.getQuery())
         .addQueryParameter("corpora", Joiner.on(",").join(query.getCorpora())).build();
 
     Request legacyFindRequest =
-        new Request.Builder().url(findUrl).addHeader("Accept", "text/plain").build();
+        new Request.Builder().url(legacyFindUrl).addHeader("Accept", "text/plain").build();
 
     // read in the file again line by line and compare it with the legacy ANNIS
     // version
     int matchNr = 0;
-    try (
-        BufferedReader matchesGraphANNIS =
-            new BufferedReader(new FileReader(matchesGraphANNISFile));
-        BufferedReader matchesLegacy =
-            new BufferedReader(client.newCall(legacyFindRequest).execute().body().charStream())) {
+    try (BufferedReader matchesGraphANNIS = new BufferedReader(new FileReader(findResult));
+        BufferedReader matchesLegacy = new BufferedReader(
+            legacyClient.newCall(legacyFindRequest).execute().body().charStream())) {
       // compare each line
       String m1;
       String m2;
@@ -223,7 +227,7 @@ public class URLShortenerDefinition {
         }
       }
     } finally {
-      Files.delete(matchesGraphANNISFile.toPath());
+      Files.delete(findResult.toPath());
     }
 
     return QueryStatus.OK;
@@ -269,10 +273,11 @@ public class URLShortenerDefinition {
     return 0;
   }
 
-  private QueryStatus testQuirksMode(SearchApi searchApi, OkHttpClient client,
+  private QueryStatus testQuirksMode(WebClient localClient, OkHttpClient remoteClient,
       HttpUrl annisSearchServiceBaseUrl) {
     URLShortenerDefinition quirksQuery = this.rewriteInQuirksMode();
-    QueryStatus quirksStatus = quirksQuery.test(searchApi, client, annisSearchServiceBaseUrl);
+    QueryStatus quirksStatus =
+        quirksQuery.test(localClient, remoteClient, annisSearchServiceBaseUrl);
     if (quirksStatus == QueryStatus.OK) {
       this.query = quirksQuery.query;
       this.uri = quirksQuery.uri;
@@ -285,15 +290,17 @@ public class URLShortenerDefinition {
   }
 
 
-  private QueryStatus testCountAndFind(SearchApi searchApi, OkHttpClient client,
+  private QueryStatus testCountAndFind(WebClient localClient, OkHttpClient legacyClient,
       HttpUrl annisSearchServiceBaseUrl) throws IOException, WebClientResponseException {
     try {
       // check count first (also warmup for the corpus)
-      int countLegacy = getLegacyCount(client, annisSearchServiceBaseUrl);
-      int countGraphANNIS = searchApi.count(new CountQuery().query(query.getQuery())
-          .queryLanguage(query.getApiQueryLanguage()).corpora(new LinkedList<>(query.getCorpora())))
-          .block()
-          .getMatchCount();
+      int countLegacy = getLegacyCount(legacyClient, annisSearchServiceBaseUrl);
+      int countGraphANNIS =
+          localClient.post().uri("/search/count")
+              .bodyValue(new CountQuery().query(query.getQuery())
+                  .queryLanguage(query.getApiQueryLanguage())
+                  .corpora(new LinkedList<>(query.getCorpora())))
+              .retrieve().bodyToMono(CountExtra.class).block().getMatchCount();
       if (countGraphANNIS != countLegacy) {
         this.errorMsg = "should have been " + countLegacy + " but was " + countGraphANNIS;
         return QueryStatus.COUNT_DIFFERS;
@@ -301,7 +308,7 @@ public class URLShortenerDefinition {
         return QueryStatus.OK;
       } else {
         // When count is the same and non-empty test if the returned IDs are the same
-        return testFind(searchApi, client, annisSearchServiceBaseUrl);
+        return testFind(localClient, legacyClient, annisSearchServiceBaseUrl);
       }
     } catch (WebClientResponseException ex) {
       if (ex.getStatusCode() == HttpStatus.BAD_REQUEST
@@ -316,7 +323,7 @@ public class URLShortenerDefinition {
     }
   }
 
-  public QueryStatus test(SearchApi searchApi, OkHttpClient client,
+  public QueryStatus test(WebClient localClient, OkHttpClient remoteClient,
       HttpUrl annisSearchServiceBaseUrl) {
 
     if (this.query.getCorpora().isEmpty()) {
@@ -325,10 +332,10 @@ public class URLShortenerDefinition {
     }
 
     try {
-      QueryStatus status = testCountAndFind(searchApi, client, annisSearchServiceBaseUrl);
+      QueryStatus status = testCountAndFind(localClient, remoteClient, annisSearchServiceBaseUrl);
       if (status != QueryStatus.OK && this.query.getQueryLanguage() == QueryLanguage.AQL) {
         // check in quirks mode and rewrite if necessary
-        status = testQuirksMode(searchApi, client, annisSearchServiceBaseUrl);
+        status = testQuirksMode(localClient, remoteClient, annisSearchServiceBaseUrl);
       }
 
       return status;

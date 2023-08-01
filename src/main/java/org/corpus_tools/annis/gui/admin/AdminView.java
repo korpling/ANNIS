@@ -26,7 +26,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.Helper;
@@ -199,12 +198,6 @@ public class AdminView extends VerticalLayout
     return "";
   }
 
-
-  @Override
-  public void invalidateClient() {
-    // The current client implementation the client is always fresh
-  }
-
   @Override
   public void onLogin() {
     for (UIView.Listener l : listeners) {
@@ -281,12 +274,6 @@ public class AdminView extends VerticalLayout
   public void showWarning(String error, String description) {
     Notification.show(error, description, Notification.Type.WARNING_MESSAGE);
   }
-
-  @Override
-  public ApiClient getClient() {
-    return ui.getClient();
-  }
-
   @Override
   public WebClient getWebClient() {
     return ui.getWebClient();

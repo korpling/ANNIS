@@ -38,8 +38,6 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.Helper;
@@ -101,14 +99,14 @@ public class MigrationPanel extends Panel
       }, new MigrationCallback(this, failedQueries));
 
     });
-    
+
     emailText.setCaption("E-Mail for status reports (optional)");
     emailText.setPlaceholder("you@example.com");
     emailText.setWidth(TEXTFIELD_WIDTH, Unit.EM);
 
 
-    formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername,
-        servicePassword, skipExisting);
+    formLayout = new FormLayout(exportedFileUpload, serviceUrl, serviceUsername, servicePassword,
+        skipExisting);
   }
 
   @Override
@@ -161,15 +159,15 @@ public class MigrationPanel extends Panel
     txtMessages.setCursorPosition(txtMessages.getValue().length() - 1);
   }
 
-  private boolean checkSingleQuery(URLShortenerDefinition q, SearchApi searchApi,
-      UrlShortener urlShortener, OkHttpClient client, HttpUrl searchServiceBaseUrl,
+  private boolean checkSingleQuery(URLShortenerDefinition q, UrlShortener urlShortener,
+      OkHttpClient legacyClient, HttpUrl searchServiceBaseUrl,
       Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
     // check the query
     try {
       ui.access(() -> progress.setCaption(String.format("testing query %s on corpus %s (UUID %s)",
           q.getQuery().getQuery().trim(), q.getQuery().getCorpora(), q.getUuid())));
 
-      QueryStatus status = q.test(searchApi, client, searchServiceBaseUrl);
+      QueryStatus status = q.test(ui.getWebClient(), legacyClient, searchServiceBaseUrl);
 
       // insert URLs into new database
       URI temporary = null;
@@ -208,8 +206,8 @@ public class MigrationPanel extends Panel
   }
 
   private boolean readUrlShortenerLine(String[] line, boolean skipExisting,
-      Set<String> knownCorpora, SearchApi searchApi, OkHttpClient client,
-      HttpUrl searchServiceBaseUrl, Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
+      Set<String> knownCorpora, OkHttpClient legacyClient, HttpUrl searchServiceBaseUrl,
+      Multimap<QueryStatus, URLShortenerDefinition> failedQueries) {
 
     if (line.length != 4) {
       return false;
@@ -237,7 +235,7 @@ public class MigrationPanel extends Panel
             failedQueries.put(QueryStatus.UUID_EXISTS, q);
           }
         } else {
-          return checkSingleQuery(q, searchApi, ui.getUrlShortener(), client, searchServiceBaseUrl,
+          return checkSingleQuery(q, ui.getUrlShortener(), legacyClient, searchServiceBaseUrl,
               failedQueries);
         }
       }
@@ -271,15 +269,13 @@ public class MigrationPanel extends Panel
       // test authentication and fail early
       HttpUrl testUrl = parsedServiceUrl.newBuilder().addPathSegment("annis")
           .addPathSegment("admin").addPathSegment("is-authenticated").build();
-      Request testRequest =
-          new Request.Builder().url(testUrl).build();
+      Request testRequest = new Request.Builder().url(testUrl).build();
       try {
-        String result =
-            client.build().newCall(testRequest).execute().body().string();
+        String result = client.build().newCall(testRequest).execute().body().string();
         if (!"true".equalsIgnoreCase(result)) {
-          ui.access(() -> Notification
-              .show("Authentication failed, please check the provided user name and password",
-                  Notification.Type.ERROR_MESSAGE));
+          ui.access(() -> Notification.show(
+              "Authentication failed, please check the provided user name and password",
+              Notification.Type.ERROR_MESSAGE));
           return Optional.empty();
         }
       } catch (IOException ex) {
@@ -301,8 +297,6 @@ public class MigrationPanel extends Panel
     HttpUrl searchServiceBaseUrl = parsedServiceUrl.newBuilder().addPathSegment("annis")
         .addPathSegment("query").addPathSegment("search").build();
 
-    ApiClient apiClient = Helper.getClient(ui);
-    SearchApi searchApi = new SearchApi(apiClient);
     List<String> queriedCorpora = ui.getWebClient().get().uri("/corpora").retrieve()
         .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
     Set<String> knownCorpora = new HashSet<>(queriedCorpora);
@@ -319,8 +313,8 @@ public class MigrationPanel extends Panel
       try (CSVReader csvReader = new CSVReader(new FileReader(urlShortenerFile), '\t')) {
         String[] line;
         while ((line = csvReader.readNext()) != null) {
-          if (readUrlShortenerLine(line, skipExisting, knownCorpora,
-              searchApi, client.get(), searchServiceBaseUrl, failedQueries)) {
+          if (readUrlShortenerLine(line, skipExisting, knownCorpora, client.get(),
+              searchServiceBaseUrl, failedQueries)) {
             successfulQueries++;
           }
           processedQueries++;

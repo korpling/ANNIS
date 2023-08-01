@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.ServletContext;
-import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.gui.components.SettingsStorage;
 import org.corpus_tools.annis.gui.requesthandler.ResourceRequestHandler;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
@@ -169,8 +168,6 @@ public abstract class CommonUI extends AnnisBaseUI {
         return urlPrefix;
     }
     
-    public abstract ApiClient getClient();
-
     public abstract WebClient getWebClient();
 
     /**

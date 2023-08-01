@@ -47,9 +47,7 @@ import java.util.Map;
 import java.util.Optional;
 import javax.servlet.ServletContext;
 import javax.xml.stream.XMLStreamException;
-import okhttp3.Request;
 import org.apache.commons.io.IOUtils;
-import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserController;
@@ -179,7 +177,7 @@ public class EmbeddedVisUI extends CommonUI {
 
   @Autowired(required = false)
   private transient OAuth2ClientProperties oauth2Clients;
-  
+
   @Autowired
   private WebClient webClient;
 
@@ -238,19 +236,19 @@ public class EmbeddedVisUI extends CommonUI {
     String corpusNodeId = Joiner.on('/').join(corpusPathRaw);
 
     if (args.containsKey(KEY_FULLTEXT)) {
-      
+
       boolean isUsingRawText = visPlugin.get().isUsingRawText();
       String aql = Helper.buildDocumentQuery(corpusNodeId, null, isUsingRawText);
 
       GraphMLLoaderCallback callback =
           new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args, UI.getCurrent());
-      
+
       webClient.get()
           .uri(ub -> ub.path("/corpora/{corpus}/subgraph-for-query").queryParam("query", aql)
               .build(toplevelCorpus))
           .retrieve().bodyToMono(new ParameterizedTypeReference<File>() {}).subscribe(callback);
 
-      
+
 
     } else {
       SubgraphWithContext subgraphQuery = new SubgraphWithContext();
@@ -263,7 +261,8 @@ public class EmbeddedVisUI extends CommonUI {
       } else {
         subgraphQuery.setSegmentation(null);
       }
-      GraphMLLoaderCallback callback = new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args, UI.getCurrent());
+      GraphMLLoaderCallback callback =
+          new GraphMLLoaderCallback(corpusNodeId, visPlugin.get(), args, UI.getCurrent());
       webClient.post().uri("/corpora/{corpus}/subgraph", toplevelCorpus).bodyValue(subgraphQuery)
           .retrieve().bodyToMono(new ParameterizedTypeReference<File>() {}).subscribe(callback);
     }
@@ -370,18 +369,15 @@ public class EmbeddedVisUI extends CommonUI {
 
       if (visPluginOpt.isPresent()) {
         VisualizerPlugin visPlugin = visPluginOpt.get();
-        URI uri = new URI(rawUri);
-        // fetch content of the URI
-        ApiClient client = Helper.getClient(this);
-
         displayLoadingIndicator();
 
         // copy the arguments for using them later in the callback
         final Map<String, String[]> argsCopy = new LinkedHashMap<>(args);
-        Request request = new okhttp3.Request.Builder().url(uri.toASCIIString()).build();
 
         final UI ui = UI.getCurrent();
-        client.getWebClient().get().uri(uri).retrieve().toEntity(InputStream.class)
+        URI uri = new URI(rawUri);
+
+        webClient.get().uri(uri).retrieve().toEntity(InputStream.class)
             .subscribe(body -> ui.access(() -> {
               try {
                 File tmpFile = File.createTempFile("embeddded-vis-fetched-result-", ".salt");
@@ -462,8 +458,7 @@ public class EmbeddedVisUI extends CommonUI {
     addStyleName("loaded-embedded-vis");
   }
 
-  private void showHtmlDoc(String corpus, String documentNodeName,
-      Map<String, String[]> args) {
+  private void showHtmlDoc(String corpus, String documentNodeName, Map<String, String[]> args) {
     // do nothing for empty fragments
     if (args == null || args.isEmpty()) {
       return;
@@ -503,18 +498,12 @@ public class EmbeddedVisUI extends CommonUI {
               + "</ul>");
     }
   }
-  
-	@Override
-	public ApiClient getClient() {
-		ApiClient result = new ApiClient(webClient);
-		result.setBasePath(getConfig().getWebserviceUrl());
-		return result;
-	}
 
-    @Override
-    public WebClient getWebClient() {
-      return webClient;
-    }
+
+  @Override
+  public WebClient getWebClient() {
+    return webClient;
+  }
 
   @Override
   public ServletContext getServletContext() {

@@ -61,7 +61,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.MultiPartEmail;
-import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
@@ -476,14 +475,6 @@ public class Helper {
       }
     }
     return sb.toString();
-  }
-
-  public static ApiClient getClient(final UI ui) {
-    if (ui instanceof CommonUI) {
-      CommonUI annisUI = (CommonUI) ui;
-      return annisUI.getClient();
-    }
-    return null;
   }
 
   public static Set<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui)
