@@ -26,7 +26,6 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.ui.NativeSelect;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -391,12 +390,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener {
         Collection<String> corpusSelection = cp.getState().getSelectedCorpora();
         try {
             for (String corpus : corpusSelection) {
-                for (AnnoKey key : Helper.getMetaAnnotationNames(corpus, UI.getCurrent())) {
+              for (AnnoKey key : Helper.getMetaAnnotationNames(corpus, UI.getCurrent())
+                  .toIterable()) {
                     result.add(key.getName());
                 }
             }
 
-          } catch (WebClientResponseException | IOException ex) {
+          } catch (WebClientResponseException ex) {
             log.error(null, ex);
         }
 

@@ -55,7 +55,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
@@ -117,6 +116,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
+import reactor.util.function.Tuples;
 
 /**
  *
@@ -376,6 +376,7 @@ public class Helper {
 
     }
   }
+
   // the name of the web font class, the css class contains !important.
   public final static String CORPUS_FONT_FORCE = "corpus-font-force";
 
@@ -479,77 +480,45 @@ public class Helper {
     return sb.toString();
   }
 
-  public static Set<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui)
-      throws WebClientResponseException, IOException {
-    final Set<AnnoKey> metaAnnos = new HashSet<>();
+  public static Flux<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui) {
 
     if (ui instanceof CommonUI) {
       CommonUI commonUI = (CommonUI) ui;
 
       WebClient client = commonUI.getWebClient();
 
-      final List<org.corpus_tools.annis.api.model.Annotation> nodeAnnos =
-          client.get()
-              .uri(
-                  uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
-                      .queryParam("list_values", false)
-                      .queryParam("only_most_frequent_values", true).build(corpus))
-              .retrieve().bodyToFlux(Annotation.class)
-              .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
-                  && !Objects.equals(a.getKey().getName(), "tok"))
-              .collectList().block();
+      Flux<Annotation> nodeAnnos = client.get()
+          .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
+              .queryParam("list_values", false).queryParam("only_most_frequent_values", true)
+              .build(corpus))
+          .retrieve().bodyToFlux(Annotation.class)
+          .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
+              && !Objects.equals(a.getKey().getName(), "tok"));
       // Check for each annotation if its actually a meta-annotation
-      for (final org.corpus_tools.annis.api.model.Annotation a : nodeAnnos) {
-        String annotationName = getQName(a.getKey());
-        if (annotationIsMetadata(corpus, annotationName, commonUI)) {
-          metaAnnos.add(a.getKey());
-        }
-      }
+      Flux<Annotation> metaAnnos = nodeAnnos.map(a -> {
+        return Tuples.of(a, getQName(a.getKey()));
+      }).filter(t -> validQNamePattern.matcher(t.getT2()).matches()).flatMap(t -> {
+        final FindQuery q = new FindQuery();
+        q.setCorpora(Arrays.asList(corpus));
+
+        q.setQuery("annis:node_type=\"corpus\" _ident_ " + t.getT2());
+        // Not sorting the results is much faster, especially if we only fetch the first
+        // item (we are only interested if a match exists, not how many items or which one)
+        q.setOrder(OrderEnum.NOTSORTED);
+        q.setLimit(1);
+        q.setOffset(0);
+        q.setQueryLanguage(QueryLanguage.AQL);
+        
+        // Fetch first item, if there is no match the result will be empty
+        Mono<String> findResult =
+            client.post().uri("/search/find").bodyValue(q).retrieve().bodyToMono(String.class);
+        return findResult.zipWith(Mono.just(t.getT1()));
+      }).filter(t -> !t.getT1().trim().isEmpty()).map(Tuple2<String, Annotation>::getT2);
+      return metaAnnos.map(a -> a.getKey()).distinct();
     }
 
-    return metaAnnos;
+    return Flux.empty();
   }
-
-  private static boolean annotationIsMetadata(String corpus, String annotationName, CommonUI ui)
-      throws WebClientResponseException, IOException {
-    WebClient client = ui.getWebClient();
-    if (!validQNamePattern.matcher(annotationName).matches()) {
-      return false;
-    }
-
-    final FindQuery q = new FindQuery();
-    q.setCorpora(Arrays.asList(corpus));
-
-    q.setQuery("annis:node_type=\"corpus\" _ident_ " + annotationName);
-    // Not sorting the results is much faster, especially if we only fetch the first
-    // item (we are only interested if a match exists, not how many items or which one)
-    q.setOrder(OrderEnum.NOTSORTED);
-    q.setLimit(1);
-    q.setOffset(0);
-
-    q.setQueryLanguage(QueryLanguage.AQL);
-
-    File findResult = File.createTempFile("annis-find", ".txt");
-    Flux<DataBuffer> response = client.post().uri("/search/find").bodyValue(q).retrieve()
-        .bodyToFlux(DataBuffer.class);
-    DataBufferUtils.write(response, findResult.toPath()).block();
-
-    if (findResult != null && findResult.isFile())
-      try {
-        try (Stream<String> lines = Files.lines(findResult.toPath(), StandardCharsets.UTF_8)) {
-          Optional<String> anyLine = lines.findAny();
-          if (anyLine.isPresent() && !anyLine.get().isEmpty()) {
-            return true;
-          }
-        }
-      } catch (final IOException ex) {
-        log.error("Error when accessing file with find results", ex);
-      } finally {
-        Files.delete(findResult.toPath());
-      }
-    return false;
-  }
-
 
   public static String getQName(final AnnoKey key) {
     if (key == null) {
@@ -668,14 +637,12 @@ public class Helper {
   public static Mono<Map<String, CorpusConfiguration>> getCorpusConfigurationMap(
       Collection<String> corpora, WebClient client) {
     Mono<Map<String, CorpusConfiguration>> corpusConfigs =
-        Flux.fromIterable(corpora).flatMap(
-        corpus -> {
+        Flux.fromIterable(corpora).flatMap(corpus -> {
           Mono<CorpusConfiguration> result =
               client.get().uri("/corpora/{corpus}/configuration", corpus).retrieve()
-              .bodyToMono(CorpusConfiguration.class);
+                  .bodyToMono(CorpusConfiguration.class);
           return result.zipWith(Mono.just(corpus));
-        }
-        ).collectMap(Tuple2::getT2, Tuple2::getT1);
+        }).collectMap(Tuple2::getT2, Tuple2::getT1);
     return corpusConfigs;
   }
 
@@ -733,8 +700,7 @@ public class Helper {
                 .queryParam("query", aql).queryParam("query_language", QueryLanguage.AQL)
                 .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
                 .build(toplevelCorpusName))
-            .accept(MediaType.APPLICATION_XML)
-            .retrieve().bodyToFlux(DataBuffer.class);
+            .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
         DataBufferUtils.write(response, graphML.toPath()).block();
         SCorpusGraph result = CorpusGraphMapper.map(graphML);
         Files.deleteIfExists(graphML.toPath());
@@ -765,18 +731,15 @@ public class Helper {
 
         // Get the corpus graph and with it the meta data on the corpus/document nodes
         File graphML = File.createTempFile("annis-subgraph", ".salt");
-        Flux<DataBuffer> response =
-            client.get()
-                .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
-                    .queryParam("query",
-                        "annis:node_type=\"corpus\" _ident_ annis:doc=/"
-                            + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/")
-                    .queryParam("query_language", QueryLanguage.AQL)
-                    .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
-                    .build(toplevelCorpusName))
-                .accept(MediaType.APPLICATION_XML)
-                .retrieve()
-                .bodyToFlux(DataBuffer.class);
+        Flux<DataBuffer> response = client.get()
+            .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+                .queryParam("query",
+                    "annis:node_type=\"corpus\" _ident_ annis:doc=/"
+                        + AQL_REGEX_VALUE_ESCAPER.escape(documentName) + "/")
+                .queryParam("query_language", QueryLanguage.AQL)
+                .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
+                .build(toplevelCorpusName))
+            .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
         DataBufferUtils.write(response, graphML.toPath()).block();
         final SCorpusGraph cg = CorpusGraphMapper.map(graphML);
         Files.deleteIfExists(graphML.toPath());

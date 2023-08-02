@@ -22,11 +22,10 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +33,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
@@ -41,13 +41,14 @@ import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.components.ExampleTable;
-import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.controller.QueryController;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.util.Helper;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 /**
  *
@@ -189,201 +190,185 @@ public class CorpusBrowserPanel extends Panel {
 
     WebClient client = ui.getWebClient();
 
-    try {
-      List<Annotation> nodeAnnos = client.get()
-          .uri(ub -> ub.path("/corpora/{corpus}/node-annotations").queryParam("list_values", true)
-              .queryParam("only_most_frequent_values", true).build(corpus))
-          .retrieve().bodyToFlux(Annotation.class)
-          .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
-              && !Objects.equals(a.getKey().getName(), "tok"))
-          .collectList().block();
+    Flux<Component> dominanceComponents = client.get().uri(
+        ub -> ub.path("/corpora/{corpus}/components").queryParam("type", "Dominance").build(corpus))
+        .retrieve().bodyToFlux(Component.class);
+    Flux<Component> pointingComponents = client.get().uri(
+        ub -> ub.path("/corpora/{corpus}/components").queryParam("type", "Pointing").build(corpus))
+        .retrieve().bodyToFlux(Component.class);
 
-      final List<Annotation> metaAnnos = new LinkedList<>(nodeAnnos);
+    Flux<Component> components = Flux.concat(dominanceComponents, pointingComponents);
 
-      final Set<AnnoKey> metaAnnoKeys = Helper.getMetaAnnotationNames(corpus, ui);
-      nodeAnnos.removeIf(anno -> metaAnnoKeys.contains(anno.getKey()));
-      metaAnnos.removeIf(anno -> !metaAnnoKeys.contains(anno.getKey()));
+    Mono<Map<Component, Collection<Annotation>>> edgeAnnosByComponent = components.flatMap(c -> {
+      Flux<Annotation> componentEdgeAnnos = client.get()
+          .uri(ub -> ub.path("/corpora/{corpus}/edge-annotations/{type}/{layer}/{name}/")
+              .queryParam("list_values", true).queryParam("only_most_frequent_values", true)
+              .build(corpus, c.getType().getValue(), c.getLayer(), c.getName()))
 
-      List<Component> dominanceComponents =
-          client
-              .get().uri(ub -> ub.path("/corpora/{corpus}/components")
-                  .queryParam("type", "Dominance").build(corpus))
-              .retrieve().bodyToFlux(Component.class).collectList().block();
-      List<Component> pointingComponents =
-          client.get().uri(ub -> ub.path("/corpora/{corpus}/components")
-              .queryParam("type", "Pointing").build(corpus)).retrieve().bodyToFlux(Component.class)
-              .collectList().block();
-      List<Component> components = new LinkedList<>();
-      components.addAll(dominanceComponents);
-      components.addAll(pointingComponents);
+          .retrieve().bodyToFlux(Annotation.class);
+      return componentEdgeAnnos.zipWith(Flux.just(c).repeat());
+    }).collectMultimap(Tuple2::getT2, Tuple2::getT1);
 
-      final List<Annotation> allEdgeAnnos = new LinkedList<>();
-      final Map<Component, List<Annotation>> edgeAnnosByComponent = new LinkedHashMap<>();
-      for (Component c : components) {
-        try {
-          List<Annotation> annos =
-              client.get()
-                  .uri(ub -> ub
-                      .path("/corpora/{corpus}/edge-annotations/{type}/{layer}/{name}/")
-                      .queryParam("list_values", true).queryParam("only_most_frequent_values", true)
-                      .build(corpus, c.getType().getValue(), c.getLayer(), c.getName()))
+    Flux<Annotation> nodeAnnos = client.get()
+        .uri(ub -> ub.path("/corpora/{corpus}/node-annotations").queryParam("list_values", true)
+            .queryParam("only_most_frequent_values", true).build(corpus))
+        .retrieve().bodyToFlux(Annotation.class)
+        .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
+            && !Objects.equals(a.getKey().getName(), "tok"));
+    Flux<AnnoKey> metaAnnoKeys = Helper.getMetaAnnotationNames(corpus, ui);
 
-                  .retrieve()
-                  .bodyToFlux(Annotation.class).collectList()
-                  .block();
-          edgeAnnosByComponent.put(c, annos);
-          allEdgeAnnos.addAll(annos);
-        } catch (WebClientResponseException ex) {
-          // Ignore any not found errors
+    Mono.zip(nodeAnnos.collectList(), components.collectList(), edgeAnnosByComponent,
+        metaAnnoKeys.collectList()).subscribe(t -> ui.access(() -> {
+          showEntries(t.getT1(), t.getT2(), t.getT3(), new LinkedHashSet<>(t.getT4()));
+        }));
+  }
+
+  private void showEntries(List<Annotation> nodeAnnos, List<Component> components,
+      Map<Component, Collection<Annotation>> edgeAnnosByComponent, Set<AnnoKey> metaAnnoKeys) {
+
+    TreeSet<CorpusBrowserEntry> nodeAnnoItems = new TreeSet<>();
+    TreeSet<CorpusBrowserEntry> edgeAnnoItems = new TreeSet<>();
+    TreeSet<CorpusBrowserEntry> edgeTypeItems = new TreeSet<>();
+    TreeSet<CorpusBrowserEntry> metaAnnoItems = new TreeSet<>();
+
+    progress.setVisible(false);
+    accordion.setVisible(true);
+
+
+    List<Annotation> metaAnnos = new LinkedList<>(nodeAnnos);
+    nodeAnnos.removeIf(anno -> metaAnnoKeys.contains(anno.getKey()));
+    metaAnnos.removeIf(anno -> !metaAnnoKeys.contains(anno.getKey()));
+
+    Set<Annotation> allEdgeAnnos = edgeAnnosByComponent.entrySet().stream()
+        .flatMap(annos -> annos.getValue().stream()).collect(Collectors.toSet());
+
+
+    boolean stripNodeAnno = canExcludeNamespace(nodeAnnos);
+    boolean stripEdgeName = canExcludeNamespace(allEdgeAnnos);
+    boolean stripEdgeAnno = true;
+    HashSet<String> nodeAnnoNames = new HashSet<>();
+    HashSet<String> edgeAnnoNames = new HashSet<>();
+    HashSet<String> edgeNames = new HashSet<>();
+    boolean hasDominance = false;
+    boolean hasEmptyDominance = false;
+
+    // do some preparations first
+    for (Annotation a : nodeAnnos) {
+      // check for ambiguous names
+      if (!nodeAnnoNames.add(a.getKey().getName())) {
+        stripNodeAnno = false;
+      }
+    }
+    for (Component c : components) {
+      // check if collected edge names are unique
+      if (!edgeNames.add(Helper.getQName(c))) {
+        stripEdgeName = false;
+      }
+      // check if we need to add the general dominance example edge
+      if (c.getType() == AnnotationComponentType.DOMINANCE) {
+        hasDominance = true;
+        if (c.getName() == null || c.getName().isEmpty()) {
+          hasEmptyDominance = true;
         }
       }
-
-      getUI().access(() -> {
-
-        TreeSet<CorpusBrowserEntry> nodeAnnoItems = new TreeSet<>();
-        TreeSet<CorpusBrowserEntry> edgeAnnoItems = new TreeSet<>();
-        TreeSet<CorpusBrowserEntry> edgeTypeItems = new TreeSet<>();
-        TreeSet<CorpusBrowserEntry> metaAnnoItems = new TreeSet<>();
-
-        progress.setVisible(false);
-        accordion.setVisible(true);
-
-        boolean stripNodeAnno = canExcludeNamespace(nodeAnnos);
-        boolean stripEdgeName = canExcludeNamespace(allEdgeAnnos);
-        boolean stripEdgeAnno = true;
-        HashSet<String> nodeAnnoNames = new HashSet<>();
-        HashSet<String> edgeAnnoNames = new HashSet<>();
-        HashSet<String> edgeNames = new HashSet<>();
-        boolean hasDominance = false;
-        boolean hasEmptyDominance = false;
-
-        // do some preparations first
-        for (Annotation a : nodeAnnos) {
-          // check for ambiguous names
-          if (!nodeAnnoNames.add(a.getKey().getName())) {
-            stripNodeAnno = false;
-          }
-        }
-        for (Component c : components) {
-          // check if collected edge names are unique
-          if (!edgeNames.add(Helper.getQName(c))) {
-            stripEdgeName = false;
-          }
-          // check if we need to add the general dominance example edge
-          if (c.getType() == AnnotationComponentType.DOMINANCE) {
-            hasDominance = true;
-            if (c.getName() == null || c.getName().isEmpty()) {
-              hasEmptyDominance = true;
-            }
-          }
-        }
-
-        for (List<Annotation> annos : edgeAnnosByComponent.values()) {
-          for (Annotation a : annos) {
-            // check for ambiguous names
-            if (!edgeAnnoNames.add(a.getKey().getName())) {
-              stripEdgeAnno = false;
-            }
-          }
-        }
-
-        // fill the actual containers
-        for (Annotation a : nodeAnnos) {
-          String name = stripNodeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
-          CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-          cbe.setName(name);
-          cbe.setExample(name + "=\"" + a.getVal() + "\"");
-          cbe.setCorpus(corpus);
-          nodeAnnoItems.add(cbe);
-        }
-
-        // edge type entry
-        if (hasDominance && !hasEmptyDominance) {
-          CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-          cbe.setName("(dominance)");
-          cbe.setCorpus(corpus);
-          cbe.setExample("node & node & #1 > #2");
-          edgeTypeItems.add(cbe);
-        }
-        for (Component c : components) {
-          CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
-          String name = stripEdgeName ? c.getName() : Helper.getQName(c);
-          if ((name == null || name.isEmpty())
-              && c.getType() == AnnotationComponentType.DOMINANCE) {
-            cbeEdgeType.setName("(dominance)");
-          } else {
-            cbeEdgeType.setName(name);
-          }
-          cbeEdgeType.setCorpus(corpus);
-          if (c.getType() == AnnotationComponentType.POINTING) {
-            cbeEdgeType.setExample("node & node & #1 ->" + c.getName() + " #2");
-          } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
-            cbeEdgeType.setExample("node & node & #1 >" + c.getName() + " #2");
-          }
-          edgeTypeItems.add(cbeEdgeType);
-        }
-
-        // edge annotation entries
-        for (Map.Entry<Component, List<Annotation>> entry : edgeAnnosByComponent.entrySet()) {
-          Component c = entry.getKey();
-          for (Annotation a : entry.getValue()) {
-            CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
-            String edgeAnno = stripEdgeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
-            cbeEdgeAnno.setName(edgeAnno);
-            cbeEdgeAnno.setCorpus(corpus);
-            if (c.getType() == AnnotationComponentType.POINTING) {
-              cbeEdgeAnno.setExample("node & node & #1 ->" + c.getName() + "["
-                  + a.getKey().getName() + "=\"" + a.getVal() + "\"] #2");
-            } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
-              cbeEdgeAnno.setExample(
-                  "node & node & #1 >[" + a.getKey().getName() + "=\"" + a.getVal() + "\"] #2");
-            }
-            edgeAnnoItems.add(cbeEdgeAnno);
-
-          }
-        }
-
-        boolean stripMetaName = canExcludeNamespace(metaAnnos);
-        for (Annotation a : nodeAnnos) {
-          String name = stripMetaName ? a.getKey().getName() : Helper.getQName(a.getKey());
-          CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-          cbe.setName(name);
-          cbe.setExample(name + "=\"" + a.getVal() + "\"");
-          cbe.setCorpus(corpus);
-          nodeAnnoItems.add(cbe);
-        }
-        for (Annotation a : metaAnnos) {
-          String name = stripNodeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
-          CorpusBrowserEntry cbe = new CorpusBrowserEntry();
-          cbe.setName(name);
-          cbe.setExample(name + "=\"" + a.getVal() + "\"");
-          cbe.setCorpus(corpus);
-          metaAnnoItems.add(cbe);
-        }
-
-        lblNoNodeAnno.setVisible(nodeAnnoItems.isEmpty());
-        tblNodeAnno.setVisible(!nodeAnnoItems.isEmpty());
-        tblNodeAnno.setItems(new ArrayList<>(nodeAnnoItems));
-
-        lblNoEdgeAnno.setVisible(edgeAnnoItems.isEmpty());
-        tblEdgeAnno.setVisible(!edgeAnnoItems.isEmpty());
-        tblEdgeAnno.setItems(edgeAnnoItems);
-
-        lblNoEdgeTypes.setVisible(edgeTypeItems.isEmpty());
-        tblEdgeTypes.setVisible(!edgeTypeItems.isEmpty());
-        tblEdgeTypes.setItems(edgeTypeItems);
-
-        lblNoMetaAnno.setVisible(metaAnnoItems.isEmpty());
-        tblMetaAnno.setVisible(!metaAnnoItems.isEmpty());
-        tblMetaAnno.setItems(metaAnnoItems);
-
-      });
-
-    } catch (WebClientResponseException | IOException e) {
-      getUI().access(() -> {
-        ExceptionDialog.show(e, "Error fetching corpus annotations", getUI());
-      });
     }
+
+    for (Collection<Annotation> annos : edgeAnnosByComponent.values()) {
+      for (Annotation a : annos) {
+        // check for ambiguous names
+        if (!edgeAnnoNames.add(a.getKey().getName())) {
+          stripEdgeAnno = false;
+        }
+      }
+    }
+
+    // fill the actual containers
+    for (Annotation a : nodeAnnos) {
+      String name = stripNodeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
+      CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+      cbe.setName(name);
+      cbe.setExample(name + "=\"" + a.getVal() + "\"");
+      cbe.setCorpus(corpus);
+      nodeAnnoItems.add(cbe);
+    }
+
+    // edge type entry
+    if (hasDominance && !hasEmptyDominance) {
+      CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+      cbe.setName("(dominance)");
+      cbe.setCorpus(corpus);
+      cbe.setExample("node & node & #1 > #2");
+      edgeTypeItems.add(cbe);
+    }
+    for (Component c : components) {
+      CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
+      String name = stripEdgeName ? c.getName() : Helper.getQName(c);
+      if ((name == null || name.isEmpty()) && c.getType() == AnnotationComponentType.DOMINANCE) {
+        cbeEdgeType.setName("(dominance)");
+      } else {
+        cbeEdgeType.setName(name);
+      }
+      cbeEdgeType.setCorpus(corpus);
+      if (c.getType() == AnnotationComponentType.POINTING) {
+        cbeEdgeType.setExample("node & node & #1 ->" + c.getName() + " #2");
+      } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
+        cbeEdgeType.setExample("node & node & #1 >" + c.getName() + " #2");
+      }
+      edgeTypeItems.add(cbeEdgeType);
+    }
+
+    // edge annotation entries
+    for (Map.Entry<Component, Collection<Annotation>> entry : edgeAnnosByComponent.entrySet()) {
+      Component c = entry.getKey();
+      for (Annotation a : entry.getValue()) {
+        CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
+        String edgeAnno = stripEdgeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
+        cbeEdgeAnno.setName(edgeAnno);
+        cbeEdgeAnno.setCorpus(corpus);
+        if (c.getType() == AnnotationComponentType.POINTING) {
+          cbeEdgeAnno.setExample("node & node & #1 ->" + c.getName() + "[" + a.getKey().getName()
+              + "=\"" + a.getVal() + "\"] #2");
+        } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
+          cbeEdgeAnno.setExample(
+              "node & node & #1 >[" + a.getKey().getName() + "=\"" + a.getVal() + "\"] #2");
+        }
+        edgeAnnoItems.add(cbeEdgeAnno);
+      }
+    }
+
+    boolean stripMetaName = canExcludeNamespace(metaAnnos);
+    for (Annotation a : nodeAnnos) {
+      String name = stripMetaName ? a.getKey().getName() : Helper.getQName(a.getKey());
+      CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+      cbe.setName(name);
+      cbe.setExample(name + "=\"" + a.getVal() + "\"");
+      cbe.setCorpus(corpus);
+      nodeAnnoItems.add(cbe);
+    }
+    for (Annotation a : metaAnnos) {
+      String name = stripNodeAnno ? a.getKey().getName() : Helper.getQName(a.getKey());
+      CorpusBrowserEntry cbe = new CorpusBrowserEntry();
+      cbe.setName(name);
+      cbe.setExample(name + "=\"" + a.getVal() + "\"");
+      cbe.setCorpus(corpus);
+      metaAnnoItems.add(cbe);
+    }
+
+    lblNoNodeAnno.setVisible(nodeAnnoItems.isEmpty());
+    tblNodeAnno.setVisible(!nodeAnnoItems.isEmpty());
+    tblNodeAnno.setItems(new ArrayList<>(nodeAnnoItems));
+
+    lblNoEdgeAnno.setVisible(edgeAnnoItems.isEmpty());
+    tblEdgeAnno.setVisible(!edgeAnnoItems.isEmpty());
+    tblEdgeAnno.setItems(edgeAnnoItems);
+
+    lblNoEdgeTypes.setVisible(edgeTypeItems.isEmpty());
+    tblEdgeTypes.setVisible(!edgeTypeItems.isEmpty());
+    tblEdgeTypes.setItems(edgeTypeItems);
+
+    lblNoMetaAnno.setVisible(metaAnnoItems.isEmpty());
+    tblMetaAnno.setVisible(!metaAnnoItems.isEmpty());
+    tblMetaAnno.setItems(metaAnnoItems);
 
   }
 }
