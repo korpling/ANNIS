@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.corpus_tools.annis.gui.ServiceStarter;
 import org.corpus_tools.annis.gui.UIConfig;
+import org.corpus_tools.annis.gui.controller.CorpusGraphMessageConverter;
 import org.corpus_tools.annis.gui.controller.DocumentGraphMessageConverter;
 import org.springframework.boot.autoconfigure.condition.NoneNestedConditions;
 import org.springframework.boot.autoconfigure.security.oauth2.client.ClientsConfiguredCondition;
@@ -98,6 +99,7 @@ public class SecurityConfiguration {
 
     WebClient.Builder builder = WebClient.builder().baseUrl(serviceURL).codecs(codecsConfigure -> {
       codecsConfigure.customCodecs().register(new DocumentGraphMessageConverter());
+      codecsConfigure.customCodecs().register(new CorpusGraphMessageConverter());
     });
     Optional<Authentication> desktopUserToken = serviceStarter.getDesktopUserToken();
     if (desktopUserToken.isPresent()) {

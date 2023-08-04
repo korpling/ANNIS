@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
-import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.annis.gui.graphml.CorpusGraphMapper;
+import org.corpus_tools.salt.common.SCorpusGraph;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
@@ -19,7 +19,7 @@ import org.springframework.http.codec.HttpMessageReader;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public class DocumentGraphMessageConverter implements HttpMessageReader<SDocumentGraph> {
+public class CorpusGraphMessageConverter implements HttpMessageReader<SCorpusGraph> {
 
 
   @Override
@@ -30,19 +30,19 @@ public class DocumentGraphMessageConverter implements HttpMessageReader<SDocumen
 
   @Override
   public boolean canRead(ResolvableType elementType, MediaType mediaType) {
-    return elementType.isAssignableFrom(SDocumentGraph.class)
+    return elementType.isAssignableFrom(SCorpusGraph.class)
         && MediaType.APPLICATION_XML.equals(mediaType);
   }
 
   @Override
-  public Flux<SDocumentGraph> read(ResolvableType elementType, ReactiveHttpInputMessage message,
+  public Flux<SCorpusGraph> read(ResolvableType elementType, ReactiveHttpInputMessage message,
       Map<String, Object> hints) {
     // We can only read a single SDocumentGraph object from a request
     return readMono(elementType, message, hints).flux();
   }
 
   @Override
-  public Mono<SDocumentGraph> readMono(ResolvableType elementType, ReactiveHttpInputMessage message,
+  public Mono<SCorpusGraph> readMono(ResolvableType elementType, ReactiveHttpInputMessage message,
       Map<String, Object> hints) {
     try {
       File graphML = File.createTempFile("annis-subgraph-", ".salt");
@@ -51,7 +51,7 @@ public class DocumentGraphMessageConverter implements HttpMessageReader<SDocumen
       return DataBufferUtils.write(message.getBody(), fileChannel).map(DataBufferUtils::release)
           .then(Mono.just(graphML)).flatMap(f -> {
             try {
-              SDocumentGraph result = DocumentGraphMapper.map(f);
+              SCorpusGraph result = CorpusGraphMapper.map(f);
               Files.deleteIfExists(f.toPath());
               return Mono.just(result);
             } catch (XMLStreamException | IOException ex) {

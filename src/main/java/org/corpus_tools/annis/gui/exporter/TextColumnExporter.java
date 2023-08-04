@@ -638,7 +638,8 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
           corpusName = urlPathEscape.escape(corpusName);
           
           List<SMetaAnnotation> metadata = new ArrayList<>();
-          for(SNode n : Helper.getMetaData(corpusName, Optional.of(docName), ui).getNodes()) {
+          for (SNode n : Helper.getMetaData(corpusName, Optional.of(docName), ui).block()
+              .getNodes()) {
             metadata.addAll(n.getMetaAnnotations());
           }
           

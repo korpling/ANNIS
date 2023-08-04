@@ -14,7 +14,6 @@
 package org.corpus_tools.annis.gui.components;
 
 import com.google.common.collect.ComparisonChain;
-import com.google.common.util.concurrent.FutureCallback;
 import com.vaadin.data.ValueProvider;
 import com.vaadin.data.provider.ListDataProvider;
 import com.vaadin.server.SerializableComparator;
@@ -36,14 +35,13 @@ import java.util.Optional;
 import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
-import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.salt.common.SCorpus;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.eclipse.emf.common.util.URI;
+import reactor.core.publisher.Mono;
 
 /**
  * Provides all corpus annotations for a corpus or for a specific search result.
@@ -96,160 +94,6 @@ public class MetaDataPanel extends Panel {
     }
   }
 
-  private final class MetadataAvailableCallback
-      implements FutureCallback<CorpusMetadataCallResult> {
-    @Override
-    public void onFailure(Throwable t) {
-      layout.removeComponent(progress);
-      ExceptionDialog.show(t, "Could not get meta data", getUI());
-    }
-
-    @Override
-    public void onSuccess(CorpusMetadataCallResult result) {
-      layout.removeComponent(progress);
-      Accordion accordion = new Accordion();
-      accordion.setSizeFull();
-
-
-      boolean hasDocument = addDocumentMetadata(result, accordion);
-      boolean hasCorpus = addCorpusMetadata(result, accordion);
-
-      // set output to none if no metadata are available
-      if (hasDocument || hasCorpus) {
-        layout.addComponent(accordion);
-      } else {
-        addEmptyLabel();
-      }
-    }
-
-    private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData,
-        CorpusConfiguration config) {
-      ValueProvider<Annotation, String> nameProvider = anno -> Helper.getQName(anno.getKey());
-
-
-      if (config == null) {
-        metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
-      } else {
-        metaData.setSortComparator(
-            new ConfiguredSortOrderComparator(config.getView().getCorpusAnnotationOrder()));
-      }
-      Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
-      tblMeta.setDataProvider(metaData);
-      Column<Annotation, String> nameColumn = tblMeta.addColumn(nameProvider);
-      nameColumn.setWidthUndefined();
-      nameColumn.setCaption("Name");
-      nameColumn.setId("genname");
-      Column<Annotation, ?> valueColumn =
-          tblMeta.addComponentColumn(anno -> new Label(anno.getVal(), ContentMode.HTML));
-      valueColumn.setId("genval");
-      valueColumn.setCaption("Value");
-
-      tblMeta.setColumns(nameColumn.getId(), valueColumn.getId());
-
-      tblMeta.setSizeFull();
-      valueColumn.setExpandRatio(1);
-      return tblMeta;
-    }
-
-    private boolean addCorpusMetadata(CorpusMetadataCallResult result, Accordion accordion) {
-      boolean hasResult = false;
-
-      // Sort the (sub-) corpora so sub-corpora come first
-      List<SCorpus> corpora = new ArrayList<>(result.metadata.getCorpora());
-      corpora.sort((c1, c2) -> {
-        URI u1 = c1.getPath();
-        URI u2 = c2.getPath();
-        return ComparisonChain.start().compare(u1.segmentCount(), u2.segmentCount())
-            .compare(u1.toString(), u2.toString()).result();
-      });
-
-      for (SCorpus c : corpora) {
-        List<Annotation> corpusAnnos = new ArrayList<>();
-        for (SMetaAnnotation metaAnno : c.getMetaAnnotations()) {
-          Annotation anno = new Annotation();
-          AnnoKey key = new AnnoKey();
-          key.setNs(metaAnno.getNamespace());
-          key.setName(metaAnno.getName());
-          anno.setKey(key);
-          anno.setVal(metaAnno.getValue_STEXT());
-          corpusAnnos.add(anno);
-        }
-
-
-        if (!corpusAnnos.isEmpty()) {
-
-          String path = c.getPath().toString();
-          if (path.startsWith("salt:/")) {
-            path = path.substring("salt:/".length());
-          }
-          path = path + " (corpus)";
-          accordion.addTab(setupTable(new ListDataProvider<>(corpusAnnos), result.config), path);
-          hasResult = true;
-        }
-      }
-      return hasResult;
-    }
-
-    private boolean addDocumentMetadata(CorpusMetadataCallResult result, Accordion accordion) {
-      boolean hasResult = false;
-
-      // Add all document metadata first, then the corpus metadata
-      List<SDocument> documents = result.metadata.getDocuments();
-      if (documents != null) {
-        // There should only be one document in the corpus graph, but keeping the code generic
-        // should not hurt
-        for (SDocument d : documents) {
-          List<Annotation> docAnnos = new ArrayList<>();
-          for (SMetaAnnotation metaAnno : d.getMetaAnnotations()) {
-            Annotation anno = new Annotation();
-            AnnoKey key = new AnnoKey();
-            key.setNs(metaAnno.getNamespace());
-            key.setName(metaAnno.getName());
-            anno.setKey(key);
-            anno.setVal(metaAnno.getValue_STEXT());
-            docAnnos.add(anno);
-          }
-
-          if (!docAnnos.isEmpty()) {
-            String path = d.getName();
-
-            // In case we are called to only output a corpus, this might have been mapped as
-            // document. So only add the "document" suffix in case we are sure it is an actual
-            // corpus.
-            if (documentName.isPresent()) {
-              path = path + " (document)";
-            }
-
-            accordion.addTab(setupTable(new ListDataProvider<>(docAnnos), result.config), path);
-            hasResult = true;
-          }
-        }
-      }
-      return hasResult;
-    }
-
-    /**
-     * Places a label in the middle center of the corpus browser panel.
-     */
-    private void addEmptyLabel() {
-      if (emptyLabel == null) {
-        emptyLabel = new Label("none");
-      }
-
-      if (corpusAnnotationTable != null) {
-        layout.removeComponent(corpusAnnotationTable);
-      }
-
-      layout.addComponent(emptyLabel);
-
-      // this has only an effect after adding the component to a parent. Bug by
-      // vaadin?
-      emptyLabel.setSizeUndefined();
-
-      layout.setComponentAlignment(emptyLabel, Alignment.MIDDLE_CENTER);
-      layout.setExpandRatio(emptyLabel, 1.0f);
-    }
-  }
 
   /**
    * 
@@ -303,19 +147,173 @@ public class MetaDataPanel extends Panel {
 
     final UI ui = getUI();
 
-    Background.runWithCallback(() -> {
+    Mono<CorpusConfiguration> config =
+        Helper.getCorpusConfig(toplevelCorpusName, ui).doOnError(ex -> {
+          ui.access(() -> {
+            layout.removeComponent(progress);
+            ExceptionDialog.show(ex, "Could not get meta data", getUI());
+          });
+        });
+
+    Mono<SCorpusGraph> metaData =
+        Helper.getMetaData(toplevelCorpusName, documentName, ui).doOnError(ex -> {
+          ui.access(() -> {
+            layout.removeComponent(progress);
+            ExceptionDialog.show(ex, "Could not get corpus configuration", getUI());
+          });
+        });
+
+    Mono.zip(config, metaData).subscribe(t -> {
+
       CorpusMetadataCallResult result = new CorpusMetadataCallResult();
+      result.config = t.getT1();
+      result.metadata = t.getT2();
+      ui.access(() -> {
+        layout.removeComponent(progress);
+        Accordion accordion = new Accordion();
+        accordion.setSizeFull();
 
-      result.metadata = Helper.getMetaData(toplevelCorpusName, documentName, ui);
-      if (ui instanceof AnnisUI) {
-        result.config = ((AnnisUI) ui).getCorpusConfigWithCache(toplevelCorpusName);
-      } else {
-        result.config = Helper.getCorpusConfig(toplevelCorpusName, ui);
-      }
-      return result;
+        boolean hasDocument = addDocumentMetadata(result, accordion);
+        boolean hasCorpus = addCorpusMetadata(result, accordion);
 
-    }, new MetadataAvailableCallback());
+        // set output to none if no metadata are available
+        if (hasDocument || hasCorpus) {
+          layout.addComponent(accordion);
+        } else {
+          addEmptyLabel();
+        }
+      });
+    });
+
   }
 
+  private boolean addCorpusMetadata(CorpusMetadataCallResult result, Accordion accordion) {
+    boolean hasResult = false;
+
+    // Sort the (sub-) corpora so sub-corpora come first
+    List<SCorpus> corpora = new ArrayList<>(result.metadata.getCorpora());
+    corpora.sort((c1, c2) -> {
+      URI u1 = c1.getPath();
+      URI u2 = c2.getPath();
+      return ComparisonChain.start().compare(u1.segmentCount(), u2.segmentCount())
+          .compare(u1.toString(), u2.toString()).result();
+    });
+
+    for (SCorpus c : corpora) {
+      List<Annotation> corpusAnnos = new ArrayList<>();
+      for (SMetaAnnotation metaAnno : c.getMetaAnnotations()) {
+        Annotation anno = new Annotation();
+        AnnoKey key = new AnnoKey();
+        key.setNs(metaAnno.getNamespace());
+        key.setName(metaAnno.getName());
+        anno.setKey(key);
+        anno.setVal(metaAnno.getValue_STEXT());
+        corpusAnnos.add(anno);
+      }
+
+
+      if (!corpusAnnos.isEmpty()) {
+
+        String path = c.getPath().toString();
+        if (path.startsWith("salt:/")) {
+          path = path.substring("salt:/".length());
+        }
+        path = path + " (corpus)";
+        accordion.addTab(setupTable(new ListDataProvider<>(corpusAnnos), result.config), path);
+        hasResult = true;
+      }
+    }
+    return hasResult;
+  }
+
+  private boolean addDocumentMetadata(CorpusMetadataCallResult result, Accordion accordion) {
+    boolean hasResult = false;
+
+    // Add all document metadata first, then the corpus metadata
+    List<SDocument> documents = result.metadata.getDocuments();
+    if (documents != null) {
+      // There should only be one document in the corpus graph, but keeping the code generic
+      // should not hurt
+      for (SDocument d : documents) {
+        List<Annotation> docAnnos = new ArrayList<>();
+        for (SMetaAnnotation metaAnno : d.getMetaAnnotations()) {
+          Annotation anno = new Annotation();
+          AnnoKey key = new AnnoKey();
+          key.setNs(metaAnno.getNamespace());
+          key.setName(metaAnno.getName());
+          anno.setKey(key);
+          anno.setVal(metaAnno.getValue_STEXT());
+          docAnnos.add(anno);
+        }
+
+        if (!docAnnos.isEmpty()) {
+          String path = d.getName();
+
+          // In case we are called to only output a corpus, this might have been mapped as
+          // document. So only add the "document" suffix in case we are sure it is an actual
+          // corpus.
+          if (documentName.isPresent()) {
+            path = path + " (document)";
+          }
+
+          accordion.addTab(setupTable(new ListDataProvider<>(docAnnos), result.config), path);
+          hasResult = true;
+        }
+      }
+    }
+    return hasResult;
+  }
+
+  /**
+   * Places a label in the middle center of the corpus browser panel.
+   */
+  private void addEmptyLabel() {
+    if (emptyLabel == null) {
+      emptyLabel = new Label("none");
+    }
+
+    if (corpusAnnotationTable != null) {
+      layout.removeComponent(corpusAnnotationTable);
+    }
+
+    layout.addComponent(emptyLabel);
+
+    // this has only an effect after adding the component to a parent. Bug by
+    // vaadin?
+    emptyLabel.setSizeUndefined();
+
+    layout.setComponentAlignment(emptyLabel, Alignment.MIDDLE_CENTER);
+    layout.setExpandRatio(emptyLabel, 1.0f);
+  }
+
+
+  private Grid<Annotation> setupTable(ListDataProvider<Annotation> metaData,
+      CorpusConfiguration config) {
+    ValueProvider<Annotation, String> nameProvider = anno -> Helper.getQName(anno.getKey());
+
+
+    if (config == null) {
+      metaData.setSortOrder(nameProvider, SortDirection.ASCENDING);
+    } else {
+      metaData.setSortComparator(
+          new ConfiguredSortOrderComparator(config.getView().getCorpusAnnotationOrder()));
+    }
+    Grid<Annotation> tblMeta = new Grid<>(Annotation.class);
+    tblMeta.setDataProvider(metaData);
+    Column<Annotation, String> nameColumn = tblMeta.addColumn(nameProvider);
+    nameColumn.setWidthUndefined();
+    nameColumn.setCaption("Name");
+    nameColumn.setId("genname");
+    Column<Annotation, ?> valueColumn =
+        tblMeta.addComponentColumn(anno -> new Label(anno.getVal(), ContentMode.HTML));
+    valueColumn.setId("genval");
+    valueColumn.setCaption("Value");
+
+    tblMeta.setColumns(nameColumn.getId(), valueColumn.getId());
+
+    tblMeta.setSizeFull();
+    valueColumn.setExpandRatio(1);
+    return tblMeta;
+  }
 
 }

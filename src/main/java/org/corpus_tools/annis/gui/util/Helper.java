@@ -508,7 +508,7 @@ public class Helper {
         q.setLimit(1);
         q.setOffset(0);
         q.setQueryLanguage(QueryLanguage.AQL);
-        
+
         // Fetch first item, if there is no match the result will be empty
         Mono<String> findResult =
             client.post().uri("/search/find").bodyValue(q).retrieve().bodyToMono(String.class);
@@ -605,32 +605,27 @@ public class Helper {
    * Loads the corpus config of a specific corpus.
    *
    * @param corpus The name of the corpus, for which the config is fetched.
-   * @return A {@link CorpusConfig} object, which wraps a {@link Properties} object. This Properties
-   *         object stores the corpus configuration as simple key-value pairs.
+   * @return A {@link Mono} for a {@link CorpusConfig} object, which wraps a {@link Properties}
+   *         object. This Properties object stores the corpus configuration as simple key-value
+   *         pairs.
    */
-  public static CorpusConfiguration getCorpusConfig(final String corpus, final UI ui) {
+  public static Mono<CorpusConfiguration> getCorpusConfig(final String corpus, final UI ui) {
 
     if (corpus == null || corpus.isEmpty()) {
       Notification.show("no corpus is selected",
           "please select at least one corpus and execute query again",
           Notification.Type.WARNING_MESSAGE);
-      return null;
+      return Mono.empty();
     } else if (ui instanceof CommonUI) {
       CommonUI commonUI = (CommonUI) ui;
-      CorpusConfiguration corpusConfig = new CorpusConfiguration();
 
       WebClient client = commonUI.getWebClient();
 
-      try {
-        corpusConfig = client.get().uri("/corpora/{corpus}/configuration", corpus).retrieve()
-            .bodyToMono(CorpusConfiguration.class).block();
-      } catch (final WebClientResponseException ex) {
-        ui.access(() -> ExceptionDialog.show(ex, ERROR_MESSAGE_CORPUS_PROPS_HEADER, ui));
-      }
+      return client.get().uri("/corpora/{corpus}/configuration", corpus).retrieve()
+          .bodyToMono(CorpusConfiguration.class);
 
-      return corpusConfig;
     } else {
-      return null;
+      return Mono.empty();
     }
   }
 
@@ -674,43 +669,32 @@ public class Helper {
    *        be fetched.
    * @return Returns a corpus graph that contains the meta data as (sub-) corpus annotation.
    */
-  public static SCorpusGraph getMetaData(final String toplevelCorpusName,
+  public static Mono<SCorpusGraph> getMetaData(final String toplevelCorpusName,
       final Optional<String> documentName, final UI ui) {
 
     if (ui instanceof CommonUI) {
       CommonUI commonUI = (CommonUI) ui;
       WebClient client = commonUI.getWebClient();
-      try {
-
-        // Get the corpus graph and with it the meta data on the corpus/document nodes
-        String aql;
-        if (documentName.isPresent()) {
-          aql = "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
-              + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get()) + "/)" + " |"
-              + "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
-              + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get())
-              + "/ @* annis:node_type=\"corpus\")";
-        } else {
-          aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=/"
-              + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
-        }
-        File graphML = File.createTempFile("annis-subgraph", ".salt");
-        Flux<DataBuffer> response = client.get()
-            .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
-                .queryParam("query", aql).queryParam("query_language", QueryLanguage.AQL)
-                .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
-                .build(toplevelCorpusName))
-            .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
-        DataBufferUtils.write(response, graphML.toPath()).block();
-        SCorpusGraph result = CorpusGraphMapper.map(graphML);
-        Files.deleteIfExists(graphML.toPath());
-        return result;
-      } catch (WebClientResponseException | XMLStreamException | IOException ex) {
-        log.error(null, ex);
-        ui.access(() -> ExceptionDialog.show(ex, "Could not retrieve metadata", ui));
+      String aql;
+      if (documentName.isPresent()) {
+        aql = "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
+            + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get()) + "/)" + " |"
+            + "(annis:node_type=\"corpus\" _ident_ annis:doc=/"
+            + AQL_REGEX_VALUE_ESCAPER.escape(documentName.get())
+            + "/ @* annis:node_type=\"corpus\")";
+      } else {
+        aql = "annis:node_type=\"corpus\" _ident_ annis:node_name=/"
+            + AQL_REGEX_VALUE_ESCAPER.escape(toplevelCorpusName) + "/";
       }
+
+      return client.get()
+          .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+              .queryParam("query", aql).queryParam("query_language", QueryLanguage.AQL)
+              .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
+              .build(toplevelCorpusName))
+          .accept(MediaType.APPLICATION_XML).retrieve().bodyToMono(SCorpusGraph.class);
     }
-    return SaltFactory.createSCorpusGraph();
+    return Mono.empty();
   }
 
   /**

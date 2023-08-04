@@ -181,7 +181,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     if (corpusConfigCache != null) {
       config = corpusConfigCache.getIfPresent(corpus);
       if (config == null) {
-        config = Helper.getCorpusConfig(corpus, AnnisUI.this);
+        config = Helper.getCorpusConfig(corpus, AnnisUI.this).block();
         corpusConfigCache.put(corpus, config);
       }
     }

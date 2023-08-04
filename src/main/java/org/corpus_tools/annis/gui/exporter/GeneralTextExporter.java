@@ -75,6 +75,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
       List<SMetaAnnotation> asList = new ArrayList<>();
       for (SNode n : Helper.getMetaData(toplevelCorpus, Optional.ofNullable(documentName), ui)
+          .block()
           .getNodes()) {
         asList.addAll(n.getMetaAnnotations());
       }
