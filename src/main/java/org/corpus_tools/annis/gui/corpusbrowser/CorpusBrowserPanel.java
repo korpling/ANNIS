@@ -196,7 +196,8 @@ public class CorpusBrowserPanel extends Panel {
 
     Flux<Component> components = Flux.concat(dominanceComponents, pointingComponents);
 
-    Mono<Map<Component, Collection<Annotation>>> edgeAnnosByComponent = components.flatMap(c -> {
+    Mono<Map<Component, Collection<Annotation>>> edgeAnnosByComponent =
+        components.filter(c -> !c.getName().isEmpty()).flatMap(c -> {
       Flux<Annotation> componentEdgeAnnos = client.get()
           .uri(ub -> ub.path("/corpora/{corpus}/edge-annotations/{type}/{layer}/{name}/")
               .queryParam("list_values", true).queryParam("only_most_frequent_values", true)
