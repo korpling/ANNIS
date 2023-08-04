@@ -38,7 +38,6 @@ import org.corpus_tools.annis.api.model.AnnoKey;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
-import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.components.ExampleTable;
 import org.corpus_tools.annis.gui.controller.QueryController;
@@ -170,9 +169,7 @@ public class CorpusBrowserPanel extends Panel {
     final UI ui = getUI();
 
     if (ui instanceof CommonUI) {
-      Background.run(() -> {
-        fetchAnnotationsInBackground((CommonUI) ui);
-      });
+      fetchAnnotationsInBackground((CommonUI) ui);
     }
   }
 
