@@ -137,7 +137,7 @@ public class ExampleQueriesPanel extends CssLayout {
     btn.setStyleName(ValoTheme.BUTTON_LINK);
     btn.addClickListener(event -> {
       CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
-      corpusList.initCorpusBrowser(corpusName, btn);
+      corpusList.initCorpusBrowser(corpusName, btn, ui);
     });
 
     return btn;

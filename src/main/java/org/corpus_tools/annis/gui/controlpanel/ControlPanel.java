@@ -29,8 +29,6 @@ public class ControlPanel extends VerticalLayout {
 
     private static final long serialVersionUID = -2220211539424865671L;
 
-    private final AnnisUI ui;
-
     private final QueryPanel queryPanel;
 
     private final CorpusListPanel corpusList;
@@ -40,7 +38,7 @@ public class ControlPanel extends VerticalLayout {
     private final TabSheet optionsTab;
 
     public ControlPanel(AnnisUI ui) {
-      this.ui = ui;
+
         setSizeFull();
         setMargin(true);
 
@@ -52,7 +50,7 @@ public class ControlPanel extends VerticalLayout {
         optionsTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
         queryPanel = new QueryPanel(ui);
-        corpusList = new CorpusListPanel(ui);
+        corpusList = new CorpusListPanel();
         searchOptions = new SearchOptionsPanel();
 
         optionsTab.addTab(corpusList, "Corpus List", null);

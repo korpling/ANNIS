@@ -55,7 +55,7 @@ class MetaDataPanelTest {
     // Open a corpus browser for pcc2
     Button button = mock(Button.class);
     CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
-    corpusList.initCorpusBrowser("pcc2", button);
+    corpusList.initCorpusBrowser("pcc2", button, ui);
 
     // Get window by its title
     Window w = _get(Window.class, spec -> spec.withCaption("Corpus information for pcc2"));

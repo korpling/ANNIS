@@ -63,7 +63,7 @@ class CorpusBrowserPanelTest {
     // Open a corpus browser for the given corpus
     Button button = mock(Button.class);
     CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
-    corpusList.initCorpusBrowser(corpus, button);
+    corpusList.initCorpusBrowser(corpus, button, ui);
 
     // Get window by its title
     Window w = _get(Window.class, spec -> spec.withCaption("Corpus information for " + corpus));
