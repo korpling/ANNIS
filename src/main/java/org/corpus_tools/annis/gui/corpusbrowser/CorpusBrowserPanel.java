@@ -16,10 +16,8 @@ package org.corpus_tools.annis.gui.corpusbrowser;
 import com.vaadin.event.selection.SelectionEvent;
 import com.vaadin.event.selection.SelectionListener;
 import com.vaadin.ui.Accordion;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
@@ -99,11 +97,7 @@ public class CorpusBrowserPanel extends Panel {
 
   private QueryController controller;
 
-  private ProgressBar progress;
-
   private Accordion accordion;
-
-  private VerticalLayout layout;
 
   public CorpusBrowserPanel() {
     this(null, null);
@@ -115,8 +109,6 @@ public class CorpusBrowserPanel extends Panel {
     this.controller = controller;
 
     setSizeFull();
-    progress = new ProgressBar();
-    progress.setIndeterminate(true);
 
     tblNodeAnno = new ExampleTable();
     tblEdgeTypes = new ExampleTable();
@@ -155,15 +147,8 @@ public class CorpusBrowserPanel extends Panel {
     accordion = new Accordion(tabNodeAnno, tabEdgeAnno, tabEdgeTypes, tabMetaAnno);
     accordion.setSizeFull();
     accordion.setVisible(true);
-    progress.setVisible(true);
-    progress.setSizeFull();
 
-    layout = new VerticalLayout();
-    layout.addComponents(progress, accordion);
-    layout.setSizeFull();
-    layout.setMargin(false);
-    layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
-    setContent(layout);
+    setContent(accordion);
 
   }
 
@@ -242,7 +227,6 @@ public class CorpusBrowserPanel extends Panel {
     TreeSet<CorpusBrowserEntry> edgeTypeItems = new TreeSet<>();
     TreeSet<CorpusBrowserEntry> metaAnnoItems = new TreeSet<>();
 
-    progress.setVisible(false);
     accordion.setVisible(true);
 
 
