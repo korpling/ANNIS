@@ -407,9 +407,10 @@ public class QueryController implements Serializable {
 
     if (ui instanceof AnnisUI) {
       AnnisUI annisUI = (AnnisUI) ui;
-      ResultViewPanel newResultView = new ResultViewPanel(annisUI, displayedQuery);
-      newResultView.getPaging().addCallback(
-          new PagingCallback(annisUI, searchView, newResultView, displayedQuery));
+      ResultViewPanel newResultView =
+          new ResultViewPanel(displayedQuery, annisUI.getQueryController());
+      newResultView.getPaging()
+          .addCallback(new PagingCallback(this, searchView, newResultView, displayedQuery));
 
       TabSheet.Tab newTab;
 
@@ -428,8 +429,7 @@ public class QueryController implements Serializable {
     }
   }
 
-  public void executeFindSearch(PagedResultQuery query, ResultViewPanel resultPanel,
-      AnnisUI ui) {
+  public void executeFindSearch(PagedResultQuery query, ResultViewPanel resultPanel, AnnisUI ui) {
     resultPanel.showMatchSearchInProgress(query.getSegmentation());
 
     FindQuery q = new FindQuery();
@@ -450,13 +450,13 @@ public class QueryController implements Serializable {
     // Get the subgraph for each match
     Flux<Tuple3<SaltProject, Match, Map<String, CorpusConfiguration>>> subgraphs =
         matches.flatMap(m -> {
-      SubgraphWithContext arg = new SubgraphWithContext();
-      arg.setLeft(query.getLeftContext());
-      arg.setRight(query.getRightContext());
-      arg.setSegmentation(query.getSegmentation());
-      arg.setNodeIds(m.getSaltIDs().stream().collect(Collectors.toList()));
+          SubgraphWithContext arg = new SubgraphWithContext();
+          arg.setLeft(query.getLeftContext());
+          arg.setRight(query.getRightContext());
+          arg.setSegmentation(query.getSegmentation());
+          arg.setNodeIds(m.getSaltIDs().stream().collect(Collectors.toList()));
           return Mono.zip(createSaltFromMatch(m, arg), Mono.just(m), corpusConfigMap);
-    });
+        });
 
     subgraphs.doOnError(unknownException -> {
 
@@ -493,8 +493,8 @@ public class QueryController implements Serializable {
           }
         });
       }
-    }).subscribe(tuple -> ui.access(() -> resultPanel.addQueryResult(query, tuple.getT1(),
-        Arrays.asList(tuple.getT2()), tuple.getT3())));
+    }).subscribe(tuple -> ui.accessSynchronously(() -> resultPanel.addQueryResult(query,
+        tuple.getT1(), Arrays.asList(tuple.getT2()), tuple.getT3(), ui)));
 
   }
 

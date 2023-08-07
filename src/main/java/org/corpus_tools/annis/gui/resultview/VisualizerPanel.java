@@ -24,6 +24,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.ValoTheme;
 import java.io.File;
 import java.io.IOException;
@@ -102,7 +103,7 @@ public class VisualizerPanel extends CssLayout
       try {
         final Component createdComponent = future.get(120, TimeUnit.SECONDS);
 
-        ui.access(() -> {
+        UI.getCurrent().access(() -> {
           vis = createdComponent;
           updateGUIAfterLoadingVisualizer(callback);
         });
@@ -123,7 +124,7 @@ public class VisualizerPanel extends CssLayout
 
       if (exception != null) {
         final Throwable finalException = exception;
-        ui.access(() -> Notification.show(
+        UI.getCurrent().access(() -> Notification.show(
             "Error when creating visualizer "
                 + (visPlugin == null ? UNKNOWN : visPlugin.getShortName()),
             finalException.toString(), Notification.Type.WARNING_MESSAGE));
@@ -206,8 +207,6 @@ public class VisualizerPanel extends CssLayout
 
   private ProgressBar progress;
 
-  private AnnisUI ui;
-
   private VisualizerContextChanger visCtxChanger;
 
   private static final String UNKNOWN = "<unknown>";
@@ -219,8 +218,7 @@ public class VisualizerPanel extends CssLayout
    */
   public VisualizerPanel(final VisualizerRule visRule, int visId, SDocument result, Match match,
       Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered, String htmlID,
-      String resultID, VisualizerContextChanger parent, String segmentationName, AnnisUI ui) {
-    this.ui = ui;
+      String resultID, VisualizerContextChanger parent, String segmentationName) {
     this.visRule = visRule;
     this.visId = visId;
 
@@ -254,7 +252,10 @@ public class VisualizerPanel extends CssLayout
   public void attach() {
     super.attach();
 
-    if (visRule != null) {
+    UI uiRaw = UI.getCurrent();
+
+    if (uiRaw instanceof AnnisUI && visRule != null) {
+      AnnisUI ui = (AnnisUI) uiRaw;
       visPlugin = ui.getVisualizerPlugins().stream()
           .filter(plugin -> Objects.equal(plugin.getShortName(), visRule.getVisType())).findAny()
           .orElse(null);
@@ -292,7 +293,7 @@ public class VisualizerPanel extends CssLayout
 
         // create the visualizer and calc input
         try {
-          vis = createComponent();
+          vis = createComponent(ui);
           if (vis != null) {
             vis.setVisible(true);
             addComponent(vis);
@@ -329,12 +330,12 @@ public class VisualizerPanel extends CssLayout
     toggleVisualizer(isVisible, null);
   }
 
-  private Component createComponent() {
+  private Component createComponent(CommonUI ui) {
     if (visPlugin == null) {
       return null;
     }
 
-    final VisualizerInput input = createInput();
+    final VisualizerInput input = createInput(ui);
 
     Component c = visPlugin.createComponent(input, this);
     if (c == null) {
@@ -347,7 +348,7 @@ public class VisualizerPanel extends CssLayout
     return c;
   }
 
-  private VisualizerInput createInput() {
+  private VisualizerInput createInput(CommonUI ui) {
     VisualizerInput input = new VisualizerInput();
     input.setUI(ui);
     input.setContextPath(ui.getServletContext().getContextPath());
@@ -448,7 +449,9 @@ public class VisualizerPanel extends CssLayout
 
 
   private void loadVisualizer(final LoadableVisualizer.Callback callback) {
-    if (visPlugin != null) {
+    UI uiRaw = UI.getCurrent();
+    if (uiRaw instanceof CommonUI && visPlugin != null) {
+      CommonUI ui = (CommonUI) uiRaw;
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
@@ -460,7 +463,7 @@ public class VisualizerPanel extends CssLayout
       final Future<Component> future = execService.submit(() -> {
         // only create component if not already created
         if (vis == null) {
-          return createComponent();
+          return createComponent(ui);
         } else {
           return vis;
         }

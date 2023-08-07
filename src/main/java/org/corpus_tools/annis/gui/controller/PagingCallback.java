@@ -13,6 +13,7 @@
  */
 package org.corpus_tools.annis.gui.controller;
 
+import com.vaadin.ui.UI;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.SearchView;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
@@ -29,13 +30,14 @@ public class PagingCallback {
     private final ResultViewPanel panel;
 
     private final SearchView searchView;
-    private final AnnisUI ui;
+    private final QueryController queryController;
     private final DisplayedResultQuery query;
 
-    public PagingCallback(AnnisUI ui, SearchView searchView, ResultViewPanel panel,
+    public PagingCallback(QueryController queryController, SearchView searchView,
+        ResultViewPanel panel,
             DisplayedResultQuery initialQuery) {
         this.panel = panel;
-        this.ui = ui;
+        this.queryController = queryController;
         this.searchView = searchView;
         this.query = initialQuery;
     }
@@ -43,9 +45,9 @@ public class PagingCallback {
     public void switchPage(long offset, int limit) {
         query.setOffset(offset);
         query.setLimit(limit);
-        ui.getQueryController().setQuery(query);
+        queryController.setQuery(query);
         // execute the result query again
-        updateMatches(ui.getQueryController().getSearchQuery(), panel);
+        updateMatches(queryController.getSearchQuery(), panel);
 
     }
 
@@ -53,7 +55,9 @@ public class PagingCallback {
         if (panel != null) {
             searchView.updateFragment(newQuery);
             searchView.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
-            ui.getQueryController().executeFindSearch(newQuery, panel, ui);
+            if (UI.getCurrent() instanceof AnnisUI) {
+              queryController.executeFindSearch(newQuery, panel, (AnnisUI) UI.getCurrent());
+            }
         }
     }
 
