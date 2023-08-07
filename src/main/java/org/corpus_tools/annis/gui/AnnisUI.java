@@ -27,6 +27,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.Component;
 import java.io.IOException;
 import java.net.URI;
@@ -75,7 +76,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   private QueryController queryController;
 
-  private SearchView searchView;
+  @Autowired
+  SpringViewProvider viewProvider;
 
   @Autowired
   private List<VisualizerPlugin> visualizerPlugins;
@@ -94,6 +96,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   @Autowired
   private WebClient webClient;
+
+  private SearchView searchView;
 
   private AdminView adminView;
 
@@ -221,11 +225,11 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     setErrorHandler(this);
 
     adminView = new AdminView(AnnisUI.this);
+    searchView = new SearchView(AnnisUI.this);
 
     toolbar = new MainToolbar(getConfig(), oauth2Clients);
     toolbar.setQueryController(queryController);
 
-    this.searchView = new SearchView(this);
     this.queryController = new QueryController(this, searchView, queryState);
 
     toolbar.addLoginListener(searchView);
@@ -243,7 +247,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     if (Helper.getUser().isPresent()) {
       getToolbar().onLogin();
     }
-    
+
     Object fragmentToRestore =
         VaadinSession.getCurrent().getAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE);
     if (fragmentToRestore instanceof String) {

@@ -21,9 +21,8 @@ public class ExampleTable extends Grid<CorpusBrowserEntry> {
 
         getColumn("name").setCaption("Name");
 
-        Column<?, ?> exampleColumn = addColumn(
-                cbe -> ("<div class=\"" + Helper.CORPUS_FONT_FORCE + "\">" + cbe.getExample() + "</div>"),
-                new HtmlRenderer());
+        Column<?, ?> exampleColumn = addColumn(cbe -> ("<div class=\"" + Helper.CORPUS_FONT_FORCE
+            + "\">" + cbe.getExample() + "</div>"), new HtmlRenderer());
         exampleColumn.setId("genexample");
         exampleColumn.setCaption("Example (click to use query)");
         exampleColumn.setExpandRatio(1);

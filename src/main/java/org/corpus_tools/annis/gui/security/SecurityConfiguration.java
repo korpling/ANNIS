@@ -1,6 +1,7 @@
 package org.corpus_tools.annis.gui.security;
 
 import com.fasterxml.jackson.dataformat.toml.TomlMapper;
+import com.vaadin.spring.annotation.EnableVaadin;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.springframework.security.oauth2.client.web.reactive.function.client.S
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@EnableVaadin
 @Configuration
 public class SecurityConfiguration {
 

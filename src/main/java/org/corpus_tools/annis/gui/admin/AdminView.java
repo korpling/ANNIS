@@ -18,6 +18,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Page;
+import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
@@ -47,6 +48,7 @@ import org.springframework.web.reactive.function.client.WebClient;
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
+@SpringView
 public class AdminView extends VerticalLayout
     implements View, UIView, LoginListener, TabSheet.SelectedTabChangeListener, ApiClientProvider {
 

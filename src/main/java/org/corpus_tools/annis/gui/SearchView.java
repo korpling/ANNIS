@@ -26,6 +26,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.Layout;
@@ -76,6 +77,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
+@SpringView
 public class SearchView extends GridLayout
     implements View, MimeTypeErrorListener, Page.UriFragmentChangedListener,
     TabSheet.CloseHandler, LoginListener, TabSheet.SelectedTabChangeListener {

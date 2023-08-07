@@ -480,44 +480,38 @@ public class Helper {
     return sb.toString();
   }
 
-  public static Flux<AnnoKey> getMetaAnnotationNames(final String corpus, final UI ui) {
+  public static Flux<AnnoKey> getMetaAnnotationNames(final String corpus, WebClient client) {
 
-    if (ui instanceof CommonUI) {
-      CommonUI commonUI = (CommonUI) ui;
+    Flux<Annotation> nodeAnnos = client.get()
+        .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
+            .queryParam("list_values", false).queryParam("only_most_frequent_values", true)
+            .build(corpus))
+        .retrieve().bodyToFlux(Annotation.class)
+        .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
+            && !Objects.equals(a.getKey().getName(), "tok"));
+    // Check for each annotation if its actually a meta-annotation
+    Flux<Annotation> metaAnnos = nodeAnnos.map(a -> {
+      return Tuples.of(a, getQName(a.getKey()));
+    }).filter(t -> validQNamePattern.matcher(t.getT2()).matches()).flatMap(t -> {
+      final FindQuery q = new FindQuery();
+      q.setCorpora(Arrays.asList(corpus));
 
-      WebClient client = commonUI.getWebClient();
+      q.setQuery("annis:node_type=\"corpus\" _ident_ " + t.getT2());
+      // Not sorting the results is much faster, especially if we only fetch the first
+      // item (we are only interested if a match exists, not how many items or which one)
+      q.setOrder(OrderEnum.NOTSORTED);
+      q.setLimit(1);
+      q.setOffset(0);
+      q.setQueryLanguage(QueryLanguage.AQL);
 
-      Flux<Annotation> nodeAnnos = client.get()
-          .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
-              .queryParam("list_values", false).queryParam("only_most_frequent_values", true)
-              .build(corpus))
-          .retrieve().bodyToFlux(Annotation.class)
-          .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
-              && !Objects.equals(a.getKey().getName(), "tok"));
-      // Check for each annotation if its actually a meta-annotation
-      Flux<Annotation> metaAnnos = nodeAnnos.map(a -> {
-        return Tuples.of(a, getQName(a.getKey()));
-      }).filter(t -> validQNamePattern.matcher(t.getT2()).matches()).flatMap(t -> {
-        final FindQuery q = new FindQuery();
-        q.setCorpora(Arrays.asList(corpus));
+      // Fetch first item, if there is no match the result will be empty
+      Flux<String> findResult =
+          client.post().uri("/search/find").bodyValue(q).retrieve().bodyToFlux(String.class);
+      return findResult.zipWith(Mono.just(t.getT1()).repeat());
+    }).filter(t -> t.getT1() != null && !t.getT1().trim().isEmpty())
+        .map(Tuple2<String, Annotation>::getT2);
+    return metaAnnos.map(a -> a.getKey()).distinct();
 
-        q.setQuery("annis:node_type=\"corpus\" _ident_ " + t.getT2());
-        // Not sorting the results is much faster, especially if we only fetch the first
-        // item (we are only interested if a match exists, not how many items or which one)
-        q.setOrder(OrderEnum.NOTSORTED);
-        q.setLimit(1);
-        q.setOffset(0);
-        q.setQueryLanguage(QueryLanguage.AQL);
-
-        // Fetch first item, if there is no match the result will be empty
-        Mono<String> findResult =
-            client.post().uri("/search/find").bodyValue(q).retrieve().bodyToMono(String.class);
-        return findResult.zipWith(Mono.just(t.getT1()));
-      }).filter(t -> !t.getT1().trim().isEmpty()).map(Tuple2<String, Annotation>::getT2);
-      return metaAnnos.map(a -> a.getKey()).distinct();
-    }
-
-    return Flux.empty();
   }
 
   public static String getQName(final AnnoKey key) {

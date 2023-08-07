@@ -44,6 +44,7 @@ import org.corpus_tools.annis.gui.controller.QueryController;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryLanguage;
 import org.corpus_tools.annis.gui.util.Helper;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -55,9 +56,13 @@ import reactor.util.function.Tuple2;
  */
 public class CorpusBrowserPanel extends Panel {
 
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(Helper.class);
+
   private class ExampleListener implements SelectionListener<CorpusBrowserEntry> {
 
     private static final long serialVersionUID = 5456621606184042619L;
+
+
 
     @Override
     public void selectionChange(SelectionEvent<CorpusBrowserEntry> event) {
@@ -169,7 +174,7 @@ public class CorpusBrowserPanel extends Panel {
     final UI ui = getUI();
 
     if (ui instanceof CommonUI) {
-      fetchAnnotationsInBackground((CommonUI) ui);
+      fetchAnnotations((CommonUI) ui);
     }
   }
 
@@ -183,29 +188,35 @@ public class CorpusBrowserPanel extends Panel {
     return true;
   }
 
-  private void fetchAnnotationsInBackground(CommonUI ui) {
-
-    WebClient client = ui.getWebClient();
-
+  private Flux<Component> createComponentQuery(WebClient client) {
     Flux<Component> dominanceComponents = client.get().uri(
         ub -> ub.path("/corpora/{corpus}/components").queryParam("type", "Dominance").build(corpus))
         .retrieve().bodyToFlux(Component.class);
+
     Flux<Component> pointingComponents = client.get().uri(
         ub -> ub.path("/corpora/{corpus}/components").queryParam("type", "Pointing").build(corpus))
         .retrieve().bodyToFlux(Component.class);
 
-    Flux<Component> components = Flux.concat(dominanceComponents, pointingComponents);
 
-    Mono<Map<Component, Collection<Annotation>>> edgeAnnosByComponent =
-        components.filter(c -> !c.getName().isEmpty()).flatMap(c -> {
-      Flux<Annotation> componentEdgeAnnos = client.get()
-          .uri(ub -> ub.path("/corpora/{corpus}/edge-annotations/{type}/{layer}/{name}/")
-              .queryParam("list_values", true).queryParam("only_most_frequent_values", true)
-              .build(corpus, c.getType().getValue(), c.getLayer(), c.getName()))
+    return Flux.merge(dominanceComponents, pointingComponents);
+  }
 
-          .retrieve().bodyToFlux(Annotation.class);
-      return componentEdgeAnnos.zipWith(Flux.just(c).repeat());
-    }).collectMultimap(Tuple2::getT2, Tuple2::getT1);
+  private void fetchAnnotations(CommonUI ui) {
+
+    WebClient client = ui.getWebClient();
+
+    Flux<Tuple2<Annotation, Component>> edgeAnnosByComponent =
+        createComponentQuery(client).filter(c -> !c.getName().isEmpty()).flatMap(c -> {
+          Flux<Annotation> componentEdgeAnnos = client.get()
+              .uri(ub -> ub.path("/corpora/{corpus}/edge-annotations/{type}/{layer}/{name}/")
+                  .queryParam("list_values", true).queryParam("only_most_frequent_values", true)
+                  .build(corpus, c.getType().getValue(), c.getLayer(), c.getName()))
+
+              .retrieve().bodyToFlux(Annotation.class);
+          return componentEdgeAnnos.zipWith(Mono.just(c).repeat());
+        });
+
+    Flux<Component> components = createComponentQuery(client);
 
     Flux<Annotation> nodeAnnos = client.get()
         .uri(ub -> ub.path("/corpora/{corpus}/node-annotations").queryParam("list_values", true)
@@ -213,17 +224,19 @@ public class CorpusBrowserPanel extends Panel {
         .retrieve().bodyToFlux(Annotation.class)
         .filter(a -> !Objects.equals(a.getKey().getNs(), "annis")
             && !Objects.equals(a.getKey().getName(), "tok"));
-    Flux<AnnoKey> metaAnnoKeys = Helper.getMetaAnnotationNames(corpus, ui);
+    Flux<AnnoKey> metaAnnoKeys = Helper.getMetaAnnotationNames(corpus, client);
 
-    Mono.zip(nodeAnnos.collectList(), components.collectList(), edgeAnnosByComponent,
-        metaAnnoKeys.collectList()).subscribe(t -> ui.access(() -> {
-          showEntries(t.getT1(), t.getT2(), t.getT3(), new LinkedHashSet<>(t.getT4()));
-        }));
+
+    showEntries(nodeAnnos.collectList().block(), components.collectList().block(),
+        edgeAnnosByComponent.collectMultimap(Tuple2::getT2, Tuple2::getT1).block(),
+        metaAnnoKeys.collectList().block());
   }
 
   private void showEntries(List<Annotation> nodeAnnos, List<Component> components,
-      Map<Component, Collection<Annotation>> edgeAnnosByComponent, Set<AnnoKey> metaAnnoKeys) {
+      Map<Component, Collection<Annotation>> edgeAnnosByComponent, List<AnnoKey> metaAnnoKeysList) {
 
+    Set<AnnoKey> metaAnnoKeys = new LinkedHashSet<>(metaAnnoKeysList);
+    
     TreeSet<CorpusBrowserEntry> nodeAnnoItems = new TreeSet<>();
     TreeSet<CorpusBrowserEntry> edgeAnnoItems = new TreeSet<>();
     TreeSet<CorpusBrowserEntry> edgeTypeItems = new TreeSet<>();
