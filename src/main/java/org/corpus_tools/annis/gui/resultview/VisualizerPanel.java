@@ -90,10 +90,12 @@ public class VisualizerPanel extends CssLayout
 
     private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
+    private UI ui;
 
-    public BackgroundJob(Future<Component> future, LoadableVisualizer.Callback callback) {
+    public BackgroundJob(Future<Component> future, LoadableVisualizer.Callback callback, UI ui) {
       this.future = future;
       this.callback = callback;
+      this.ui = ui;
     }
 
     @Override
@@ -103,7 +105,7 @@ public class VisualizerPanel extends CssLayout
       try {
         final Component createdComponent = future.get(120, TimeUnit.SECONDS);
 
-        UI.getCurrent().access(() -> {
+        ui.access(() -> {
           vis = createdComponent;
           updateGUIAfterLoadingVisualizer(callback);
         });
@@ -124,7 +126,7 @@ public class VisualizerPanel extends CssLayout
 
       if (exception != null) {
         final Throwable finalException = exception;
-        UI.getCurrent().access(() -> Notification.show(
+        ui.access(() -> Notification.show(
             "Error when creating visualizer "
                 + (visPlugin == null ? UNKNOWN : visPlugin.getShortName()),
             finalException.toString(), Notification.Type.WARNING_MESSAGE));
@@ -470,7 +472,7 @@ public class VisualizerPanel extends CssLayout
       });
 
       // run the actual code to load the visualizer
-      Background.run(new BackgroundJob(future, callback));
+      Background.run(new BackgroundJob(future, callback, ui));
 
     } // end if create input was needed
 
