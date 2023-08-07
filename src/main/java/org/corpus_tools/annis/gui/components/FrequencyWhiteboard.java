@@ -15,7 +15,7 @@
  */
 package org.corpus_tools.annis.gui.components;
 
-import static org.corpus_tools.annis.gui.Helper.encodeGeneric;
+import static org.corpus_tools.annis.gui.util.Helper.encodeGeneric;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;

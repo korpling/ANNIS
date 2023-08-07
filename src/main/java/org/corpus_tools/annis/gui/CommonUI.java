@@ -21,18 +21,20 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import javax.servlet.ServletContext;
-import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.gui.components.SettingsStorage;
+import org.corpus_tools.annis.gui.objects.FontConfig;
+import org.corpus_tools.annis.gui.objects.InstanceConfig;
 import org.corpus_tools.annis.gui.requesthandler.ResourceRequestHandler;
-import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -49,18 +51,14 @@ public abstract class CommonUI extends AnnisBaseUI {
 
     private InstanceConfig instanceConfig;
 
-    private SecurityContext securityContext;
-
-    protected CommonUI(String urlPrefix, ServiceStarter serviceStarter,
-        AuthenticationSuccessListener authListener) {
-        this.urlPrefix = urlPrefix;
-        Optional<Authentication> desktopAuth = serviceStarter.getDesktopUserToken();
-        if (desktopAuth.isPresent()) {
-          // Login the provided desktop user
-          getSecurityContext().setAuthentication(desktopAuth.get());
-          authListener.setToken(desktopAuth.get().getCredentials().toString());
-        }
-    }
+	protected CommonUI(String urlPrefix, ServiceStarter serviceStarter) {
+		this.urlPrefix = urlPrefix;
+		Optional<Authentication> userToken = serviceStarter.getDesktopUserToken();
+		if(userToken.isPresent()) {
+			// Login with the static desktop token
+			SecurityContextHolder.getContext().setAuthentication(userToken.get());
+		}
+	}
 
 
     public InstanceConfig getInstanceConfig() {
@@ -173,9 +171,7 @@ public abstract class CommonUI extends AnnisBaseUI {
         return urlPrefix;
     }
     
-    public abstract ApiClient getClient();
-
-
+    public abstract WebClient getWebClient();
 
     /**
      * Handle common errors like database/service connection problems and display a unified error
@@ -194,10 +190,10 @@ public abstract class CommonUI extends AnnisBaseUI {
           rootCause = rootCause.getCause();
         }
 
-        if (rootCause instanceof ApiException) {
-          ApiException apiEx = (ApiException) rootCause;
+        if (rootCause instanceof WebClientResponseException) {
+          WebClientResponseException apiEx = (WebClientResponseException) rootCause;
 
-          if (apiEx.getCode() == 503) {
+          if (apiEx.getStatusCode() == HttpStatus.SERVICE_UNAVAILABLE) {
             // database connection error
             Notification n = new Notification(
                 "Can't execute " + (action == null ? "" : "\"" + action + "\"")
@@ -214,7 +210,7 @@ public abstract class CommonUI extends AnnisBaseUI {
 
             n.show(this.getPage());
             return true;
-          } else if (apiEx.getCode() == 401) {
+          } else if (apiEx.getStatusCode() == HttpStatus.UNAUTHORIZED) {
             redirectToLogin();
             return true;
           }
@@ -224,13 +220,6 @@ public abstract class CommonUI extends AnnisBaseUI {
     }
 
     public abstract ServletContext getServletContext();
-
-    public SecurityContext getSecurityContext() {
-      if (this.securityContext == null) {
-        this.securityContext = SecurityContextHolder.getContext();
-      }
-      return securityContext;
-    }
 
     public abstract OAuth2ClientProperties getOauth2ClientProperties();
 

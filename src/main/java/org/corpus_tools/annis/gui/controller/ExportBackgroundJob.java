@@ -15,21 +15,19 @@
  */
 package org.corpus_tools.annis.gui.controller;
 
+import com.google.common.eventbus.EventBus;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-
-import com.google.common.eventbus.EventBus;
-
-import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.ExportPanel;
+import org.corpus_tools.annis.gui.components.ExportPanel;
 import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.objects.ExportQuery;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -84,8 +82,9 @@ public class ExportBackgroundJob implements Callable<File> {
                 if (panel != null) {
                     panel.showResult(currentTmpFile, exportError);
                 }
-                if (exportError instanceof ApiException) {
-                    ui.getQueryController().reportServiceException((ApiException) exportError, true);
+              if (exportError instanceof WebClientResponseException) {
+                ui.getQueryController()
+                    .reportServiceException((WebClientResponseException) exportError, true);
                 }
             });
         }

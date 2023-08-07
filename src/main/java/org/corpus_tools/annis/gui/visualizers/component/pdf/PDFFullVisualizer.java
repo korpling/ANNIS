@@ -14,7 +14,7 @@
 package org.corpus_tools.annis.gui.visualizers.component.pdf;
 
 import com.vaadin.ui.Panel;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.springframework.stereotype.Component;
@@ -40,7 +40,7 @@ public class PDFFullVisualizer extends AbstractVisualizer { // NO_UCD (unused co
   private static final long serialVersionUID = -1053564254980292442L;
 
   @Override
-  public Panel createComponent(VisualizerInput input, VisualizationToggle visToggle) {
+  public Panel createComponent(VisualizerInput input, VisualizerPanel visPanel) {
     Panel p = new Panel();
     p.setHeight(input.getMappings().getOrDefault("height", "-1") + "px");
     p.setContent(new PDFPanel(input, "-1"));

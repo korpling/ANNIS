@@ -19,7 +19,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.UUID;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.IFrameResource;
 import org.corpus_tools.annis.gui.visualizers.IFrameResourceMap;
@@ -44,7 +44,7 @@ public abstract class AbstractIFrameVisualizer extends AbstractVisualizer
       org.slf4j.LoggerFactory.getLogger(AbstractIFrameVisualizer.class);
 
   @Override
-  public Component createComponent(final VisualizerInput vis, VisualizationToggle visToggle) {
+  public Component createComponent(final VisualizerInput vis, VisualizerPanel visPanel) {
     ByteArrayOutputStream outStream = new ByteArrayOutputStream();
     writeOutput(vis, outStream);
 

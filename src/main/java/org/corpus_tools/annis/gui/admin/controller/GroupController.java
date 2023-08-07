@@ -19,8 +19,8 @@ import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 import org.corpus_tools.annis.api.model.Group;
-import org.corpus_tools.annis.gui.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.ServiceQueryException;
+import org.corpus_tools.annis.gui.admin.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.admin.model.CorpusManagement;
 import org.corpus_tools.annis.gui.admin.model.GroupManagement;
 import org.corpus_tools.annis.gui.admin.view.GroupListView;
@@ -154,12 +154,6 @@ public class GroupController implements GroupListView.Listener, UIView.Listener 
   @Override
   public void loginChanged(boolean isLoggedIn) {
     this.isLoggedIn = isLoggedIn;
-    if (model.getWebResourceProvider() != null) {
-      model.getWebResourceProvider().invalidateClient();
-    }
-    if (corpusModel.getClientProvider() != null) {
-      corpusModel.getClientProvider().invalidateClient();
-    }
     if (isLoggedIn && viewIsActive) {
       fetchDataFromService();
     } else {

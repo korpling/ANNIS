@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.objects.AnnisConstants;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SSpanningRelation;
@@ -280,7 +280,8 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
      *            returned for the user query
      */
     @Override
-    public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args, int recordNumber, int nodeCount)
+    public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args,
+        int recordNumber, long nodeCount)
             throws IOException {
         String currSpeakerName = "";
         String prevSpeakerName = "";
@@ -294,7 +295,7 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
             filterNumbersSetByUser.clear();
             filterNumbersIsEmpty = true;
             listOfMetakeys.clear();
-            adjacencyMatrix = new int[nodeCount][nodeCount];
+            adjacencyMatrix = new int[(int) nodeCount][(int) nodeCount];
             matrixIsFilled = false;
             singleMatchesGlobal.clear();
             orderedMatchNumbersGlobal.clear();
@@ -637,7 +638,8 @@ public class TextColumnExporter extends BaseMatrixExporter { // NO_UCD (use defa
           corpusName = urlPathEscape.escape(corpusName);
           
           List<SMetaAnnotation> metadata = new ArrayList<>();
-          for(SNode n : Helper.getMetaData(corpusName, Optional.of(docName), ui).getNodes()) {
+          for (SNode n : Helper.getMetaData(corpusName, Optional.of(docName), ui).block()
+              .getNodes()) {
             metadata.addAll(n.getMetaAnnotations());
           }
           

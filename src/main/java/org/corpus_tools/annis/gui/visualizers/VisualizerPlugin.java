@@ -17,7 +17,7 @@ import com.vaadin.ui.Component;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.salt.core.SNode;
 
 /**
@@ -50,7 +50,7 @@ public interface VisualizerPlugin extends Serializable {
    * It is used by the ANNIS plugin system to generate something viewable for vaadin.
    *
    */
-  public Component createComponent(VisualizerInput visInput, VisualizationToggle visToggle);
+  public Component createComponent(VisualizerInput visInput, VisualizerPanel visToggle);
 
   /**
    * Get the shorted name of the linguistic type of this visualizer ("partitur", "tree", etc.)

@@ -34,10 +34,10 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.apache.commons.io.IOUtils;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.SingletonBeanStoreRetrievalStrategy;
 import org.corpus_tools.annis.gui.TestHelper;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,6 +48,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.OidcIdToken;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -460,15 +461,15 @@ class MigrationPanelTest {
   @Test
   void testLoggedOut() {
     // Test that the test environment provides us with a logged in administrator user first
-    Authentication oldAuth = ui.getSecurityContext().getAuthentication();
-    Optional<OAuth2User> user = Helper.getUser(ui);
+    Authentication oldAuth = SecurityContextHolder.getContext().getAuthentication();
+    Optional<OAuth2User> user = Helper.getUser();
     assertTrue(user.isPresent());
     OAuth2User adminUser = user.get();
     assertTrue(Helper.getUserRoles(adminUser).contains("admin"));
 
     // Logout the current user
-    ui.getSecurityContext().setAuthentication(null);
-    assertFalse(Helper.getUser(ui).isPresent());
+    SecurityContextHolder.getContext().setAuthentication(null);
+    assertFalse(Helper.getUser().isPresent());
 
     // Change to migration tab panel
     showMigrationPanel();
@@ -476,12 +477,12 @@ class MigrationPanelTest {
     assertNull(panel.getContent());
 
     // Login in the admin user again
-    ui.getSecurityContext().setAuthentication(oldAuth);
+    SecurityContextHolder.getContext().setAuthentication(oldAuth);
   }
 
   @Test
   void testNotAnAdminUser() {
-    Authentication oldAuth = ui.getSecurityContext().getAuthentication();
+    Authentication oldAuth = SecurityContextHolder.getContext().getAuthentication();
     // Change the current user to not have the administration role
     List<String> roles = Arrays.asList();
     Instant issuedAt = Instant.now();
@@ -498,7 +499,7 @@ class MigrationPanelTest {
     claims.put("sub", "non-admin");
     OidcIdToken token = new OidcIdToken(signedToken, issuedAt, expiresAt, claims);
     DefaultOidcUser newUser = new DefaultOidcUser(grantedAuthorities, token);
-    ui.getSecurityContext().setAuthentication(
+    SecurityContextHolder.getContext().setAuthentication(
         new UsernamePasswordAuthenticationToken(newUser, signedToken, grantedAuthorities));
 
 
@@ -508,7 +509,7 @@ class MigrationPanelTest {
     assertNull(panel.getContent());
 
     // Login in the admin user again
-    ui.getSecurityContext().setAuthentication(oldAuth);
+    SecurityContextHolder.getContext().setAuthentication(oldAuth);
   }
 
 }

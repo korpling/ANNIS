@@ -18,6 +18,7 @@ import com.vaadin.icons.VaadinIcons;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.Page;
+import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
@@ -26,12 +27,8 @@ import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.LoginListener;
-import org.corpus_tools.annis.gui.MainToolbar;
 import org.corpus_tools.annis.gui.admin.controller.CorpusController;
 import org.corpus_tools.annis.gui.admin.controller.GroupController;
 import org.corpus_tools.annis.gui.admin.model.ApiClientProvider;
@@ -40,13 +37,18 @@ import org.corpus_tools.annis.gui.admin.model.GroupManagement;
 import org.corpus_tools.annis.gui.admin.reflinks.MigrationPanel;
 import org.corpus_tools.annis.gui.admin.reflinks.ReferenceLinkEditor;
 import org.corpus_tools.annis.gui.admin.view.UIView;
+import org.corpus_tools.annis.gui.components.MainToolbar;
+import org.corpus_tools.annis.gui.security.LoginListener;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
+@SpringView
 public class AdminView extends VerticalLayout
     implements View, UIView, LoginListener, TabSheet.SelectedTabChangeListener, ApiClientProvider {
 
@@ -198,12 +200,6 @@ public class AdminView extends VerticalLayout
     return "";
   }
 
-
-  @Override
-  public void invalidateClient() {
-    // The current client implementation the client is always fresh
-  }
-
   @Override
   public void onLogin() {
     for (UIView.Listener l : listeners) {
@@ -280,10 +276,9 @@ public class AdminView extends VerticalLayout
   public void showWarning(String error, String description) {
     Notification.show(error, description, Notification.Type.WARNING_MESSAGE);
   }
-
   @Override
-  public ApiClient getClient() {
-    return ui.getClient();
+  public WebClient getWebClient() {
+    return ui.getWebClient();
   }
 
 }

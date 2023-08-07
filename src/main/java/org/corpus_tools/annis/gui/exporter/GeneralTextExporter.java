@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,14 +37,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.api.SearchApi;
 import org.corpus_tools.annis.api.model.Annotation;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.FindQuery;
 import org.corpus_tools.annis.api.model.QueryLanguage;
-import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.CommonUI;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -52,6 +51,12 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 public abstract class GeneralTextExporter implements ExporterPlugin, Serializable {
 
@@ -70,6 +75,7 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
       List<SMetaAnnotation> asList = new ArrayList<>();
       for (SNode n : Helper.getMetaData(toplevelCorpus, Optional.ofNullable(documentName), ui)
+          .block()
           .getNodes()) {
         asList.addAll(n.getMetaAnnotations());
       }
@@ -142,12 +148,11 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
   public Exception convertText(String queryAnnisQL, QueryLanguage queryLanguage, int contextLeft,
       int contextRight, Set<String> corpora, List<String> keys, String argsAsString,
       boolean alignmc, Writer out, EventBus eventBus,
-      Map<String, CorpusConfiguration> corpusConfigs, UI ui) {
+      Map<String, CorpusConfiguration> corpusConfigs, CommonUI ui) {
     try {
 
-      CorporaApi corporaApi = new CorporaApi(Helper.getClient(ui));
       if (keys == null || keys.isEmpty()) {
-        keys = getAllAnnotationsAsExporterKey(corpora, corporaApi);
+        keys = getAllAnnotationsAsExporterKey(corpora, ui.getWebClient());
       }
 
       final List<String> finalKeys = keys;
@@ -165,20 +170,24 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
 
 
       // 1. Get all the matches as Salt ID
-      SearchApi searchApi = new SearchApi(Helper.getClient(ui));
-
       FindQuery query = new FindQuery();
       query.setCorpora(new LinkedList<String>(corpora));
       query.setQueryLanguage(queryLanguage);
       query.setQuery(queryAnnisQL);
 
       final AtomicInteger offset = new AtomicInteger();
-      File matches = searchApi.find(query);
+      Flux<DataBuffer> response =
+          ui.getWebClient().post().uri("/search/find").contentType(MediaType.APPLICATION_JSON)
+              .bodyValue(query).accept(MediaType.TEXT_PLAIN).retrieve()
+              .bodyToFlux(DataBuffer.class);
+
+      File matches = File.createTempFile("annis-result", ".txt");
+      DataBufferUtils.write(response, matches.toPath()).block();
       // 2. iterate over all matches and get the sub-graph for them
       try (LineIterator lines = FileUtils.lineIterator(matches, StandardCharsets.UTF_8.name())) {
         while (lines.hasNext()) {
           String currentLine = lines.nextLine();
-          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, corporaApi,
+          Optional<SaltProject> p = ExportHelper.getSubgraphForMatch(currentLine, ui.getWebClient(),
               contextLeft, contextRight, args, corpusConfigs);
           if (p.isPresent()) {
             int currentOffset = offset.getAndIncrement();
@@ -194,10 +203,11 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
           }
         }
       }
+      Files.deleteIfExists(matches.toPath());
 
       return null;
 
-    } catch (ApiException | IOException | XMLStreamException ex) {
+    } catch (WebClientResponseException | IOException | XMLStreamException ex) {
       return ex;
     }
   }
@@ -223,16 +233,23 @@ public abstract class GeneralTextExporter implements ExporterPlugin, Serializabl
    * @param corpora The corpora to query
    * @param api An API object used to perform the lookup
    * @return A list of annotation names.
-   * @throws ApiException
+   * @throws WebClientResponseException
    */
   protected List<String> getAllAnnotationsAsExporterKey(Collection<String> corpora,
-      CorporaApi api) throws ApiException {
+      WebClient client) throws WebClientResponseException {
     LinkedList<String> keys = new LinkedList<>();
     keys.add("tok");
     List<Annotation> attributes = new LinkedList<>();
   
     for (String corpus : corpora) {
-      attributes.addAll(api.nodeAnnotations(corpus, false, false));
+      Iterable<Annotation> allAnnotations = client.get()
+          .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/node-annotations")
+              .queryParam("list_values", false).queryParam("only_most_frequent_values", false)
+              .build(corpus))
+          .retrieve().bodyToFlux(Annotation.class).toIterable();
+      for (Annotation a : allAnnotations) {
+        attributes.add(a);
+      }
     }
   
     for (Annotation a : attributes) {

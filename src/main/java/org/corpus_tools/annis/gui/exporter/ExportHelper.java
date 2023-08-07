@@ -14,16 +14,14 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.CorpusConfigurationViewTimelineStrategy.StrategyEnum;
 import org.corpus_tools.annis.api.model.SubgraphWithContext;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.annis.gui.objects.Match;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.util.TimelineReconstructor;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SCorpusGraph;
@@ -33,6 +31,12 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 public class ExportHelper {
 
@@ -56,9 +60,9 @@ public class ExportHelper {
     return p;
   }
 
-  private static void recreateTimelineIfNecessary(SaltProject p, CorporaApi corporaApi,
+  private static void recreateTimelineIfNecessary(SaltProject p, WebClient client,
       Map<String, CorpusConfiguration> corpusConfigs)
-      throws ApiException, UnsupportedEncodingException {
+      throws WebClientResponseException, UnsupportedEncodingException {
 
 
     Set<String> corpusNames = Helper.getToplevelCorpusNames(p);
@@ -82,15 +86,14 @@ public class ExportHelper {
     }
 
     // Get all segmentation names
-    Set<String> segNames = new TreeSet<>();
-    for (Component c : corporaApi.components(firstCorpusName,
-        AnnotationComponentType.ORDERING.getValue(), null)) {
-      if (!c.getName().isEmpty() && !"annis".equals(c.getLayer())) {
-        segNames.add(c.getName());
-      }
-    }
+    List<String> segNames = client.get()
+        .uri(ub -> ub.path("/corpora/{corpus}/components")
+            .queryParam("type", AnnotationComponentType.ORDERING.getValue()).build(firstCorpusName))
+        .retrieve().bodyToFlux(Component.class)
+        .filter(c -> !c.getName().isEmpty() && !"annis".equals(c.getLayer())).map(c -> c.getName())
+        .collectList().block();
 
-    recreateTimeline(p, timelineStrategy, segNames, config);
+    recreateTimeline(p, timelineStrategy, new TreeSet<>(segNames), config);
   }
 
   private static void recreateTimeline(SaltProject p, StrategyEnum timelineStrategy,
@@ -126,10 +129,10 @@ public class ExportHelper {
     }
   }
 
-  protected static Optional<SaltProject> getSubgraphForMatch(String match, CorporaApi corporaApi,
+  protected static Optional<SaltProject> getSubgraphForMatch(String match, WebClient client,
       int contextLeft, int contextRight, Map<String, String> args,
       Map<String, CorpusConfiguration> corpusConfigs)
-      throws ApiException, IOException, XMLStreamException {
+      throws WebClientResponseException, IOException, XMLStreamException {
 
     // iterate over all matches and get the sub-graph for a group of matches
     Match parsedMatch = Match.parseFromString(match);
@@ -149,17 +152,19 @@ public class ExportHelper {
         subgraphQuery.setSegmentation(args.get(SEGMENTATION_KEY));
       }
 
-      File graphML = corporaApi.subgraphForNodes(corpusNameForMatch, subgraphQuery);
+      File graphML = File.createTempFile("annis-subgraph", ".salt");
+      Flux<DataBuffer> response = client.post()
+          .uri("/corpora/{corpus}/subgraph", corpusNameForMatch)
+          .accept(MediaType.APPLICATION_XML).bodyValue(subgraphQuery).retrieve()
+          .bodyToFlux(DataBuffer.class);
+      DataBufferUtils.write(response, graphML.toPath()).block();
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-      if (Files.deleteIfExists(graphML.toPath())) {
-        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-            graphML.getPath());
-      }
+      Files.deleteIfExists(graphML.toPath());
 
       SaltProject p = documentGraphToProject(docGraph, corpusPathForMatch);
       Helper.addMatchToDocumentGraph(parsedMatch, docGraph);
-      recreateTimelineIfNecessary(p, corporaApi, corpusConfigs);
+      recreateTimelineIfNecessary(p, client, corpusConfigs);
 
       return Optional.of(p);
     }

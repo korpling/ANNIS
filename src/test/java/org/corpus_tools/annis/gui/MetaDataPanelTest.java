@@ -17,6 +17,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Window;
 import org.corpus_tools.annis.api.model.Annotation;
+import org.corpus_tools.annis.gui.components.MetaDataPanel;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +55,7 @@ class MetaDataPanelTest {
     // Open a corpus browser for pcc2
     Button button = mock(Button.class);
     CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
-    corpusList.initCorpusBrowser("pcc2", button);
+    corpusList.initCorpusBrowser("pcc2", button, ui);
 
     // Get window by its title
     Window w = _get(Window.class, spec -> spec.withCaption("Corpus information for pcc2"));

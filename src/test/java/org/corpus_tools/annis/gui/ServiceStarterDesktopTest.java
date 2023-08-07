@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -44,16 +45,15 @@ class ServiceStarterDesktopTest {
 
   @Test
   void testDesktopAuthConfigured() {
-    assertNotNull(ui.getAuthListener().getToken());
-    SecurityContext ctx = ui.getSecurityContext();
+    SecurityContext ctx = SecurityContextHolder.getContext();
     assertNotNull(ctx);
     Authentication auth = ctx.getAuthentication();
     assertNotNull(auth);
+    assertNotNull(auth.getCredentials());
 
     assertTrue(auth.isAuthenticated());
     assertEquals("desktop", auth.getName());
     assertNull(auth.getDetails());
-    assertEquals(ui.getAuthListener().getToken(), auth.getCredentials());
     assertTrue(auth.getPrincipal() instanceof OAuth2User);
   }
 

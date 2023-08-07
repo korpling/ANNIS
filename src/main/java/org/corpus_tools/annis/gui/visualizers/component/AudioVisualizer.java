@@ -21,17 +21,18 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.util.List;
 import org.apache.tika.Tika;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.components.medialement.MediaElement;
 import org.corpus_tools.annis.gui.components.medialement.MediaElementPlayer;
 import org.corpus_tools.annis.gui.media.MediaController;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -49,7 +50,7 @@ public class AudioVisualizer extends AbstractVisualizer { // NO_UCD (unused code
   private final Tika tika = new Tika();
 
   @Override
-  public MediaElementPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle) {
+  public MediaElementPlayer createComponent(VisualizerInput input, VisualizerPanel visPanel) {
     List<String> corpusPath =
         Helper.getCorpusPath(input.getDocument().getGraph(), input.getDocument());
 
@@ -58,10 +59,14 @@ public class AudioVisualizer extends AbstractVisualizer { // NO_UCD (unused code
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
 
-    CorporaApi api = new CorporaApi(Helper.getClient(input.getUI()));
+    WebClient client = input.getUI().getWebClient();
     try {
-      List<String> files =
-          api.listFiles(corpusName, Joiner.on('/').join(Lists.reverse(corpusPath)));
+      List<String> files = client.get()
+          .uri(ub -> ub.path("/corpora/{corpus}/files")
+              .queryParam("node", Joiner.on('/').join(Lists.reverse(corpusPath))).build(corpusName))
+          .retrieve()
+          .bodyToMono(new ParameterizedTypeReference<List<String>>() {}).block();
+
       for (String f : files) {
         String guessedMimeType = tika.detect(f);
         if (guessedMimeType != null && guessedMimeType.startsWith("audio/")) {
@@ -79,7 +84,7 @@ public class AudioVisualizer extends AbstractVisualizer { // NO_UCD (unused code
 
         }
       }
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       ExceptionDialog.show(e, UI.getCurrent());
     }
 
@@ -89,7 +94,7 @@ public class AudioVisualizer extends AbstractVisualizer { // NO_UCD (unused code
 
     if (VaadinSession.getCurrent().getAttribute(MediaController.class) != null) {
       VaadinSession.getCurrent().getAttribute(MediaController.class).addMediaPlayer(player,
-          input.getId(), visToggle);
+          input.getId(), visPanel);
     }
 
     return player;

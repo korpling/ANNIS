@@ -34,8 +34,12 @@ import com.vaadin.v7.data.util.IndexedContainer;
 import com.vaadin.v7.ui.AbstractSelect;
 import com.vaadin.v7.ui.ComboBox;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,18 +50,22 @@ import java.util.SortedSet;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.api.model.VisualizerRule;
+import org.corpus_tools.annis.api.model.VisualizerRule.ElementEnum;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.IDGenerator;
-import org.corpus_tools.annis.gui.MetaDataPanel;
-import org.corpus_tools.annis.gui.QueryController;
+import org.corpus_tools.annis.gui.components.MetaDataPanel;
+import org.corpus_tools.annis.gui.controller.QueryController;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
 import org.corpus_tools.annis.gui.objects.Match;
 import org.corpus_tools.annis.gui.query_references.ShareSingleMatchGenerator;
+import org.corpus_tools.annis.gui.util.Helper;
+import org.corpus_tools.annis.gui.util.IDGenerator;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SaltProject;
+import org.corpus_tools.salt.core.SLayer;
 import org.corpus_tools.salt.core.SNode;
+import org.corpus_tools.salt.core.SRelation;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -144,7 +152,6 @@ public class SingleResultPanel extends CssLayout
 
   private SDocument result;
 
-  private final AnnisUI ui;
   private final List<VisualizerPanel> visualizers = new LinkedList<>();
 
   private List<VisualizerRule> resolverEntries;
@@ -163,7 +170,7 @@ public class SingleResultPanel extends CssLayout
 
   private final long resultNumber;
 
-  private final ResolverProvider resolverProvider;
+  private final Map<String, CorpusConfiguration> corpusConfigs;
 
   private final Set<String> visibleTokenAnnos;
 
@@ -180,17 +187,16 @@ public class SingleResultPanel extends CssLayout
   private final Match match;
 
   public SingleResultPanel(final SDocument result, Match match, long resultNumber,
-      ResolverProvider resolverProvider, AnnisUI ui, Set<String> visibleTokenAnnos,
+      Map<String, CorpusConfiguration> corpusConfigs, Set<String> visibleTokenAnnos,
       String segmentationName, QueryController controller, DisplayedResultQuery query) {
-    this.ui = ui;
     this.result = result;
     this.segmentationName = segmentationName;
     this.queryController = controller;
     this.resultNumber = resultNumber;
-    this.resolverProvider = resolverProvider;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.query = query;
     this.match = match;
+    this.corpusConfigs = corpusConfigs;
 
     setWidth("100%");
     setHeight("-1px");
@@ -333,7 +339,9 @@ public class SingleResultPanel extends CssLayout
     super.attach();
 
     initVisualizer();
-    if (ui.getConfig().isShortenReferenceLinks() && !ui.isDesktopMode()) {
+    UI ui = UI.getCurrent();
+    if (ui instanceof AnnisUI && ((AnnisUI) ui).getConfig().isShortenReferenceLinks()
+        && !((AnnisUI) ui).isDesktopMode()) {
       btLink.setVisible(true);
     } else {
       btLink.setVisible(false);
@@ -370,8 +378,60 @@ public class SingleResultPanel extends CssLayout
 
   private void initVisualizer() {
     try {
-      resolverEntries = resolverProvider == null ? new LinkedList<>()
-          : resolverProvider.getResolverEntries(path.get(0), result, UI.getCurrent());
+      String corpusName = path.get(0);
+      CorpusConfiguration configForThisResult = corpusConfigs.get(corpusName);
+      resolverEntries = new ArrayList<>();
+      if (configForThisResult != null) {
+        // create a request for resolver entries
+        HashSet<SingleResolverRequest> resolverRequests = new HashSet<>();
+
+        Set<String> nodeLayers = new HashSet<String>();
+        Set<String> edgeLayers = new HashSet<String>();
+
+        if (result != null && result.getDocumentGraph() != null) {
+          for (SNode n : result.getDocumentGraph().getNodes()) {
+            for (SLayer layer : n.getLayers()) {
+              nodeLayers.add(layer.getName());
+            }
+          }
+
+          for (SRelation<SNode, SNode> e : result.getDocumentGraph().getRelations()) {
+            for (SLayer layer : e.getLayers()) {
+              try {
+                edgeLayers.add(layer.getName());
+              } catch (NullPointerException ex) {
+                log.warn("NullPointerException when using Salt, was trying to get layer name", ex);
+              }
+            }
+          }
+
+        }
+
+        for (String ns : nodeLayers) {
+          resolverRequests.add(new SingleResolverRequest(corpusName, ns, ElementEnum.NODE));
+        }
+        for (String ns : edgeLayers) {
+          resolverRequests.add(new SingleResolverRequest(corpusName, ns, ElementEnum.EDGE));
+        }
+        // Find all visualizers that match this result and make sure the matching rules are unique
+        LinkedHashSet<VisualizerRule> matchingRules = new LinkedHashSet<>();
+        for (VisualizerRule visRule : configForThisResult.getVisualizers()) {
+          for (SingleResolverRequest r : resolverRequests) {
+            if (visRule.getMappings() == null) {
+              visRule.setMappings(new LinkedHashMap<>());
+            }
+            if (visRule.getElement() != null && !visRule.getElement().equals(r.getType())) {
+              continue;
+            }
+            if (visRule.getLayer() != null && !visRule.getLayer().equals(r.getNamespace())) {
+              continue;
+            }
+            matchingRules.add(visRule);
+          }
+        }
+        resolverEntries.addAll(matchingRules);
+      }
+
       visualizers.clear();
 
       List<VisualizerPanel> openVisualizers = new LinkedList<>();
@@ -388,7 +448,7 @@ public class SingleResultPanel extends CssLayout
         String htmlID = "resolver-" + resultNumber + "_" + i;
 
         VisualizerPanel p = new VisualizerPanel(visRule, i, result, match, visibleTokenAnnos,
-            markedAndCovered, htmlID, resultID, this, segmentationName, ui);
+            markedAndCovered, htmlID, resultID, this, segmentationName);
 
         visualizers.add(p);
 
@@ -463,7 +523,9 @@ public class SingleResultPanel extends CssLayout
 
   private void showShareSingleMatchGenerator() {
     // select the current match
-    if (ui != null) {
+    UI rawUi = UI.getCurrent();
+    if (rawUi instanceof AnnisUI) {
+      AnnisUI ui = (AnnisUI) rawUi;
       ui.getQueryState().getSelectedMatches().getValue().clear();
       ui.getQueryState().getSelectedMatches().getValue().add(resultNumber);
       ui.getSearchView().updateFragment(ui.getQueryController().getSearchQuery());
@@ -478,7 +540,7 @@ public class SingleResultPanel extends CssLayout
       window.addCloseListener(e -> btLink.setEnabled(true));
       window.setCaption("Match reference link");
 
-      ui.addWindow(window);
+      rawUi.addWindow(window);
     }
   }
 

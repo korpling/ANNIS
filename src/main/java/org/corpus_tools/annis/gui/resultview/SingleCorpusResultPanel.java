@@ -27,9 +27,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.MetaDataPanel;
+import org.corpus_tools.annis.gui.components.MetaDataPanel;
 import org.corpus_tools.annis.gui.objects.DisplayedResultQuery;
+import org.corpus_tools.annis.gui.util.Helper;
 
 public class SingleCorpusResultPanel extends CssLayout {
   private static final long serialVersionUID = 3L;

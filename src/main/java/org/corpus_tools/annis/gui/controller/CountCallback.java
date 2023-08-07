@@ -13,70 +13,49 @@
  */
 package org.corpus_tools.annis.gui.controller;
 
-import java.util.List;
-import java.util.Map;
-import org.corpus_tools.annis.ApiCallback;
-import org.corpus_tools.annis.ApiException;
+import java.util.function.Consumer;
 import org.corpus_tools.annis.api.model.CountExtra;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.resultview.ResultViewPanel;
+import org.reactivestreams.Subscription;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  */
-public class CountCallback implements ApiCallback<CountExtra> {
-    private final ResultViewPanel panel;
+public class CountCallback implements Consumer<CountExtra> {
 
-    private final int pageSize;
+  private static final Logger log = LoggerFactory.getLogger(CountCallback.class);
 
-    private final AnnisUI ui;
+  private final ResultViewPanel panel;
+  private final int pageSize;
+  private final AnnisUI ui;
+  private Subscription subscription;
 
-    public CountCallback(ResultViewPanel panel, int pageSize, AnnisUI ui) {
-        this.panel = panel;
-        this.pageSize = pageSize;
-        this.ui = ui;
-    }
+  public CountCallback(ResultViewPanel panel, int pageSize, AnnisUI ui) {
+    this.panel = panel;
+    this.pageSize = pageSize;
+    this.ui = ui;
+  }
+  @Override
+  public void accept(CountExtra result) {
+    ui.access(() -> {
+      ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
 
-    @Override
-    public void onFailure(ApiException e, int statusCode,
-            Map<String, List<String>> responseHeaders) {
-        ui.access(() -> {
-          ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
-          ui.getQueryController().reportServiceException(e, true);
-        });
+      String documentString = result.getDocumentCount() > 1 ? "documents" : "document";
+      String matchesString = result.getMatchCount() > 1 ? "matches" : "match";
+      ui.getSearchView().getControlPanel().getQueryPanel().setStatus("" + result.getMatchCount()
+          + " " + matchesString + "\nin " + result.getDocumentCount() + " " + documentString);
+      if (result.getMatchCount() > 0 && panel != null) {
+        panel.getPaging().setPageSize(pageSize, false);
+        panel.setCount(result.getMatchCount());
+      }
+      ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+    });
 
-    }
-
-    @Override
-    public void onSuccess(CountExtra result, int statusCode,
-            Map<String, List<String>> responseHeaders) {
-        ui.access(() -> {
-            ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
-
-            String documentString = result.getDocumentCount() > 1 ? "documents" : "document";
-            String matchesString = result.getMatchCount() > 1 ? "matches" : "match";
-            ui.getSearchView().getControlPanel().getQueryPanel()
-                    .setStatus("" + result.getMatchCount() + " " + matchesString + "\nin "
-                            + result.getDocumentCount() + " " + documentString);
-            if (result.getMatchCount() > 0 && panel != null) {
-                panel.getPaging().setPageSize(pageSize, false);
-                panel.setCount(result.getMatchCount());
-            }
-            ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-        });
-    }
-
-    @Override
-    public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
-
-    }
-
-    @Override
-    public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
-
-
-    }
+  }
 
 }

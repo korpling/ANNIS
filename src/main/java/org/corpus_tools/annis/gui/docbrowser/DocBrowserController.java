@@ -37,17 +37,15 @@ import java.util.Map;
 import java.util.Optional;
 import javax.xml.stream.XMLStreamException;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CommonUI;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.annis.gui.objects.RawTextWrapper;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.FilteringVisualizerPlugin;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
@@ -59,6 +57,12 @@ import org.corpus_tools.salt.common.SaltProject;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 /**
  * Represents a global controller for the doc browser feature.
@@ -190,8 +194,8 @@ public class DocBrowserController implements Serializable {
 
 
     // get the whole document wrapped in a salt project
+    WebClient client = ui.getWebClient();
     try {
-      CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
       final SaltProject p = SaltFactory.createSaltProject();
       SCorpusGraph cg = p.createCorpusGraph();
@@ -201,20 +205,24 @@ public class DocBrowserController implements Serializable {
 
       // Build a query that includes all (possible filtered by name) node of the document
       String aql = Helper.buildDocumentQuery(documentNodeName, nodeAnnoFilter, useRawText);
-      File graphML = api.subgraphForQuery(corpus, aql, QueryLanguage.AQL, null);
+
+      File graphML = File.createTempFile("annis-subgraph", ".salt");
+      Flux<DataBuffer> response = client.get()
+          .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+              .queryParam("query", aql).queryParam("query_language", QueryLanguage.AQL)
+              .build(corpus))
+          .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
+      DataBufferUtils.write(response, graphML.toPath()).block();
 
       SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-      if (Files.deleteIfExists(graphML.toPath())) {
-        log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-            graphML.getPath());
-      }
+      Files.deleteIfExists(graphML.toPath());
 
       doc.setDocumentGraph(docGraph);
       input.setResult(doc);
       if (useRawText) {
         input.setRawText(new RawTextWrapper(docGraph));
       }
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       log.error("General remote service exception", e);
     } catch (XMLStreamException | IOException ex) {
       log.error("Could not map GraphML to Salt", ex);

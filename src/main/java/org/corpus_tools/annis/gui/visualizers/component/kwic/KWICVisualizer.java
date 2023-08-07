@@ -17,9 +17,9 @@ import com.vaadin.server.VaadinSession;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.corpus_tools.annis.gui.VisualizationToggle;
 import org.corpus_tools.annis.gui.media.MediaController;
 import org.corpus_tools.annis.gui.media.PDFController;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.salt.common.STextualDS;
@@ -43,7 +43,7 @@ public class KWICVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
   private static final long serialVersionUID = 1405603777567084847L;
 
   @Override
-  public KWICInterface createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
+  public KWICInterface createComponent(VisualizerInput visInput, VisualizerPanel visPanel) {
     MediaController mediaController =
         VaadinSession.getCurrent().getAttribute(MediaController.class);
     PDFController pdfController = VaadinSession.getCurrent().getAttribute(PDFController.class);

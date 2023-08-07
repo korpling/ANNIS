@@ -42,16 +42,16 @@ import java.util.List;
 import org.corpus_tools.annis.api.model.BadRequestError;
 import org.corpus_tools.annis.api.model.QueryAttributeDescription;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.ExportPanel;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.HistoryPanel;
-import org.corpus_tools.annis.gui.IDGenerator;
+import org.corpus_tools.annis.gui.components.ExportPanel;
+import org.corpus_tools.annis.gui.components.HistoryPanel;
 import org.corpus_tools.annis.gui.components.VirtualKeyboardCodeEditor;
 import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
 import org.corpus_tools.annis.gui.frequency.FrequencyQueryPanel;
 import org.corpus_tools.annis.gui.objects.Query;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
-import org.corpus_tools.annis.gui.querybuilder.QueryBuilderChooser;
+import org.corpus_tools.annis.gui.querybuilder.tiger.QueryBuilderChooser;
+import org.corpus_tools.annis.gui.util.Helper;
+import org.corpus_tools.annis.gui.util.IDGenerator;
 import org.vaadin.hene.popupbutton.PopupButton;
 
 /**

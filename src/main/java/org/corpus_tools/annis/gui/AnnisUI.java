@@ -13,8 +13,6 @@
  */
 package org.corpus_tools.annis.gui;
 
-import static org.corpus_tools.annis.gui.Helper.DEFAULT_CONFIG;
-
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
@@ -27,7 +25,9 @@ import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.spring.annotation.SpringUI;
+import com.vaadin.spring.navigator.SpringViewProvider;
 import com.vaadin.ui.Component;
 import java.io.IOException;
 import java.net.URI;
@@ -35,24 +35,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.ServletContext;
-import org.corpus_tools.annis.ApiClient;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
 import org.corpus_tools.annis.gui.admin.AdminView;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
+import org.corpus_tools.annis.gui.components.MainToolbar;
+import org.corpus_tools.annis.gui.controller.QueryController;
 import org.corpus_tools.annis.gui.exporter.ExporterPlugin;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
-import org.corpus_tools.annis.gui.querybuilder.QueryBuilderPlugin;
+import org.corpus_tools.annis.gui.querybuilder.tiger.QueryBuilderPlugin;
 import org.corpus_tools.annis.gui.requesthandler.BinaryRequestHandler;
-import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
-import org.corpus_tools.annis.gui.security.AutoTokenRefreshClient;
 import org.corpus_tools.annis.gui.security.SecurityConfiguration;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.VisualizerPlugin;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.web.reactive.function.client.WebClient;
 
 /**
  * GUI for searching in corpora.
@@ -62,7 +63,7 @@ import org.springframework.core.env.Profiles;
 @Theme("annis")
 @Widgetset("org.corpus_tools.annis.gui.widgets.gwt.AnnisWidgetSet")
 @SpringUI(path = "/*")
-@Push(value = PushMode.AUTOMATIC)
+@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
 public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListener {
 
   private static final Profiles DESKTOP_PROFILES = Profiles.of("desktop & !test");
@@ -75,7 +76,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
   private QueryController queryController;
 
-  private SearchView searchView;
+  @Autowired
+  SpringViewProvider viewProvider;
 
   @Autowired
   private List<VisualizerPlugin> visualizerPlugins;
@@ -92,7 +94,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Autowired
   private UIConfig config;
 
-  private final AuthenticationSuccessListener authListener;
+  @Autowired
+  private WebClient webClient;
+
+  private SearchView searchView;
 
   private AdminView adminView;
 
@@ -113,10 +118,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
    */
   private MainToolbar toolbar;
 
-  @Autowired
-  public AnnisUI(ServiceStarter serviceStarter, AuthenticationSuccessListener authListener) {
-    super("", serviceStarter, authListener);
-    this.authListener = authListener;
+  public AnnisUI(ServiceStarter serviceStarter) {
+    super("", serviceStarter);
     initTransients();
   }
 
@@ -130,11 +133,11 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     // make sure the toolbar is removed from the old view
     searchView.setToolbar(null);
     adminView.setToolbar(null);
-    toolbar.setSidebar(null);
+    toolbar.setSearchView(null);
 
     if (event.getNewView() == searchView) {
       searchView.setToolbar(toolbar);
-      toolbar.setSidebar(searchView);
+      toolbar.setSearchView(searchView);
       toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN, AnnisUI.this);
     } else if (event.getNewView() == adminView) {
       adminView.setToolbar(toolbar);
@@ -182,12 +185,7 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     if (corpusConfigCache != null) {
       config = corpusConfigCache.getIfPresent(corpus);
       if (config == null) {
-        if (corpus.equals(DEFAULT_CONFIG)) {
-          config = Helper.getDefaultCorpusConfig();
-        } else {
-          config = Helper.getCorpusConfig(corpus, AnnisUI.this);
-        }
-
+        config = Helper.getCorpusConfig(corpus, AnnisUI.this).block();
         corpusConfigCache.put(corpus, config);
       }
     }
@@ -227,11 +225,11 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
     setErrorHandler(this);
 
     adminView = new AdminView(AnnisUI.this);
+    searchView = new SearchView(AnnisUI.this);
 
     toolbar = new MainToolbar(getConfig(), oauth2Clients);
     toolbar.setQueryController(queryController);
 
-    this.searchView = new SearchView(this);
     this.queryController = new QueryController(this, searchView, queryState);
 
     toolbar.addLoginListener(searchView);
@@ -246,10 +244,10 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
 
     loadInstanceFonts();
 
-    if (Helper.getUser(this).isPresent()) {
+    if (Helper.getUser().isPresent()) {
       getToolbar().onLogin();
     }
-    
+
     Object fragmentToRestore =
         VaadinSession.getCurrent().getAttribute(SecurityConfiguration.FRAGMENT_TO_RESTORE);
     if (fragmentToRestore instanceof String) {
@@ -260,8 +258,8 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   }
 
   @Override
-  public ApiClient getClient() {
-    return new AutoTokenRefreshClient(this, this.getAuthListener());
+  public WebClient getWebClient() {
+    return webClient;
   }
 
 
@@ -318,9 +316,5 @@ public class AnnisUI extends CommonUI implements ErrorHandler, ViewChangeListene
   @Override
   public OAuth2ClientProperties getOauth2ClientProperties() {
     return this.oauth2Clients;
-  }
-
-  public AuthenticationSuccessListener getAuthListener() {
-    return authListener;
   }
 }

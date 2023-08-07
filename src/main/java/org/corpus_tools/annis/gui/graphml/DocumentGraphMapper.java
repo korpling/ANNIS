@@ -28,7 +28,7 @@ import javax.xml.stream.events.XMLEvent;
 import org.apache.commons.lang3.tuple.Pair;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.Component;
-import org.corpus_tools.annis.gui.Helper;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.SaltFactory;
 import org.corpus_tools.salt.common.SDocumentGraph;

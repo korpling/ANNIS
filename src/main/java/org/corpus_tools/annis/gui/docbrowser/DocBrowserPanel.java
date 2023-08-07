@@ -25,21 +25,18 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.v7.data.util.filter.SimpleStringFilter;
 import com.vaadin.v7.ui.themes.ChameleonTheme;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.AnnotationComponentType;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.graphml.CorpusGraphMapper;
 import org.corpus_tools.annis.gui.objects.DocumentBrowserConfig;
@@ -48,6 +45,13 @@ import org.corpus_tools.salt.common.SCorpusGraph;
 import org.corpus_tools.salt.common.SDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 /**
  *
@@ -62,16 +66,20 @@ public class DocBrowserPanel extends Panel {
     @Override
     public void run() {
 
-      CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      WebClient client = ui.getWebClient();
 
       try {
-        File graphML = api.subgraphForQuery(corpus, "annis:node_type=\"corpus\"",
-            QueryLanguage.AQL, AnnotationComponentType.PARTOF);
+        File graphML = File.createTempFile("annis-subgraph", ".salt");
+        Flux<DataBuffer> response = client.get()
+            .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+                .queryParam("query", "annis:node_type=\"corpus\"")
+                .queryParam("query_language", QueryLanguage.AQL)
+                .queryParam("component_type_filter", AnnotationComponentType.PARTOF)
+                .build(corpus))
+            .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
+        DataBufferUtils.write(response, graphML.toPath()).block();
         SCorpusGraph graph = CorpusGraphMapper.map(graphML);
-        if (Files.deleteIfExists(graphML.toPath())) {
-          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-              graphML.getPath());
-        }
+        Files.deleteIfExists(graphML.toPath());
         List<SDocument> docs = graph.getDocuments();
 
         ui.access(() -> {
@@ -95,7 +103,7 @@ public class DocBrowserPanel extends Panel {
           table.setDocuments(docs);
         });
 
-      } catch (ApiException | IOException | XMLStreamException ex) {
+      } catch (WebClientResponseException | IOException | XMLStreamException ex) {
         ui.access(() -> {
            ExceptionDialog.show(ex, ui);
         });
@@ -174,22 +182,23 @@ public class DocBrowserPanel extends Panel {
     textVis.setDisplayName("full text");
     textVis.setVisType("raw_text");
     defaultConfig.setVisualizers(Arrays.asList(new Visualizer(textVis)));
-    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+    WebClient client = ui.getWebClient();
 
     try {
-      File result =
-          api.getFile(getCorpus(),
-          urlPathEscape.escape(getCorpus()) + "/document_browser.json");
-      try(FileInputStream is = new FileInputStream(result)) {
+      byte[] response = client.get()
+          .uri("/corpora/{corpus}/files/{name}", getCorpus(),
+              urlPathEscape.escape(getCorpus()) + "/document_browser.json")
+          .retrieve().bodyToMono(byte[].class).block();
+      try (ByteArrayInputStream is = new ByteArrayInputStream(response)) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         DocumentBrowserConfig config = mapper.readValue(is, DocumentBrowserConfig.class);
         return config;
       }
-    } catch (ApiException ex) {
-      if (ex.getCode() != 404) {
-      ExceptionDialog
-          .show(ex, "Could not get the document browser configuration file from the backend.", ui);
+    } catch (WebClientResponseException ex) {
+      if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
+        ExceptionDialog.show(ex,
+            "Could not get the document browser configuration file from the backend.", ui);
       }
     }
     catch (IOException ex) {

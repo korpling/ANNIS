@@ -21,21 +21,18 @@ import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinServletResponse;
 import com.vaadin.server.VaadinSession;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import okhttp3.Call;
-import okhttp3.Response;
 import org.apache.commons.io.IOUtils;
-import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.Pair;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.CommonUI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * This request handler provides binary-files. It will proxy all requests to the REST service. Since
@@ -97,57 +94,36 @@ public class BinaryRequestHandler implements RequestHandler {
 
     // Proxy the whole request, including any HTTP headers (e.g. used for range requests) to the
     // REST endpoint.
-
-    CorporaApi api = new CorporaApi(ui.getClient());
-    ApiClient client = api.getApiClient();
-    // create path and map variables
-    String localVarPath = "/corpora/{corpus}/files/{name}"
-        .replaceAll("\\{" + "corpus" + "\\}", client.escapeString(toplevelCorpusName))
-        .replaceAll("\\{" + "name" + "\\}", client.escapeString(filePath));
-
-    List<Pair> localVarQueryParams = new ArrayList<Pair>();
-    List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
-    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-    Map<String, String> localVarCookieParams = new HashMap<String, String>();
-    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-    Enumeration<String> originalHeaderNames = request.getHeaderNames();
-    while (originalHeaderNames.hasMoreElements()) {
-      String headerName = originalHeaderNames.nextElement();
-      String headerValue = request.getHeader(headerName);
-      localVarHeaderParams.put(headerName, headerValue);
-    }
-
-    final String[] localVarAccepts = {"default"};
-    final String localVarAccept = client.selectHeaderAccept(localVarAccepts);
-    if (localVarAccept != null) {
-      localVarHeaderParams.put("Accept", localVarAccept);
-    }
-
-    final String[] localVarContentTypes = {};
-    final String localVarContentType = client.selectHeaderContentType(localVarContentTypes);
-    localVarHeaderParams.put("Content-Type", localVarContentType);
-    String[] localVarAuthNames = new String[] {"bearerAuth"};
+    WebClient client = ui.getWebClient();
 
     // Execute the call and return the response
-    Call call;
     try {
-      call = client.buildCall(localVarPath, "GET", localVarQueryParams,
-          localVarCollectionQueryParams, null, localVarHeaderParams, localVarCookieParams,
-          localVarFormParams, localVarAuthNames, null);
+      ResponseEntity<DataBuffer> proxyResponse = client.get()
+          .uri("/corpora/{top}/files/{path}",
+              toplevelCorpusName, filePath)
+          .accept(MediaType.ALL).headers(httpHeaders -> {
+            Enumeration<String> originalHeaderNames = request.getHeaderNames();
+            while (originalHeaderNames.hasMoreElements()) {
+              String headerName = originalHeaderNames.nextElement();
+              String headerValue = request.getHeader(headerName);
+              httpHeaders.set(headerName, headerValue);
+            }
+          }).retrieve().toEntity(DataBuffer.class).block();
 
-      Response proxyResponse = call.execute();
 
       // Copy response headers
-      for (String headerName : proxyResponse.headers().names()) {
-        response.setHeader(headerName, proxyResponse.header(headerName));
+      for (String headerName : proxyResponse.getHeaders().keySet()) {
+        List<String> headerValues = proxyResponse.getHeaders().getValuesAsList(headerName);
+        if(!headerValues.isEmpty()) {
+          response.setHeader(headerName, headerValues.get(0));
+        }
       }
       // Copy response body
-      response.setStatus(proxyResponse.code());
-      IOUtils.copy(proxyResponse.body().byteStream(), response.getOutputStream());
-    } catch (ApiException e) {
+      response.setStatus(proxyResponse.getStatusCodeValue());
+      IOUtils.copy(proxyResponse.getBody().asInputStream(), response.getOutputStream());
+    } catch (WebClientResponseException e) {
       log.error("Could not get binary data from service", e);
-      response.sendError(e.getCode(), e.getMessage());
+      response.sendError(e.getStatusCode().value(), e.getMessage());
     }
   }
 

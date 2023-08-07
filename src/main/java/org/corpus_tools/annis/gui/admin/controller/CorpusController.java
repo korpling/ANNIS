@@ -20,8 +20,8 @@ import com.google.common.base.Joiner;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import org.corpus_tools.annis.gui.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.ServiceQueryException;
+import org.corpus_tools.annis.gui.admin.CriticalServiceQueryException;
 import org.corpus_tools.annis.gui.admin.model.CorpusManagement;
 import org.corpus_tools.annis.gui.admin.view.CorpusListView;
 import org.corpus_tools.annis.gui.admin.view.UIView;
@@ -96,9 +96,6 @@ public class CorpusController implements CorpusListView.Listener, UIView.Listene
     @Override
     public void loginChanged(boolean isLoggedIn) {
         this.isLoggedIn = isLoggedIn;
-        if (model.getClientProvider() != null) {
-          model.getClientProvider().invalidateClient();
-        }
         if (isLoggedIn && viewIsActive) {
             fetchFromService();
         } else {

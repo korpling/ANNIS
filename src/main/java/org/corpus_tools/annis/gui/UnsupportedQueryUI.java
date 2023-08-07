@@ -21,11 +21,9 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.declarative.Design;
 import javax.servlet.ServletContext;
-import org.corpus_tools.annis.ApiClient;
-import org.corpus_tools.annis.gui.security.AuthenticationSuccessListener;
-import org.corpus_tools.annis.gui.security.AutoTokenRefreshClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @SpringUI(path = "/unsupported-query")
 @Widgetset("org.corpus_tools.annis.gui.widgets.gwt.AnnisWidgetSet")
@@ -76,19 +74,17 @@ public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
 
   @Autowired
   private UIConfig config;
-  
-  private final AuthenticationSuccessListener authListener;
+
+  @Autowired
+  private WebClient webClient;
 
 
   private UnsupportedQueryPanel panel;
 
   protected Page overwrittenPage;
 
-  @Autowired
-  public UnsupportedQueryUI(ServiceStarter serviceStarter,
-      AuthenticationSuccessListener authListener) {
-    super(URL_PREFIX, serviceStarter, authListener);
-    this.authListener = authListener;
+  public UnsupportedQueryUI(ServiceStarter serviceStarter) {
+    super(URL_PREFIX, serviceStarter);
   }
 
   @Override
@@ -127,9 +123,9 @@ public class UnsupportedQueryUI extends CommonUI { // NO_UCD (test only)
       return overwrittenPage;
     }
   }
-  
+
   @Override
-  public ApiClient getClient() {
-    return new AutoTokenRefreshClient(this, this.authListener);
+  public WebClient getWebClient() {
+    return webClient;
   }
 }

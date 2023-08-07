@@ -19,9 +19,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.query_references.UrlShortener;
 import org.corpus_tools.annis.gui.query_references.UrlShortenerEntry;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -171,7 +171,7 @@ public class ReferenceLinkEditor extends Panel {
 
     }
 
-    Optional<OAuth2User> user = Helper.getUser(getUI());
+    Optional<OAuth2User> user = Helper.getUser();
     if (user.isPresent()) {
       Set<String> roles = Helper.getUserRoles(user.get());
       if (roles.contains("admin")) {

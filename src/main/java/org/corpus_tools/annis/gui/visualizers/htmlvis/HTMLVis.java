@@ -26,12 +26,9 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,12 +42,11 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.io.IOUtils;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.gui.AnnisBaseUI;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.MatchedNodeColors;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.CommonUI;
+import org.corpus_tools.annis.gui.objects.MatchedNodeColors;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.salt.common.SDocumentGraph;
@@ -60,7 +56,10 @@ import org.corpus_tools.salt.core.SMetaAnnotation;
 import org.corpus_tools.salt.core.SNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  *
@@ -92,7 +91,7 @@ public class HTMLVis extends AbstractVisualizer {
   private boolean hitMark = true;
 
   @Override
-  public Panel createComponent(VisualizerInput vi, VisualizationToggle vt) {
+  public Panel createComponent(VisualizerInput vi, VisualizerPanel visPanel) {
     Panel scrollPanel = new Panel();
     scrollPanel.setSizeFull();
     Label lblResult = new Label("ERROR", ContentMode.HTML);
@@ -128,7 +127,7 @@ public class HTMLVis extends AbstractVisualizer {
       lblResult.addStyleName(labelClass);
 
       injectWebFonts(visConfigName, corpusName, rootCorpusId, vi.getUI(),
-          new CorporaApi(Helper.getClient(vi.getUI())));
+          vi.getUI().getWebClient());
       injectCSS(visConfigName, corpusName, rootCorpusId, wrapperClassName, vi.getUI());
     }
 
@@ -389,7 +388,7 @@ public class HTMLVis extends AbstractVisualizer {
 
   @Override
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
-      String toplevelCorpusId, Map<String, String> mappings, UI ui) {
+      String toplevelCorpusId, Map<String, String> mappings, CommonUI ui) {
     Set<String> result = null;
 
     toplevelCorpusId = Helper.removeSaltPrefix(toplevelCorpusId);
@@ -426,20 +425,20 @@ public class HTMLVis extends AbstractVisualizer {
   }
 
   private void injectCSS(String visConfigName, String corpusName, String corpusNodeId,
-      String wrapperClassName, UI ui) {
-    CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      String wrapperClassName, CommonUI ui) {
+    WebClient client = ui.getWebClient();
     InputStream inStreamCSSRaw = null;
     if (visConfigName == null) {
       inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
     } else {
       try {
-        File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".css");
-        f.deleteOnExit();
-
-        inStreamCSSRaw = new FileInputStream(f);
-
-      } catch (ApiException ex) {
-        if (ex.getCode() != 404) {
+        byte[] response = client.get()
+            .uri("/corpora/{corpus}/files/{name}", corpusName,
+                corpusNodeId + "/" + visConfigName + ".css")
+            .retrieve().bodyToMono(byte[].class).block();
+        inStreamCSSRaw = new ByteArrayInputStream(response);
+      } catch (WebClientResponseException ex) {
+        if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
           log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
           ui.access(() -> {
             Notification.show("Could not retrieve the HTML visualizer web-font configuration file",
@@ -447,8 +446,6 @@ public class HTMLVis extends AbstractVisualizer {
 
           });
         }
-      } catch (FileNotFoundException ex) {
-        log.error("Just downloaded file not found", ex);
       }
 
     }
@@ -467,31 +464,31 @@ public class HTMLVis extends AbstractVisualizer {
     }
   }
 
-  protected void injectWebFonts(String visConfigName, String corpusName, String corpusNodeId, UI ui,
-      CorporaApi api) {
+  protected void injectWebFonts(String visConfigName, String corpusName, String corpusNodeId,
+      UI ui, WebClient client) {
 
     try {
-      File f = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".fonts.json");
-      f.deleteOnExit();
-      try (FileInputStream inStreamJSON = new FileInputStream(f)) {
+      byte[] response = client.get()
+          .uri("/corpora/{corpus}/files/{name}", corpusName,
+              corpusNodeId + "/" + visConfigName + ".fonts.json")
+          .retrieve().bodyToMono(byte[].class).block();
+
+      try (ByteArrayInputStream inStreamJSON = new ByteArrayInputStream(response)) {
         ObjectMapper mapper = createJsonMapper();
         WebFontList fontConfigList = mapper.readValue(inStreamJSON, WebFontList.class);
 
         for (WebFont fontConfig : fontConfigList.getWebFonts()) {
           injectWebFontConfig(fontConfig, ui);
         }
-
       } catch (IOException ex) {
         log.error("Could not parse the HTML visualizer web-font configuration file", ex);
         new Notification("Could not parse the HTML visualizer web-font configuration file",
             ex.getMessage(), Notification.Type.ERROR_MESSAGE).show(ui.getPage());
-      } finally {
-        Files.deleteIfExists(f.toPath());
       }
-    } catch (IOException ex) {
-      log.error("Unexpected input/output exception", ex);
-    } catch (ApiException ex) {
-      if (ex.getCode() != 404) {
+
+
+    } catch (WebClientResponseException ex) {
+      if (ex.getStatusCode() != HttpStatus.NOT_FOUND) {
         log.error("Could not retrieve the HTML visualizer web-font configuration file", ex);
         ui.access(() -> {
           new Notification("Could not retrieve the HTML visualizer web-font configuration file",
@@ -537,7 +534,7 @@ public class HTMLVis extends AbstractVisualizer {
   }
 
   private VisualizationDefinition[] parseDefinitions(String corpusName, String corpusNodeId,
-      Map<String, String> mappings, UI ui) {
+      Map<String, String> mappings, CommonUI ui) {
     InputStream inStreamConfigRaw = null;
 
     String visConfigName = mappings.get("config");
@@ -546,16 +543,18 @@ public class HTMLVis extends AbstractVisualizer {
       inStreamConfigRaw = HTMLVis.class.getResourceAsStream("defaultvis.config");
     } else {
 
-      CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      WebClient client = ui.getWebClient();
       try {
-        File file = api.getFile(corpusName, corpusNodeId + "/" + visConfigName + ".config");
-        inStreamConfigRaw = new FileInputStream(file);
-      } catch (ApiException e) {
-        if (e.getCode() != 404) {
+       byte[] response = client.get()
+            .uri("/corpora/{corpus}/files/{name}", corpusName,
+                corpusNodeId + "/" + visConfigName + ".config")
+            .retrieve().bodyToMono(byte[].class).block();
+        
+       inStreamConfigRaw = new ByteArrayInputStream(response);
+      } catch (WebClientResponseException e) {
+        if (e.getStatusCode() != HttpStatus.NOT_FOUND) {
           log.error("Exception while getting the HTML visualizer configuration", e);
         }
-      } catch (IOException e) {
-        log.error("Exception while getting the HTML visualizer configuration", e);
       }
     }
 

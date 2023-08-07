@@ -35,8 +35,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.objects.AnnisConstants;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
@@ -76,7 +76,8 @@ public class CSVExporter extends BaseMatrixExporter {
      *
      */
     @Override
-    public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args, int matchNumber, int nodeCount)
+    public void createAdjacencyMatrix(SDocumentGraph graph, Map<String, String> args,
+        int matchNumber, long nodeCount)
             throws IOException, IllegalArgumentException {
         // first match
         if (matchNumber == 0) {
@@ -201,7 +202,8 @@ public class CSVExporter extends BaseMatrixExporter {
       String corpusName = Helper.getCorpusPath(graph.getDocument().getId()).get(0);
       // TODO cache the metadata
       List<SMetaAnnotation> metaAnnos = new ArrayList<>();
-      for(SNode n : Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui).getNodes()) {
+      for (SNode n : Helper.getMetaData(corpusName, Optional.of(graph.getDocument().getName()), ui)
+          .block().getNodes()) {
         metaAnnos.addAll(n.getMetaAnnotations());
       }
       Multimap<String, SMetaAnnotation> metaAnnosByName = Multimaps.index(metaAnnos, SMetaAnnotation::getName);

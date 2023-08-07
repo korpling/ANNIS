@@ -13,9 +13,9 @@
  */
 package org.corpus_tools.annis.gui.visualizers;
 
-import com.vaadin.ui.UI;
 import java.util.List;
 import java.util.Map;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.salt.common.SCorpus;
 
 /**
@@ -36,5 +36,5 @@ public interface FilteringVisualizerPlugin {
    * @see SCorpus#getId()
    */
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName,
-      String toplevelCorpusId, Map<String, String> mappings, UI ui);
+      String toplevelCorpusId, Map<String, String> mappings, CommonUI ui);
 }

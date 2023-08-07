@@ -13,7 +13,7 @@
  */
 package org.corpus_tools.annis.gui.media;
 
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 
 /**
  * System wide access to multimedia player functions.
@@ -30,7 +30,7 @@ public interface MediaController {
    * @param player The instance.
    * @param resultID To which result this player belongs.
    */
-  public void addMediaPlayer(MediaPlayer player, String resultID, VisualizationToggle toggle);
+  public void addMediaPlayer(MediaPlayer player, String resultID, VisualizerPanel visPanel);
 
   /**
    * Unregister all associated {@link MediaPlayer} instances.

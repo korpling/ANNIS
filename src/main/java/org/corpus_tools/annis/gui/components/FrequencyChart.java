@@ -22,9 +22,9 @@ import com.vaadin.v7.ui.OptionGroup;
 import java.util.List;
 import org.corpus_tools.annis.api.model.FrequencyTableRow;
 import org.corpus_tools.annis.gui.AnnisUI;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.InstanceConfig;
 import org.corpus_tools.annis.gui.frequency.FrequencyResultPanel;
+import org.corpus_tools.annis.gui.objects.InstanceConfig;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.slf4j.LoggerFactory;
 
 /**

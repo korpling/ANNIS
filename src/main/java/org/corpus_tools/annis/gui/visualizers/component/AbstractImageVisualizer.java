@@ -19,8 +19,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.UUID;
-import org.corpus_tools.annis.gui.ImagePanel;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.components.ImagePanel;
+import org.corpus_tools.annis.gui.resultview.VisualizerPanel;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 
@@ -35,7 +35,7 @@ public abstract class AbstractImageVisualizer extends AbstractVisualizer {
   private static final long serialVersionUID = -3055099196694903386L;
 
   @Override
-  public ImagePanel createComponent(final VisualizerInput visInput, VisualizationToggle visToggle) {
+  public ImagePanel createComponent(final VisualizerInput visInput, VisualizerPanel visPanel) {
 
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     writeOutput(visInput, out);

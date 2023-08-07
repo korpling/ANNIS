@@ -41,15 +41,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import javax.xml.stream.XMLStreamException;
-import org.corpus_tools.annis.ApiException;
-import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.QueryLanguage;
 import org.corpus_tools.annis.api.model.VisualizerRule;
 import org.corpus_tools.annis.api.model.VisualizerRule.VisibilityEnum;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
-import org.corpus_tools.annis.gui.Helper;
-import org.corpus_tools.annis.gui.VisualizationToggle;
+import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.graphml.DocumentGraphMapper;
 import org.corpus_tools.annis.gui.media.MediaController;
@@ -57,6 +54,7 @@ import org.corpus_tools.annis.gui.media.MediaPlayer;
 import org.corpus_tools.annis.gui.media.PDFViewer;
 import org.corpus_tools.annis.gui.objects.Match;
 import org.corpus_tools.annis.gui.objects.RawTextWrapper;
+import org.corpus_tools.annis.gui.util.Helper;
 import org.corpus_tools.annis.gui.visualizers.FilteringVisualizerPlugin;
 import org.corpus_tools.annis.gui.visualizers.LoadableVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
@@ -70,6 +68,12 @@ import org.corpus_tools.salt.core.SNode;
 import org.eclipse.emf.common.util.URI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Flux;
 
 /**
  * Controls the visibility of visualizer plugins and provides some control methods for the media
@@ -81,15 +85,17 @@ import org.slf4j.LoggerFactory;
  */
 
 public class VisualizerPanel extends CssLayout
-    implements Button.ClickListener, VisualizationToggle {
+    implements Button.ClickListener {
   private class BackgroundJob implements Runnable {
 
     private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
+    private UI ui;
 
-    public BackgroundJob(Future<Component> future, LoadableVisualizer.Callback callback) {
+    public BackgroundJob(Future<Component> future, LoadableVisualizer.Callback callback, UI ui) {
       this.future = future;
       this.callback = callback;
+      this.ui = ui;
     }
 
     @Override
@@ -203,8 +209,6 @@ public class VisualizerPanel extends CssLayout
 
   private ProgressBar progress;
 
-  private AnnisUI ui;
-
   private VisualizerContextChanger visCtxChanger;
 
   private static final String UNKNOWN = "<unknown>";
@@ -216,8 +220,7 @@ public class VisualizerPanel extends CssLayout
    */
   public VisualizerPanel(final VisualizerRule visRule, int visId, SDocument result, Match match,
       Set<String> visibleTokenAnnos, Map<SNode, Long> markedAndCovered, String htmlID,
-      String resultID, VisualizerContextChanger parent, String segmentationName, AnnisUI ui) {
-    this.ui = ui;
+      String resultID, VisualizerContextChanger parent, String segmentationName) {
     this.visRule = visRule;
     this.visId = visId;
 
@@ -251,7 +254,10 @@ public class VisualizerPanel extends CssLayout
   public void attach() {
     super.attach();
 
-    if (visRule != null) {
+    UI uiRaw = UI.getCurrent();
+
+    if (uiRaw instanceof AnnisUI && visRule != null) {
+      AnnisUI ui = (AnnisUI) uiRaw;
       visPlugin = ui.getVisualizerPlugins().stream()
           .filter(plugin -> Objects.equal(plugin.getShortName(), visRule.getVisType())).findAny()
           .orElse(null);
@@ -289,7 +295,7 @@ public class VisualizerPanel extends CssLayout
 
         // create the visualizer and calc input
         try {
-          vis = createComponent();
+          vis = createComponent(ui);
           if (vis != null) {
             vis.setVisible(true);
             addComponent(vis);
@@ -326,12 +332,12 @@ public class VisualizerPanel extends CssLayout
     toggleVisualizer(isVisible, null);
   }
 
-  private Component createComponent() {
+  private Component createComponent(CommonUI ui) {
     if (visPlugin == null) {
       return null;
     }
 
-    final VisualizerInput input = createInput();
+    final VisualizerInput input = createInput(ui);
 
     Component c = visPlugin.createComponent(input, this);
     if (c == null) {
@@ -344,7 +350,7 @@ public class VisualizerPanel extends CssLayout
     return c;
   }
 
-  private VisualizerInput createInput() {
+  private VisualizerInput createInput(CommonUI ui) {
     VisualizerInput input = new VisualizerInput();
     input.setUI(ui);
     input.setContextPath(ui.getServletContext().getContextPath());
@@ -394,25 +400,29 @@ public class VisualizerPanel extends CssLayout
   }
 
 
-  private SaltProject getDocument(List<String> nodeAnnoFilter, boolean useRawText, UI ui) {
+  private SaltProject getDocument(List<String> nodeAnnoFilter, boolean useRawText, CommonUI ui) {
 
     try {
-      CorporaApi api = new CorporaApi(Helper.getClient(ui));
+      WebClient client = ui.getWebClient();
       // Reconstruct the document node name from the raw path of the match
       String documentNodeName = Joiner.on('/').join(documentPathRaw);
       String aql = Helper.buildDocumentQuery(documentNodeName, nodeAnnoFilter, useRawText);
 
-      File graphML = api.subgraphForQuery(documentPathDecoded.get(0), aql, QueryLanguage.AQL, null);
       try {
         final SaltProject p = SaltFactory.createSaltProject();
         SCorpusGraph cg = p.createCorpusGraph();
         URI docURI = URI.createURI("salt:/" + Joiner.on('/').join(documentPathRaw));
         SDocument doc = cg.createDocument(docURI);
+
+        File graphML = File.createTempFile("annis-subgraph", ".salt");
+        Flux<DataBuffer> response = client.get()
+            .uri(uriBuilder -> uriBuilder.path("/corpora/{corpus}/subgraph-for-query")
+                .queryParam("query", aql).queryParam("query_language", QueryLanguage.AQL)
+                .build(documentPathDecoded.get(0)))
+            .accept(MediaType.APPLICATION_XML).retrieve().bodyToFlux(DataBuffer.class);
+        DataBufferUtils.write(response, graphML.toPath()).block();
         SDocumentGraph docGraph = DocumentGraphMapper.map(graphML);
-        if (Files.deleteIfExists(graphML.toPath())) {
-          log.debug("Could not delete temporary SaltXML file {} because it does not exist.",
-              graphML.getPath());
-        }
+        Files.deleteIfExists(graphML.toPath());
         doc.setDocumentGraph(docGraph);
 
         return p;
@@ -420,7 +430,7 @@ public class VisualizerPanel extends CssLayout
         log.error("Could not map GraphML to Salt", ex);
         ui.access(() -> ExceptionDialog.show(ex, "Could not map GraphML to Salt", ui));
       }
-    } catch (ApiException e) {
+    } catch (WebClientResponseException e) {
       log.error("General remote service exception", e);
     }
     return null;
@@ -441,7 +451,9 @@ public class VisualizerPanel extends CssLayout
 
 
   private void loadVisualizer(final LoadableVisualizer.Callback callback) {
-    if (visPlugin != null) {
+    UI uiRaw = UI.getCurrent();
+    if (uiRaw instanceof CommonUI && visPlugin != null) {
+      CommonUI ui = (CommonUI) uiRaw;
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
@@ -453,14 +465,14 @@ public class VisualizerPanel extends CssLayout
       final Future<Component> future = execService.submit(() -> {
         // only create component if not already created
         if (vis == null) {
-          return createComponent();
+          return createComponent(ui);
         } else {
           return vis;
         }
       });
 
       // run the actual code to load the visualizer
-      Background.run(new BackgroundJob(future, callback));
+      Background.run(new BackgroundJob(future, callback, ui));
 
     } // end if create input was needed
 
@@ -482,7 +494,6 @@ public class VisualizerPanel extends CssLayout
     }
   }
 
-  @Override
   public void toggleVisualizer(boolean visible, LoadableVisualizer.Callback callback) {
     if (visible) {
       loadVisualizer(callback);
@@ -500,7 +511,6 @@ public class VisualizerPanel extends CssLayout
   }
 
 
-  @Override
   public boolean visualizerIsVisible() {
     return vis != null && vis.isVisible();
   }

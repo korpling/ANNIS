@@ -19,8 +19,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.corpus_tools.annis.gui.beans.CorpusBrowserEntry;
+import org.corpus_tools.annis.gui.components.ExampleTable;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
+import org.corpus_tools.annis.gui.corpusbrowser.CorpusBrowserEntry;
+import org.corpus_tools.annis.gui.corpusbrowser.CorpusBrowserPanel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +63,7 @@ class CorpusBrowserPanelTest {
     // Open a corpus browser for the given corpus
     Button button = mock(Button.class);
     CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
-    corpusList.initCorpusBrowser(corpus, button);
+    corpusList.initCorpusBrowser(corpus, button, ui);
 
     // Get window by its title
     Window w = _get(Window.class, spec -> spec.withCaption("Corpus information for " + corpus));
