@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Update to graphANNIS 2.4.7 with various bugfixes.
+- Update to graphANNIS 2.4.8 with various bugfixes.
 - When an optional node (for negation without existence) was not at the end of
   the query, find queries could give an empty output.
 
