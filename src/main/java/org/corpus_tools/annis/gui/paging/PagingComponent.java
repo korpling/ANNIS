@@ -33,7 +33,7 @@ import com.vaadin.v7.ui.themes.ChameleonTheme;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.query_references.ShareQueryReferenceWindow;

@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update to graphANNIS 2.4.8 with various bugfixes.
+- When an optional node (for negation without existence) was not at the end of
+  the query, find queries could give an empty output.
+
 ## [4.10.3] - 2023-07-26
 
 ### Fixed

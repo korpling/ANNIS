@@ -187,10 +187,12 @@ class AnnisUITest {
             + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"",
         1000);
 
-    ResultViewPanel resultView = _get(ResultViewPanel.class);
 
-    awaitCondition(30,
-        () -> _find(resultView, SingleResultPanel.class).size() == Math.min(matchCount, 10), 1000);
+    awaitCondition(60, () -> {
+      ResultViewPanel resultView = _get(ResultViewPanel.class);
+
+      return _find(resultView, SingleResultPanel.class).size() == Math.min(matchCount, 10);
+    }, 100);
   }
 
   @Test
@@ -382,8 +384,12 @@ class AnnisUITest {
     awaitCondition(5, () -> "Valid query, click on \"Search\" to start searching."
         .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
 
+    Thread.sleep(500);
+
     Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
     _click(searchButton);
+
+    Thread.sleep(500);
 
     // Wait until the count is displayed
     String expectedStatus = "1 match\nin 1 document";
