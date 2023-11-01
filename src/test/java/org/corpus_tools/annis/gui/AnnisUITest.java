@@ -187,10 +187,12 @@ class AnnisUITest {
             + ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus() + "\"",
         1000);
 
-    ResultViewPanel resultView = _get(ResultViewPanel.class);
 
-    awaitCondition(30,
-        () -> _find(resultView, SingleResultPanel.class).size() == Math.min(matchCount, 10), 1000);
+    awaitCondition(30, () -> {
+      ResultViewPanel resultView = _get(ResultViewPanel.class);
+
+      return _find(resultView, SingleResultPanel.class).size() == Math.min(matchCount, 10);
+    }, 1000);
   }
 
   @Test
