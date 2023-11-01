@@ -384,8 +384,12 @@ class AnnisUITest {
     awaitCondition(5, () -> "Valid query, click on \"Search\" to start searching."
         .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()));
 
+    Thread.sleep(500);
+
     Button searchButton = _get(Button.class, spec -> spec.withCaption("Search"));
     _click(searchButton);
+
+    Thread.sleep(500);
 
     // Wait until the count is displayed
     String expectedStatus = "1 match\nin 1 document";
