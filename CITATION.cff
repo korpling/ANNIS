@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.10.3
-date-released: 2023-07-26
+version: 4.10.4
+date-released: 2023-11-01
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -188,7 +188,7 @@ references:
   repository-code: https://gitbox.apache.org/repos/asf?p=commons-io.git
 - type: software
   title: Apache Commons Lang
-  version: 3.12.0
+  version: 3.13.0
   abbreviation: org.apache.commons:commons-lang3
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Lang
@@ -199,7 +199,7 @@ references:
   - name: Henri Yandell
   - name: Steven Caswell
   - name: Robert Burrell Donkin
-  - name: Gary D. Gregory
+  - name: Gary Gregory
   - name: Fredrik Westermarck
   - name: James Carman
   - name: Niall Pemberton
@@ -214,7 +214,7 @@ references:
   repository-code: https://gitbox.apache.org/repos/asf?p=commons-lang.git
 - type: software
   title: Apache Commons Text
-  version: 1.10.0
+  version: 1.11.0
   abbreviation: org.apache.commons:commons-text
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Text
@@ -1712,7 +1712,7 @@ references:
   title: vaadin-compatibility-themes
   version: 8.14.3
   abbreviation: com.vaadin:vaadin-compatibility-themes
-  license-url: http://www.apache.org/licenses/LICENSE-2.0
+  license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_compatibility_themes
     directory.
   authors:
