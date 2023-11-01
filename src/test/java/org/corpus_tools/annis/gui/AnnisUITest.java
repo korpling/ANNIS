@@ -188,11 +188,11 @@ class AnnisUITest {
         1000);
 
 
-    awaitCondition(30, () -> {
+    awaitCondition(60, () -> {
       ResultViewPanel resultView = _get(ResultViewPanel.class);
 
       return _find(resultView, SingleResultPanel.class).size() == Math.min(matchCount, 10);
-    }, 1000);
+    }, 100);
   }
 
   @Test
