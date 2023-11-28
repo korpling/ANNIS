@@ -24,17 +24,19 @@ if [ "$install_graphannis_cli" = true ] ; then
         if [[ "$OS_NAME" == "linux" ]];
         then
             rm -f $HOME/.cargo/bin/annis
-            curl -L -o $HOME/.cargo/bin/annis https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/annis
-            chmod u+x $HOME/.cargo/bin/annis
+            curl -L -o annis.tar.xz https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/graphannis-cli-x86_64-unknown-linux-gnu.tar.xz
+            tar xf annis.tar.xz -C $HOME/.cargo/bin/
         elif [[ "$OS_NAME" == "osx" ]];
         then
             rm -f $HOME/.cargo/bin/annis
-            curl -L -o $HOME/.cargo/bin/annis https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/annis.osx
-            chmod u+x $HOME/.cargo/bin/annis
+            curl -L -o annis.tar.xz https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/graphannis-cli-x86_64-apple-darwin.tar.xz
+            tar xf annis.tar.xz -C $HOME/.cargo/bin/
         elif [[ "$OS_NAME" == "windows" ]];
         then
             del /s /q $HOME/.cargo/bin/annis.exe
-            curl -L -o $HOME/.cargo/bin/annis.exe https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/annis.exe
+            curl -L -o annis.zip https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/graphannis-cli-x86_64-pc-windows-msvc.zip
+            Expand-Archive -Path annis.zip -DestinationPath $HOME/.cargo/bin/annis.exe
+            
         else
             >&2 echo "Unknown value \"${OS_NAME}\" for environment variable OS_NAME"
         	exit 1
