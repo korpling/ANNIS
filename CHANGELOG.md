@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update to graphANNIS 3.0.0 with various bugfixes.
+- Polling the import status in the adminstration view fixed.
+
 ## [4.10.4] - 2023-11-01
 
 ### Fixed

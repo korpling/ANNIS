@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 8
         run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 2.2.0
+      - run: misc/download-annis-cli.sh 3.0.0
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
@@ -55,7 +55,36 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 11
         run: echo JAVA_HOME=$JAVA_HOME_11_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 2.2.0
+      - run: misc/download-annis-cli.sh 3.0.0
+        env:
+          OS_NAME: linux
+      - run: misc/import-test-corpora.sh
+      - name: Run Maven install (includes tests)
+        run: mvn install
+  test_jdk17:
+    name: Execute all automated tests on JDK 17
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          # Otherwise the new code can't be determined or code coverage is less informing
+          fetch-depth: 0
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-11-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-11-
+      - name: Cache test corpora
+        uses: actions/cache@v2
+        with:
+          path: "*.zip"
+          key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
+      - name: Set JAVA_HOME to included JDK 17
+        run: echo JAVA_HOME=$JAVA_HOME_17_X64 >> $GITHUB_ENV
+      - run: misc/download-annis-cli.sh 3.0.0
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh

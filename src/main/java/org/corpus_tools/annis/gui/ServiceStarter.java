@@ -161,10 +161,11 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   private Optional<String> executablePathForSystem() {
     Optional<String> execPath = Optional.empty();
     if (SystemUtils.IS_OS_MAC_OSX) {
-      execPath = Optional.of("darwin/graphannis-webservice.osx");
+      execPath = Optional.of("graphannis-webservice-x86_64-apple-darwin/graphannis-webservice");
     } else if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
       if (SystemUtils.IS_OS_LINUX) {
-        execPath = Optional.of("linux-x86-64/graphannis-webservice");
+        execPath =
+            Optional.of("graphannis-webservice-x86_64-unknown-linux-gnu/graphannis-webservice");
       } else if (SystemUtils.IS_OS_WINDOWS) {
         execPath = Optional.of("win32-x86-64/graphannis-webservice.exe");
       }
