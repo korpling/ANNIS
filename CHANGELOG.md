@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.10.6] - 2024-01-16
+
 ### Fixed
 
 - Updated to graphANNIS 3.1.0 which has improvements in memory handling. This
@@ -1311,7 +1313,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.10.5...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.10.6...HEAD
+[4.10.6]: https://github.com/korpling/ANNIS/compare/v4.10.5...v4.10.6
 [4.10.5]: https://github.com/korpling/ANNIS/compare/v4.10.4...v4.10.5
 [4.10.4]: https://github.com/korpling/ANNIS/compare/v4.10.3...v4.10.4
 [4.10.3]: https://github.com/korpling/ANNIS/compare/v4.10.2...v4.10.3
