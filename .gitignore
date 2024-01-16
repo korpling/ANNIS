@@ -6,3 +6,4 @@ target/
 *.iml
 *.factorypath
 *.zip
+/service.sqlite
