@@ -5,6 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Updated to graphANNIS 3.1.0 which has improvements in memory handling. This
+  should fix some situations where ANNIS becomes unresponsive in a enviroment
+  with a lot of different corpora.
+
 ## [4.10.5] - 2023-11-28
 
 ### Fixed
