@@ -263,6 +263,8 @@ public class QueryController implements Serializable {
 
     ExportQuery query = getExportQuery();
 
+    log.debug("Executing {}", query);
+
     checkQuirksMode(query);
 
     addHistoryEntry(query);

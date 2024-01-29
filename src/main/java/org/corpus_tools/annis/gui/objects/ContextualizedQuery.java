@@ -93,4 +93,13 @@ public class ContextualizedQuery extends Query {
   public void setSegmentation(String segmentation) {
     this.segmentation = segmentation;
   }
+
+  @Override
+  public String toString() {
+    return "ContextualizedQuery [leftContext=" + leftContext + ", rightContext=" + rightContext
+        + ", segmentation=" + segmentation + ", super=" + super.toString() + "]";
+  }
+
+
+
 }

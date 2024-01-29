@@ -147,4 +147,12 @@ public class Query implements Serializable {
     return StringUtils.join(fragmentParts, "&");
   }
 
+  @Override
+  public String toString() {
+    return "Query [query=" + query + ", corpora=" + corpora + ", queryLanguage=" + queryLanguage
+        + "]";
+  }
+
+
+
 }
