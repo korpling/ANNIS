@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added the possibility to log user search interactions of the `QueryController`.
+
 ## [4.10.6] - 2024-01-16
 
 ### Fixed
