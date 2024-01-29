@@ -263,6 +263,8 @@ public class QueryController implements Serializable {
 
     ExportQuery query = getExportQuery();
 
+    log.debug("Executing {}", query);
+
     checkQuirksMode(query);
 
     addHistoryEntry(query);
@@ -309,6 +311,8 @@ public class QueryController implements Serializable {
         .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
         .queryLanguage(state.getQueryLanguageLegacy()).def(freqDefinition).build();
 
+    log.debug("Executing {}", query);
+
     checkQuirksMode(query);
 
     addHistoryEntry(query);
@@ -350,6 +354,8 @@ public class QueryController implements Serializable {
     }
     // construct a query from the current properties
     DisplayedResultQuery displayedQuery = getSearchQuery();
+
+    log.debug("Executing {}", displayedQuery);
 
     searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
 
@@ -605,6 +611,7 @@ public class QueryController implements Serializable {
 
   public void setSelectedCorpora(Set<String> selected) {
     if (!Objects.deepEquals(state.getSelectedCorpora(), selected)) {
+      log.debug("Selected corpora {}", selected);
       state.setSelectedCorpora(selected);
       corpusSelectionChanged();
     }

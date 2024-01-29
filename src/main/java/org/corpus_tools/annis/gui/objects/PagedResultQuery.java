@@ -119,4 +119,12 @@ public class PagedResultQuery extends ContextualizedQuery {
     this.order = order;
   }
 
+  @Override
+  public String toString() {
+    return "[offset=" + offset + ", limit=" + limit + ", order=" + order + ", super="
+        + super.toString() + "]";
+  }
+
+
+
 }

@@ -89,5 +89,15 @@ public class ExportQuery extends ContextualizedQuery {
     public void setParameters(String parameters) {
         this.parameters = parameters;
     }
+    @Override
+    public String toString() {
+      return "export query [exporter=" + exporter.getSimpleName() + ", annotationKeys="
+          + annotationKeys
+          + ", parameters=" + parameters + ", alignmc=" + alignmc + ", super=" + super.toString()
+          + "]";
+    }
+
+
+
 
 }
