@@ -311,6 +311,8 @@ public class QueryController implements Serializable {
         .corpora(new LinkedHashSet<>(state.getSelectedCorpora()))
         .queryLanguage(state.getQueryLanguageLegacy()).def(freqDefinition).build();
 
+    log.debug("Executing {}", query);
+
     checkQuirksMode(query);
 
     addHistoryEntry(query);
@@ -352,6 +354,8 @@ public class QueryController implements Serializable {
     }
     // construct a query from the current properties
     DisplayedResultQuery displayedQuery = getSearchQuery();
+
+    log.debug("Executing {}", displayedQuery);
 
     searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
 

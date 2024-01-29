@@ -149,7 +149,7 @@ public class Query implements Serializable {
 
   @Override
   public String toString() {
-    return "Query [query=" + query + ", corpora=" + corpora + ", queryLanguage=" + queryLanguage
+    return "[query=" + query + ", corpora=" + corpora + ", queryLanguage=" + queryLanguage
         + "]";
   }
 

@@ -55,4 +55,12 @@ public class FrequencyQuery extends Query {
   public void setFrequencyDefinition(FrequencyTableQuery frequencyDefinition) {
     this.frequencyDefinition = frequencyDefinition;
   }
+
+  @Override
+  public String toString() {
+    return "frequency query [frequencyDefinition=" + frequencyDefinition + ", super="
+        + super.toString() + "]";
+  }
+
+
 }

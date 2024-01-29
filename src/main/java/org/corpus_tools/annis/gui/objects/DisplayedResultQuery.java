@@ -136,4 +136,12 @@ public class DisplayedResultQuery extends PagedResultQuery {
         "The selected matches set of a paged result query must never be null (but can be empty)");
     this.selectedMatches = selectedMatches;
   }
+
+  @Override
+  public String toString() {
+    return "search query [selectedMatches=" + selectedMatches + ", baseText=" + baseText
+        + ", super=" + super.toString() + "]";
+  }
+
+
 }

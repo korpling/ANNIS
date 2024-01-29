@@ -96,7 +96,7 @@ public class ContextualizedQuery extends Query {
 
   @Override
   public String toString() {
-    return "ContextualizedQuery [leftContext=" + leftContext + ", rightContext=" + rightContext
+    return "[leftContext=" + leftContext + ", rightContext=" + rightContext
         + ", segmentation=" + segmentation + ", super=" + super.toString() + "]";
   }
 

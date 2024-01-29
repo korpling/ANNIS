@@ -91,7 +91,7 @@ public class ExportQuery extends ContextualizedQuery {
     }
     @Override
     public String toString() {
-      return "ExportQuery [exporter=" + exporter.getSimpleName() + ", annotationKeys="
+      return "export query [exporter=" + exporter.getSimpleName() + ", annotationKeys="
           + annotationKeys
           + ", parameters=" + parameters + ", alignmc=" + alignmc + ", super=" + super.toString()
           + "]";
