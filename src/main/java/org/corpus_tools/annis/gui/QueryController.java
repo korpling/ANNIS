@@ -611,6 +611,7 @@ public class QueryController implements Serializable {
 
   public void setSelectedCorpora(Set<String> selected) {
     if (!Objects.deepEquals(state.getSelectedCorpora(), selected)) {
+      log.debug("Selected corpora {}", selected);
       state.setSelectedCorpora(selected);
       corpusSelectionChanged();
     }
