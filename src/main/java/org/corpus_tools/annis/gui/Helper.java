@@ -119,6 +119,8 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
  */
 public class Helper {
 
+  private static final int DEFAULT_CONTEXT = 5;
+
   private static final String UTF_8 = "UTF-8";
 
   private static final Pattern validQNamePattern =
@@ -663,7 +665,7 @@ public class Helper {
     defaultCorpusConfig.setVisualizers(new LinkedList<>());
 
     defaultCorpusConfig.getView().setPageSize(10);
-    defaultCorpusConfig.getContext().setDefault(5);
+    defaultCorpusConfig.getContext().setDefault(DEFAULT_CONTEXT);
     defaultCorpusConfig.getContext().setSizes(Arrays.asList(1, 2, 5, 10));
     defaultCorpusConfig.getContext().setMax(Integer.MAX_VALUE);
 

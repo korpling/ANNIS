@@ -334,12 +334,14 @@ public class SearchOptionsPanel extends FormLayout {
 
     // Calculate merged context
     Optional<Integer> mergedDefaultCtx = selectedConfigs.stream()
+        .filter(config -> config.getContext() != null && config.getContext().getDefault() != null)
         .map(config -> config.getContext().getDefault()).min(Comparator.naturalOrder());
     if (mergedDefaultCtx.isPresent()) {
       corpusConfig.getContext().setDefault(mergedDefaultCtx.get());
     }
 
     Optional<Integer> mergedMaxCtx = selectedConfigs.stream()
+        .filter(config -> config.getContext() != null && config.getContext().getMax() != null)
         .map(config -> config.getContext().getMax()).filter(maxCtx -> maxCtx != null)
         .min(Comparator.naturalOrder());
     if (mergedMaxCtx.isPresent()) {
@@ -349,7 +351,9 @@ public class SearchOptionsPanel extends FormLayout {
     // Add all context steps and sort them
     TreeSet<Integer> contextSizes = new TreeSet<>();
     for (CorpusConfiguration config : selectedConfigs) {
-      contextSizes.addAll(config.getContext().getSizes());
+      if (config.getContext() != null && config.getContext().getSizes() != null) {
+        contextSizes.addAll(config.getContext().getSizes());
+      }
     }
     if (!contextSizes.isEmpty()) {
       corpusConfig.getContext().setSizes(new ArrayList<>(contextSizes));
@@ -357,6 +361,7 @@ public class SearchOptionsPanel extends FormLayout {
 
     // merge the results per page
     Optional<Integer> mergedPageSize = selectedConfigs.stream()
+        .filter(config -> config.getView() != null && config.getView().getPageSize() != null)
         .map(config -> config.getView().getPageSize()).min(Comparator.naturalOrder());
     if (mergedPageSize.isPresent()) {
       corpusConfig.getView().setPageSize(mergedPageSize.get());
@@ -366,14 +371,23 @@ public class SearchOptionsPanel extends FormLayout {
     // It is not guaranteed that the different corpora have the same segmentation layers, but all
     // corpora have token
     Set<String> allContextSegmentations = selectedConfigs.stream()
+        .filter(
+            config -> config.getContext() != null && config.getContext().getSegmentation() != null)
         .map(config -> config.getContext().getSegmentation()).collect(Collectors.toSet());
-    if (allContextSegmentations.size() == 1) {
+    boolean anyTokenAsSegmentation = selectedConfigs.stream().anyMatch(
+        config -> config.getContext() != null && config.getContext().getSegmentation() == null);
+    if (!anyTokenAsSegmentation && allContextSegmentations.size() == 1) {
       corpusConfig.getContext().setSegmentation(allContextSegmentations.iterator().next());
     }
 
     Set<String> allBaseTextSegmentations = selectedConfigs.stream()
+        .filter(config -> config.getView() != null
+            && config.getView().getBaseTextSegmentation() != null)
         .map(config -> config.getView().getBaseTextSegmentation()).collect(Collectors.toSet());
-    if (allBaseTextSegmentations.size() == 1) {
+    boolean anyTokenAsBaseText = selectedConfigs.stream().anyMatch(
+        config -> config.getContext() != null && config.getContext().getSegmentation() == null);
+
+    if (!anyTokenAsBaseText && allBaseTextSegmentations.size() == 1) {
       corpusConfig.getView().setBaseTextSegmentation(allBaseTextSegmentations.iterator().next());
     }
     return corpusConfig;
