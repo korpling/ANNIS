@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.11.1] - 2024-03-13
+
 
 ### Fixed
 
@@ -1353,7 +1355,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.11.0...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.11.1...HEAD
+[4.11.1]: https://github.com/korpling/ANNIS/compare/v4.11.0...v4.11.1
 [4.11.0]: https://github.com/korpling/ANNIS/compare/v4.10.6...v4.11.0
 [4.10.6]: https://github.com/korpling/ANNIS/compare/v4.10.5...v4.10.6
 [4.10.5]: https://github.com/korpling/ANNIS/compare/v4.10.4...v4.10.5
