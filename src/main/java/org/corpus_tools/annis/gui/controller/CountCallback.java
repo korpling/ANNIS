@@ -56,8 +56,9 @@ public class CountCallback implements ApiCallback<CountExtra> {
         ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
 
         // Decide whether to use plural
-        String documentString = result.getDocumentCount() > 1 ? "documents" : "document";
-        String matchesString = result.getMatchCount() > 1 ? "matches" : "match";
+        String documentString = result.getDocumentCount() == 1 ? "document" : "documents";
+        String matchesString =
+            result.getMatchCount() == 1 ? "match" : "matches";
         // Construct the whole string, but omit the document count if it is zero (e.g. because
         // there are only sub-corpus or document matches and no matches inside a document)
         String completeString =

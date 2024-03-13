@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Use plural form when there is no match in result status: "0 matches".
+
 ## [4.11.1] - 2024-03-13
 
 
