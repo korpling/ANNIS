@@ -51,21 +51,26 @@ public class CountCallback implements ApiCallback<CountExtra> {
 
     @Override
     public void onSuccess(CountExtra result, int statusCode,
-            Map<String, List<String>> responseHeaders) {
-        ui.access(() -> {
-            ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
+        Map<String, List<String>> responseHeaders) {
+      ui.access(() -> {
+        ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
 
-            String documentString = result.getDocumentCount() > 1 ? "documents" : "document";
-            String matchesString = result.getMatchCount() > 1 ? "matches" : "match";
-            ui.getSearchView().getControlPanel().getQueryPanel()
-                    .setStatus("" + result.getMatchCount() + " " + matchesString + "\nin "
-                            + result.getDocumentCount() + " " + documentString);
-            if (result.getMatchCount() > 0 && panel != null) {
-                panel.getPaging().setPageSize(pageSize, false);
-                panel.setCount(result.getMatchCount());
-            }
-            ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-        });
+        // Decide whether to use plural
+        String documentString = result.getDocumentCount() > 1 ? "documents" : "document";
+        String matchesString = result.getMatchCount() > 1 ? "matches" : "match";
+        // Construct the whole string, but omit the document count if it is zero (e.g. because
+        // there are only sub-corpus or document matches and no matches inside a document)
+        String completeString =
+            result.getDocumentCount() == 0 ? "" + result.getMatchCount() + " " + matchesString
+                : "" + result.getMatchCount() + " " + matchesString + "\nin "
+                    + result.getDocumentCount() + " " + documentString;
+        ui.getSearchView().getControlPanel().getQueryPanel().setStatus(completeString);
+        if (result.getMatchCount() > 0 && panel != null) {
+          panel.getPaging().setPageSize(pageSize, false);
+          panel.setCount(result.getMatchCount());
+        }
+        ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+      });
     }
 
     @Override

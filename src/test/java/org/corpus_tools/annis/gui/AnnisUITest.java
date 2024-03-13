@@ -354,7 +354,7 @@ class AnnisUITest {
     _click(searchButton);
 
     // Wait until the count is displayed
-    String expectedStatus = "2 matches\nin 2 documents";
+    String expectedStatus = "2 matches";
     awaitCondition(60,
         () -> expectedStatus
             .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
@@ -392,7 +392,7 @@ class AnnisUITest {
     Thread.sleep(500);
 
     // Wait until the count is displayed
-    String expectedStatus = "1 match\nin 1 document";
+    String expectedStatus = "1 match";
     awaitCondition(60,
         () -> expectedStatus
             .equals(ui.getSearchView().getControlPanel().getQueryPanel().getLastPublicStatus()),
