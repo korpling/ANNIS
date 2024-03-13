@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Avoid null pointer exceptions when merging corpus configs for search
   options.
+- Updated to graphANNIS 3.2.0 which contains several performance improvements
+  for working with large corpora (>10 million token). You might have to
+  re-import the corpora to get the full performance improvement, because a new
+  graph storage implementation and statistics have been added.
 
 ## [4.11.0] - 2024-02-09
 
