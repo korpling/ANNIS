@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.concurrent.NotThreadSafe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.BeanFactory;
@@ -22,6 +23,7 @@ import org.springframework.util.ResourceUtils;
 @SpringBootTest
 @ActiveProfiles({"test", "headless"})
 @WebAppConfiguration
+@NotThreadSafe
 class ServiceStarterTest {
 
   @Autowired
