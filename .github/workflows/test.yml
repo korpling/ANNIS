@@ -26,7 +26,7 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 8
         run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 3.0.0
+      - run: misc/download-annis-cli.sh
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
@@ -55,7 +55,7 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 11
         run: echo JAVA_HOME=$JAVA_HOME_11_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 3.0.0
+      - run: misc/download-annis-cli.sh
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
@@ -84,7 +84,7 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 17
         run: echo JAVA_HOME=$JAVA_HOME_17_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 3.0.0
+      - run: misc/download-annis-cli.sh
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
