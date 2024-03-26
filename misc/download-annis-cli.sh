@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GRAPHANNIS_VERSION=${1:-3.0.0}
+GRAPHANNIS_VERSION=${1:-3.2.1}
 
 install_graphannis_cli=false
 
@@ -24,7 +24,8 @@ if [ "$install_graphannis_cli" = true ] ; then
        
         rm -f $HOME/.cargo/bin/annis
         curl -L -o annis.tar.xz https://github.com/korpling/graphANNIS/releases/download/v${GRAPHANNIS_VERSION}/graphannis-cli-x86_64-unknown-linux-gnu.tar.xz
-        tar xf annis.tar.xz 
+        tar xf annis.tar.xz
+	mkdir -p $HOME/.cargo/bin
         mv graphannis-cli-x86_64-unknown-linux-gnu/annis $HOME/.cargo/bin/
 fi
 

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
@@ -20,13 +20,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-8-
       - name: Cache test corpora
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "*.zip"
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 8
         run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 3.0.0
+      - run: misc/download-annis-cli.sh
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           # Otherwise the new code can't be determined or code coverage is less informing
           fetch-depth: 0
@@ -55,7 +55,7 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 11
         run: echo JAVA_HOME=$JAVA_HOME_11_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 3.0.0
+      - run: misc/download-annis-cli.sh
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh
@@ -63,7 +63,7 @@ jobs:
         run: mvn install
   test_jdk17:
     name: Execute all automated tests on JDK 17
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -84,7 +84,7 @@ jobs:
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
       - name: Set JAVA_HOME to included JDK 17
         run: echo JAVA_HOME=$JAVA_HOME_17_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh 3.0.0
+      - run: misc/download-annis-cli.sh
         env:
           OS_NAME: linux
       - run: misc/import-test-corpora.sh

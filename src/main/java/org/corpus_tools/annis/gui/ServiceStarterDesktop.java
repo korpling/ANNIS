@@ -38,8 +38,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -49,6 +51,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Profile("desktop")
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused code)
 
   private static final String USER_NAME = "desktop";
