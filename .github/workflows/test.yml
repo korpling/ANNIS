@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
@@ -20,7 +20,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-8-
       - name: Cache test corpora
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: "*.zip"
           key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           # Otherwise the new code can't be determined or code coverage is less informing
           fetch-depth: 0
