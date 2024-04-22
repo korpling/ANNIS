@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.11.3] - 2024-04-22
+
 ### Fixed
 
 - Upgraded to graphANNIS 3.2.2 which fixes a regression with showing paged
@@ -1367,7 +1369,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.11.2...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.11.3...HEAD
+[4.11.3]: https://github.com/korpling/ANNIS/compare/v4.11.2...v4.11.3
 [4.11.2]: https://github.com/korpling/ANNIS/compare/v4.11.1...v4.11.2
 [4.11.1]: https://github.com/korpling/ANNIS/compare/v4.11.0...v4.11.1
 [4.11.0]: https://github.com/korpling/ANNIS/compare/v4.10.6...v4.11.0
