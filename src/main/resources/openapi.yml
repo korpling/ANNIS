@@ -1014,11 +1014,11 @@ components:
                   type: string
                   description: >
                     Which strategy to apply.
-                    
+
                     - Explicit: Do not assume any relation between spans and segmentation nodes if not explicitly given by a `Coverage` edge).
-                    
+
                     - ImplicitFromNamespace:  Use the namespace of an annotated span to map them to a segmentation node.
-                    
+
                     - ImplicitFromMapping: Map qualified annotation names (e.g. `speaker1::pause`) to the segmentation names.
                   enum:
                     - Explicit
@@ -1035,7 +1035,27 @@ components:
                     "layout::column": "tok_dipl"
                     "layout::line": "tok_dipl"
                     "layout::page": "tok_dipl"
-                    
+        corpus_size:
+          type: object
+          description: "Manually curated information about the size of the corpus."
+          properties:
+            quantity:
+              type: integer
+              description: The actual number describing the size of the corpus."
+              example: 500000
+            unit:
+              type: object
+              required: ["name"]
+              properties:
+                name:
+                  type: string
+                  enum: ["token", "segmentation"]
+                  example: "segmentation"
+                value:
+                  type: string
+                  description: "For the 'segmentation' type the name of the segmentation."
+                  example: "dipl"
+
         example_queries:
           type: array
           description: An array of example queries for the corpus with a description.
