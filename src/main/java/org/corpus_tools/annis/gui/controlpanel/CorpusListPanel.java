@@ -25,6 +25,7 @@ import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -186,6 +187,7 @@ public class CorpusListPanel extends VerticalLayout {
     cbSelection.setEmptySelectionAllowed(true);
     cbSelection.setEmptySelectionCaption(ALL_CORPORA);
     cbSelection.addValueChangeListener(cs -> updateCorpusSetList(true));
+    
 
     selectionLayout.addComponent(cbSelection);
     selectionLayout.setExpandRatio(cbSelection, 1.0f);
@@ -193,8 +195,18 @@ public class CorpusListPanel extends VerticalLayout {
     selectionLayout.setComponentAlignment(cbSelection, Alignment.MIDDLE_RIGHT);
     selectionLayout.setComponentAlignment(lblVisible, Alignment.MIDDLE_LEFT);
 
+
+    CheckBox selectedOnly = new CheckBox("Selected only");
+    selectedOnly.addValueChangeListener(event -> {
+      tblCorpora.getDataProvider().refreshAll();
+    });
+    selectionLayout.addComponent(selectedOnly);
+    selectionLayout.setComponentAlignment(selectedOnly, Alignment.MIDDLE_CENTER);
+
+
     Button btReload = new Button();
     btReload.addClickListener(event -> {
+      selectedOnly.setValue(false);
       updateCorpusSetList(false);
       Notification.show("Reloaded corpus list", Notification.Type.HUMANIZED_MESSAGE);
     });
@@ -221,34 +233,17 @@ public class CorpusListPanel extends VerticalLayout {
       // Always show selected corpora
       if (tblCorpora.getSelectedItems().contains(corpus)) {
         return true;
+      } else if (selectedOnly.getValue()) {
+        return false;
       }
 
       // Check if the corpus is included in the corpus set or filtered by the name
-      String selectedCorpusSetName = cbSelection.getValue();
-
       String corpusNameFilter =
           txtFilter.getValue() == null ? "" : txtFilter.getValue().trim().toLowerCase();
 
-      if (!corpusNameFilter.isEmpty() && !corpus.name.toLowerCase().contains(corpusNameFilter)) {
-        return false;
-      } else if (selectedCorpusSetName != null && !ALL_CORPORA.equals(selectedCorpusSetName)) {
-        CorpusSet selectedCS = null;
-
-        List<CorpusSet> corpusSets = new LinkedList<>();
-        if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
-          corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
-        }
-
-        for (CorpusSet cs : corpusSets) {
-          if (cs.getName().equals(selectedCorpusSetName)) {
-            selectedCS = cs;
-          }
-        }
-
-        return selectedCS == null || selectedCS.getCorpora().contains(corpus);
-
-      }
-      return true;
+      boolean includedByNameFilter =
+          corpusNameFilter.isEmpty() || !corpus.name.toLowerCase().contains(corpusNameFilter);
+      return includedByNameFilter && includedInCorpusSet(corpus.name);
     };
 
     tblCorpora.setWidthFull();
@@ -323,9 +318,25 @@ public class CorpusListPanel extends VerticalLayout {
     addComponent(tblCorpora);
 
     setExpandRatio(tblCorpora, 1.0f);
+  }
+
+  private boolean includedInCorpusSet(String corpus) {
+    CorpusSet selectedCS = null;
+
+    List<CorpusSet> corpusSets = new LinkedList<>();
+    if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
+      corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
+    }
+    String selectedCorpusSetName = cbSelection.getValue();
 
 
+    for (CorpusSet cs : corpusSets) {
+      if (cs.getName().equals(selectedCorpusSetName)) {
+        selectedCS = cs;
+      }
+    }
 
+    return selectedCS == null || selectedCS.getCorpora().contains(corpus);
   }
 
   private List<CorpusWithSize> createCorpusList(CorporaApi api) throws ApiException {
