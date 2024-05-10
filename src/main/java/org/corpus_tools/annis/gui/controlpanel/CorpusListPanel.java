@@ -102,8 +102,7 @@ public class CorpusListPanel extends VerticalLayout {
         // query in background
         CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
-        List<CorpusWithSize> corpora =
-            api.listCorpora().stream().map(c -> new CorpusWithSize(c)).collect(Collectors.toList());
+        List<CorpusWithSize> corpora = createCorpusList(api);
 
         // update the GUI
         ui.access(() -> {
@@ -329,6 +328,33 @@ public class CorpusListPanel extends VerticalLayout {
 
   }
 
+  private List<CorpusWithSize> createCorpusList(CorporaApi api) throws ApiException {
+    List<CorpusWithSize> corpora = new LinkedList<>();
+    for (String c : api.listCorpora()) {
+      CorpusConfiguration config = api.corpusConfiguration(c);
+      if (config.getCorpusSize() != null && config.getCorpusSize().getQuantity() != null) {
+        String desc = null;
+        if (config.getCorpusSize().getUnit() != null) {
+          switch (config.getCorpusSize().getUnit().getName()) {
+            case SEGMENTATION:
+              desc = config.getCorpusSize().getUnit().getValue();
+              break;
+            case TOKEN:
+              desc = "token";
+              break;
+            default:
+              break;
+
+          }
+        }
+        corpora.add(new CorpusWithSize(c, config.getCorpusSize().getQuantity(), desc));
+      } else {
+        corpora.add(new CorpusWithSize(c));
+      }
+    }
+    return corpora;
+  }
+
   @Override
   public void attach() {
     super.attach();
@@ -341,30 +367,8 @@ public class CorpusListPanel extends VerticalLayout {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
     try {
-      List<CorpusWithSize> corpora = new LinkedList<>();
-      for (String c : api.listCorpora()) {
-        CorpusConfiguration config = api.corpusConfiguration(c);
-        if (config.getCorpusSize() != null && config.getCorpusSize().getQuantity() != null) {
-          String desc = null;
-          if (config.getCorpusSize().getUnit() != null) {
-            switch (config.getCorpusSize().getUnit().getName()) {
-              case SEGMENTATION:
-                desc = config.getCorpusSize().getUnit().getValue();
-                break;
-              case TOKEN:
-                desc = "token";
-                break;
-              default:
-                break;
-              
-            }
-          }
-          corpora.add(new CorpusWithSize(c, config.getCorpusSize().getQuantity(), desc));
-        } else {
-          corpora.add(new CorpusWithSize(c));
-        }
-      }
 
+      List<CorpusWithSize> corpora = createCorpusList(api);
       availableCorpora = new ListDataProvider<>(corpora);
       availableCorpora.setFilter(filter);
       tblCorpora.setDataProvider(availableCorpora);
