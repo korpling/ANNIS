@@ -45,6 +45,7 @@ import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -87,6 +88,26 @@ public class CorpusListPanel extends VerticalLayout {
       this.size = Optional.of(size);
       this.size_description = Optional.ofNullable(size_description);
     }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(name, size, size_description);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      CorpusWithSize other = (CorpusWithSize) obj;
+      return Objects.equals(name, other.name) && Objects.equals(size, other.size)
+          && Objects.equals(size_description, other.size_description);
+    }
+
+
   }
 
 
