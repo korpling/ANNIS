@@ -1049,7 +1049,7 @@ components:
               properties:
                 name:
                   type: string
-                  enum: ["token", "segmentation"]
+                  enum: ["tokens", "segmentation"]
                   example: "segmentation"
                 value:
                   type: string

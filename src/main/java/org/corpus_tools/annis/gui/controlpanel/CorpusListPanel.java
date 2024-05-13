@@ -13,6 +13,7 @@
  */
 package org.corpus_tools.annis.gui.controlpanel;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;
 import com.google.common.escape.Escaper;
 import com.google.common.html.HtmlEscapers;
@@ -87,6 +88,8 @@ public class CorpusListPanel extends VerticalLayout {
       this.size_description = Optional.ofNullable(size_description);
     }
   }
+
+
 
   private class CorpusListUpdater implements Runnable {
 
@@ -187,7 +190,7 @@ public class CorpusListPanel extends VerticalLayout {
     cbSelection.setEmptySelectionAllowed(true);
     cbSelection.setEmptySelectionCaption(ALL_CORPORA);
     cbSelection.addValueChangeListener(cs -> updateCorpusSetList(true));
-    
+
 
     selectionLayout.addComponent(cbSelection);
     selectionLayout.setExpandRatio(cbSelection, 1.0f);
@@ -274,35 +277,35 @@ public class CorpusListPanel extends VerticalLayout {
 
     Column<CorpusWithSize, Button> docBrowserColumn =
         tblCorpora.addComponentColumn(corpus_with_size -> {
-      final Button l = new Button();
-      l.setIcon(DOC_ICON);
-      l.setDescription("opens the document browser for " + corpus_with_size.name);
-      l.addClickListener(event -> {
+          final Button l = new Button();
+          l.setIcon(DOC_ICON);
+          l.setDescription("opens the document browser for " + corpus_with_size.name);
+          l.addClickListener(event -> {
             ui.getSearchView().getDocBrowserController().openDocBrowser(corpus_with_size.name);
-      });
-      l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY,
-          ValoTheme.BUTTON_SMALL);
-      return l;
-    });
+          });
+          l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY,
+              ValoTheme.BUTTON_SMALL);
+          return l;
+        });
     docBrowserColumn.setExpandRatio(0);
     docBrowserColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
     docBrowserColumn.setResizable(false);
 
-    nameColumn = tblCorpora
-        .addColumn(corpus -> "<span title=\"" + htmlEscaper.escape(corpus.name) + "\">"
-            + corpus.name + "</a>",
-            new HtmlRenderer());
+    nameColumn = tblCorpora.addColumn(
+        corpus -> "<span title=\"" + htmlEscaper.escape(corpus.name) + "\">" + corpus.name + "</a>",
+        new HtmlRenderer());
     nameColumn.setCaption("Corpus");
     nameColumn.setId("corpus");
     nameColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
     nameColumn.setResizable(true);
     nameColumn.setWidth(180.0);
-    
+
 
     sizeColumn = tblCorpora.addColumn((corpus) -> {
       if (corpus.size.isPresent()) {
-        String desc = corpus.size_description.orElse("");
-        return "<span title=\"" + htmlEscaper.escape(desc) + "\">" + corpus.size.get() + "</span>";
+        String desc = corpus.size_description.orElse("unknown unit");
+        return "<span title=\"" + corpus.size.get() + " (" + htmlEscaper.escape(desc) + ")\">"
+            + corpus.size.get() + "</span>";
       } else {
         return "";
       }
@@ -310,11 +313,12 @@ public class CorpusListPanel extends VerticalLayout {
     sizeColumn.setCaption("Size");
     sizeColumn.setWidth(75.0);
     sizeColumn.setResizable(true);
+    sizeColumn.setComparator(
+        (c1, c2) -> ComparisonChain.start().compare(c1.size.orElse(0), c2.size.orElse(0))
+            .compare(c1.size_description.orElse(""), c2.size_description.orElse("")).result());
 
 
-    tblCorpora.setSortOrder(
-        new GridSortOrderBuilder<CorpusWithSize>().thenAsc(nameColumn).thenAsc(sizeColumn)
-            .build());
+    tblCorpora.setSortOrder(new GridSortOrderBuilder<CorpusWithSize>().thenAsc(nameColumn).build());
     addComponent(tblCorpora);
 
     setExpandRatio(tblCorpora, 1.0f);
@@ -350,8 +354,8 @@ public class CorpusListPanel extends VerticalLayout {
             case SEGMENTATION:
               desc = config.getCorpusSize().getUnit().getValue();
               break;
-            case TOKEN:
-              desc = "token";
+            case TOKENS:
+              desc = "tokens";
               break;
             default:
               break;
@@ -393,7 +397,7 @@ public class CorpusListPanel extends VerticalLayout {
         }
       }
 
-      
+
       if (corpora.isEmpty() && Helper.getUser(ui.getSecurityContext()).isPresent()) {
         Notification.show(
             "No corpora found. Please login "
