@@ -436,7 +436,7 @@ public class CorpusListPanel extends VerticalLayout {
     binder.forField(corpusSelection).bind(state -> state.getSelectedCorpora().stream().map(c -> {
       CorpusConfiguration config = ui.getCorpusConfigWithCache(c);
       return new CorpusWithSize(c, config);
-    }).collect(Collectors.toSet()), (state, selectedCorpora) -> state
+    }).collect(Collectors.toSet()), (state, selectedCorpora) -> ui.getQueryController()
         .setSelectedCorpora(selectedCorpora.stream().map(c -> c.name).collect(Collectors.toSet())));
 
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
