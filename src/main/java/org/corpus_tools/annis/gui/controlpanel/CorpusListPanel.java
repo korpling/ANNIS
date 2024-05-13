@@ -284,7 +284,7 @@ public class CorpusListPanel extends VerticalLayout {
           txtFilter.getValue() == null ? "" : txtFilter.getValue().trim().toLowerCase();
 
       boolean includedByNameFilter =
-          corpusNameFilter.isEmpty() || !corpus.name.toLowerCase().contains(corpusNameFilter);
+          corpusNameFilter.isEmpty() || corpus.name.toLowerCase().contains(corpusNameFilter);
       return includedByNameFilter && includedInCorpusSet(corpus.name);
     };
 
