@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
 import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.CorpusConfigurationCorpusSize;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CorpusBrowserPanel;
@@ -77,17 +78,34 @@ public class CorpusListPanel extends VerticalLayout {
     Optional<Integer> size;
     Optional<String> size_description;
 
-    CorpusWithSize(String name) {
+    CorpusWithSize(String name, CorpusConfiguration config) {
       this.name = name;
-      this.size = Optional.empty();
-      this.size_description = Optional.empty();
+      if (config != null && config.getCorpusSize() != null) {
+        CorpusConfigurationCorpusSize corpusSize = config.getCorpusSize();
+        this.size = Optional.ofNullable(corpusSize.getQuantity());
+
+        String desc = null;
+        if (corpusSize.getUnit() != null) {
+          switch (corpusSize.getUnit().getName()) {
+            case SEGMENTATION:
+              desc = corpusSize.getUnit().getValue();
+              break;
+            case TOKENS:
+              desc = "tokens";
+              break;
+            default:
+              break;
+
+          }
+        }
+        this.size_description = Optional.ofNullable(desc);
+
+      } else {
+        this.size = Optional.empty();
+        this.size_description = Optional.empty();
+      }
     }
 
-    CorpusWithSize(String name, int size, String size_description) {
-      this.name = name;
-      this.size = Optional.of(size);
-      this.size_description = Optional.ofNullable(size_description);
-    }
 
     @Override
     public int hashCode() {
@@ -368,25 +386,7 @@ public class CorpusListPanel extends VerticalLayout {
     List<CorpusWithSize> corpora = new LinkedList<>();
     for (String c : api.listCorpora()) {
       CorpusConfiguration config = ui.getCorpusConfigWithCache(c);
-      if (config.getCorpusSize() != null && config.getCorpusSize().getQuantity() != null) {
-        String desc = null;
-        if (config.getCorpusSize().getUnit() != null) {
-          switch (config.getCorpusSize().getUnit().getName()) {
-            case SEGMENTATION:
-              desc = config.getCorpusSize().getUnit().getValue();
-              break;
-            case TOKENS:
-              desc = "tokens";
-              break;
-            default:
-              break;
-
-          }
-        }
-        corpora.add(new CorpusWithSize(c, config.getCorpusSize().getQuantity(), desc));
-      } else {
-        corpora.add(new CorpusWithSize(c));
-      }
+      corpora.add(new CorpusWithSize(c, config));
     }
     return corpora;
   }
@@ -433,20 +433,15 @@ public class CorpusListPanel extends VerticalLayout {
 
     Binder<QueryUIState> binder = ui.getQueryController().getBinder();
     MultiSelect<CorpusWithSize> corpusSelection = tblCorpora.asMultiSelect();
-    binder.forField(corpusSelection)
-        .bind(state -> state.getSelectedCorpora().stream().map(c -> new CorpusWithSize(c))
-            .collect(Collectors.toSet()),
-            (state, selectedCorpora) -> ui.getQueryController().setSelectedCorpora(
-                selectedCorpora.stream().map(c -> c.name).collect(Collectors.toSet())));
-
+    binder.forField(corpusSelection).bind(state -> state.getSelectedCorpora().stream().map(c -> {
+      CorpusConfiguration config = ui.getCorpusConfigWithCache(c);
+      return new CorpusWithSize(c, config);
+    }).collect(Collectors.toSet()), (state, selectedCorpora) -> state
+        .setSelectedCorpora(selectedCorpora.stream().map(c -> c.name).collect(Collectors.toSet())));
 
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
   }
 
-
-  public Grid<CorpusWithSize> getTblCorpora() {
-    return tblCorpora;
-  }
 
   public void initCorpusBrowser(String topLevelCorpusName, final Button l) {
 
