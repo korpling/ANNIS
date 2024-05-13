@@ -346,7 +346,7 @@ public class CorpusListPanel extends VerticalLayout {
   private List<CorpusWithSize> createCorpusList(CorporaApi api) throws ApiException {
     List<CorpusWithSize> corpora = new LinkedList<>();
     for (String c : api.listCorpora()) {
-      CorpusConfiguration config = api.corpusConfiguration(c);
+      CorpusConfiguration config = ui.getCorpusConfigWithCache(c);
       if (config.getCorpusSize() != null && config.getCorpusSize().getQuantity() != null) {
         String desc = null;
         if (config.getCorpusSize().getUnit() != null) {
