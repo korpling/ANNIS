@@ -14,8 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.github.mvysny.kaributesting.v8.GridKt;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.github.mvysny.kaributesting.v8.NotificationsKt;
-import com.vaadin.data.provider.DataProvider;
-import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.data.provider.Query;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.ContentMode;
@@ -52,6 +51,7 @@ import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
 import org.corpus_tools.annis.gui.components.medialement.MediaElementPlayer;
 import org.corpus_tools.annis.gui.controlpanel.ControlPanel;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
+import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel.CorpusWithSize;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserTable;
@@ -114,7 +114,7 @@ class AnnisUITest {
     CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
 
     @SuppressWarnings("unchecked")
-    Grid<String> corpusList = _get(corpusListPanel, Grid.class);
+    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
 
     @SuppressWarnings("unchecked")
     ComboBox<String> corpusSetChooser = _get(corpusListPanel, ComboBox.class);
@@ -126,7 +126,8 @@ class AnnisUITest {
     _setValue(corpusSetChooser, "test");
 
     assertEquals(1, GridKt._size(corpusList));
-    assertEquals("pcc2", GridKt._get(corpusList, 0));
+    CorpusWithSize firstEntry = GridKt._get(corpusList, 0);
+    assertEquals("pcc2", firstEntry.getName());
   }
 
 
@@ -138,24 +139,29 @@ class AnnisUITest {
     _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), corpusName);
 
     @SuppressWarnings("unchecked")
-    Grid<String> grid = _get(Grid.class,
+    Grid<CorpusWithSize> grid = _get(Grid.class,
         spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
     grid.getSelectionModel().deselectAll();
 
     // Wait until the (refreshed) corpus list is shown
     awaitCondition(30, () -> {
-      DataProvider<String, ?> provider = grid.getDataProvider();
-      if (provider instanceof ListDataProvider<?>) {
-        ListDataProvider<?> listDataProvider = (ListDataProvider<?>) provider;
-        return listDataProvider.getItems().contains(corpusName)
+        boolean isInItems =
+            grid.getDataProvider().fetch(new Query<>())
+                .anyMatch(c -> corpusName.equals(c.getName()));
+        
+        return isInItems
             && ui.getQueryState().getSelectedCorpora().isEmpty();
-      } else {
-        return false;
-      }
+
     }, () -> "Corpus list did not appear");
 
     // Explicitly select the corpus
-    grid.getSelectionModel().select(corpusName);
+    Optional<CorpusWithSize> entry =
+        grid.getDataProvider().fetch(new Query<>()).filter(c -> corpusName.equals(c.getName()))
+            .findFirst();
+    if (entry.isPresent()) {
+      grid.getSelectionModel().select(entry.get());
+
+    }
 
     awaitCondition(30, () -> ui.getQueryState().getSelectedCorpora().contains(corpusName),
         () -> "Could not select corpus " + corpusName + ", "

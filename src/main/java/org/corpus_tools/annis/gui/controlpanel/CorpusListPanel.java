@@ -73,7 +73,7 @@ public class CorpusListPanel extends VerticalLayout {
 
   private static final String COMPACT_COLUMN_CLASS = "compact-column";
 
-  private static class CorpusWithSize {
+  public static class CorpusWithSize {
     String name;
     Optional<Integer> size;
     Optional<String> size_description;
@@ -123,6 +123,10 @@ public class CorpusListPanel extends VerticalLayout {
       CorpusWithSize other = (CorpusWithSize) obj;
       return Objects.equals(name, other.name) && Objects.equals(size, other.size)
           && Objects.equals(size_description, other.size_description);
+    }
+
+    public String getName() {
+      return name;
     }
 
 
