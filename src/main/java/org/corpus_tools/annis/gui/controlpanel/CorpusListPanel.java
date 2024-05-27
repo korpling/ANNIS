@@ -13,7 +13,10 @@
  */
 package org.corpus_tools.annis.gui.controlpanel;
 
+import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Sets;
+import com.google.common.escape.Escaper;
+import com.google.common.html.HtmlEscapers;
 import com.vaadin.data.Binder;
 import com.vaadin.data.provider.GridSortOrderBuilder;
 import com.vaadin.data.provider.ListDataProvider;
@@ -23,6 +26,7 @@ import com.vaadin.server.SerializablePredicate;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
@@ -36,14 +40,19 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.api.CorporaApi;
+import org.corpus_tools.annis.api.model.CorpusConfiguration;
+import org.corpus_tools.annis.api.model.CorpusConfigurationCorpusSize;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Background;
 import org.corpus_tools.annis.gui.CorpusBrowserPanel;
@@ -54,7 +63,6 @@ import org.corpus_tools.annis.gui.MetaDataPanel;
 import org.corpus_tools.annis.gui.components.ExceptionDialog;
 import org.corpus_tools.annis.gui.objects.QueryUIState;
 import org.slf4j.LoggerFactory;
-import org.vaadin.extension.gridscroll.GridScrollExtension;
 
 /**
  * Displays a filterable list of corpora.
@@ -64,6 +72,74 @@ import org.vaadin.extension.gridscroll.GridScrollExtension;
 public class CorpusListPanel extends VerticalLayout {
 
   private static final String COMPACT_COLUMN_CLASS = "compact-column";
+
+  public static class CorpusWithSize {
+    String name;
+    Optional<Integer> size;
+    Optional<String> sizeDescription;
+
+    CorpusWithSize(String name, CorpusConfiguration config) {
+      this.name = name;
+      if (config != null && config.getCorpusSize() != null) {
+        CorpusConfigurationCorpusSize corpusSize = config.getCorpusSize();
+        this.size = Optional.ofNullable(corpusSize.getQuantity());
+
+        String desc = null;
+        if (corpusSize.getUnit() != null) {
+          switch (corpusSize.getUnit().getName()) {
+            case SEGMENTATION:
+              desc = corpusSize.getUnit().getValue();
+              break;
+            case TOKENS:
+              desc = "tokens";
+              break;
+            default:
+              break;
+
+          }
+        }
+        this.sizeDescription = Optional.ofNullable(desc);
+
+      } else {
+        this.size = Optional.empty();
+        this.sizeDescription = Optional.empty();
+      }
+    }
+
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(name, size, sizeDescription);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      CorpusWithSize other = (CorpusWithSize) obj;
+      return Objects.equals(name, other.name) && Objects.equals(size, other.size)
+          && Objects.equals(sizeDescription, other.sizeDescription);
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public Optional<Integer> getSize() {
+      return size;
+    }
+
+    public Optional<String> getSizeDescription() {
+      return sizeDescription;
+    }
+
+  }
+
+
 
   private class CorpusListUpdater implements Runnable {
 
@@ -80,13 +156,13 @@ public class CorpusListPanel extends VerticalLayout {
         // query in background
         CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
-        List<String> corpora = api.listCorpora();
+        List<CorpusWithSize> corpora = createCorpusList(api);
 
         // update the GUI
         ui.access(() -> {
           availableCorpora = new ListDataProvider<>(corpora);
           availableCorpora.setFilter(filter);
-          HashSet<String> oldSelectedItems = new HashSet<>(tblCorpora.getSelectedItems());
+          HashSet<CorpusWithSize> oldSelectedItems = new HashSet<>(tblCorpora.getSelectedItems());
           tblCorpora.setDataProvider(availableCorpora);
           // reset the selected items
           tblCorpora.asMultiSelect().setValue(oldSelectedItems);
@@ -118,9 +194,8 @@ public class CorpusListPanel extends VerticalLayout {
   public static final String ALL_CORPORA = "All";
 
 
-  private final Grid<String> tblCorpora = new Grid<>();
-  private final GridScrollExtension<String> tblCorporaScrollExt =
-      new GridScrollExtension<>(tblCorpora);
+  private final Grid<CorpusWithSize> tblCorpora = new Grid<>();
+
 
   private final HorizontalLayout selectionLayout;
 
@@ -130,13 +205,15 @@ public class CorpusListPanel extends VerticalLayout {
 
   private final AnnisUI ui;
 
-  private final SerializablePredicate<String> filter;
+  private final SerializablePredicate<CorpusWithSize> filter;
 
-  private ListDataProvider<String> availableCorpora;
+  private ListDataProvider<CorpusWithSize> availableCorpora;
 
-  private final Column<String, String> nameColumn;
+  private final Column<CorpusWithSize, String> nameColumn;
 
-  private final Column<String, Boolean> selectedColumn;
+  private static final Escaper htmlEscaper = HtmlEscapers.htmlEscaper();
+
+  private Column<CorpusWithSize, String> sizeColumn;
 
 
   public CorpusListPanel(AnnisUI ui) {
@@ -164,14 +241,23 @@ public class CorpusListPanel extends VerticalLayout {
     cbSelection.setEmptySelectionCaption(ALL_CORPORA);
     cbSelection.addValueChangeListener(cs -> updateCorpusSetList(true));
 
+
     selectionLayout.addComponent(cbSelection);
     selectionLayout.setExpandRatio(cbSelection, 1.0f);
     selectionLayout.setSpacing(true);
     selectionLayout.setComponentAlignment(cbSelection, Alignment.MIDDLE_RIGHT);
     selectionLayout.setComponentAlignment(lblVisible, Alignment.MIDDLE_LEFT);
 
+
+    CheckBox selectedOnly = new CheckBox("Selected only");
+    selectedOnly.addValueChangeListener(event -> tblCorpora.getDataProvider().refreshAll());
+    selectionLayout.addComponent(selectedOnly);
+    selectionLayout.setComponentAlignment(selectedOnly, Alignment.MIDDLE_CENTER);
+
+
     Button btReload = new Button();
     btReload.addClickListener(event -> {
+      selectedOnly.setValue(false);
       updateCorpusSetList(false);
       Notification.show("Reloaded corpus list", Notification.Type.HUMANIZED_MESSAGE);
     });
@@ -198,34 +284,17 @@ public class CorpusListPanel extends VerticalLayout {
       // Always show selected corpora
       if (tblCorpora.getSelectedItems().contains(corpus)) {
         return true;
+      } else if (Boolean.TRUE.equals(selectedOnly.getValue())) {
+        return false;
       }
 
       // Check if the corpus is included in the corpus set or filtered by the name
-      String selectedCorpusSetName = cbSelection.getValue();
-
       String corpusNameFilter =
           txtFilter.getValue() == null ? "" : txtFilter.getValue().trim().toLowerCase();
 
-      if (!corpusNameFilter.isEmpty() && !corpus.toLowerCase().contains(corpusNameFilter)) {
-        return false;
-      } else if (selectedCorpusSetName != null && !ALL_CORPORA.equals(selectedCorpusSetName)) {
-        CorpusSet selectedCS = null;
-
-        List<CorpusSet> corpusSets = new LinkedList<>();
-        if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
-          corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
-        }
-
-        for (CorpusSet cs : corpusSets) {
-          if (cs.getName().equals(selectedCorpusSetName)) {
-            selectedCS = cs;
-          }
-        }
-
-        return selectedCS == null || selectedCS.getCorpora().contains(corpus);
-
-      }
-      return true;
+      boolean includedByNameFilter =
+          corpusNameFilter.isEmpty() || corpus.name.toLowerCase().contains(corpusNameFilter);
+      return includedByNameFilter && includedInCorpusSet(corpus.name);
     };
 
     tblCorpora.setWidthFull();
@@ -242,7 +311,7 @@ public class CorpusListPanel extends VerticalLayout {
       l.addClickListener(event -> {
         if (ui.getQueryController() != null) {
           l.setEnabled(false);
-          initCorpusBrowser(corpus, l);
+          initCorpusBrowser(corpus.name, l);
         }
       });
       l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY,
@@ -254,40 +323,81 @@ public class CorpusListPanel extends VerticalLayout {
     infoColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
     infoColumn.setResizable(false);
 
-    Column<String, Button> docBrowserColumn = tblCorpora.addComponentColumn(corpus -> {
-      final Button l = new Button();
-      l.setIcon(DOC_ICON);
-      l.setDescription("opens the document browser for " + corpus);
-      l.addClickListener(event -> {
-        ui.getSearchView().getDocBrowserController().openDocBrowser(corpus);
-      });
-      l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY,
-          ValoTheme.BUTTON_SMALL);
-      return l;
-    });
+    Column<CorpusWithSize, Button> docBrowserColumn =
+        tblCorpora.addComponentColumn(corpusWithSize -> {
+          final Button l = new Button();
+          l.setIcon(DOC_ICON);
+          l.setDescription("opens the document browser for " + corpusWithSize.name);
+          l.addClickListener(event -> {
+            ui.getSearchView().getDocBrowserController().openDocBrowser(corpusWithSize.name);
+          });
+          l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY,
+              ValoTheme.BUTTON_SMALL);
+          return l;
+        });
     docBrowserColumn.setExpandRatio(0);
     docBrowserColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
     docBrowserColumn.setResizable(false);
 
-    nameColumn = tblCorpora.addColumn(corpus -> corpus);
+    nameColumn = tblCorpora.addColumn(
+        corpus -> "<span title=\"" + htmlEscaper.escape(corpus.name) + "\">" + corpus.name + "</a>",
+        new HtmlRenderer());
     nameColumn.setCaption("Corpus");
     nameColumn.setId("corpus");
-    nameColumn.setExpandRatio(10);
     nameColumn.setStyleGenerator(item -> COMPACT_COLUMN_CLASS);
-    nameColumn.setResizable(false);
-    
-    selectedColumn =
-        tblCorpora.addColumn(corpus -> ui.getQueryState().getSelectedCorpora().contains(corpus));
-    selectedColumn.setHidden(true);
+    nameColumn.setResizable(true);
+    nameColumn.setWidth(180.0);
 
-    tblCorpora.setSortOrder(
-        new GridSortOrderBuilder<String>().thenDesc(selectedColumn).thenAsc(nameColumn).build());
+
+    sizeColumn = tblCorpora.addColumn(corpus -> {
+      if (corpus.size.isPresent()) {
+        String desc = corpus.sizeDescription.orElse("unknown unit");
+        return "<span title=\"" + corpus.size.get() + " (" + htmlEscaper.escape(desc) + ")\">"
+            + corpus.size.get() + "</span>";
+      } else {
+        return "";
+      }
+    }, new HtmlRenderer());
+    sizeColumn.setCaption("Size");
+    sizeColumn.setWidth(75.0);
+    sizeColumn.setResizable(true);
+    sizeColumn.setComparator(
+        (c1, c2) -> ComparisonChain.start().compare(c1.size.orElse(0), c2.size.orElse(0))
+            .compare(c1.sizeDescription.orElse(""), c2.sizeDescription.orElse("")).result());
+
+
+    tblCorpora.setSortOrder(new GridSortOrderBuilder<CorpusWithSize>().thenAsc(nameColumn).build());
     addComponent(tblCorpora);
 
-    tblCorporaScrollExt.addGridScrolledListener(event -> tblCorpora.recalculateColumnWidths());
-
     setExpandRatio(tblCorpora, 1.0f);
+  }
 
+  private boolean includedInCorpusSet(String corpus) {
+    CorpusSet selectedCS = null;
+
+    List<CorpusSet> corpusSets = new LinkedList<>();
+    if (ui.getInstanceConfig() != null && ui.getInstanceConfig().getCorpusSets() != null) {
+      corpusSets.addAll(ui.getInstanceConfig().getCorpusSets());
+    }
+    String selectedCorpusSetName = cbSelection.getValue();
+
+
+    for (CorpusSet cs : corpusSets) {
+      if (cs.getName().equals(selectedCorpusSetName)) {
+        selectedCS = cs;
+      }
+    }
+
+    return selectedCS == null || selectedCS.getCorpora().contains(corpus);
+  }
+
+  private List<CorpusWithSize> createCorpusList(CorporaApi api) throws ApiException {
+    List<CorpusWithSize> corpora = new LinkedList<>();
+    for (String c : api.listCorpora()) {
+      CorpusConfiguration config = ui.getCorpusConfigWithCache(c);
+      corpora.add(new CorpusWithSize(c, config));
+    }
+    return corpora;
   }
 
   @Override
@@ -299,7 +409,8 @@ public class CorpusListPanel extends VerticalLayout {
     CorporaApi api = new CorporaApi(Helper.getClient(ui));
 
     try {
-      List<String> corpora = api.listCorpora();
+
+      List<CorpusWithSize> corpora = createCorpusList(api);
       availableCorpora = new ListDataProvider<>(corpora);
       availableCorpora.setFilter(filter);
       tblCorpora.setDataProvider(availableCorpora);
@@ -313,7 +424,7 @@ public class CorpusListPanel extends VerticalLayout {
         }
       }
 
-      
+
       if (corpora.isEmpty() && Helper.getUser(ui.getSecurityContext()).isPresent()) {
         Notification.show(
             "No corpora found. Please login "
@@ -327,28 +438,16 @@ public class CorpusListPanel extends VerticalLayout {
     }
 
     Binder<QueryUIState> binder = ui.getQueryController().getBinder();
-    MultiSelect<String> corpusSelection = tblCorpora.asMultiSelect();
-    binder.forField(corpusSelection).bind(QueryUIState::getSelectedCorpora,
-        (state, selectedCorpora) -> ui.getQueryController().setSelectedCorpora(selectedCorpora));
-
+    MultiSelect<CorpusWithSize> corpusSelection = tblCorpora.asMultiSelect();
+    binder.forField(corpusSelection).bind(state -> state.getSelectedCorpora().stream().map(c -> {
+      CorpusConfiguration config = ui.getCorpusConfigWithCache(c);
+      return new CorpusWithSize(c, config);
+    }).collect(Collectors.toSet()), (state, selectedCorpora) -> ui.getQueryController()
+        .setSelectedCorpora(selectedCorpora.stream().map(c -> c.name).collect(Collectors.toSet())));
 
     IDGenerator.assignIDForFields(CorpusListPanel.this, tblCorpora, txtFilter);
-    corpusSelectionChanged();
   }
 
-  public void corpusSelectionChanged() {
-    // trigger a resort
-    tblCorpora.clearSortOrder();
-    tblCorpora.setSortOrder(
-        new GridSortOrderBuilder<String>().thenDesc(selectedColumn).thenAsc(nameColumn).build());
-    if (availableCorpora != null && !availableCorpora.getItems().isEmpty()) {
-      tblCorpora.scrollTo(0);
-    }
-  }
-
-  public Grid<String> getTblCorpora() {
-    return tblCorpora;
-  }
 
   public void initCorpusBrowser(String topLevelCorpusName, final Button l) {
 

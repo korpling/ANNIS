@@ -14,14 +14,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import com.github.mvysny.kaributesting.v8.GridKt;
 import com.github.mvysny.kaributesting.v8.MockVaadin;
 import com.github.mvysny.kaributesting.v8.NotificationsKt;
-import com.vaadin.data.provider.DataProvider;
-import com.vaadin.data.provider.ListDataProvider;
+import com.vaadin.data.provider.Query;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.Page;
 import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
@@ -37,6 +37,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -52,6 +53,7 @@ import org.corpus_tools.annis.gui.components.codemirror.AqlCodeEditor;
 import org.corpus_tools.annis.gui.components.medialement.MediaElementPlayer;
 import org.corpus_tools.annis.gui.controlpanel.ControlPanel;
 import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel;
+import org.corpus_tools.annis.gui.controlpanel.CorpusListPanel.CorpusWithSize;
 import org.corpus_tools.annis.gui.controlpanel.SearchOptionsPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserPanel;
 import org.corpus_tools.annis.gui.docbrowser.DocBrowserTable;
@@ -104,58 +106,39 @@ class AnnisUITest {
     MockVaadin.tearDown();
   }
 
-  @Test
-  void testTitleFromInstanceConfig() {
-    assertEquals("ANNIS", ui.getInstanceConfig().getInstanceDisplayName());
-  }
-
-  @Test
-  void testChangeCorpusSet() {
-    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
-
-    @SuppressWarnings("unchecked")
-    Grid<String> corpusList = _get(corpusListPanel, Grid.class);
-
-    @SuppressWarnings("unchecked")
-    ComboBox<String> corpusSetChooser = _get(corpusListPanel, ComboBox.class);
-    assertEquals(null, corpusSetChooser.getValue());
-
-
-    assertTrue(GridKt._size(corpusList) > 1);
-
-    _setValue(corpusSetChooser, "test");
-
-    assertEquals(1, GridKt._size(corpusList));
-    assertEquals("pcc2", GridKt._get(corpusList, 0));
-  }
-
-
   private void selectCorpus(String corpusName) throws Exception {
+    selectCorpus(corpusName, true);
+  }
 
+  private void selectCorpus(String corpusName, boolean unselectOld) throws Exception {
 
     // Filter for the corpus name in case the corpus list has too many entries and does not show
-    // the pcc2 corpus yet
+    // the selected corpus yet
     _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), corpusName);
 
     @SuppressWarnings("unchecked")
-    Grid<String> grid = _get(Grid.class,
+    Grid<CorpusWithSize> grid = _get(Grid.class,
         spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
-    grid.getSelectionModel().deselectAll();
+    if (unselectOld) {
+      grid.getSelectionModel().deselectAll();
+      awaitCondition(30, () -> ui.getQueryState().getSelectedCorpora().isEmpty(),
+          () -> "Corpus list was not empty");
+    }
 
     // Wait until the (refreshed) corpus list is shown
-    awaitCondition(30, () -> {
-      DataProvider<String, ?> provider = grid.getDataProvider();
-      if (provider instanceof ListDataProvider<?>) {
-        ListDataProvider<?> listDataProvider = (ListDataProvider<?>) provider;
-        return listDataProvider.getItems().contains(corpusName)
-            && ui.getQueryState().getSelectedCorpora().isEmpty();
-      } else {
-        return false;
-      }
-    }, () -> "Corpus list did not appear");
+    awaitCondition(30,
+        () -> grid.getDataProvider().fetch(new Query<>())
+            .anyMatch(c -> corpusName.equals(c.getName())),
+        () -> "Corpus " + corpusName + " did not appear in corpus list");
 
     // Explicitly select the corpus
-    grid.getSelectionModel().select(corpusName);
+    Optional<CorpusWithSize> entry =
+        grid.getDataProvider().fetch(new Query<>()).filter(c -> corpusName.equals(c.getName()))
+            .findFirst();
+    if (entry.isPresent()) {
+      grid.getSelectionModel().select(entry.get());
+
+    }
 
     awaitCondition(30, () -> ui.getQueryState().getSelectedCorpora().contains(corpusName),
         () -> "Could not select corpus " + corpusName + ", "
@@ -194,6 +177,86 @@ class AnnisUITest {
       return _find(resultView, SingleResultPanel.class).size() == Math.min(matchCount, 10);
     }, 100);
   }
+
+
+  @Test
+  void testTitleFromInstanceConfig() {
+    assertEquals("ANNIS", ui.getInstanceConfig().getInstanceDisplayName());
+  }
+
+  @Test
+  void testChangeCorpusSet() {
+    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
+
+    @SuppressWarnings("unchecked")
+    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
+
+    @SuppressWarnings("unchecked")
+    ComboBox<String> corpusSetChooser = _get(corpusListPanel, ComboBox.class);
+    assertEquals(null, corpusSetChooser.getValue());
+
+
+    assertTrue(GridKt._size(corpusList) > 1);
+
+    _setValue(corpusSetChooser, "test");
+
+    assertEquals(1, GridKt._size(corpusList));
+    CorpusWithSize firstEntry = GridKt._get(corpusList, 0);
+    assertEquals("pcc2", firstEntry.getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void showSelectedCorporaOnly() throws Exception {
+    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
+
+    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
+
+    selectCorpus("pcc2", true);
+    selectCorpus("parallel.sample", false);
+    _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), "");
+
+    long oldCorpusItemsSize = GridKt._size(corpusList);
+
+    assertTrue(oldCorpusItemsSize > 2);
+    // Only show the selected ones
+    _setValue(_get(CheckBox.class, spec -> spec.withCaption("Selected only")), true);
+
+    long updatedCorpusItemsSize = GridKt._size(corpusList);
+    assertEquals(2, updatedCorpusItemsSize);
+
+    // Show unselected again
+    _setValue(_get(CheckBox.class, spec -> spec.withCaption("Selected only")), false);
+    updatedCorpusItemsSize = GridKt._size(corpusList);
+    assertEquals(oldCorpusItemsSize, updatedCorpusItemsSize);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void reloadCorpusListKeepsSelected() throws Exception {
+    selectCorpus("pcc2");
+    _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), "");
+
+    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
+
+    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
+
+    long oldCorpusItemsSize = GridKt._size(corpusList);
+    assertTrue(oldCorpusItemsSize > 1);
+
+    _click(_get(Button.class,
+        spec -> spec.withPredicate(b -> "Reload corpus list".equals(b.getDescription()))));
+
+    long updatedCorpusItemsSize = GridKt._size(corpusList);
+    assertEquals(oldCorpusItemsSize, updatedCorpusItemsSize);
+    LinkedList<CorpusWithSize> selectedItems = new LinkedList<>(corpusList.getSelectedItems());
+    assertEquals(1, selectedItems.size());
+    assertEquals("pcc2", selectedItems.get(0).getName());
+    assertEquals(399, selectedItems.get(0).getSize().get());
+    assertEquals("tokens", selectedItems.get(0).getSizeDescription().get());
+
+  }
+
 
   @Test
   void tokenSearchPcc2() throws Exception {
@@ -514,7 +577,7 @@ class AnnisUITest {
     // Activate the share window
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
     _click(_get(resultPanel, Button.class,
-        spec -> spec.withPredicate((b) -> "Share match reference".equals(b.getDescription()))));
+        spec -> spec.withPredicate(b -> "Share match reference".equals(b.getDescription()))));
 
     // Get the window which shows all the different links
     Window shareWindow = _get(Window.class, spec -> spec.withCaption("Match reference link"));
@@ -550,7 +613,7 @@ class AnnisUITest {
 
 
   @Test
-  void aboutWindow() throws InterruptedException {
+  void aboutWindow() {
     UI.getCurrent().getNavigator().navigateTo("");
 
     _click(_get(Button.class, spec -> spec.withCaption("About ANNIS")));

@@ -251,7 +251,6 @@ public class QueryController implements Serializable {
         .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora());
     searchView.getHelpPanel().getExamples()
         .setSelectedCorpusInBackground(getState().getSelectedCorpora());
-    searchView.getControlPanel().getCorpusList().corpusSelectionChanged();
   }
 
   public void executeExport(ExportPanel panel, EventBus eventBus) {

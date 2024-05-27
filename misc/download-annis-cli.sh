@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GRAPHANNIS_VERSION=${1:-3.2.1}
+GRAPHANNIS_VERSION=${1:-3.3.0}
 
 install_graphannis_cli=false
 
