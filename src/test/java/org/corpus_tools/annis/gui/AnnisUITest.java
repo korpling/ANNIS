@@ -21,6 +21,7 @@ import com.vaadin.shared.ui.ContentMode;
 import com.vaadin.spring.internal.UIScopeImpl;
 import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Grid;
@@ -130,29 +131,57 @@ class AnnisUITest {
     assertEquals("pcc2", firstEntry.getName());
   }
 
+  @SuppressWarnings("unchecked")
+  @Test
+  void showSelectedCorporaOnly() throws Exception {
+    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
+
+
+    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
+
+    selectCorpus("pcc2", true);
+    selectCorpus("parallel.sample", false);
+    _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), "");
+
+    long oldCorpusItemsSize = GridKt._size(corpusList);
+
+    assertTrue(oldCorpusItemsSize > 2);
+    // Only show the selected ones
+    _setValue(_get(CheckBox.class, spec -> spec.withCaption("Selected only")), true);
+
+    long updatedCorpusItemsSize = GridKt._size(corpusList);
+    assertEquals(2, updatedCorpusItemsSize);
+
+    // Show unselected again
+    _setValue(_get(CheckBox.class, spec -> spec.withCaption("Selected only")), false);
+    updatedCorpusItemsSize = GridKt._size(corpusList);
+    assertEquals(oldCorpusItemsSize, updatedCorpusItemsSize);
+  }
 
   private void selectCorpus(String corpusName) throws Exception {
+    selectCorpus(corpusName, true);
+  }
 
+  private void selectCorpus(String corpusName, boolean unselectOld) throws Exception {
 
     // Filter for the corpus name in case the corpus list has too many entries and does not show
-    // the pcc2 corpus yet
+    // the selected corpus yet
     _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), corpusName);
 
     @SuppressWarnings("unchecked")
     Grid<CorpusWithSize> grid = _get(Grid.class,
         spec -> spec.withId("SearchView-ControlPanel-TabSheet-CorpusListPanel-tblCorpora"));
-    grid.getSelectionModel().deselectAll();
+    if (unselectOld) {
+      grid.getSelectionModel().deselectAll();
+      awaitCondition(30, () -> ui.getQueryState().getSelectedCorpora().isEmpty(),
+          () -> "Corpus list was not empty");
+    }
 
     // Wait until the (refreshed) corpus list is shown
-    awaitCondition(30, () -> {
-        boolean isInItems =
-            grid.getDataProvider().fetch(new Query<>())
-                .anyMatch(c -> corpusName.equals(c.getName()));
-        
-        return isInItems
-            && ui.getQueryState().getSelectedCorpora().isEmpty();
-
-    }, () -> "Corpus list did not appear");
+    awaitCondition(30,
+        () -> grid.getDataProvider().fetch(new Query<>())
+            .anyMatch(c -> corpusName.equals(c.getName())),
+        () -> "Corpus " + corpusName + " did not appear in corpus list");
 
     // Explicitly select the corpus
     Optional<CorpusWithSize> entry =
