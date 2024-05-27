@@ -76,7 +76,7 @@ public class CorpusListPanel extends VerticalLayout {
   public static class CorpusWithSize {
     String name;
     Optional<Integer> size;
-    Optional<String> size_description;
+    Optional<String> sizeDescription;
 
     CorpusWithSize(String name, CorpusConfiguration config) {
       this.name = name;
@@ -98,18 +98,18 @@ public class CorpusListPanel extends VerticalLayout {
 
           }
         }
-        this.size_description = Optional.ofNullable(desc);
+        this.sizeDescription = Optional.ofNullable(desc);
 
       } else {
         this.size = Optional.empty();
-        this.size_description = Optional.empty();
+        this.sizeDescription = Optional.empty();
       }
     }
 
 
     @Override
     public int hashCode() {
-      return Objects.hash(name, size, size_description);
+      return Objects.hash(name, size, sizeDescription);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class CorpusListPanel extends VerticalLayout {
         return false;
       CorpusWithSize other = (CorpusWithSize) obj;
       return Objects.equals(name, other.name) && Objects.equals(size, other.size)
-          && Objects.equals(size_description, other.size_description);
+          && Objects.equals(sizeDescription, other.sizeDescription);
     }
 
     public String getName() {
@@ -204,7 +204,7 @@ public class CorpusListPanel extends VerticalLayout {
 
   private final Column<CorpusWithSize, String> nameColumn;
 
-  private final static Escaper htmlEscaper = HtmlEscapers.htmlEscaper();
+  private static final Escaper htmlEscaper = HtmlEscapers.htmlEscaper();
 
   private Column<CorpusWithSize, String> sizeColumn;
 
@@ -243,9 +243,7 @@ public class CorpusListPanel extends VerticalLayout {
 
 
     CheckBox selectedOnly = new CheckBox("Selected only");
-    selectedOnly.addValueChangeListener(event -> {
-      tblCorpora.getDataProvider().refreshAll();
-    });
+    selectedOnly.addValueChangeListener(event -> tblCorpora.getDataProvider().refreshAll());
     selectionLayout.addComponent(selectedOnly);
     selectionLayout.setComponentAlignment(selectedOnly, Alignment.MIDDLE_CENTER);
 
@@ -279,7 +277,7 @@ public class CorpusListPanel extends VerticalLayout {
       // Always show selected corpora
       if (tblCorpora.getSelectedItems().contains(corpus)) {
         return true;
-      } else if (selectedOnly.getValue()) {
+      } else if (Boolean.TRUE.equals(selectedOnly.getValue())) {
         return false;
       }
 
@@ -319,12 +317,12 @@ public class CorpusListPanel extends VerticalLayout {
     infoColumn.setResizable(false);
 
     Column<CorpusWithSize, Button> docBrowserColumn =
-        tblCorpora.addComponentColumn(corpus_with_size -> {
+        tblCorpora.addComponentColumn(corpusWithSize -> {
           final Button l = new Button();
           l.setIcon(DOC_ICON);
-          l.setDescription("opens the document browser for " + corpus_with_size.name);
+          l.setDescription("opens the document browser for " + corpusWithSize.name);
           l.addClickListener(event -> {
-            ui.getSearchView().getDocBrowserController().openDocBrowser(corpus_with_size.name);
+            ui.getSearchView().getDocBrowserController().openDocBrowser(corpusWithSize.name);
           });
           l.addStyleNames(ValoTheme.BUTTON_BORDERLESS, ValoTheme.BUTTON_ICON_ONLY,
               ValoTheme.BUTTON_SMALL);
@@ -344,9 +342,9 @@ public class CorpusListPanel extends VerticalLayout {
     nameColumn.setWidth(180.0);
 
 
-    sizeColumn = tblCorpora.addColumn((corpus) -> {
+    sizeColumn = tblCorpora.addColumn(corpus -> {
       if (corpus.size.isPresent()) {
-        String desc = corpus.size_description.orElse("unknown unit");
+        String desc = corpus.sizeDescription.orElse("unknown unit");
         return "<span title=\"" + corpus.size.get() + " (" + htmlEscaper.escape(desc) + ")\">"
             + corpus.size.get() + "</span>";
       } else {
@@ -358,7 +356,7 @@ public class CorpusListPanel extends VerticalLayout {
     sizeColumn.setResizable(true);
     sizeColumn.setComparator(
         (c1, c2) -> ComparisonChain.start().compare(c1.size.orElse(0), c2.size.orElse(0))
-            .compare(c1.size_description.orElse(""), c2.size_description.orElse("")).result());
+            .compare(c1.sizeDescription.orElse(""), c2.sizeDescription.orElse("")).result());
 
 
     tblCorpora.setSortOrder(new GridSortOrderBuilder<CorpusWithSize>().thenAsc(nameColumn).build());
@@ -398,9 +396,6 @@ public class CorpusListPanel extends VerticalLayout {
   @Override
   public void attach() {
     super.attach();
-
-    // tblCorporaScrollExt.addGridScrolledListener(event -> tblCorpora.recalculateColumnWidths());
-
 
     // Get the initial corpus list, this must become before the binder is set,
     // to make sure any selected value is also an item.

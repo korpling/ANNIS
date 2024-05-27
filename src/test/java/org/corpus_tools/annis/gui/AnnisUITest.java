@@ -520,7 +520,7 @@ class AnnisUITest {
     // Activate the share window
     SingleResultPanel resultPanel = _find(SingleResultPanel.class).get(0);
     _click(_get(resultPanel, Button.class,
-        spec -> spec.withPredicate((b) -> "Share match reference".equals(b.getDescription()))));
+        spec -> spec.withPredicate(b -> "Share match reference".equals(b.getDescription()))));
 
     // Get the window which shows all the different links
     Window shareWindow = _get(Window.class, spec -> spec.withCaption("Match reference link"));
@@ -556,7 +556,7 @@ class AnnisUITest {
 
 
   @Test
-  void aboutWindow() throws InterruptedException {
+  void aboutWindow() {
     UI.getCurrent().getNavigator().navigateTo("");
 
     _click(_get(Button.class, spec -> spec.withCaption("About ANNIS")));
