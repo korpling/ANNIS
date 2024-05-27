@@ -37,6 +37,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -103,59 +104,6 @@ class AnnisUITest {
   @AfterEach
   public void tearDown() {
     MockVaadin.tearDown();
-  }
-
-  @Test
-  void testTitleFromInstanceConfig() {
-    assertEquals("ANNIS", ui.getInstanceConfig().getInstanceDisplayName());
-  }
-
-  @Test
-  void testChangeCorpusSet() {
-    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
-
-    @SuppressWarnings("unchecked")
-    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
-
-    @SuppressWarnings("unchecked")
-    ComboBox<String> corpusSetChooser = _get(corpusListPanel, ComboBox.class);
-    assertEquals(null, corpusSetChooser.getValue());
-
-
-    assertTrue(GridKt._size(corpusList) > 1);
-
-    _setValue(corpusSetChooser, "test");
-
-    assertEquals(1, GridKt._size(corpusList));
-    CorpusWithSize firstEntry = GridKt._get(corpusList, 0);
-    assertEquals("pcc2", firstEntry.getName());
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  void showSelectedCorporaOnly() throws Exception {
-    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
-
-
-    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
-
-    selectCorpus("pcc2", true);
-    selectCorpus("parallel.sample", false);
-    _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), "");
-
-    long oldCorpusItemsSize = GridKt._size(corpusList);
-
-    assertTrue(oldCorpusItemsSize > 2);
-    // Only show the selected ones
-    _setValue(_get(CheckBox.class, spec -> spec.withCaption("Selected only")), true);
-
-    long updatedCorpusItemsSize = GridKt._size(corpusList);
-    assertEquals(2, updatedCorpusItemsSize);
-
-    // Show unselected again
-    _setValue(_get(CheckBox.class, spec -> spec.withCaption("Selected only")), false);
-    updatedCorpusItemsSize = GridKt._size(corpusList);
-    assertEquals(oldCorpusItemsSize, updatedCorpusItemsSize);
   }
 
   private void selectCorpus(String corpusName) throws Exception {
@@ -229,6 +177,86 @@ class AnnisUITest {
       return _find(resultView, SingleResultPanel.class).size() == Math.min(matchCount, 10);
     }, 100);
   }
+
+
+  @Test
+  void testTitleFromInstanceConfig() {
+    assertEquals("ANNIS", ui.getInstanceConfig().getInstanceDisplayName());
+  }
+
+  @Test
+  void testChangeCorpusSet() {
+    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
+
+    @SuppressWarnings("unchecked")
+    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
+
+    @SuppressWarnings("unchecked")
+    ComboBox<String> corpusSetChooser = _get(corpusListPanel, ComboBox.class);
+    assertEquals(null, corpusSetChooser.getValue());
+
+
+    assertTrue(GridKt._size(corpusList) > 1);
+
+    _setValue(corpusSetChooser, "test");
+
+    assertEquals(1, GridKt._size(corpusList));
+    CorpusWithSize firstEntry = GridKt._get(corpusList, 0);
+    assertEquals("pcc2", firstEntry.getName());
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void showSelectedCorporaOnly() throws Exception {
+    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
+
+    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
+
+    selectCorpus("pcc2", true);
+    selectCorpus("parallel.sample", false);
+    _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), "");
+
+    long oldCorpusItemsSize = GridKt._size(corpusList);
+
+    assertTrue(oldCorpusItemsSize > 2);
+    // Only show the selected ones
+    _setValue(_get(CheckBox.class, spec -> spec.withCaption("Selected only")), true);
+
+    long updatedCorpusItemsSize = GridKt._size(corpusList);
+    assertEquals(2, updatedCorpusItemsSize);
+
+    // Show unselected again
+    _setValue(_get(CheckBox.class, spec -> spec.withCaption("Selected only")), false);
+    updatedCorpusItemsSize = GridKt._size(corpusList);
+    assertEquals(oldCorpusItemsSize, updatedCorpusItemsSize);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  void reloadCorpusListKeepsSelected() throws Exception {
+    selectCorpus("pcc2");
+    _setValue(_get(TextField.class, spec -> spec.withPlaceholder("Filter")), "");
+
+    CorpusListPanel corpusListPanel = _get(CorpusListPanel.class);
+
+    Grid<CorpusWithSize> corpusList = _get(corpusListPanel, Grid.class);
+
+    long oldCorpusItemsSize = GridKt._size(corpusList);
+    assertTrue(oldCorpusItemsSize > 1);
+
+    _click(_get(Button.class,
+        spec -> spec.withPredicate(b -> "Reload corpus list".equals(b.getDescription()))));
+
+    long updatedCorpusItemsSize = GridKt._size(corpusList);
+    assertEquals(oldCorpusItemsSize, updatedCorpusItemsSize);
+    LinkedList<CorpusWithSize> selectedItems = new LinkedList<>(corpusList.getSelectedItems());
+    assertEquals(1, selectedItems.size());
+    assertEquals("pcc2", selectedItems.get(0).getName());
+    assertEquals(399, selectedItems.get(0).getSize().get());
+    assertEquals("tokens", selectedItems.get(0).getSizeDescription().get());
+
+  }
+
 
   @Test
   void tokenSearchPcc2() throws Exception {

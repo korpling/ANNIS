@@ -129,6 +129,13 @@ public class CorpusListPanel extends VerticalLayout {
       return name;
     }
 
+    public Optional<Integer> getSize() {
+      return size;
+    }
+
+    public Optional<String> getSizeDescription() {
+      return sizeDescription;
+    }
 
   }
 
