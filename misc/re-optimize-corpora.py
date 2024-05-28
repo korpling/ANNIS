@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument("corpus_list", help="Path to a CSV file containing all the corpora to re-optimize.")
 parser.add_argument("data_dir", help="The graphANNIS data directory where the corpora are stored.")
 parser.add_argument("--disk-based", action="store_true", help="If given, use the disk-mode to store the corpora.")
-parser.add_argument("--annis", default="annis", help="Path to the ANNIS executable.")
+parser.add_argument("--annis", default="annis", metavar="PATH", help="Path to the ANNIS executable.")
 
 args = parser.parse_args()
 
