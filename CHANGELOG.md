@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.12.1] - 2024-05-29
+
 ### Fixed
 
 - Updated issue in release script that was using the wrong graphANNIS version.
@@ -1391,7 +1393,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.12.0...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.12.1...HEAD
+[4.12.1]: https://github.com/korpling/ANNIS/compare/v4.12.0...v4.12.1
 [4.12.0]: https://github.com/korpling/ANNIS/compare/v4.11.3...v4.12.0
 [4.11.3]: https://github.com/korpling/ANNIS/compare/v4.11.2...v4.11.3
 [4.11.2]: https://github.com/korpling/ANNIS/compare/v4.11.1...v4.11.2
