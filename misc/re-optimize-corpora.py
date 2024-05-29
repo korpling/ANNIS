@@ -18,4 +18,7 @@ with open(args.corpus_list, "r", encoding="UTF-8") as f:
     corpora = f.read().splitlines()
 
 for c in corpora:
-    subprocess.run([args.annis, args.data_dir, "-c", "corpus " + c ,  "-c", "re-optimize"])
+    if args.disk_based:
+        subprocess.run([args.annis, args.data_dir, "-c", "set-disk-based true", "-c", "corpus " + c ,  "-c", "re-optimize"])
+    else:
+        subprocess.run([args.annis, args.data_dir, "-c", "corpus " + c ,  "-c", "re-optimize"])
