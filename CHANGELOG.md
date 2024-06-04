@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Upgraded to graphANNIS 3.3.1 which fixes queries where optional nodes are
+  located not at the end but somewhere in between the query.
+
 ## [4.12.1] - 2024-05-29
 
 ### Fixed

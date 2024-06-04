@@ -39,7 +39,7 @@
         <vaadin.version>8.14.3</vaadin.version>
         <vaadin.productionMode>true</vaadin.productionMode>
         <start-class>org.corpus_tools.annis.gui.AnnisUiApplication</start-class>
-        <graphannis.version>3.3.0</graphannis.version>
+        <graphannis.version>3.3.1</graphannis.version>
         <antlr4.version>4.7.2</antlr4.version>
         <spring.profiles.active>server</spring.profiles.active>
         <swagger-core-version>1.5.24</swagger-core-version>
@@ -261,7 +261,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-unknown-linux-gnu.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>65acdfd05d0ba4a85fba402478edb7a8251e479e8eabf65655ee6ef9952f4e7b</sha256>
+                            <sha256>63cd880aee2eda2fe95f5dff74dc3dd7162b042e893c51925bee56c094c89e4c</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -276,7 +276,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-pc-windows-msvc.zip</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/win32-x86-64/</outputDirectory>
-                            <sha256>52000d8145531de97f3a71beb9c91d4b309c4aec80a2ad7f6d737a5229e5e15a</sha256>
+                            <sha256>28884c784073b407e692b55873f60f59d687f5241af1d09b1fcdc1e77af8cd99</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -291,7 +291,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-apple-darwin.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>90446e8525408c8aaafd346b8389bab2a6673dc73a1189eac9fb204d71c88b8d</sha256>
+                            <sha256>ac9d33f70865781c956d977e952ab5051360137811179dddb715fc496556539d</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
