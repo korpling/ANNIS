@@ -5,6 +5,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Grid visualizer now also display spans that do not belong to any node layer
+  when the "layer" is not specified in the resolver configuration. Before this
+  fix, the layer name was not checked, but the node still needed to be part of a
+  layer.
+
 ## [4.12.2] - 2024-06-04
 
 ### Fixed
