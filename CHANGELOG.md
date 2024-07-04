@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when the "layer" is not specified in the resolver configuration. Before this
   fix, the layer name was not checked, but the node still needed to be part of a
   layer.
+- Updated to graphANNIS 3.3.2 which fixes an issue where a backup folder in the
+  database might not be loaded correctly.
 
 ## [4.12.2] - 2024-06-04
 
