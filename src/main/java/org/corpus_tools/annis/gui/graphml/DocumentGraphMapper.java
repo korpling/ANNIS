@@ -71,8 +71,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
         SRelation relation, SNode currNode, long order) {
       if (relation == null) {
         return true;
-      } else if (relation instanceof SOrderRelation
-          && Objects.equal("", relation.getType())) {
+      } else if (relation instanceof SOrderRelation && Objects.equal("", relation.getType())) {
         return true;
       } else {
         return false;
@@ -308,7 +307,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       }
     } else {
       // Sort data sources by their name
-
       for (STextualDS ds : datasources.values()) {
         List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, ds);
         recreateTextForRootNodes(orderedTokenRoots, ds);
@@ -430,11 +428,20 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
   private List<SToken> getOrderedTokenRootsForDatasource(SDocumentGraph graph,
       Map<SToken, SToken> gapEdges, STextualDS ds) {
+
+    String selectedOrderType = null;
+    if (ds.getInRelations() == null || ds.getInRelations().isEmpty()) {
+      selectedOrderType = ds.getName();
+    }
+    if ("".equals(selectedOrderType)) {
+      selectedOrderType = null;
+    }
+
     Map<SToken, SToken> outgoingOrderingEdges = new HashMap<>();
     Map<SToken, SToken> incomingOrderingEdgesWithGaps = new HashMap<>();
 
     for (SOrderRelation rel : graph.getOrderRelations()) {
-      if (("".equals(rel.getType()) || rel.getType() == null) && rel.getSource() instanceof SToken
+      if (Objects.equal(selectedOrderType, rel.getType()) && rel.getSource() instanceof SToken
           && rel.getTarget() instanceof SToken) {
         outgoingOrderingEdges.put((SToken) rel.getSource(), (SToken) rel.getTarget());
         incomingOrderingEdgesWithGaps.put((SToken) rel.getTarget(), (SToken) rel.getSource());
@@ -444,18 +451,18 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     for (Map.Entry<SToken, SToken> rel : gapEdges.entrySet()) {
       incomingOrderingEdgesWithGaps.put(rel.getValue(), rel.getKey());
     }
-    
+
     // Get all root nodes of this data source (token without any incoming ordering edge)
-    List<SToken> datasourceRoots = graph.getTokens().stream()
-        .filter(t -> !incomingOrderingEdgesWithGaps.containsKey(t))
-        .filter(t -> ds == null
-            || isPartOf.get(t.getId()).stream().anyMatch(dsId -> ds.getId().equals(dsId)))
-        .collect(Collectors.toList());
+    List<SToken> datasourceRoots =
+        graph.getTokens().stream().filter(t -> !incomingOrderingEdgesWithGaps.containsKey(t))
+            .filter(t -> ds == null
+                || isPartOf.get(t.getId()).stream().anyMatch(dsId -> ds.getId().equals(dsId)))
+            .collect(Collectors.toList());
 
     List<SToken> result = new ArrayList<>();
     // Create an ordered list of local roots (without the gap ordering edges) by following the
     // outgoing ordering edges
-    for(SToken root : datasourceRoots) {
+    for (SToken root : datasourceRoots) {
       SToken token = root;
 
       while (token != null) {
@@ -484,8 +491,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     // traverse the token chain using the order relations
     for (SNode root : rootsForText) {
       graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-          "ORDERING",
-          new RecreateTextForRootNodeTraverser(token2Range, text));
+          "ORDERING", new RecreateTextForRootNodeTraverser(token2Range, text));
     }
 
     // update the actual text
