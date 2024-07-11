@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   layer.
 - Updated to graphANNIS 3.3.2 which fixes an issue where a backup folder in the
   database might not be loaded correctly.
+- Allow to show text visualiuations for documents where the token are not
+  connected to the textual data source.
 
 ## [4.12.2] - 2024-06-04
 

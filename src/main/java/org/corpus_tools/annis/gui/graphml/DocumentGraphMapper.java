@@ -295,8 +295,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
     // Create the textual DS for the minimal token roots
     if (datasources.isEmpty()) {
-      // Find roots ignoring the data source
-      List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, null);
+      // Find all roots ignoring the data source
+      List<SToken> orderedTokenRoots =
+          getOrderedTokenRootsForDatasource(graph, gapEdges, null, true);
       if (!orderedTokenRoots.isEmpty()) {
         // Create an empty default data source, because there are none yet
         STextualDS ds = SaltFactory.createSTextualDS();
@@ -305,10 +306,17 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
         // Use this default data source to attach the token to
         recreateTextForRootNodes(orderedTokenRoots, ds);
       }
+    } else if (datasources.size() == 1) {
+      // Re-use the existing data source, but at all available token roots to it
+      STextualDS ds = datasources.get(datasources.firstKey());
+      List<SToken> orderedTokenRoots =
+          getOrderedTokenRootsForDatasource(graph, gapEdges, ds, true);
+      recreateTextForRootNodes(orderedTokenRoots, ds);
     } else {
       // Sort data sources by their name
       for (STextualDS ds : datasources.values()) {
-        List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, ds);
+        List<SToken> orderedTokenRoots =
+            getOrderedTokenRootsForDatasource(graph, gapEdges, ds, false);
         recreateTextForRootNodes(orderedTokenRoots, ds);
       }
     }
@@ -427,24 +435,40 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   }
 
   private List<SToken> getOrderedTokenRootsForDatasource(SDocumentGraph graph,
-      Map<SToken, SToken> gapEdges, STextualDS ds) {
+      Map<SToken, SToken> gapEdges, STextualDS ds, boolean includeAllToken) {
 
-    String selectedOrderType = null;
-    if (ds.getInRelations() == null || ds.getInRelations().isEmpty()) {
+    // Allow to select additional order relations if the data source as no connected token.
+    // In this case, reconstruct which token belong to the
+    // textual data source by selecting order relations having the same type as the name of the data
+    // source.
+    String selectedOrderType = "";
+    if (ds != null && ds.getName() != null
+        && (ds.getInRelations() == null || ds.getInRelations().isEmpty())) {
       selectedOrderType = ds.getName();
-    }
-    if ("".equals(selectedOrderType)) {
-      selectedOrderType = null;
     }
 
     Map<SToken, SToken> outgoingOrderingEdges = new HashMap<>();
     Map<SToken, SToken> incomingOrderingEdgesWithGaps = new HashMap<>();
+    Set<SToken> partOfSelectedOrderingComponent = new HashSet<>();
 
     for (SOrderRelation rel : graph.getOrderRelations()) {
-      if (Objects.equal(selectedOrderType, rel.getType()) && rel.getSource() instanceof SToken
+      // Treat null type and empty name the same
+      String relationType = rel.getType() == null ? "" : rel.getType();
+      // Select relations that either belong to the minimal token layer (empty type) or that are
+      // additionally selected by the data source name.
+      if ((relationType.isEmpty() || relationType.equals(selectedOrderType))
+          && rel.getSource() instanceof SToken
           && rel.getTarget() instanceof SToken) {
-        outgoingOrderingEdges.put((SToken) rel.getSource(), (SToken) rel.getTarget());
-        incomingOrderingEdgesWithGaps.put((SToken) rel.getTarget(), (SToken) rel.getSource());
+        SToken source = (SToken) rel.getSource();
+        SToken target = (SToken) rel.getTarget();
+        
+        outgoingOrderingEdges.put(source, target);
+        incomingOrderingEdgesWithGaps.put(target, source);
+        
+        if(relationType.equals(selectedOrderType)) {
+          partOfSelectedOrderingComponent.add(source);
+          partOfSelectedOrderingComponent.add(target);
+        }
       }
     }
 
@@ -455,7 +479,12 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     // Get all root nodes of this data source (token without any incoming ordering edge)
     List<SToken> datasourceRoots =
         graph.getTokens().stream().filter(t -> !incomingOrderingEdgesWithGaps.containsKey(t))
-            .filter(t -> ds == null
+            .filter(t -> (includeAllToken || ds == null)
+                // Add all token that are part of the ordering component that matches the name of
+                // the selected data source.
+                || partOfSelectedOrderingComponent.contains(t)
+                // Add all token that have an explicit PartOf Relation to this data source (which is
+                // discouraged but can occur in legacy corpora).
                 || isPartOf.get(t.getId()).stream().anyMatch(dsId -> ds.getId().equals(dsId)))
             .collect(Collectors.toList());
 
