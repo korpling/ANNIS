@@ -576,6 +576,10 @@ public class Helper {
     final Multimap<String, SNode> orderRootsByType =
         graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
     final Set<SNode> orderRoots = new HashSet<>(orderRootsByType.get(""));
+    if (orderRoots.isEmpty()) {
+      // If there are no SOrderRelations at all, we have to assume every token is a root node
+      orderRoots.addAll(graph.getTokens());
+    }
     List<SToken> sortedTokens;
 
     if (textualDS == null) {
