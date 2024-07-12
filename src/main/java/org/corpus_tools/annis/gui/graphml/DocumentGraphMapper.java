@@ -397,7 +397,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
 
       STextualDS ds = graph.createTextualDS(text.toString());
-      // TODO: can we get the name in case of multiple data sources from the root token?
       if (datasourcesInGraphMl.size() == 1) {
         STextualDS origDs = datasourcesInGraphMl.get(datasourcesInGraphMl.firstKey());
         ds.setName(origDs.getName());
@@ -427,7 +426,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     if (featTok != null) {
       int idxStart = text.length();
       text.append(featTok.getValue_STEXT());
-      token2Range.put((SToken) token, Range.closed(idxStart, text.length()));
+      token2Range.put(token, Range.closed(idxStart, text.length()));
     }
 
     SFeature featTokWhitespaceAfter = token.getFeature("annis::tok-whitespace-after");
@@ -448,7 +447,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               String traversalId, @SuppressWarnings("rawtypes") SRelation relation, SNode currNode,
               long order) {
             if (relation == null) {
-              // TODO: check if this is ever true
               return true;
             } else if (relation instanceof SOrderRelation
                 && Objects.equal(name, relation.getType())) {
