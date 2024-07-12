@@ -238,7 +238,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
     // Always create own own data sources from the tokens. Get all real token roots (ignore gaps)
     // and create a data source for each of them.
-    recreateTextForTokenRoots(graph, gapEdges);
+    recreateTextForTokenRoots(graph, gapEdges, datasourcesInGraphMl);
 
     // Create the text annotation for the segmentation nodes
     Multimap<String, SNode> orderRoots = graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
@@ -352,7 +352,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
   }
 
-  private void recreateTextForTokenRoots(SDocumentGraph graph, Map<SToken, SToken> gapEdges) {
+  private void recreateTextForTokenRoots(SDocumentGraph graph, Map<SToken, SToken> gapEdges,
+      SortedMap<String, STextualDS> datasourcesInGraphMl) {
 
     Map<SToken, SToken> nextToken = new HashMap<>();
     Map<SToken, SToken> incomingOrderingEdgesWithGaphs = new HashMap<>();
@@ -396,6 +397,12 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
 
       STextualDS ds = graph.createTextualDS(text.toString());
+      // TODO: can we get the name in case of multiple data sources from the root token?
+      if (datasourcesInGraphMl.size() == 1) {
+        STextualDS origDs = datasourcesInGraphMl.get(datasourcesInGraphMl.firstKey());
+        ds.setName(origDs.getName());
+      }
+
       // add all relations
       token2Range.forEach((t, r) -> {
         STextualRelation rel = SaltFactory.createSTextualRelation();
