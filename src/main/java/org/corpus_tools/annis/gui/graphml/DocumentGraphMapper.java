@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -71,7 +70,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
         SRelation relation, SNode currNode, long order) {
       if (relation == null) {
         return true;
-      } else if (relation instanceof SOrderRelation && Objects.equal("", relation.getType())) {
+      } else if (relation instanceof SOrderRelation && (Objects.equal("", relation.getType())
+          || Objects.equal("datasource-gap", relation.getType()))) {
         return true;
       } else {
         return false;
@@ -175,7 +175,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     Optional<String> currentTargetId = Optional.empty();
     Optional<String> currentComponent = Optional.empty();
 
-    SortedMap<String, STextualDS> datasources = new TreeMap<>();
+    SortedMap<String, STextualDS> datasourcesInGraphMl = new TreeMap<>();
     Map<SToken, SToken> gapEdges = new HashMap<>();
 
     Map<String, String> data = new HashMap<>();
@@ -255,8 +255,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                   setNodeName(ds, currentNodeId.get());
                   mapLabels(ds, data, true);
                   ds.setText("");
-                  graph.addNode(ds);
-                  datasources.put(Helper.addSaltPrefix(currentNodeId.get()), ds);
+                  datasourcesInGraphMl.put(Helper.addSaltPrefix(currentNodeId.get()), ds);
                 }
               }
               currentNodeId = Optional.empty();
@@ -292,35 +291,16 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       }
     }
 
-
-    // Create the textual DS for the minimal token roots
-    if (datasources.isEmpty()) {
-      // Find all roots ignoring the data source
-      List<SToken> orderedTokenRoots =
-          getOrderedTokenRootsForDatasource(graph, gapEdges, null, true);
-      if (!orderedTokenRoots.isEmpty()) {
-        // Create an empty default data source, because there are none yet
-        STextualDS ds = SaltFactory.createSTextualDS();
-        ds.setText("");
-        graph.addNode(ds);
-        // Use this default data source to attach the token to
-        recreateTextForRootNodes(orderedTokenRoots, ds);
-      }
-    } else if (datasources.size() == 1) {
-      // Re-use the existing data source, but at all available token roots to it
-      STextualDS ds = datasources.get(datasources.firstKey());
-      List<SToken> orderedTokenRoots =
-          getOrderedTokenRootsForDatasource(graph, gapEdges, ds, true);
-      recreateTextForRootNodes(orderedTokenRoots, ds);
-    } else {
-      // Sort data sources by their name
-      for (STextualDS ds : datasources.values()) {
-        List<SToken> orderedTokenRoots =
-            getOrderedTokenRootsForDatasource(graph, gapEdges, ds, false);
-        recreateTextForRootNodes(orderedTokenRoots, ds);
-      }
+    // Always create own own data sources from the tokens. Get all real token roots (ignore gaps)
+    // and create a data source for each of them.
+    for (SToken tokenRoot : getTokenRoots(graph, gapEdges)) {
+      // Create an empty default data source, because there are none yet
+      STextualDS ds = SaltFactory.createSTextualDS();
+      ds.setText("");
+      graph.addNode(ds);
+      // Use this default data source to attach the token to
+      recreateTextForRootNode(tokenRoot, ds);
     }
-
 
     // Create the text annotation for the segmentation nodes
     Multimap<String, SNode> orderRoots = graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
@@ -434,94 +414,45 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
   }
 
-  private List<SToken> getOrderedTokenRootsForDatasource(SDocumentGraph graph,
-      Map<SToken, SToken> gapEdges, STextualDS ds, boolean includeAllToken) {
+  private List<SToken> getTokenRoots(SDocumentGraph graph,
+      Map<SToken, SToken> gapEdges) {
 
-    // Allow to select additional order relations if the data source as no connected token.
-    // In this case, reconstruct which token belong to the
-    // textual data source by selecting order relations having the same type as the name of the data
-    // source.
-    String selectedOrderType = "";
-    if (ds != null && ds.getName() != null
-        && (ds.getInRelations() == null || ds.getInRelations().isEmpty())) {
-      selectedOrderType = ds.getName();
-    }
 
-    Map<SToken, SToken> outgoingOrderingEdges = new HashMap<>();
-    Map<SToken, SToken> incomingOrderingEdgesWithGaps = new HashMap<>();
-    Set<SToken> partOfSelectedOrderingComponent = new HashSet<>();
+    Map<SToken, SToken> incomingOrderingEdgesWithGaphs = new HashMap<>();
 
     for (SOrderRelation rel : graph.getOrderRelations()) {
-      // Treat null type and empty name the same
-      String relationType = rel.getType() == null ? "" : rel.getType();
-      // Select relations that either belong to the minimal token layer (empty type) or that are
-      // additionally selected by the data source name.
-      if ((relationType.isEmpty() || relationType.equals(selectedOrderType))
-          && rel.getSource() instanceof SToken
+      if ((rel.getType() == null || "".equals(rel.getType())) && rel.getSource() instanceof SToken
           && rel.getTarget() instanceof SToken) {
         SToken source = (SToken) rel.getSource();
         SToken target = (SToken) rel.getTarget();
         
-        outgoingOrderingEdges.put(source, target);
-        incomingOrderingEdgesWithGaps.put(target, source);
-        
-        if(relationType.equals(selectedOrderType)) {
-          partOfSelectedOrderingComponent.add(source);
-          partOfSelectedOrderingComponent.add(target);
-        }
+        incomingOrderingEdgesWithGaphs.put(target, source);
       }
     }
 
     for (Map.Entry<SToken, SToken> rel : gapEdges.entrySet()) {
-      incomingOrderingEdgesWithGaps.put(rel.getValue(), rel.getKey());
+      incomingOrderingEdgesWithGaphs.put(rel.getValue(), rel.getKey());
     }
 
-    // Get all root nodes of this data source (token without any incoming ordering edge)
-    List<SToken> datasourceRoots =
-        graph.getTokens().stream().filter(t -> !incomingOrderingEdgesWithGaps.containsKey(t))
-            .filter(t -> (includeAllToken || ds == null)
-                // Add all token that are part of the ordering component that matches the name of
-                // the selected data source.
-                || partOfSelectedOrderingComponent.contains(t)
-                // Add all token that have an explicit PartOf Relation to this data source (which is
-                // discouraged but can occur in legacy corpora).
-                || isPartOf.get(t.getId()).stream().anyMatch(dsId -> ds.getId().equals(dsId)))
+    // Get all root nodes (tokens without any incoming ordering edge, including gap edges)
+    List<SToken> roots =
+        graph.getTokens().stream().filter(t -> !incomingOrderingEdgesWithGaphs.containsKey(t))
             .collect(Collectors.toList());
-
-    List<SToken> result = new ArrayList<>();
-    // Create an ordered list of local roots (without the gap ordering edges) by following the
-    // outgoing ordering edges
-    for (SToken root : datasourceRoots) {
-      SToken token = root;
-
-      while (token != null) {
-        result.add(token);
-
-        // Skip to to end of this token chain
-        while (outgoingOrderingEdges.containsKey(token)) {
-          token = outgoingOrderingEdges.get(token);
-        }
-        // Step over the possible gap
-        token = gapEdges.get(token);
-      }
-    }
-
-    return result;
+    return roots;
 
   }
 
 
-  private void recreateTextForRootNodes(Collection<? extends SNode> rootsForText, STextualDS ds) {
+  private void recreateTextForRootNode(SToken rootForText, STextualDS ds) {
 
     final StringBuilder text = new StringBuilder();
 
     Map<SToken, Range<Integer>> token2Range = new HashMap<>();
 
     // traverse the token chain using the order relations
-    for (SNode root : rootsForText) {
-      graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-          "ORDERING", new RecreateTextForRootNodeTraverser(token2Range, text));
-    }
+    graph.traverse(Arrays.asList(rootForText), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+        "ORDERING",
+        new RecreateTextForRootNodeTraverser(token2Range, text));
 
     // update the actual text
     ds.setText(text.toString());
