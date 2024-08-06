@@ -82,6 +82,7 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
 
     }
 
+    resolverRequests.add(new SingleResolverRequest(corpusName, null, ElementEnum.NODE));
     for (String ns : nodeLayers) {
       resolverRequests.add(new SingleResolverRequest(corpusName, ns, ElementEnum.NODE));
     }
@@ -99,14 +100,14 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
 
       if (corpusConfig != null && corpusConfig.getVisualizers() != null) {
         for (VisualizerRule visRule : corpusConfig.getVisualizers()) {
-          for (SingleResolverRequest r : resolverRequests) {
+          for (SingleResolverRequest request : resolverRequests) {
             if (visRule.getMappings() == null) {
               visRule.setMappings(new LinkedHashMap<>());
             }
-            if (visRule.getElement() != null && !visRule.getElement().equals(r.getType())) {
+            if (visRule.getElement() != null && !visRule.getElement().equals(request.getType())) {
               continue;
             }
-            if (visRule.getLayer() != null && !visRule.getLayer().equals(r.getNamespace())) {
+            if (visRule.getLayer() != null && !visRule.getLayer().equals(request.getNamespace())) {
               continue;
             }
             matchingRules.add(visRule);
