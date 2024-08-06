@@ -104,13 +104,14 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable {
             if (visRule.getMappings() == null) {
               visRule.setMappings(new LinkedHashMap<>());
             }
-            if (visRule.getElement() != null && !visRule.getElement().equals(request.getType())) {
-              continue;
+            boolean elementTypeMatches =
+                visRule.getElement() == null || visRule.getElement().equals(request.getType());
+            boolean layerMatches =
+                visRule.getLayer() == null || visRule.getLayer().equals(request.getNamespace());
+
+            if (elementTypeMatches && layerMatches) {
+              matchingRules.add(visRule);
             }
-            if (visRule.getLayer() != null && !visRule.getLayer().equals(request.getNamespace())) {
-              continue;
-            }
-            matchingRules.add(visRule);
           }
           cacheResolver.put(resolverRequests, matchingRules);
         }
