@@ -16,7 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   queries created a "File too large" error.
 - Allow to show text visualizations for documents where the token are not
   connected to the textual data source.
-- Resolver entries with the "element" type "node" but no layer are now always shown.  
+- Resolver entries with the "element" type "node" but no layer are now always 
+  shown.
+- Make the audio and video visualizer a little bit more robust when they are not 
+  pre-loaded.
 
 ## [4.12.2] - 2024-06-04
 
