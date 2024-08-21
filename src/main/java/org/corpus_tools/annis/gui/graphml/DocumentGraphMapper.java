@@ -58,6 +58,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private final Set<String> hasOutgoingCoverageEdge;
   private final Set<String> hasOutgoingDominanceEdge;
   private final Set<Pair<String, String>> hasNonEmptyDominanceEdge;
+
   private final Multimap<String, String> isPartOf;
 
 
@@ -66,6 +67,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     this.hasOutgoingCoverageEdge = new HashSet<>();
     this.hasOutgoingDominanceEdge = new HashSet<>();
     this.hasNonEmptyDominanceEdge = new HashSet<>();
+
     this.isPartOf = HashMultimap.create();
   }
 
@@ -78,33 +80,123 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
   @Override
   protected void firstPass(XMLEventReader reader) throws XMLStreamException {
+    Map<String, String> keys = new TreeMap<>();
+    int level = 0;
+    boolean inGraph = false;
+    Optional<String> currentNodeId = Optional.empty();
+    Optional<String> currentDataKey = Optional.empty();
+    Optional<String> currentSourceId = Optional.empty();
+    Optional<String> currentTargetId = Optional.empty();
+    Optional<String> currentComponent = Optional.empty();
+
+    Map<String, String> data = new HashMap<>();
+
     while (reader.hasNext()) {
       XMLEvent event = reader.nextEvent();
-      if (event.isStartElement()) {
-        StartElement element = event.asStartElement();
-        if ("edge".equals(element.getName().getLocalPart())) {
-          Attribute source = element.getAttributeByName(new QName("source"));
-          Attribute target = element.getAttributeByName(new QName("target"));
-          Attribute label = element.getAttributeByName(new QName("label"));
-          if (label != null) {
-            Component c = parseComponent(label.getValue());
-            if (source != null) {
-              if (c.getType() == AnnotationComponentType.COVERAGE) {
-                hasOutgoingCoverageEdge.add(source.getValue());
-              } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
-                hasOutgoingDominanceEdge.add(source.getValue());
-              } else if (c.getType() == AnnotationComponentType.PARTOF) {
-                isPartOf.put(Helper.addSaltPrefix(source.getValue()),
-                    Helper.addSaltPrefix(target.getValue()));
+      switch (event.getEventType()) {
+        case XMLEvent.START_ELEMENT:
+          level++;
+          StartElement startElement = event.asStartElement();
+          // create all new nodes
+          switch (startElement.getName().getLocalPart()) {
+            case "graph":
+              if (level == 2) {
+                inGraph = true;
               }
-              if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
-                  && !c.getName().isEmpty()) {
-                hasNonEmptyDominanceEdge.add(Pair.of(source.getValue(), target.getValue()));
+              break;
+            case "key":
+              if (level == 2) {
+                addAnnotationKey(keys, startElement);
               }
+              break;
+            case "node":
+              if (inGraph && level == 3) {
+                Attribute id = startElement.getAttributeByName(new QName("id"));
+                if (id != null) {
+                  currentNodeId = Optional.ofNullable(id.getValue());
+                }
+              }
+              break;
+            case "edge":
+              if (inGraph && level == 3) {
+                // Get the source and target node IDs
+                Attribute source = startElement.getAttributeByName(new QName("source"));
+                Attribute target = startElement.getAttributeByName(new QName("target"));
+                Attribute label = startElement.getAttributeByName(new QName("label"));
+                if (label != null) {
+                  Component c = parseComponent(label.getValue());
+                  if (source != null) {
+                    if (c.getType() == AnnotationComponentType.COVERAGE) {
+                      hasOutgoingCoverageEdge.add(source.getValue());
+                    } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
+                      hasOutgoingDominanceEdge.add(source.getValue());
+                    } else if (c.getType() == AnnotationComponentType.PARTOF) {
+                      isPartOf.put(Helper.addSaltPrefix(source.getValue()),
+                          Helper.addSaltPrefix(target.getValue()));
+                    }
+                    if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
+                        && !c.getName().isEmpty()) {
+                      hasNonEmptyDominanceEdge.add(Pair.of(source.getValue(), target.getValue()));
+                    }
+                  }
+                }
+              }
+              break;
+            case "data":
+              Attribute key = startElement.getAttributeByName(new QName("key"));
+              if (key != null) {
+                currentDataKey = Optional.ofNullable(key.getValue());
+              }
+              break;
+          }
+          break;
+        case XMLEvent.CHARACTERS:
+          if (currentDataKey.isPresent() && inGraph && level == 4) {
+            String annoKey = keys.get(currentDataKey.get());
+            if (annoKey != null) {
+              // Copy all data attributes into our own map
+              data.put(annoKey, event.asCharacters().getData());
             }
           }
-        }
+          break;
+        case XMLEvent.END_ELEMENT:
+          EndElement endElement = event.asEndElement();
+          switch (endElement.getName().getLocalPart()) {
+            case "graph":
+              inGraph = false;
+              break;
+            case "node":
+              String nodeType = data.get("annis::node_type");
+              if (nodeType == "datasource") {
+                // TODO: check if this data source is a timeline
+              }
+
+              currentNodeId = Optional.empty();
+              data.clear();
+              break;
+            case "edge":
+              // add edge
+              currentSourceId = Optional.empty();
+              currentTargetId = Optional.empty();
+              currentComponent = Optional.empty();
+              data.clear();
+              break;
+            case "data":
+              if (currentDataKey.isPresent()) {
+                String annoKey = keys.get(currentDataKey.get());
+                // Add an empty data entry if this element did not have any character child
+                if (annoKey != null && !data.containsKey(annoKey)) {
+                  data.put(annoKey, "");
+                }
+              }
+              currentDataKey = Optional.empty();
+              break;
+          }
+
+          level--;
+          break;
       }
+
     }
   }
 
@@ -385,7 +477,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       // traverse the token chain using the order relations
       SToken currentToken = rootForText;
       while (currentToken != null) {
-        addToken(currentToken, text, token2Range);
+        addTokenToText(currentToken, text, token2Range);
 
         SToken previousToken = currentToken;
         currentToken = nextToken.get(previousToken);
@@ -416,7 +508,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
   }
 
-  private void addToken(SToken token, StringBuilder text, Map<SToken, Range<Integer>> token2Range) {
+  private void addTokenToText(SToken token, StringBuilder text,
+      Map<SToken, Range<Integer>> token2Range) {
     SFeature featTokWhitespaceBefore = token.getFeature("annis::tok-whitespace-before");
     if (featTokWhitespaceBefore != null) {
       text.append(featTokWhitespaceBefore.getValue().toString());
