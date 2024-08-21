@@ -11,15 +11,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   when the "layer" is not specified in the resolver configuration. Before this
   fix, the layer name was not checked, but the node still needed to be part of a
   layer.
-- Updated to graphANNIS 3.3.3 which fixes an issue where a backup folder in the
-  database might not be loaded correctly and an issue where impossible precedence 
-  queries created a "File too large" error.
 - Allow to show text visualizations for documents where the token are not
   connected to the textual data source.
 - Resolver entries with the "element" type "node" but no layer are now always 
   shown.
 - Make the audio and video visualizer a little bit more robust when they are not 
   pre-loaded.
+- Upgraded to graphANNIS 3.4.0 which includes fixes for an issue where a backup 
+  folder in the database might not be loaded correctly and an issue where 
+  impossible precedence queries created a "File too large" error
 
 ## [4.12.2] - 2024-06-04
 
