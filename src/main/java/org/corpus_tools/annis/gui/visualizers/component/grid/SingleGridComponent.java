@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
@@ -50,6 +51,7 @@ import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
 
 /**
  *
@@ -230,8 +232,6 @@ public class SingleGridComponent extends Panel implements GridComponent {
   }
   
   private Row computeTimelineRow(STimeline timeline) {
-
-
     Row timelineRow = new Row();
     for (int i = timeline.getStart(); i < timeline.getEnd(); i++) {
       GridEvent event = new GridEvent(timeline.getId() + "-" + i, i, i, "" + i);
@@ -329,12 +329,62 @@ public class SingleGridComponent extends Panel implements GridComponent {
     STimeline timeline = graph.getTimeline();
     if (timeline != null) {
       Row timelineRow = computeTimelineRow(timeline);
-      // timelineRow.setStyle("invisible_token");
+      timelineRow.setStyle("invisible_token");
 
       tokenRowIsEmpty = false;
       grid.setTokRowKey("");
       rowsByAnnotation.put("", Lists.newArrayList(timelineRow));
-      // TODO: also calculate *all* token as rows and display them aligned by the timeline
+      if (!isHidingToken()) {
+        TreeMap<String, Row> allTokenRows = new TreeMap<>();
+        // also calculate tokens from *all* texts as rows and display them aligned by the timeline
+        for (STextualDS ds : graph.getTextualDSs()) {
+          Row tokenRow = new Row();
+
+          final DataSourceSequence<Number> seq = new DataSourceSequence<>();
+          seq.setDataSource(ds);
+          seq.setStart(0);
+          seq.setEnd(ds.getText() != null ? ds.getText().length() : 0);
+          List<SToken> tokensForDs = graph.getTokensBySequence(seq);
+
+          if (tokensForDs != null) {
+            for (SToken t : tokensForDs) {
+              Range<Integer> tokenRange = TimelineSpanCollector.getRange(graph, t);
+              GridEvent event = new GridEvent(t.getId(), tokenRange.lowerEndpoint(),
+                  tokenRange.upperEndpoint(), graph.getText(t));
+              event.setTextID(ds.getId());
+              for (Range<Integer> coveredRange : TimelineSpanCollector.getAllRanges(graph, t)) {
+                for (int i = coveredRange.lowerEndpoint(); i <= coveredRange.upperEndpoint(); i++) {
+                  event.getCoveredIDs().add(timeline.getId() + "-" + i);
+                }
+              }
+              tokenRow.addEvent(event);
+            }
+          }
+
+          allTokenRows.put(ds.getName(), tokenRow);
+        }
+
+        if (isTokenFirst()) {
+          // copy original list but add token row at the beginning
+          LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
+
+          for (Map.Entry<String, Row> entry : allTokenRows.entrySet()) {
+            newList.put(entry.getKey(), Lists.newArrayList(entry.getValue()));
+          }
+          newList.putAll(rowsByAnnotation);
+          rowsByAnnotation = newList;
+        } else {
+          for (Map.Entry<String, Row> entry : allTokenRows.entrySet()) {
+            rowsByAnnotation.put(entry.getKey(), Lists.newArrayList(entry.getValue()));
+          }
+        }
+
+        for (Row tokenRow : allTokenRows.values()) {
+          EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
+        }
+      }
+
+
     } else {
       // add tokens as row
       Row tokenRow = computeTokenRow(sortedSegmentationNodes, graph, rowsByAnnotation, token2index);
