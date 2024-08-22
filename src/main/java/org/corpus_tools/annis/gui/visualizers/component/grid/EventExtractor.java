@@ -38,6 +38,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.PDFPageHelper;
@@ -50,6 +51,7 @@ import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.SSpanningRelation;
 import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.STimeline;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
@@ -87,9 +89,17 @@ public class EventExtractor {
     }
 
     // calculate the left and right values of a span
-    Range<Integer> overlappedSpan = Helper.getLeftRightSpan(node, graph, token2index);
-    int left = overlappedSpan.lowerEndpoint();
+    STimeline timeline = graph.getTimeline();
+    Range<Integer> overlappedSpan;
+    if (timeline != null) {
+      overlappedSpan = TimelineSpanCollector.getRange(graph, node);
+    } else {
+      // Use the token to get the node span
+      overlappedSpan = Helper.getLeftRightSpan(node, graph, token2index);
+    }
+    int left =  overlappedSpan.lowerEndpoint();
     int right = overlappedSpan.upperEndpoint();
+
 
     for (SAnnotation anno : node.getAnnotations()) {
       ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
@@ -120,35 +130,46 @@ public class EventExtractor {
           }
 
         }
-        if (node instanceof SSpan) {
-          // calculate overlapped SToken
+        
+        if(timeline != null) {
+          for(Range<Integer> range : TimelineSpanCollector.getAllRanges(graph, node)) {
+            for(int i = range.lowerEndpoint(); i <= range.upperEndpoint(); i++) {
+              event.getCoveredIDs().add("" + i);
+              
+            }
+          }
+        } else {
+          if (node instanceof SSpan) {
+            // calculate overlapped SToken
+            List<? extends SRelation<? extends SNode, ? extends SNode>> outEdges =
+                graph.getOutRelations(node.getId());
+            if (outEdges != null) {
+              for (SRelation<? extends SNode, ? extends SNode> e : outEdges) {
+                if (e instanceof SSpanningRelation) {
+                  SSpanningRelation spanRel = (SSpanningRelation) e;
 
-          List<? extends SRelation<? extends SNode, ? extends SNode>> outEdges =
-              graph.getOutRelations(node.getId());
-          if (outEdges != null) {
-            for (SRelation<? extends SNode, ? extends SNode> e : outEdges) {
-              if (e instanceof SSpanningRelation) {
-                SSpanningRelation spanRel = (SSpanningRelation) e;
+                  SToken tok = spanRel.getTarget();
+                  event.getCoveredIDs().add(tok.getId());
 
-                SToken tok = spanRel.getTarget();
-                event.getCoveredIDs().add(tok.getId());
-
-                // get the STextualDS of this token and add it to the event
-                String textID = Helper.getTextualDSForNode(tok, graph).getId();
-                if (textID != null) {
-                  event.setTextID(textID);
+                  // get the STextualDS of this token and add it to the event
+                  String textID = Helper.getTextualDSForNode(tok, graph).getId();
+                  if (textID != null) {
+                    event.setTextID(textID);
+                  }
                 }
               }
+            } // end if span has out edges
+          } else if (node instanceof SToken) {
+            event.getCoveredIDs().add(node.getId());
+            // get the STextualDS of this token and add it to the event
+            String textID = Helper.getTextualDSForNode(node, graph).getId();
+            if (textID != null) {
+              event.setTextID(textID);
             }
-          } // end if span has out edges
-        } else if (node instanceof SToken) {
-          event.getCoveredIDs().add(node.getId());
-          // get the STextualDS of this token and add it to the event
-          String textID = Helper.getTextualDSForNode(node, graph).getId();
-          if (textID != null) {
-            event.setTextID(textID);
-          }
+          } 
         }
+        
+
 
         // try to get time annotations
         if (mediaLayer == null || mediaLayer.contains(anno.getQName())) {
@@ -182,17 +203,6 @@ public class EventExtractor {
         }
       }
     } // end for each annotation of span
-  }
-
-  private static long clip(long value, long min, long max) {
-    if (value > max) {
-      return max;
-    } else if (value < min) {
-      return min;
-    } else {
-      return value;
-    }
-
   }
 
   /**
@@ -466,6 +476,7 @@ public class EventExtractor {
 
     PDFPageHelper pageNumberHelper = new PDFPageHelper(input);
 
+
     if (showSpanAnnos) {
       for (SSpan span : graph.getSpans()) {
         if (text == null || text == Helper.getTextualDSForNode(span, graph)) {
@@ -474,6 +485,7 @@ public class EventExtractor {
         }
       } // end for each span
     }
+
 
     if (showTokenAnnos) {
       for (SToken tok : graph.getTokens()) {
@@ -509,6 +521,7 @@ public class EventExtractor {
         splitRowsOnGaps(r, graph, token2index);
       }
     }
+
 
     return rowsByAnnotation;
   }
@@ -617,58 +630,90 @@ public class EventExtractor {
   private static void splitRowsOnGaps(Row row, final SDocumentGraph graph,
       Map<SToken, Integer> token2index) {
     ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
+    STimeline timeline = graph.getTimeline();
     while (itEvents.hasNext()) {
       GridEvent event = itEvents.next();
 
-      int lastTokenIndex = -1;
-
-      // sort the coveredIDs
-      LinkedList<String> sortedCoveredToken = new LinkedList<>(event.getCoveredIDs());
-      Collections.sort(sortedCoveredToken, (o1, o2) -> {
-        SToken node1 = (SToken) graph.getNode(o1);
-        SToken node2 = (SToken) graph.getNode(o2);
-
-        if (node1 == node2) {
-          return 0;
-        }
-        if (node1 == null) {
-          return -1;
-        }
-        if (node2 == null) {
-          return +1;
-        }
-
-        long tokenIndex1 = token2index.get(node1);
-        long tokenIndex2 = token2index.get(node2);
-
-        return ((Long) (tokenIndex1)).compareTo(tokenIndex2);
-      });
-
-      // first calculate all gaps
       List<GridEvent> gaps = new LinkedList<>();
-      for (String id : sortedCoveredToken) {
-        SToken node = (SToken) graph.getNode(id);
-        int tokenIndex = token2index.get(node);
+      if (timeline != null) {
+        // Calculate the gaps using the covered timeline items
+        List<Integer> coveredTlis = event.getCoveredIDs().stream().map(id -> Integer.parseInt(id))
+            .sorted()
+            .collect(Collectors.toList());
+        int lastTli = -1;
+        for (int tli : coveredTlis) {
 
-        // sanity check
-        if (tokenIndex >= event.getLeft() && tokenIndex <= event.getRight()) {
-          int diff = tokenIndex - lastTokenIndex;
+          // sanity check
+          if (tli >= event.getLeft() && tli <= event.getRight()) {
+            int diff = tli - lastTli;
 
-          if (lastTokenIndex >= 0 && diff > 1) {
-            // we detected a gap
-            GridEvent gap = new GridEvent(event.getId() + "_gap_" + gaps.size(), lastTokenIndex + 1,
-                tokenIndex - 1, "");
-            gap.setGap(true);
-            gaps.add(gap);
+            if (lastTli >= 0 && diff > 1) {
+              // we detected a gap
+              GridEvent gap = new GridEvent(event.getId() + "_gap_" + gaps.size(),
+                  lastTli + 1, tli - 1, "");
+              gap.setGap(true);
+              gaps.add(gap);
+            }
+
+            lastTli = tli;
+          } else {
+            // reset gap search when discovered there were token we use for
+            // highlighting but do not actually cover
+            lastTli = -1;
+          }
+        }
+
+      } else {
+        // Calculate the gaps using the covered token
+        int lastTokenIndex = -1;
+
+        // sort the coveredIDs
+        LinkedList<String> sortedCoveredToken = new LinkedList<>(event.getCoveredIDs());
+        Collections.sort(sortedCoveredToken, (o1, o2) -> {
+          SToken node1 = (SToken) graph.getNode(o1);
+          SToken node2 = (SToken) graph.getNode(o2);
+
+          if (node1 == node2) {
+            return 0;
+          }
+          if (node1 == null) {
+            return -1;
+          }
+          if (node2 == null) {
+            return +1;
           }
 
-          lastTokenIndex = tokenIndex;
-        } else {
-          // reset gap search when discovered there were token we use for
-          // hightlighting but do not actually cover
-          lastTokenIndex = -1;
-        }
-      } // end for each covered token id
+          long tokenIndex1 = token2index.get(node1);
+          long tokenIndex2 = token2index.get(node2);
+
+          return ((Long) (tokenIndex1)).compareTo(tokenIndex2);
+        });
+
+        // Actually calculate the gaps
+        for (String id : sortedCoveredToken) {
+          SToken node = (SToken) graph.getNode(id);
+          int tokenIndex = token2index.get(node);
+
+          // sanity check
+          if (tokenIndex >= event.getLeft() && tokenIndex <= event.getRight()) {
+            int diff = tokenIndex - lastTokenIndex;
+
+            if (lastTokenIndex >= 0 && diff > 1) {
+              // we detected a gap
+              GridEvent gap = new GridEvent(event.getId() + "_gap_" + gaps.size(),
+                  lastTokenIndex + 1, tokenIndex - 1, "");
+              gap.setGap(true);
+              gaps.add(gap);
+            }
+
+            lastTokenIndex = tokenIndex;
+          } else {
+            // reset gap search when discovered there were token we use for
+            // highlighting but do not actually cover
+            lastTokenIndex = -1;
+          }
+        } // end for each covered token id
+      }
 
       ListIterator<GridEvent> itGaps = gaps.listIterator();
       // remember the old right value
@@ -722,6 +767,7 @@ public class EventExtractor {
   private static void splitRowsOnIslands(Row row, final SDocumentGraph graph, STextualDS text,
       Map<SToken, Integer> token2index) {
 
+    STimeline timeline = graph.getTimeline();
     BitSet tokenCoverage = new BitSet();
     // get the sorted token
     List<SToken> sortedTokenList = graph.getSortedTokenByText();
@@ -729,7 +775,13 @@ public class EventExtractor {
     ListIterator<SToken> itToken = sortedTokenList.listIterator();
     while (itToken.hasNext()) {
       SToken t = itToken.next();
-      if (text == null || text == Helper.getTextualDSForNode(t, graph)) {
+      if (timeline != null) {
+        Range<Integer> coveredRange = TimelineSpanCollector.getRange(graph, t);
+        for (int i = coveredRange.lowerEndpoint(); i <= coveredRange.upperEndpoint(); i++) {
+          tokenCoverage.set(i);
+        }
+      }
+      else if (text == null || text == Helper.getTextualDSForNode(t, graph)) {
         int tokenIndex = token2index.get(t);
         tokenCoverage.set(tokenIndex);
       }
