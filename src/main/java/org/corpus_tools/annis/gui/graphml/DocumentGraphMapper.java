@@ -634,6 +634,13 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       if (datasourcesInGraphMl.size() == 1) {
         STextualDS origDs = datasourcesInGraphMl.get(datasourcesInGraphMl.firstKey());
         ds.setName(origDs.getName());
+      } else {
+        Optional<String> orderingType =
+            rootForText.getOutRelations().stream().filter(rel -> rel instanceof SOrderRelation)
+                .map(rel -> (SOrderRelation) rel).map(rel -> rel.getType()).findFirst();
+        if (orderingType.isPresent()) {
+          ds.setName(orderingType.get());
+        }
       }
 
       // add all relations
