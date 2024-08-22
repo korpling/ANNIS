@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
+import com.google.common.collect.TreeMultimap;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -61,6 +63,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
   private final Multimap<String, String> isPartOf;
 
+  private boolean hasTimeline;
+
 
   protected DocumentGraphMapper() {
     this.graph = SaltFactory.createSDocumentGraph();
@@ -69,6 +73,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     this.hasNonEmptyDominanceEdge = new HashSet<>();
 
     this.isPartOf = HashMultimap.create();
+    this.hasTimeline = false;
   }
 
 
@@ -90,6 +95,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     Optional<String> currentComponent = Optional.empty();
 
     Map<String, String> data = new HashMap<>();
+
+    Multimap<String, String> tokenIdByComponentName = TreeMultimap.create();
+    Map<String, String> tokenToValue = new HashMap<>();
 
     while (reader.hasNext()) {
       XMLEvent event = reader.nextEvent();
@@ -123,6 +131,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                 Attribute source = startElement.getAttributeByName(new QName("source"));
                 Attribute target = startElement.getAttributeByName(new QName("target"));
                 Attribute label = startElement.getAttributeByName(new QName("label"));
+                Attribute component = startElement.getAttributeByName(new QName("label"));
                 if (label != null) {
                   Component c = parseComponent(label.getValue());
                   if (source != null) {
@@ -139,6 +148,11 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                       hasNonEmptyDominanceEdge.add(Pair.of(source.getValue(), target.getValue()));
                     }
                   }
+                }
+                if (source != null && target != null && component != null) {
+                  currentSourceId = Optional.ofNullable(source.getValue());
+                  currentTargetId = Optional.ofNullable(target.getValue());
+                  currentComponent = Optional.ofNullable(component.getValue());
                 }
               }
               break;
@@ -166,16 +180,24 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               inGraph = false;
               break;
             case "node":
-              String nodeType = data.get("annis::node_type");
-              if (nodeType == "datasource") {
-                // TODO: check if this data source is a timeline
+              String tokValue = data.get("annis::tok");
+              if (tokValue != null && currentNodeId.isPresent()) {
+                tokenToValue.put(tokValue, currentNodeId.get());
               }
 
               currentNodeId = Optional.empty();
               data.clear();
               break;
             case "edge":
-              // add edge
+              if (currentComponent.isPresent() && currentSourceId.isPresent()
+                  && currentTargetId.isPresent()) {
+                Component component = parseComponent(currentComponent.get());
+                if (component.getType() == AnnotationComponentType.ORDERING) {
+                  tokenIdByComponentName.put(component.getName(), currentSourceId.get());
+                  tokenIdByComponentName.put(component.getName(), currentTargetId.get());
+                }
+              }
+
               currentSourceId = Optional.empty();
               currentTargetId = Optional.empty();
               currentComponent = Optional.empty();
@@ -196,8 +218,28 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
           level--;
           break;
       }
-
     }
+
+    // Check if this GraphML file has a timeline.
+    this.hasTimeline = false;
+    if (tokenIdByComponentName.keySet().size() > 1) {
+      boolean hasNonEmptyBaseToken = false;
+      Pattern whitespacePattern = Pattern.compile("\\s*");
+
+      for (String tokId : tokenIdByComponentName.get("")) {
+        String tokValue = tokenToValue.getOrDefault(tokId, "");
+        // Check if this base token value is non-empty
+        if (!whitespacePattern.matcher(tokValue).matches()) {
+          hasNonEmptyBaseToken = true;
+          break;
+        }
+      }
+
+      if (!hasNonEmptyBaseToken) {
+        this.hasTimeline = true;
+      }
+    }
+
   }
 
   @Override
@@ -372,8 +414,12 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private SNode mapNode(String nodeName, Map<String, String> labels) {
     SNode newNode;
 
-    if ((labels.containsKey(ANNIS_TOK)) && !hasOutgoingCoverageEdge.contains(nodeName)) {
-      newNode = SaltFactory.createSToken();
+    if ((labels.containsKey(ANNIS_TOK))) {
+      if (!this.hasTimeline && hasOutgoingCoverageEdge.contains(nodeName)) {
+        newNode = SaltFactory.createSSpan();
+      } else {
+        newNode = SaltFactory.createSToken();
+      }
     } else if (hasOutgoingDominanceEdge.contains(nodeName)) {
       newNode = SaltFactory.createSStructure();
     } else {
