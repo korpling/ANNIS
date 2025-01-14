@@ -39,7 +39,7 @@
         <vaadin.version>8.14.3</vaadin.version>
         <vaadin.productionMode>true</vaadin.productionMode>
         <start-class>org.corpus_tools.annis.gui.AnnisUiApplication</start-class>
-        <graphannis.version>3.5.1</graphannis.version>
+        <graphannis.version>3.6.0</graphannis.version>
         <antlr4.version>4.7.2</antlr4.version>
         <spring.profiles.active>server</spring.profiles.active>
         <swagger-core-version>1.5.24</swagger-core-version>
@@ -261,7 +261,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-unknown-linux-gnu.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>e3d5d43c9ad687a5ff01d24be4de11c8d8a725b0f5526da6dc4624a85bb3c2ca</sha256>
+                            <sha256>5f5c65d01d7670cb0ea3db16f4b462d4c359d49cee2c7bea7bf2e2559d9c2026</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -276,7 +276,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-pc-windows-msvc.zip</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/win32-x86-64/</outputDirectory>
-                            <sha256>38c5b93baf89f861d95bf3e0dcbd1767e08ea9ce986e37c2e05ceb5785840b73</sha256>
+                            <sha256>7a5ba35d3e31de1ff2edf3875869647ffc9ffbe351d706dd11ac99a2e7458d64</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -291,7 +291,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-apple-darwin.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>c74ed05a6a21c1504eb0febe3f16d25b0fd2d0ecea8b321a528281843f4c7e2a</sha256>
+                            <sha256>f15fce100ed86c13e8e90a6eb0215fdd7e2ccb2956bedc84885f3889ef1d8971</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -602,7 +602,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.14.0</version>
         </dependency>
 
         <dependency>
