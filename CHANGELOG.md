@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Updated to graphANNIS 3.6.0
+
 ## [4.12.3] - 2024-11-18
 
 ### Fixed
