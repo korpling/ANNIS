@@ -7,17 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Updated to graphANNIS 3.6.0
+- Updated Java dependencies to fix security issues
+
+## [4.12.3] - 2024-11-18
+
+### Fixed
+
 - Grid visualizer now also display spans that do not belong to any node layer
   when the "layer" is not specified in the resolver configuration. Before this
   fix, the layer name was not checked, but the node still needed to be part of a
   layer.
+- Updated to graphANNIS 3.5.1 which fixes an issue where a backup folder in the
+  database might not be loaded correctly and an issue where impossible precedence 
+  queries created a "File too large" error.
 - Allow to show text visualizations for documents where the token are not
   connected to the textual data source.
 - Resolver entries with the "element" type "node" but no layer are now always 
   shown.
 - Make the audio and video visualizer a little bit more robust when they are not 
   pre-loaded.
-- Upgraded to graphANNIS 3.4.0 which includes fixes for an issue where a backup 
   folder in the database might not be loaded correctly and an issue where 
   impossible precedence queries created a "File too large" error
 
@@ -1416,7 +1425,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.12.2...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.12.3...HEAD
+[4.12.3]: https://github.com/korpling/ANNIS/compare/v4.12.2...v4.12.3
 [4.12.2]: https://github.com/korpling/ANNIS/compare/v4.12.1...v4.12.2
 [4.12.1]: https://github.com/korpling/ANNIS/compare/v4.12.0...v4.12.1
 [4.12.0]: https://github.com/korpling/ANNIS/compare/v4.11.3...v4.12.0
