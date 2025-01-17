@@ -27,8 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   shown.
 - Make the audio and video visualizer a little bit more robust when they are not 
   pre-loaded.
-  folder in the database might not be loaded correctly and an issue where 
-  impossible precedence queries created a "File too large" error
 
 ## [4.12.2] - 2024-06-04
 
