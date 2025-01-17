@@ -4,18 +4,25 @@ import com.google.common.base.Objects;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
+import com.google.common.collect.TreeMultimap;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.CheckForNull;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
@@ -34,6 +41,8 @@ import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.STextualRelation;
+import org.corpus_tools.salt.common.STimeline;
+import org.corpus_tools.salt.common.STimelineRelation;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.GraphTraverseHandler;
 import org.corpus_tools.salt.core.SAnnotation;
@@ -58,7 +67,11 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   private final Set<String> hasOutgoingCoverageEdge;
   private final Set<String> hasOutgoingDominanceEdge;
   private final Set<Pair<String, String>> hasNonEmptyDominanceEdge;
+  private final Map<SToken, SToken> gapEdges;
   private final Multimap<String, String> isPartOf;
+  private Optional<STimeline> timeline;
+  private final Map<String, Integer> timelineIndex;
+  private final Multimap<SToken, Integer> coveredTlis;
 
 
   protected DocumentGraphMapper() {
@@ -66,7 +79,11 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     this.hasOutgoingCoverageEdge = new HashSet<>();
     this.hasOutgoingDominanceEdge = new HashSet<>();
     this.hasNonEmptyDominanceEdge = new HashSet<>();
+    this.gapEdges = new HashMap<>();
     this.isPartOf = HashMultimap.create();
+    this.timeline = Optional.empty();
+    this.timelineIndex = new HashMap<>();
+    this.coveredTlis = HashMultimap.create();
   }
 
 
@@ -76,36 +93,205 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     return mapper.graph;
   }
 
-  @Override
-  protected void firstPass(XMLEventReader reader) throws XMLStreamException {
-    while (reader.hasNext()) {
-      XMLEvent event = reader.nextEvent();
-      if (event.isStartElement()) {
-        StartElement element = event.asStartElement();
-        if ("edge".equals(element.getName().getLocalPart())) {
-          Attribute source = element.getAttributeByName(new QName("source"));
-          Attribute target = element.getAttributeByName(new QName("target"));
-          Attribute label = element.getAttributeByName(new QName("label"));
-          if (label != null) {
-            Component c = parseComponent(label.getValue());
-            if (source != null) {
-              if (c.getType() == AnnotationComponentType.COVERAGE) {
-                hasOutgoingCoverageEdge.add(source.getValue());
-              } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
-                hasOutgoingDominanceEdge.add(source.getValue());
-              } else if (c.getType() == AnnotationComponentType.PARTOF) {
-                isPartOf.put(Helper.addSaltPrefix(source.getValue()),
-                    Helper.addSaltPrefix(target.getValue()));
-              }
-              if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
-                  && !c.getName().isEmpty()) {
-                hasNonEmptyDominanceEdge.add(Pair.of(source.getValue(), target.getValue()));
-              }
-            }
+  private static boolean isConnected(String a, String b, Multimap<String, String> outgoingEdges) {
+
+    HashSet<String> visited = new HashSet<>();
+    Deque<String> stack = new LinkedList<>();
+    stack.add(a);
+
+    while (!stack.isEmpty()) {
+      String current = stack.removeLast();
+      if (visited.add(current)) {
+        for (String out : outgoingEdges.get(current)) {
+          if (Objects.equal(b, out)) {
+            return true;
           }
+          stack.add(out);
         }
       }
     }
+
+    return false;
+  }
+
+  @Override
+  protected void firstPass(XMLEventReader reader) throws XMLStreamException {
+    Map<String, String> keys = new TreeMap<>();
+    int level = 0;
+    boolean inGraph = false;
+    Optional<String> currentNodeId = Optional.empty();
+    Optional<String> currentDataKey = Optional.empty();
+    Optional<String> currentSourceId = Optional.empty();
+    Optional<String> currentTargetId = Optional.empty();
+    Optional<String> currentComponent = Optional.empty();
+
+    Map<String, String> data = new HashMap<>();
+
+    Multimap<String, String> tokenIdByComponentName = TreeMultimap.create();
+    Map<String, String> tokenToValue = new HashMap<>();
+    Multimap<String, String> outgoingOrderingEdges = HashMultimap.create();
+
+    while (reader.hasNext()) {
+      XMLEvent event = reader.nextEvent();
+      switch (event.getEventType()) {
+        case XMLEvent.START_ELEMENT:
+          level++;
+          StartElement startElement = event.asStartElement();
+          // create all new nodes
+          switch (startElement.getName().getLocalPart()) {
+            case "graph":
+              if (level == 2) {
+                inGraph = true;
+              }
+              break;
+            case "key":
+              if (level == 2) {
+                addAnnotationKey(keys, startElement);
+              }
+              break;
+            case "node":
+              if (inGraph && level == 3) {
+                Attribute id = startElement.getAttributeByName(new QName("id"));
+                if (id != null) {
+                  currentNodeId = Optional.ofNullable(id.getValue());
+                }
+              }
+              break;
+            case "edge":
+              if (inGraph && level == 3) {
+                // Get the source and target node IDs
+                Attribute source = startElement.getAttributeByName(new QName("source"));
+                Attribute target = startElement.getAttributeByName(new QName("target"));
+                Attribute label = startElement.getAttributeByName(new QName("label"));
+                Attribute component = startElement.getAttributeByName(new QName("label"));
+                if (label != null) {
+                  Component c = parseComponent(label.getValue());
+                  if (source != null) {
+                    if (c.getType() == AnnotationComponentType.COVERAGE) {
+                      hasOutgoingCoverageEdge.add(source.getValue());
+                    } else if (c.getType() == AnnotationComponentType.DOMINANCE) {
+                      hasOutgoingDominanceEdge.add(source.getValue());
+                    } else if (c.getType() == AnnotationComponentType.PARTOF) {
+                      isPartOf.put(Helper.addSaltPrefix(source.getValue()),
+                          Helper.addSaltPrefix(target.getValue()));
+                    } else if (c.getType() == AnnotationComponentType.ORDERING
+                        && "annis".equals(c.getLayer())
+                        && "".equals(c.getName()) && target != null) {
+                      outgoingOrderingEdges.put(source.getValue(), target.getValue());
+                    }
+                    if (target != null && c.getType() == AnnotationComponentType.DOMINANCE
+                        && !c.getName().isEmpty()) {
+                      hasNonEmptyDominanceEdge.add(Pair.of(source.getValue(), target.getValue()));
+                    }
+                  }
+                }
+                if (source != null && target != null && component != null) {
+                  currentSourceId = Optional.ofNullable(source.getValue());
+                  currentTargetId = Optional.ofNullable(target.getValue());
+                  currentComponent = Optional.ofNullable(component.getValue());
+                }
+              }
+              break;
+            case "data":
+              Attribute key = startElement.getAttributeByName(new QName("key"));
+              if (key != null) {
+                currentDataKey = Optional.ofNullable(key.getValue());
+              }
+              break;
+          }
+          break;
+        case XMLEvent.CHARACTERS:
+          if (currentDataKey.isPresent() && inGraph && level == 4) {
+            String annoKey = keys.get(currentDataKey.get());
+            if (annoKey != null) {
+              // Copy all data attributes into our own map
+              data.put(annoKey, event.asCharacters().getData());
+            }
+          }
+          break;
+        case XMLEvent.END_ELEMENT:
+          EndElement endElement = event.asEndElement();
+          switch (endElement.getName().getLocalPart()) {
+            case "graph":
+              inGraph = false;
+              break;
+            case "node":
+              String tokValue = data.get("annis::tok");
+              if (tokValue != null && currentNodeId.isPresent()) {
+                tokenToValue.put(tokValue, currentNodeId.get());
+              }
+
+              currentNodeId = Optional.empty();
+              data.clear();
+              break;
+            case "edge":
+              if (currentComponent.isPresent() && currentSourceId.isPresent()
+                  && currentTargetId.isPresent()) {
+                Component component = parseComponent(currentComponent.get());
+                if (component.getType() == AnnotationComponentType.ORDERING) {
+                  tokenIdByComponentName.put(component.getName(), currentSourceId.get());
+                  tokenIdByComponentName.put(component.getName(), currentTargetId.get());
+                }
+              }
+
+              currentSourceId = Optional.empty();
+              currentTargetId = Optional.empty();
+              currentComponent = Optional.empty();
+              data.clear();
+              break;
+            case "data":
+              if (currentDataKey.isPresent()) {
+                String annoKey = keys.get(currentDataKey.get());
+                // Add an empty data entry if this element did not have any character child
+                if (annoKey != null && !data.containsKey(annoKey)) {
+                  data.put(annoKey, "");
+                }
+              }
+              currentDataKey = Optional.empty();
+              break;
+          }
+
+          level--;
+          break;
+      }
+    }
+
+    // Check if this GraphML file has a timeline.
+    if (tokenIdByComponentName.keySet().size() > 1) {
+      boolean hasNonEmptyBaseToken = false;
+      Pattern whitespacePattern = Pattern.compile("\\s*");
+
+      for (String tokId : tokenIdByComponentName.get("")) {
+        String tokValue = tokenToValue.getOrDefault(tokId, "");
+        // Check if this base token value is non-empty
+        if (!whitespacePattern.matcher(tokValue).matches()) {
+          hasNonEmptyBaseToken = true;
+          break;
+        }
+      }
+
+      if (!hasNonEmptyBaseToken) {
+        STimeline timeline = graph.createTimeline();
+
+        // Order the timeline tokens by the ordering edges
+        ArrayList<String> tlis = new ArrayList<>(tokenIdByComponentName.get(""));
+        tlis.sort((a, b) -> {
+          if (isConnected(a, b, outgoingOrderingEdges)) {
+            return -1;
+          } else if (isConnected(b, a, outgoingOrderingEdges)) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+        timeline.setData(tlis.size());
+        for (int i = 0; i < tlis.size(); i++) {
+          this.timelineIndex.put(tlis.get(i), i);
+        }
+        this.timeline = Optional.of(timeline);
+      }
+    }
+
   }
 
   @Override
@@ -121,7 +307,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     Optional<String> currentComponent = Optional.empty();
 
     SortedMap<String, STextualDS> datasourcesInGraphMl = new TreeMap<>();
-    Map<SToken, SToken> gapEdges = new HashMap<>();
 
     Map<String, String> data = new HashMap<>();
 
@@ -193,7 +378,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                 if ("node".equals(nodeType)) {
                   // Map node and add it
                   SNode n = mapNode(currentNodeId.get(), data);
-                  graph.addNode(n);
+                  if (n != null) {
+                    graph.addNode(n);
+                  }
                 } else if ("datasource".equals(nodeType)) {
                   // Create a textual datasource of this name
                   STextualDS ds = SaltFactory.createSTextualDS();
@@ -211,7 +398,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               if (currentSourceId.isPresent() && currentTargetId.isPresent()
                   && currentComponent.isPresent()) {
                 mapAndAddEdge(currentSourceId.get(), currentTargetId.get(), currentComponent.get(),
-                    data, gapEdges);
+                    data);
               }
 
               currentSourceId = Optional.empty();
@@ -236,9 +423,26 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       }
     }
 
+    if (timeline.isPresent()) {
+      // Add a timeline relation to all token
+      for (Map.Entry<SToken, Collection<Integer>> entry : this.coveredTlis.asMap().entrySet()) {
+
+        TreeSet<Integer> sortedTlis = new TreeSet<>(entry.getValue());
+
+        STimelineRelation timeRel = SaltFactory.createSTimelineRelation();
+        timeRel.setSource(entry.getKey());
+        timeRel.setTarget(this.timeline.get());
+        timeRel.setStart(sortedTlis.first());
+        timeRel.setEnd(sortedTlis.last() + 1);
+        graph.addRelation(timeRel);
+
+      }
+
+    }
+
     // Always create own own data sources from the tokens. Get all real token roots (ignore gaps)
     // and create a data source for each of them.
-    recreateTextForTokenRoots(graph, gapEdges, datasourcesInGraphMl);
+    recreateTextForTokenRoots(graph, datasourcesInGraphMl);
 
     // Create the text annotation for the segmentation nodes
     Multimap<String, SNode> orderRoots = graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
@@ -277,11 +481,30 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
   }
 
+  @CheckForNull
   private SNode mapNode(String nodeName, Map<String, String> labels) {
     SNode newNode;
 
-    if ((labels.containsKey(ANNIS_TOK)) && !hasOutgoingCoverageEdge.contains(nodeName)) {
-      newNode = SaltFactory.createSToken();
+    if ((labels.containsKey(ANNIS_TOK))) {
+      if (this.timeline.isPresent()) {
+        if (hasOutgoingCoverageEdge.contains(nodeName)) {
+          newNode = SaltFactory.createSToken();
+        } else {
+          // Do not map timeline items as token
+          return null;
+        }
+      } else {
+        if (hasOutgoingCoverageEdge.contains(nodeName)) {
+          newNode = SaltFactory.createSSpan();
+        } else {
+          newNode = SaltFactory.createSToken();
+        }
+      }
+      if (!this.timeline.isPresent() && hasOutgoingCoverageEdge.contains(nodeName)) {
+        newNode = SaltFactory.createSSpan();
+      } else {
+        newNode = SaltFactory.createSToken();
+      }
     } else if (hasOutgoingDominanceEdge.contains(nodeName)) {
       newNode = SaltFactory.createSStructure();
     } else {
@@ -295,7 +518,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
   }
 
   private void mapAndAddEdge(String sourceId, String targetId, String componentRaw,
-      Map<String, String> labels, Map<SToken, SToken> gapEdges) {
+      Map<String, String> labels) {
 
     SNode source = graph.getNode(Helper.addSaltPrefix(sourceId));
     SNode target = graph.getNode(Helper.addSaltPrefix(targetId));
@@ -303,9 +526,15 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     // Split the component description into its parts
     Component component = parseComponent(componentRaw);
 
-    if (source != null && target != null && source != target) {
-
+    if (this.timeline.isPresent() && component.getType() == AnnotationComponentType.COVERAGE
+        && target == null
+        && source instanceof SToken) {
+      // The coverage edge describe to which timeline item the token belongs to.
+      // At this point, we are only interested in the index of the TLI.
+      this.coveredTlis.put((SToken) source, this.timelineIndex.get(targetId));
+    } else if (source != null && target != null && source != target) {
       SRelation<?, ?> rel = null;
+
       switch (component.getType()) {
         case DOMINANCE:
           if ((component.getName() == null || component.getName().isEmpty())
@@ -325,9 +554,14 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
           if ("annis".equals(component.getLayer())
               && "datasource-gap".equals(component.getName())) {
             if (source instanceof SToken && target instanceof SToken) {
-              gapEdges.put((SToken) source, (SToken) target);
+              this.gapEdges.put((SToken) source, (SToken) target);
             }
-          } else {
+          } else if (this.timeline.isPresent() && "annis".equals(component.getLayer())
+              && "".equals(component.getName())) {
+            // Do not map ordering edges for the timeline
+            rel = null;
+          }
+          else {
             rel = graph.createRelation(source, target, SALT_TYPE.SORDER_RELATION, null);
           }
 
@@ -352,14 +586,14 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
   }
 
-  private void recreateTextForTokenRoots(SDocumentGraph graph, Map<SToken, SToken> gapEdges,
+  private void recreateTextForTokenRoots(SDocumentGraph graph,
       SortedMap<String, STextualDS> datasourcesInGraphMl) {
 
     Map<SToken, SToken> nextToken = new HashMap<>();
     Map<SToken, SToken> incomingOrderingEdgesWithGaphs = new HashMap<>();
 
     for (SOrderRelation rel : graph.getOrderRelations()) {
-      if ((rel.getType() == null || "".equals(rel.getType())) && rel.getSource() instanceof SToken
+      if (rel.getSource() instanceof SToken
           && rel.getTarget() instanceof SToken) {
         SToken source = (SToken) rel.getSource();
         SToken target = (SToken) rel.getTarget();
@@ -369,7 +603,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       }
     }
 
-    for (Map.Entry<SToken, SToken> rel : gapEdges.entrySet()) {
+    for (Map.Entry<SToken, SToken> rel : this.gapEdges.entrySet()) {
       incomingOrderingEdgesWithGaphs.put(rel.getValue(), rel.getKey());
     }
 
@@ -385,13 +619,13 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       // traverse the token chain using the order relations
       SToken currentToken = rootForText;
       while (currentToken != null) {
-        addToken(currentToken, text, token2Range);
+        addTokenToText(currentToken, text, token2Range);
 
         SToken previousToken = currentToken;
         currentToken = nextToken.get(previousToken);
         // Step over the possible gap
         if (currentToken == null) {
-          currentToken = gapEdges.get(previousToken);
+          currentToken = this.gapEdges.get(previousToken);
         }
       }
 
@@ -400,6 +634,13 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       if (datasourcesInGraphMl.size() == 1) {
         STextualDS origDs = datasourcesInGraphMl.get(datasourcesInGraphMl.firstKey());
         ds.setName(origDs.getName());
+      } else {
+        Optional<String> orderingType =
+            rootForText.getOutRelations().stream().filter(rel -> rel instanceof SOrderRelation)
+                .map(rel -> (SOrderRelation) rel).map(rel -> rel.getType()).findFirst();
+        if (orderingType.isPresent()) {
+          ds.setName(orderingType.get());
+        }
       }
 
       // add all relations
@@ -416,7 +657,8 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
   }
 
-  private void addToken(SToken token, StringBuilder text, Map<SToken, Range<Integer>> token2Range) {
+  private void addTokenToText(SToken token, StringBuilder text,
+      Map<SToken, Range<Integer>> token2Range) {
     SFeature featTokWhitespaceBefore = token.getFeature("annis::tok-whitespace-before");
     if (featTokWhitespaceBefore != null) {
       text.append(featTokWhitespaceBefore.getValue().toString());
