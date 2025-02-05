@@ -45,7 +45,7 @@
         <swagger-core-version>1.5.24</swagger-core-version>
         <gson-fire-version>1.8.4</gson-fire-version>
         <kotlin.version>1.6.0</kotlin.version>
-        <commons-lang3.version>3.13.0</commons-lang3.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
     </properties>
 
     <repositories>
@@ -281,7 +281,22 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>download-mac-binaries</id>
+                        <id>download-apple-silicon-macos-binaries</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-aarch64-apple-darwin.tar.xz</url>
+                            <outputDirectory>
+                                ${project.build.directory}/native/</outputDirectory>
+                            <sha256>658ae2ab56d69a800625d463161a0578e04023abc4640981acc198d85b14f3c7</sha256>
+                            <unpack>true</unpack>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-intel-macos-binaries</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>

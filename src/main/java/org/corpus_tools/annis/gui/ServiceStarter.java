@@ -120,20 +120,10 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
           // Start the process and read output/error stream in background threads
           log.info("Starting the bundled graphANNIS service with configuration file {}",
               serviceConfigFile.getAbsolutePath());
-          ProcessBuilder backgroundProcessBuilder;
-
-          if (SystemUtils.IS_OS_MAC_OSX) {
-            // On MacOS has several processor architectors, but allows to emulate x86_64 processors
-            // with the Rosetta tool. We use the `arch` helper program to trigger emulation if
-            // necessary. This is necessary when Java support the native processor architecture and
-            // thus is not emulated yet.
-            backgroundProcessBuilder = new ProcessBuilder("arch", "-x86_64",
-                tmpExec.getAbsolutePath(), "--config", serviceConfigFile.getAbsolutePath());
-
-          } else {
-            backgroundProcessBuilder = new ProcessBuilder(tmpExec.getAbsolutePath(), "--config",
-                serviceConfigFile.getAbsolutePath());
-          }
+          ProcessBuilder backgroundProcessBuilder = new ProcessBuilder(tmpExec.getAbsolutePath(),
+              "--config",
+              serviceConfigFile.getAbsolutePath());
+          
           backgroundProcess = backgroundProcessBuilder.start();
 
           // Create threads that read from the output and error streams and add the messages to
@@ -164,8 +154,21 @@ public class ServiceStarter implements ApplicationListener<ApplicationReadyEvent
   private Optional<String> executablePathForSystem() {
     Optional<String> execPath = Optional.empty();
     if (SystemUtils.IS_OS_MAC_OSX) {
-      execPath = Optional.of("graphannis-webservice-x86_64-apple-darwin/graphannis-webservice");
-    } else if ("amd64".equals(SystemUtils.OS_ARCH) || "x86_64".equals(SystemUtils.OS_ARCH)) {
+      // MacOS 64 bit architecture includes the newer Apple Silicon chips and the old Intel ones,
+      // but not AMD
+      if ("aarch64".equals(SystemUtils.OS_ARCH)) {
+        execPath = Optional.of("graphannis-webservice-aarch64-apple-darwin/graphannis-webservice");
+      } else if ("x86_64".equals(SystemUtils.OS_ARCH)) {
+        execPath = Optional.of("graphannis-webservice-x86_64-apple-darwin/graphannis-webservice");
+      } else {
+        log.error(
+            "GraphANNIS can only be run on 64 bit operating systems (\"x86_64\" or \"aarch64\") "
+                + "and with a 64 bit version of Java, "
+                + "but this is reported as architecture {}!",
+            SystemUtils.OS_ARCH);
+      }
+    } else if ("x86_64".equals(SystemUtils.OS_ARCH) || "amd64".equals(SystemUtils.OS_ARCH)) {
+      // ARM is not supported on Linux/Windows yet, but the other 64 bit architectures are
       if (SystemUtils.IS_OS_LINUX) {
         execPath =
             Optional.of("graphannis-webservice-x86_64-unknown-linux-gnu/graphannis-webservice");
