@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.12.3
-date-released: 2024-11-18
+version: 4.12.4
+date-released: 2025-02-05
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -165,7 +165,7 @@ references:
   repository-code: http://svn.apache.org/viewvc/commons/proper/email/tags/EMAIL_1_5
 - type: software
   title: Apache Commons IO
-  version: '2.7'
+  version: 2.14.0
   abbreviation: commons-io:commons-io
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Commons_IO
@@ -188,7 +188,7 @@ references:
   repository-code: https://gitbox.apache.org/repos/asf?p=commons-io.git
 - type: software
   title: Apache Commons Lang
-  version: 3.13.0
+  version: 3.17.0
   abbreviation: org.apache.commons:commons-lang3
   license: Apache-2.0
   notes: More license information can be found in the THIRD-PARTY/Apache_Commons_Lang
