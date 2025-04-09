@@ -7,22 +7,29 @@ import com.google.gson.Gson;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.corpus_tools.annis.gui.MatchedNodeColors;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.component.grid.EventExtractor;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SSpanningRelation;
 import org.corpus_tools.salt.common.SToken;
@@ -233,91 +240,221 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
 
     SDocument doc = visInput.getDocument();
     doc.getDocumentGraph().sortTokenByText();
-    List<SToken> tokens = doc.getDocumentGraph().getTokens();
     Set<SLayer> layers = doc.getDocumentGraph().getLayers();
-
-    // create lists of sorted tokens for each layer
-    Map<SLayer, List<SToken>> tokensByLayer = new HashMap<>();
-
-    for (SLayer layer : layers) {
-      for (SToken token : tokens) {
-        if (token.getLayers().contains(layer)) {
-          if (tokensByLayer.get(layer) == null) {
-            tokensByLayer.put(layer, new ArrayList<SToken>());
-          }
-          tokensByLayer.get(layer).add(token);
-        }
-      }
+    
+    // NEW step 1: Create list of ordered nodes (sorted by ordering)
+    List<SNode> orderRoots = doc.getDocumentGraph().getRootsByRelation(SALT_TYPE.SORDER_RELATION);
+    Map<String, LinkedHashSet<SNode>> orderings = new HashMap<>();
+    Map<SNode, String> node2OrderName = new HashMap<>();
+    for (SNode root : orderRoots) {
+    	Set<String> outnames = root.getOutRelations().stream().filter((SRelation r) -> r instanceof SOrderRelation).map((SRelation r) -> r.getType()).collect(Collectors.toSet());
+    	// follow all paths for a given name (assumption: there is only one path for each name)
+    	for (String outname : outnames) {
+    		if (outname == null || outname.isEmpty()) {
+    			continue; // tokens are treated separately;
+    		}    		
+    		if (!orderings.containsKey(outname)) {
+    			orderings.put(outname, new LinkedHashSet<SNode>());
+    		}
+    		LinkedHashSet<SNode> nodes = orderings.get(outname);
+    		nodes.add(root);
+    		node2OrderName.put(root, outname);
+    		Optional<SRelation> next = root.getOutRelations().stream().filter((SRelation r) -> r instanceof SOrderRelation && outname.equals(r.getType())).findFirst();
+    		while (next.isPresent()) {
+    			SNode target = (SNode) next.get().getTarget();
+    			nodes.add(target);
+    			node2OrderName.put(target, outname);
+    			next = target.getOutRelations().stream().filter((SRelation r) -> r instanceof SOrderRelation && outname.equals(r.getType())).findFirst();
+    		}
+    	}
     }
+    
+    // NEW step 2: Identify pointing relations and ordered nodes
+    String configLayer = visInput.getMappings().get("layer");  // FIXME get constant
+    List<SPointingRelation> pointingRels = doc.getDocumentGraph().getPointingRelations().stream().filter((SPointingRelation p) -> configLayer == null || configLayer.equals(p.getType())).collect(Collectors.toList());
+    Integer n = orderings.values().stream().map((LinkedHashSet<SNode> v) -> v.size()).max(Comparator.naturalOrder()).get();
+    SNode[] sources = new SNode[n == null? 0 : n];  // Note: This will lead to an empty visualisation in case there is no longest ordering
+    SNode[] targets = new SNode[sources.length];
+    for (SPointingRelation pRel : pointingRels) {
+    	SNode source = pRel.getSource();
+    	SNode target = pRel.getTarget();
+    	
+    }
+
+//    // create lists of sorted tokens for each layer
+//    Map<SLayer, List<SToken>> tokensByLayer = new HashMap<>();
+//
+//    for (SLayer layer : layers) {
+//      for (SToken token : tokens) {
+//        if (token.getLayers().contains(layer)) {
+//          if (tokensByLayer.get(layer) == null) {
+//            tokensByLayer.put(layer, new ArrayList<SToken>());
+//          }
+//          tokensByLayer.get(layer).add(token);
+//        }
+//      }
+//    }
+	  Map<SLayer, List<SNode>> nodesByLayer = new HashMap<>();
+	
+	  for (SLayer layer : layers) {
+		  for (LinkedHashSet<SNode> nodeList : orderings.values()) {
+			  for (SNode node : nodeList) {
+				  if (node.getLayers().contains(layer)) {
+			          if (nodesByLayer.get(layer) == null) {
+			            nodesByLayer.put(layer, new ArrayList<SNode>());
+			          }
+			          nodesByLayer.get(layer).add(node);
+				  }
+			  }
+		  }
+	  }
 
     // organized by layer, create lists of token maps with the right
     // structure to be converted to JSON as "segments" for
     // SentStructure.js
+//    Map<String, List<Map<String, String>>> segmentsMap = new HashMap<>();
+//
+//    for (Map.Entry<SLayer, List<SToken>> entry : tokensByLayer.entrySet()) {
+//      SLayer layer = entry.getKey();
+//
+//      List<SToken> lTokens = entry.getValue();
+//
+//      segmentsMap.put(layer.getId(), new ArrayList<Map<String, String>>());
+//
+//      for (SToken token : lTokens) {
+//        Map<String, String> tokenMap = new HashMap<>();
+//        tokenMap.put("id", layer.getId() + "_" + stripId(token.getId()));
+//        tokenMap.put("type", doc.getDocumentGraph().getText(token));
+//
+//        // highlight matched tokens
+//        String tokenColor = "black";
+//        if (visInput.getMarkedAndCovered().containsKey(token)) {
+//          tokenColor =
+//              MatchedNodeColors.getHTMLColorByMatch(visInput.getMarkedAndCovered().get(token));
+//        }
+//        tokenMap.put("color", tokenColor);
+//
+//        // dummy values
+//        tokenMap.put("dep", "ROOT");
+//        tokenMap.put("lemma", "");
+//        tokenMap.put("pos", "");
+//        tokenMap.put("dep_to", "0");
+//
+//        segmentsMap.get(layer.getId()).add(tokenMap);
+//      }
+//    }
     Map<String, List<Map<String, String>>> segmentsMap = new HashMap<>();
+    ArrayList<SNode> nodes = new ArrayList<>();
+    List<SNode> allNodes = doc.getDocumentGraph().getNodes();
 
-    for (Map.Entry<SLayer, List<SToken>> entry : tokensByLayer.entrySet()) {
-      SLayer layer = entry.getKey();
+    for (Map.Entry<String, LinkedHashSet<SNode>> entry : orderings.entrySet()) {
+      String name = entry.getKey();
+      LinkedHashSet<SNode> lNodes = entry.getValue();
+      nodes.addAll(lNodes);
 
-      List<SToken> lTokens = entry.getValue();
+      segmentsMap.put(name, new ArrayList<Map<String, String>>());
 
-      segmentsMap.put(layer.getId(), new ArrayList<Map<String, String>>());
-
-      for (SToken token : lTokens) {
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("id", layer.getId() + "_" + stripId(token.getId()));
-        tokenMap.put("type", doc.getDocumentGraph().getText(token));
+      for (SNode node : lNodes) {  // FIXME this goes by layer, but it might have to go by ordering
+        Map<String, String> nodeMap = new HashMap<>();
+        nodeMap.put("id", name + "_" + stripId(node.getId()));
+        String value = null;        
+        String orderName = node2OrderName.get(node); 
+        if (orderName != null) {
+        	SAnnotation anno = doc.getDocumentGraph().getAnnotation(null, orderName);
+        	if (anno == null) {
+        		anno = doc.getDocumentGraph().getAnnotation(orderName, orderName);
+        	}
+        	if (anno == null) {
+        		anno = doc.getDocumentGraph().getAnnotation("default_ns", orderName);
+        	}
+        	if (anno != null) {
+        		value = anno.getValue_STEXT();
+        	}
+        }
+        if (orderName == null || value == null) {
+        	value = doc.getDocumentGraph().getText(node);
+        }
+        nodeMap.put("type", value);  // the annotation name (not qname) needs to match the ordering name; if empty use "annis::tok", i. e. getText() 
 
         // highlight matched tokens
-        String tokenColor = "black";
-        if (visInput.getMarkedAndCovered().containsKey(token)) {
-          tokenColor =
-              MatchedNodeColors.getHTMLColorByMatch(visInput.getMarkedAndCovered().get(token));
+        String nodeColor = "black";
+        if (visInput.getMarkedAndCovered().containsKey(node)) {
+          nodeColor =
+              MatchedNodeColors.getHTMLColorByMatch(visInput.getMarkedAndCovered().get(node));
         }
-        tokenMap.put("color", tokenColor);
+        nodeMap.put("color", nodeColor);
 
         // dummy values
-        tokenMap.put("dep", "ROOT");
-        tokenMap.put("lemma", "");
-        tokenMap.put("pos", "");
-        tokenMap.put("dep_to", "0");
+        nodeMap.put("dep", "ROOT");
+        nodeMap.put("lemma", "");
+        nodeMap.put("pos", "");
+        nodeMap.put("dep_to", "0");
 
-        segmentsMap.get(layer.getId()).add(tokenMap);
+        segmentsMap.get(name).add(nodeMap);
       }
     }
 
     // find all pointing relations between tokens in different layers
+//    List<SPointingRelation> pRelations = doc.getDocumentGraph().getPointingRelations();
+//
+//    Map<Pair<SToken, SToken>, String> tokenPRelations = new HashMap<>();
+
+    /* this needs to be replaced to work for generic (ordered) nodes OLD:*/
+//    for (SToken token : tokens) {
+//      for (SPointingRelation pRelation : pRelations) {
+//        if (token.getInRelations().contains(pRelation)) {
+//          if (tokens.contains(pRelation.getSource()) && tokens.contains(pRelation.getTarget())) {
+//            SToken sourceToken = (SToken) pRelation.getSource();
+//            SToken targetToken = (SToken) pRelation.getTarget();
+//
+//            // only keep pointing relations between tokens in
+//            // different layers (parallel alignment annotations,
+//            // not dependency/other annotations)
+//            Set<SLayer> intersectLayers = new HashSet<>(sourceToken.getLayers());
+//            intersectLayers.retainAll(targetToken.getLayers());
+//
+//            if (intersectLayers.size() == 0) {
+//              tokenPRelations.put(Pair.of(sourceToken, targetToken),
+//                  getPointingRelationAnnotation(pRelation));
+//            }
+//          }
+//        }
+//      }
+//    }
+    
+    /* NEW: */
     List<SPointingRelation> pRelations = doc.getDocumentGraph().getPointingRelations();
 
-    Map<Pair<SToken, SToken>, String> tokenPRelations = new HashMap<>();
+    Map<Pair<SNode, SNode>, String> nodePRelations = new HashMap<>();
+    
+    for (SNode node : nodes) {
+        for (SPointingRelation pRelation : pRelations) {
+          if (node.getInRelations().contains(pRelation)) {
+            if (nodes.contains(pRelation.getSource()) && nodes.contains(pRelation.getTarget())) {
+              SNode sourceNode = (SNode) pRelation.getSource();
+              SNode targetNode = (SNode) pRelation.getTarget();
 
-    for (SToken token : tokens) {
-      for (SPointingRelation pRelation : pRelations) {
-        if (token.getInRelations().contains(pRelation)) {
-          if (tokens.contains(pRelation.getSource()) && tokens.contains(pRelation.getTarget())) {
-            SToken sourceToken = (SToken) pRelation.getSource();
-            SToken targetToken = (SToken) pRelation.getTarget();
+              // only keep pointing relations between tokens in
+              // different layers (parallel alignment annotations,
+              // not dependency/other annotations)
+              Set<SLayer> intersectLayers = new HashSet<>(sourceNode.getLayers());
+              intersectLayers.retainAll(targetNode.getLayers());
 
-            // only keep pointing relations between tokens in
-            // different layers (parallel alignment annotations,
-            // not dependency/other annotations)
-            Set<SLayer> intersectLayers = new HashSet<>(sourceToken.getLayers());
-            intersectLayers.retainAll(targetToken.getLayers());
-
-            if (intersectLayers.size() == 0) {
-              tokenPRelations.put(Pair.of(sourceToken, targetToken),
-                  getPointingRelationAnnotation(pRelation));
+              if (intersectLayers.size() == 0) {
+                nodePRelations.put(Pair.of(sourceNode, targetNode),
+                    getPointingRelationAnnotation(pRelation));
+              }
             }
           }
         }
       }
-    }
 
     // create a list of alignments between tokens to be converted
     // to JSON for SentStructure.js as "alignments"
     List<List<String>> alignmentsList = new ArrayList<>();
 
-    for (Map.Entry<Pair<SToken, SToken>, String> entry : tokenPRelations.entrySet()) {
-      Pair<SToken, SToken> p = entry.getKey();
+    for (Map.Entry<Pair<SNode, SNode>, String> entry : nodePRelations.entrySet()) {
+      Pair<SNode, SNode> p = entry.getKey();
 
       List<String> alignment = new ArrayList<>();
       alignment.add(
