@@ -58,7 +58,7 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
     NODE_ANNOS_KW(
         org.corpus_tools.annis.gui.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY), POINTING_REL_ANNOS_KW(
             "pointingRelAnnos"), SPANNING_REL_ANNOS_KW(
-                "spanningRelAnnos"), DOMINANCE_REL_ANNOS_KW("dominanceRelAnnos"), EDGE_NAME_KW("edge_name");
+                "spanningRelAnnos"), DOMINANCE_REL_ANNOS_KW("dominanceRelAnnos"), EDGE_NAME_KW("edge_type");
 
     private final String value;
 

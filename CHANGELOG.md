@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `sentstructurejs` visualizer also works for multiple segmentations. 
-  Via an optional mapping `edge_name` the alignment edges can be specified,
+  Via an optional mapping `edge_type` the alignment edges can be specified,
   which must match the internally derived STYPE. No value for `edge_name`
   incorporates all poiting relations. To work with multiple segmentations,
   the aligned segmentations need to have an ordering with a unique name.
