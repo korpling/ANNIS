@@ -276,7 +276,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-pc-windows-msvc.zip</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/win32-x86-64/</outputDirectory>
-                            <sha256>011d324a491bf98d1e6e0a09052ddab98806cf8f7f5f7bde6391ea79e2ea5922</sha256>
+                            <sha256>87d501cc409069b24bbc7822ad1e196f2762266be665984e14bf9f684cf8df49</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
