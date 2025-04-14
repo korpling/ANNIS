@@ -13,9 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   incorporates all poiting relations. To work with multiple segmentations,
   the aligned segmentations need to have an ordering with a unique name.
   Furthermore, the ordered nodes provide the segment values for the visualizer
-  through annotations with a name that is equal to the ordering name,
-  the namespace is optional, i. e. can be empty, the ordering name as well,
-  or `default_ns`.
+  through annotations with a name that is equal to the ordering name.
+  The namespace is optional, i. e. can be empty, equal to the layer name
+  or ordering name, or `default_ns`.
 
 ## [4.12.4] - 2025-02-05
 
