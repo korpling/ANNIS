@@ -325,6 +325,9 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
 	        if (orderName != null) {
 	        	SAnnotation anno = doc.getDocumentGraph().getAnnotation(null, orderName);
 	        	if (anno == null) {
+	        		anno = node.getAnnotation(nodeLayer.getName(), orderName);
+	        	}
+	        	if (anno == null) {
 	        		anno = node.getAnnotation(orderName, orderName);
 	        	}
 	        	if (anno == null) {
