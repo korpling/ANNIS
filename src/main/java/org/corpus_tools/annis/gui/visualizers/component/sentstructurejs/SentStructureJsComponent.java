@@ -7,22 +7,29 @@ import com.google.gson.Gson;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.corpus_tools.annis.gui.MatchedNodeColors;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.component.grid.EventExtractor;
+import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocument;
 import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SDominanceRelation;
+import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SSpanningRelation;
 import org.corpus_tools.salt.common.SToken;
@@ -51,7 +58,7 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
     NODE_ANNOS_KW(
         org.corpus_tools.annis.gui.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY), POINTING_REL_ANNOS_KW(
             "pointingRelAnnos"), SPANNING_REL_ANNOS_KW(
-                "spanningRelAnnos"), DOMINANCE_REL_ANNOS_KW("dominanceRelAnnos");
+                "spanningRelAnnos"), DOMINANCE_REL_ANNOS_KW("dominanceRelAnnos"), EDGE_NAME_KW("edge_type");
 
     private final String value;
 
@@ -228,87 +235,132 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
     // put user configurations to the configuration list
     for (Annos_Keyword kw : Annos_Keyword.values()) {
       configurations.add(visInput.getMappings().get(kw.getValue()));
-      fillFilterAnnotations(visInput, kw.ordinal());
+      if (!kw.equals(Annos_Keyword.EDGE_NAME_KW)) {
+    	  fillFilterAnnotations(visInput, kw.ordinal());
+      }
     }
 
     SDocument doc = visInput.getDocument();
     doc.getDocumentGraph().sortTokenByText();
-    List<SToken> tokens = doc.getDocumentGraph().getTokens();
-    Set<SLayer> layers = doc.getDocumentGraph().getLayers();
-
-    // create lists of sorted tokens for each layer
-    Map<SLayer, List<SToken>> tokensByLayer = new HashMap<>();
-
-    for (SLayer layer : layers) {
-      for (SToken token : tokens) {
-        if (token.getLayers().contains(layer)) {
-          if (tokensByLayer.get(layer) == null) {
-            tokensByLayer.put(layer, new ArrayList<SToken>());
-          }
-          tokensByLayer.get(layer).add(token);
-        }
-      }
+    
+    // NEW step 1: Create list of ordered nodes (sorted by ordering)
+    List<SNode> orderRoots = doc.getDocumentGraph().getRootsByRelation(SALT_TYPE.SORDER_RELATION);
+    Map<String, LinkedHashSet<SNode>> orderings = new HashMap<>();
+    Map<SNode, String> node2OrderName = new HashMap<>();
+    for (SNode root : orderRoots) {
+    	Set<String> outnames = root.getOutRelations().stream().filter((SRelation r) -> r instanceof SOrderRelation).map((SRelation r) -> r.getType()).collect(Collectors.toSet());
+    	// follow all paths for a given name (assumption: there is only one path for each name)
+    	for (String outname : outnames) {
+    		if (!orderings.containsKey(outname)) {
+    			orderings.put(outname, new LinkedHashSet<SNode>());
+    		}
+    		LinkedHashSet<SNode> nodes = orderings.get(outname);
+    		nodes.add(root);
+    		node2OrderName.put(root, outname);
+    		Optional<SRelation> next = root.getOutRelations().stream().filter((SRelation r) -> r instanceof SOrderRelation && outname.equals(r.getType())).findFirst();
+    		while (next.isPresent()) {
+    			SNode target = (SNode) next.get().getTarget();
+    			nodes.add(target);
+    			node2OrderName.put(target, outname);
+    			next = target.getOutRelations().stream().filter((SRelation r) -> r instanceof SOrderRelation && outname.equals(r.getType())).findFirst();
+    		}
+    	}
     }
-
-    // organized by layer, create lists of token maps with the right
-    // structure to be converted to JSON as "segments" for
-    // SentStructure.js
+    
+    // NEW step 2: Identify pointing relations and ordered nodes
+    String configLayer = configurations.get(configurations.size() - 1);
+    List<SPointingRelation> pointingRels = doc.getDocumentGraph()
+    		.getPointingRelations()
+    		.stream()
+    		.filter((SPointingRelation p) -> configLayer == null || configLayer.equals(p.getType()))
+    		.collect(Collectors.toList());    
+    Map<Pair<SNode, SNode>, String> nodePRelations = new HashMap<>();
+    SLayer sourceLayer = null;
+    SLayer targetLayer = null;
+    for (SPointingRelation pRel : pointingRels) {
+    	SNode source = pRel.getSource();
+    	SNode target = pRel.getTarget();
+    	nodePRelations.put(Pair.of(source, target),
+                getPointingRelationAnnotation(pRel));
+    	if (sourceLayer == null) {
+    		SLayer l = source.getLayers().iterator().next();
+    		if (l != null) {
+    			sourceLayer = l;
+    		}
+    	}
+    	if (targetLayer == null) {
+    		SLayer l = target.getLayers().iterator().next();
+    		if (l != null) {
+    			targetLayer = l;
+    		}
+    	}
+    }
+    final String srcLayerId = sourceLayer == null? "" : sourceLayer.getId();
+    final String tgtLayerId = targetLayer == null? "" : targetLayer.getId();
+    
     Map<String, List<Map<String, String>>> segmentsMap = new HashMap<>();
 
-    for (Map.Entry<SLayer, List<SToken>> entry : tokensByLayer.entrySet()) {
-      SLayer layer = entry.getKey();
+    for (Map.Entry<String, LinkedHashSet<SNode>> entry : orderings.entrySet()) {
+      String name = entry.getKey();
+      LinkedHashSet<SNode> oNodes = entry.getValue();
+      Set<SLayer> distinctLayers = oNodes.stream().flatMap((SNode n) -> n.getLayers().stream()).collect(Collectors.toSet());
 
-      List<SToken> lTokens = entry.getValue();
+      for (SLayer layer : distinctLayers) {
+    	  String key = String.join("_", layer.getId(), name);
 
-      segmentsMap.put(layer.getId(), new ArrayList<Map<String, String>>());
-
-      for (SToken token : lTokens) {
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("id", layer.getId() + "_" + stripId(token.getId()));
-        tokenMap.put("type", doc.getDocumentGraph().getText(token));
-
-        // highlight matched tokens
-        String tokenColor = "black";
-        if (visInput.getMarkedAndCovered().containsKey(token)) {
-          tokenColor =
-              MatchedNodeColors.getHTMLColorByMatch(visInput.getMarkedAndCovered().get(token));
-        }
-        tokenMap.put("color", tokenColor);
-
-        // dummy values
-        tokenMap.put("dep", "ROOT");
-        tokenMap.put("lemma", "");
-        tokenMap.put("pos", "");
-        tokenMap.put("dep_to", "0");
-
-        segmentsMap.get(layer.getId()).add(tokenMap);
-      }
-    }
-
-    // find all pointing relations between tokens in different layers
-    List<SPointingRelation> pRelations = doc.getDocumentGraph().getPointingRelations();
-
-    Map<Pair<SToken, SToken>, String> tokenPRelations = new HashMap<>();
-
-    for (SToken token : tokens) {
-      for (SPointingRelation pRelation : pRelations) {
-        if (token.getInRelations().contains(pRelation)) {
-          if (tokens.contains(pRelation.getSource()) && tokens.contains(pRelation.getTarget())) {
-            SToken sourceToken = (SToken) pRelation.getSource();
-            SToken targetToken = (SToken) pRelation.getTarget();
-
-            // only keep pointing relations between tokens in
-            // different layers (parallel alignment annotations,
-            // not dependency/other annotations)
-            Set<SLayer> intersectLayers = new HashSet<>(sourceToken.getLayers());
-            intersectLayers.retainAll(targetToken.getLayers());
-
-            if (intersectLayers.size() == 0) {
-              tokenPRelations.put(Pair.of(sourceToken, targetToken),
-                  getPointingRelationAnnotation(pRelation));
-            }
-          }
-        }
+	      if (!(layer.getId().equals(srcLayerId) || layer.getId().equals(tgtLayerId))) {
+	    	  continue;
+	      }
+	      segmentsMap.put(key, new ArrayList<Map<String, String>>());
+	      
+	      for (SNode node : oNodes) {
+	    	SLayer nodeLayer = node.getLayers().iterator().next();
+	    	if (nodeLayer == null || !nodeLayer.getId().equals(layer.getId())) {
+	    		continue;
+	    	}
+	        Map<String, String> nodeMap = new HashMap<>();
+	        nodeMap.put("id", nodeLayer.getId() + "_" + stripId(node.getId()));
+	        String value = null;        
+	        String orderName = node2OrderName.get(node); 
+	        if (orderName != null) {
+	        	SAnnotation anno = doc.getDocumentGraph().getAnnotation(null, orderName);
+	        	if (anno == null) {
+	        		anno = node.getAnnotation(nodeLayer.getName(), orderName);
+	        	}
+	        	if (anno == null) {
+	        		anno = node.getAnnotation(orderName, orderName);
+	        	}
+	        	if (anno == null) {
+	        		anno = node.getAnnotation("default_ns", orderName);
+	        	}
+	        	if (anno != null) {
+	        		value = anno.getValue_STEXT();
+	        	}
+	        }
+	        if (orderName == null || value == null) {
+	        	value = doc.getDocumentGraph().getText(node);
+	        }
+	        nodeMap.put("type", value); 
+	
+	        // highlight matched tokens
+	        String nodeColor = "black";
+	        if (visInput.getMarkedAndCovered().containsKey(node)) {
+	          nodeColor =
+	              MatchedNodeColors.getHTMLColorByMatch(visInput.getMarkedAndCovered().get(node));
+	        }
+	        nodeMap.put("color", nodeColor);
+	
+	        // dummy values
+	        nodeMap.put("dep", "ROOT");
+	        nodeMap.put("lemma", "");
+	        nodeMap.put("pos", "");
+	        nodeMap.put("dep_to", "0");
+	
+	        segmentsMap.get(key).add(nodeMap);
+	      }
+		  if (segmentsMap.get(key).isEmpty()) {
+			  segmentsMap.remove(key);
+		  }
       }
     }
 
@@ -316,8 +368,8 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
     // to JSON for SentStructure.js as "alignments"
     List<List<String>> alignmentsList = new ArrayList<>();
 
-    for (Map.Entry<Pair<SToken, SToken>, String> entry : tokenPRelations.entrySet()) {
-      Pair<SToken, SToken> p = entry.getKey();
+    for (Map.Entry<Pair<SNode, SNode>, String> entry : nodePRelations.entrySet()) {
+      Pair<SNode, SNode> p = entry.getKey();
 
       List<String> alignment = new ArrayList<>();
       alignment.add(

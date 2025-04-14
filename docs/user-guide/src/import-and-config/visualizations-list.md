@@ -66,6 +66,10 @@ texts using [SentStructure.js](https://gitlab.cl.uzh.ch/sparcling/SentStructure.
 
 Use `alignment_label` to specify the edge annotation name that should be displayed.
 
+For filtering the edges that are considered for alignments, you can set `edge_type`
+to the name of the pointing relations. The name of a pointing relation component
+can be derived from the operator used to search them, e. g., `->align` is used
+for edges in the component with the name `align`.
 
 ## `discourse` 
 
