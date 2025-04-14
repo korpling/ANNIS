@@ -261,7 +261,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-unknown-linux-gnu.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>2cadaebe9084faaaa301b1b7f56fe2f18abbba20b19b3747ec0405d0b652905a</sha256>
+                            <sha256>c4d2fe02294d560ff90895d5a8b4f148ae217361b32b6f703d9d89ee80bf66f6</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
