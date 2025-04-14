@@ -295,8 +295,8 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
     		}
     	}
     }
-    final String srcLayerId = sourceLayer.getId();
-    final String tgtLayerId = targetLayer.getId();
+    final String srcLayerId = sourceLayer == null? "" : sourceLayer.getId();
+    final String tgtLayerId = targetLayer == null? "" : targetLayer.getId();
     
     Map<String, List<Map<String, String>>> segmentsMap = new HashMap<>();
 
@@ -307,11 +307,11 @@ public class SentStructureJsComponent extends AbstractJavaScriptComponent
 
       for (SLayer layer : distinctLayers) {
     	  String key = String.join("_", layer.getId(), name);
-	      segmentsMap.put(key, new ArrayList<Map<String, String>>());
 
 	      if (!(layer.getId().equals(srcLayerId) || layer.getId().equals(tgtLayerId))) {
 	    	  continue;
 	      }
+	      segmentsMap.put(key, new ArrayList<Map<String, String>>());
 	      
 	      for (SNode node : oNodes) {
 	    	SLayer nodeLayer = node.getLayers().iterator().next();
