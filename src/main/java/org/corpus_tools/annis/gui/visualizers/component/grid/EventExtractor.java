@@ -363,15 +363,25 @@ public class EventExtractor {
       if (nodes != null) {
         for (SNode n : nodes) {
           if (type.isAssignableFrom(n.getClass())) {
-            for (SLayer layer : n.getLayers()) {
-              if (namespace == null || namespace.equals(layer.getName())) {
-                for (SAnnotation anno : n.getAnnotations()) {
-                  result.add(anno.getQName());
-                }
-                // we got all annotations of this node, jump to next node
-                break;
-              } // end if namespace equals layer name
-            } // end for each layer
+            if (namespace == null) {
+              // Directly add annotation names from all nodes without checking to which layer the
+              // node belongs.
+              for (SAnnotation anno : n.getAnnotations()) {
+                result.add(anno.getQName());
+              }
+            } else {
+              for (SLayer layer : n.getLayers()) {
+                // Only includes nodes that belong to a layer with the configured name
+                if (namespace.equals(layer.getName())) {
+                  for (SAnnotation anno : n.getAnnotations()) {
+                    result.add(anno.getQName());
+                  }
+                  // we got all annotations of this node, jump to next node
+                  break;
+                } // end if namespace equals layer name
+              } // end for each layer
+            }
+
           }
         } // end for each node
       }

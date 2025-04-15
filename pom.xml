@@ -11,7 +11,7 @@
 
     <groupId>org.corpus-tools</groupId>
     <artifactId>annis</artifactId>
-    <version>4.12.3-SNAPSHOT</version>
+    <version>4.12.5-SNAPSHOT</version>
     <name>ANNIS user interface</name>
     <packaging>jar</packaging>
     <scm>
@@ -39,13 +39,13 @@
         <vaadin.version>8.14.3</vaadin.version>
         <vaadin.productionMode>true</vaadin.productionMode>
         <start-class>org.corpus_tools.annis.gui.AnnisUiApplication</start-class>
-        <graphannis.version>3.3.1</graphannis.version>
+        <graphannis.version>3.7.1</graphannis.version>
         <antlr4.version>4.7.2</antlr4.version>
         <spring.profiles.active>server</spring.profiles.active>
         <swagger-core-version>1.5.24</swagger-core-version>
         <gson-fire-version>1.8.4</gson-fire-version>
         <kotlin.version>1.6.0</kotlin.version>
-        <commons-lang3.version>3.13.0</commons-lang3.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
     </properties>
 
     <repositories>
@@ -261,7 +261,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-unknown-linux-gnu.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>63cd880aee2eda2fe95f5dff74dc3dd7162b042e893c51925bee56c094c89e4c</sha256>
+                            <sha256>c4d2fe02294d560ff90895d5a8b4f148ae217361b32b6f703d9d89ee80bf66f6</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -276,12 +276,27 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-pc-windows-msvc.zip</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/win32-x86-64/</outputDirectory>
-                            <sha256>28884c784073b407e692b55873f60f59d687f5241af1d09b1fcdc1e77af8cd99</sha256>
+                            <sha256>87d501cc409069b24bbc7822ad1e196f2762266be665984e14bf9f684cf8df49</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
                     <execution>
-                        <id>download-mac-binaries</id>
+                        <id>download-apple-silicon-macos-binaries</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>
+                                https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-aarch64-apple-darwin.tar.xz</url>
+                            <outputDirectory>
+                                ${project.build.directory}/native/</outputDirectory>
+                            <sha256>0e51feee2f8d979b88c7797cdd6803137b1a9585ad92c556eeace159e1921fa8</sha256>
+                            <unpack>true</unpack>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>download-intel-macos-binaries</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>wget</goal>
@@ -291,7 +306,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-apple-darwin.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>ac9d33f70865781c956d977e952ab5051360137811179dddb715fc496556539d</sha256>
+                            <sha256>f44f58dbaabe3af86fbe1ba91f5deb424a2fb47b91d2368e6fe92c835a61cd6e</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -602,7 +617,7 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>2.7</version>
+            <version>2.14.0</version>
         </dependency>
 
         <dependency>

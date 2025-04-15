@@ -1,6 +1,0 @@
-status = [
-  "Execute all automated tests JDK 8",
-  "Execute all automated tests on JDK 11",
-  "Test documentation",
-  "SonarCloud Code Analysis",
-]

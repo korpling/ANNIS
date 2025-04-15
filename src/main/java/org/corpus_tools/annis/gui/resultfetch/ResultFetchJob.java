@@ -141,7 +141,6 @@ public class ResultFetchJob implements Runnable {
           SaltProject p = createSaltFromMatch(m, arg, current, corpora);
           ui.access(() -> resultPanel.addQueryResult(query, p, matchList));
 
-
           if (Thread.interrupted()) {
             return;
           }
@@ -173,7 +172,7 @@ public class ResultFetchJob implements Runnable {
           } else if (ex.getCode() == 403) {
             paging.setInfo("Not authorized to query this corpus.");
           } else {
-            ExceptionDialog.show(ex, ui);
+            ExceptionDialog.show(ex, "Backend error", ui);
           }
           resultPanel.showFinishedSubgraphSearch();
 

@@ -7,8 +7,6 @@ import com.google.common.collect.Range;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -54,60 +52,6 @@ import org.corpus_tools.salt.util.SaltUtil;
 public class DocumentGraphMapper extends AbstractGraphMLMapper {
 
   private static final String ANNIS_TOK = "annis::tok";
-
-  private final class RecreateTextForRootNodeTraverser implements GraphTraverseHandler {
-    private final Map<SToken, Range<Integer>> token2Range;
-    private final StringBuilder text;
-
-    private RecreateTextForRootNodeTraverser(Map<SToken, Range<Integer>> token2Range,
-        StringBuilder text) {
-      this.token2Range = token2Range;
-      this.text = text;
-    }
-
-    @SuppressWarnings("rawtypes")
-    @Override
-    public boolean checkConstraint(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-        SRelation relation, SNode currNode, long order) {
-      if (relation == null) {
-        return true;
-      } else if (relation instanceof SOrderRelation
-          && Objects.equal("", relation.getType())) {
-        return true;
-      } else {
-        return false;
-      }
-    }
-
-    @Override
-    public void nodeLeft(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-        SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {}
-
-    @Override
-    public void nodeReached(SGraph.GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-        SNode currNode, SRelation<SNode, SNode> relation, SNode fromNode, long order) {
-
-      if (currNode instanceof SToken) {
-        SFeature featTokWhitespaceBefore = currNode.getFeature("annis::tok-whitespace-before");
-        if (featTokWhitespaceBefore != null) {
-          text.append(featTokWhitespaceBefore.getValue().toString());
-        }
-
-        SFeature featTok = currNode.getFeature(ANNIS_TOK);
-        if (featTok != null) {
-          int idxStart = text.length();
-          text.append(featTok.getValue_STEXT());
-          token2Range.put((SToken) currNode, Range.closed(idxStart, text.length()));
-        }
-
-        SFeature featTokWhitespaceAfter = currNode.getFeature("annis::tok-whitespace-after");
-        if (featTokWhitespaceAfter != null) {
-          text.append(featTokWhitespaceAfter.getValue().toString());
-        }
-      }
-
-    }
-  }
 
   private final SDocumentGraph graph;
 
@@ -176,7 +120,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     Optional<String> currentTargetId = Optional.empty();
     Optional<String> currentComponent = Optional.empty();
 
-    SortedMap<String, STextualDS> datasources = new TreeMap<>();
+    SortedMap<String, STextualDS> datasourcesInGraphMl = new TreeMap<>();
     Map<SToken, SToken> gapEdges = new HashMap<>();
 
     Map<String, String> data = new HashMap<>();
@@ -256,8 +200,7 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
                   setNodeName(ds, currentNodeId.get());
                   mapLabels(ds, data, true);
                   ds.setText("");
-                  graph.addNode(ds);
-                  datasources.put(Helper.addSaltPrefix(currentNodeId.get()), ds);
+                  datasourcesInGraphMl.put(Helper.addSaltPrefix(currentNodeId.get()), ds);
                 }
               }
               currentNodeId = Optional.empty();
@@ -293,28 +236,9 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
       }
     }
 
-
-    // Create the textual DS for the minimal token roots
-    if (datasources.isEmpty()) {
-      // Find roots ignoring the data source
-      List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, null);
-      if (!orderedTokenRoots.isEmpty()) {
-        // Create an empty default data source, because there are none yet
-        STextualDS ds = SaltFactory.createSTextualDS();
-        ds.setText("");
-        graph.addNode(ds);
-        // Use this default data source to attach the token to
-        recreateTextForRootNodes(orderedTokenRoots, ds);
-      }
-    } else {
-      // Sort data sources by their name
-
-      for (STextualDS ds : datasources.values()) {
-        List<SToken> orderedTokenRoots = getOrderedTokenRootsForDatasource(graph, gapEdges, ds);
-        recreateTextForRootNodes(orderedTokenRoots, ds);
-      }
-    }
-
+    // Always create own own data sources from the tokens. Get all real token roots (ignore gaps)
+    // and create a data source for each of them.
+    recreateTextForTokenRoots(graph, gapEdges, datasourcesInGraphMl);
 
     // Create the text annotation for the segmentation nodes
     Multimap<String, SNode> orderRoots = graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
@@ -428,79 +352,89 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
     }
   }
 
-  private List<SToken> getOrderedTokenRootsForDatasource(SDocumentGraph graph,
-      Map<SToken, SToken> gapEdges, STextualDS ds) {
-    Map<SToken, SToken> outgoingOrderingEdges = new HashMap<>();
-    Map<SToken, SToken> incomingOrderingEdgesWithGaps = new HashMap<>();
+  private void recreateTextForTokenRoots(SDocumentGraph graph, Map<SToken, SToken> gapEdges,
+      SortedMap<String, STextualDS> datasourcesInGraphMl) {
+
+    Map<SToken, SToken> nextToken = new HashMap<>();
+    Map<SToken, SToken> incomingOrderingEdgesWithGaphs = new HashMap<>();
 
     for (SOrderRelation rel : graph.getOrderRelations()) {
-      if (("".equals(rel.getType()) || rel.getType() == null) && rel.getSource() instanceof SToken
+      if ((rel.getType() == null || "".equals(rel.getType())) && rel.getSource() instanceof SToken
           && rel.getTarget() instanceof SToken) {
-        outgoingOrderingEdges.put((SToken) rel.getSource(), (SToken) rel.getTarget());
-        incomingOrderingEdgesWithGaps.put((SToken) rel.getTarget(), (SToken) rel.getSource());
+        SToken source = (SToken) rel.getSource();
+        SToken target = (SToken) rel.getTarget();
+
+        nextToken.put(source, target);
+        incomingOrderingEdgesWithGaphs.put(target, source);
       }
     }
 
     for (Map.Entry<SToken, SToken> rel : gapEdges.entrySet()) {
-      incomingOrderingEdgesWithGaps.put(rel.getValue(), rel.getKey());
+      incomingOrderingEdgesWithGaphs.put(rel.getValue(), rel.getKey());
     }
-    
-    // Get all root nodes of this data source (token without any incoming ordering edge)
-    List<SToken> datasourceRoots = graph.getTokens().stream()
-        .filter(t -> !incomingOrderingEdgesWithGaps.containsKey(t))
-        .filter(t -> ds == null
-            || isPartOf.get(t.getId()).stream().anyMatch(dsId -> ds.getId().equals(dsId)))
-        .collect(Collectors.toList());
 
-    List<SToken> result = new ArrayList<>();
-    // Create an ordered list of local roots (without the gap ordering edges) by following the
-    // outgoing ordering edges
-    for(SToken root : datasourceRoots) {
-      SToken token = root;
+    // Get all root nodes (tokens without any incoming ordering edge, including gap edges)
+    List<SToken> roots = graph.getTokens().stream()
+        .filter(t -> !incomingOrderingEdgesWithGaphs.containsKey(t)).collect(Collectors.toList());
 
-      while (token != null) {
-        result.add(token);
+    for (SToken rootForText : roots) {
+      final StringBuilder text = new StringBuilder();
 
-        // Skip to to end of this token chain
-        while (outgoingOrderingEdges.containsKey(token)) {
-          token = outgoingOrderingEdges.get(token);
-        }
+      Map<SToken, Range<Integer>> token2Range = new HashMap<>();
+
+      // traverse the token chain using the order relations
+      SToken currentToken = rootForText;
+      while (currentToken != null) {
+        addToken(currentToken, text, token2Range);
+
+        SToken previousToken = currentToken;
+        currentToken = nextToken.get(previousToken);
         // Step over the possible gap
-        token = gapEdges.get(token);
+        if (currentToken == null) {
+          currentToken = gapEdges.get(previousToken);
+        }
       }
+
+
+      STextualDS ds = graph.createTextualDS(text.toString());
+      if (datasourcesInGraphMl.size() == 1) {
+        STextualDS origDs = datasourcesInGraphMl.get(datasourcesInGraphMl.firstKey());
+        ds.setName(origDs.getName());
+      }
+
+      // add all relations
+      token2Range.forEach((t, r) -> {
+        STextualRelation rel = SaltFactory.createSTextualRelation();
+        rel.setSource(t);
+        rel.setTarget(ds);
+        rel.setStart(r.lowerEndpoint());
+        rel.setEnd(r.upperEndpoint());
+        graph.addRelation(rel);
+      });
     }
 
-    return result;
 
   }
 
-
-  private void recreateTextForRootNodes(Collection<? extends SNode> rootsForText, STextualDS ds) {
-
-    final StringBuilder text = new StringBuilder();
-
-    Map<SToken, Range<Integer>> token2Range = new HashMap<>();
-
-    // traverse the token chain using the order relations
-    for (SNode root : rootsForText) {
-      graph.traverse(Arrays.asList(root), SGraph.GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-          "ORDERING",
-          new RecreateTextForRootNodeTraverser(token2Range, text));
+  private void addToken(SToken token, StringBuilder text, Map<SToken, Range<Integer>> token2Range) {
+    SFeature featTokWhitespaceBefore = token.getFeature("annis::tok-whitespace-before");
+    if (featTokWhitespaceBefore != null) {
+      text.append(featTokWhitespaceBefore.getValue().toString());
     }
 
-    // update the actual text
-    ds.setText(text.toString());
+    SFeature featTok = token.getFeature(ANNIS_TOK);
+    if (featTok != null) {
+      int idxStart = text.length();
+      text.append(featTok.getValue_STEXT());
+      token2Range.put(token, Range.closed(idxStart, text.length()));
+    }
 
-    // add all relations
-    token2Range.forEach((t, r) -> {
-      STextualRelation rel = SaltFactory.createSTextualRelation();
-      rel.setSource(t);
-      rel.setTarget(ds);
-      rel.setStart(r.lowerEndpoint());
-      rel.setEnd(r.upperEndpoint());
-      graph.addRelation(rel);
-    });
+    SFeature featTokWhitespaceAfter = token.getFeature("annis::tok-whitespace-after");
+    if (featTokWhitespaceAfter != null) {
+      text.append(featTokWhitespaceAfter.getValue().toString());
+    }
   }
+
 
 
   private void addTextToSegmentation(final String name, List<SNode> rootNodes) {
@@ -513,7 +447,6 @@ public class DocumentGraphMapper extends AbstractGraphMLMapper {
               String traversalId, @SuppressWarnings("rawtypes") SRelation relation, SNode currNode,
               long order) {
             if (relation == null) {
-              // TODO: check if this is ever true
               return true;
             } else if (relation instanceof SOrderRelation
                 && Objects.equal(name, relation.getType())) {

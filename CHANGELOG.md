@@ -5,6 +5,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update to graphANNIS 3.7.1
+
+### Added
+
+- `sentstructurejs` visualizer also works for multiple segmentations. 
+  Via an optional mapping `edge_type` the alignment edges can be specified,
+  which must match the internally derived STYPE. No value for `edge_name`
+  incorporates all poiting relations. To work with multiple segmentations,
+  the aligned segmentations need to have an ordering with a unique name.
+  Furthermore, the ordered nodes provide the segment values for the visualizer
+  through annotations with a name that is equal to the ordering name.
+  The namespace is optional, i. e. can be empty, equal to the layer name
+  or ordering name, or `default_ns`.
+
+## [4.12.4] - 2025-02-05
+
+### Fixed
+
+- Use native aarch64 graphANNIS service on Apple Silicon instead of relying on emulation.
+- Updated to graphANNIS 3.6.0
+- Updated Java dependencies to fix security issues
+
+## [4.12.3] - 2024-11-18
+
+### Fixed
+
+- Grid visualizer now also display spans that do not belong to any node layer
+  when the "layer" is not specified in the resolver configuration. Before this
+  fix, the layer name was not checked, but the node still needed to be part of a
+  layer.
+- Updated to graphANNIS 3.5.1 which fixes an issue where a backup folder in the
+  database might not be loaded correctly and an issue where impossible precedence 
+  queries created a "File too large" error.
+- Allow to show text visualizations for documents where the token are not
+  connected to the textual data source.
+- Resolver entries with the "element" type "node" but no layer are now always 
+  shown.
+- Make the audio and video visualizer a little bit more robust when they are not 
+  pre-loaded.
+
 ## [4.12.2] - 2024-06-04
 
 ### Fixed
@@ -1400,7 +1442,9 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.12.2...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.12.4...HEAD
+[4.12.4]: https://github.com/korpling/ANNIS/compare/v4.12.3...v4.12.4
+[4.12.3]: https://github.com/korpling/ANNIS/compare/v4.12.2...v4.12.3
 [4.12.2]: https://github.com/korpling/ANNIS/compare/v4.12.1...v4.12.2
 [4.12.1]: https://github.com/korpling/ANNIS/compare/v4.12.0...v4.12.1
 [4.12.0]: https://github.com/korpling/ANNIS/compare/v4.11.3...v4.12.0

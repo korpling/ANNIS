@@ -18,7 +18,6 @@ import static org.corpus_tools.annis.gui.objects.AnnisConstants.FEAT_MATCHEDNODE
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
@@ -573,9 +572,6 @@ public class Helper {
       return token2index;
     }
 
-    final Multimap<String, SNode> orderRootsByType =
-        graph.getRootsByRelationType(SALT_TYPE.SORDER_RELATION);
-    final Set<SNode> orderRoots = new HashSet<>(orderRootsByType.get(""));
     List<SToken> sortedTokens;
 
     if (textualDS == null) {
@@ -589,16 +585,21 @@ public class Helper {
       sortedTokens = graph.getSortedTokenByText(graph.getTokensBySequence(seq));
     }
 
-    if (sortedTokens != null) {
-      int i = 0;
-      for (final SToken t : sortedTokens) {
-        if (i > 0 && orderRoots.contains(t)) {
-          // introduce a gap because the token stream is not complete
-          i += 1;
-        }
-        token2index.put(t, i++);
-      }
+    if (sortedTokens == null) {
+      return token2index;
     }
+
+    int i = 0;
+    for (final SToken t : sortedTokens) {
+      boolean hasIncomingOrderRel = t.getInRelations().stream()
+          .anyMatch(rel -> rel instanceof SOrderRelation && "".equals(rel.getType()));
+      if (i > 0 && !hasIncomingOrderRel) {
+        // introduce a gap because the token stream is not complete
+        i += 1;
+      }
+      token2index.put(t, i++);
+    }
+
 
     return token2index;
   }

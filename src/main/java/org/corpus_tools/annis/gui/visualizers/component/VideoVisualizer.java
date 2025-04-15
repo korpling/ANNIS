@@ -79,9 +79,9 @@ public class VideoVisualizer extends AbstractVisualizer { // NO_UCD (unused code
     MediaElementPlayer player =
         new MediaElementPlayer(MediaElement.video, binaryServletPath, mimeType);
 
-    if (VaadinSession.getCurrent().getAttribute(MediaController.class) != null) {
-      VaadinSession.getCurrent().getAttribute(MediaController.class).addMediaPlayer(player,
-          input.getId(), visToggle);
+    VaadinSession session = input.getUI().getSession();
+    if (session.getAttribute(MediaController.class) != null) {
+      session.getAttribute(MediaController.class).addMediaPlayer(player, input.getId(), visToggle);
     }
 
     return player;

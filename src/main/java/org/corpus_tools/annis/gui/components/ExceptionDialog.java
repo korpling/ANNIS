@@ -26,6 +26,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
+import org.corpus_tools.annis.ApiException;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.CommonUI;
 import org.corpus_tools.annis.gui.Helper;
@@ -94,6 +95,9 @@ public class ExceptionDialog extends Window implements Button.ClickListener {
         String message = ex != null ? ex.getMessage() : null;
         if (message == null || message.isEmpty()) {
             message = "<no message>";
+        }
+        if(ex instanceof ApiException) {
+          message = ((ApiException) ex).getResponseBody() + " (" + message + ")";
         }
         Label lblMessage = new Label(message);
         lblMessage.addStyleName("exception-message-content");
