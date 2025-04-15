@@ -1151,6 +1151,10 @@ texts using <a href="https://gitlab.cl.uzh.ch/sparcling/SentStructure.js">SentSt
 <p><img src="import-and-config/vis-sentstructurejs.png" alt="sentstructurejs visualizer for parallel corpus alignment" /></p>
 <h3 id="mappings-3"><a class="header" href="#mappings-3">Mappings</a></h3>
 <p>Use <code>alignment_label</code> to specify the edge annotation name that should be displayed.</p>
+<p>For filtering the edges that are considered for alignments, you can set <code>edge_type</code>
+to the name of the pointing relations. The name of a pointing relation component
+can be derived from the operator used to search them, e. g., <code>-&gt;align</code> is used
+for edges in the component with the name <code>align</code>.</p>
 <h2 id="discourse"><a class="header" href="#discourse"><code>discourse</code></a></h2>
 <p>A view of the entire text of a document, possibly with interactive coreference links.</p>
 <p><img src="import-and-config/vis-discourse.png" alt="discourse visualizer" /></p>
