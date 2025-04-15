@@ -306,7 +306,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-apple-darwin.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>2666134faabbd5098c33093f4a472ee16b1eb5c2274e60bf8b6c8d8c146ae3ff</sha256>
+                            <sha256>f44f58dbaabe3af86fbe1ba91f5deb424a2fb47b91d2368e6fe92c835a61cd6e</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
