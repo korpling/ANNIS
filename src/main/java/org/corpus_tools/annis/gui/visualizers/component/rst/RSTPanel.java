@@ -29,10 +29,6 @@ import org.corpus_tools.annis.gui.widgets.JITWrapper;
  * @author Benjamin Weißenfels {@literal <b.pixeldrama@gmail.com>}
  */
 public class RSTPanel extends Panel {
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -6927553315933396473L;
   private CssRenderInfo renderInfo;
 
   RSTPanel(VisualizerInput visInput) {
@@ -61,29 +57,40 @@ public class RSTPanel extends Panel {
     buttonRight.setHeight("100%");
     buttonRight.addStyleName("right-button");
 
-    buttonLeft.addClickListener(event -> {
-      if (rstView.getScrollLeft() < scrollStep) {
-        buttonLeft.setEnabled(false);
-        rstView.setScrollLeft(0);
-      } else {
-        // if the right button was deactivated set it back
-        rstView.setScrollLeft(rstView.getScrollLeft() - scrollStep);
-      }
+    buttonLeft.addClickListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        if (rstView.getScrollLeft() < scrollStep) {
+          buttonLeft.setEnabled(false);
+          rstView.setScrollLeft(0);
+        } else {
+          // if the right button was deactivated set it back
+          rstView.setScrollLeft(rstView.getScrollLeft() - scrollStep);
+        }
 
-      buttonRight.setEnabled(true);
+        buttonRight.setEnabled(true);
+      }
     });
 
-    buttonRight.addClickListener(event -> renderInfo.calculate("#" + rstView.getId() + " canvas"));
+    buttonRight.addClickListener(new Button.ClickListener() {
+      @Override
+      public void buttonClick(Button.ClickEvent event) {
+        renderInfo.calculate("#" + rstView.getId() + " canvas");
+      }
+    });
 
-    renderInfo = new CssRenderInfo((width, height) -> {
-      if (width - rstView.getScrollLeft() > scrollStep) {
-        buttonLeft.setEnabled(true);
-        rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
-      } else {
-        rstView.setScrollLeft(rstView.getScrollLeft() - (width - rstView.getScrollLeft()));
+    renderInfo = new CssRenderInfo(new CssRenderInfo.Callback() {
+      @Override
+      public void renderInfoReceived(int width, int height) {
+        if (width - rstView.getScrollLeft() > scrollStep) {
+          buttonLeft.setEnabled(true);
+          rstView.setScrollLeft(rstView.getScrollLeft() + scrollStep);
+        } else {
+          rstView.setScrollLeft(rstView.getScrollLeft() - (width - rstView.getScrollLeft()));
 
-        buttonLeft.setEnabled(true);
-        buttonRight.setEnabled(false);
+          buttonLeft.setEnabled(true);
+          buttonRight.setEnabled(false);
+        }
       }
     });
     rstView.addExtension(renderInfo);
