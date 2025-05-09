@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## Added
+
+- Backport support for RST++/RS4 features (secondary edges with signals) from ANNIS 3. 
+See <https://github.com/gucorpling/peppermodules-rs4module> and <https://github.com/korpling/pepperModules-RSTModules/pull/7>. 
+
 ## [4.13.0] - 2025-04-15
 
 ### Fixed
