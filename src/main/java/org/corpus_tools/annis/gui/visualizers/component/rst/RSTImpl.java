@@ -20,9 +20,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +37,7 @@ import org.corpus_tools.annis.gui.widgets.JITWrapper;
 import org.corpus_tools.annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SDominanceRelation;
 import org.corpus_tools.salt.common.SPointingRelation;
 import org.corpus_tools.salt.common.SStructure;
 import org.corpus_tools.salt.common.STextualDS;
@@ -105,18 +106,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RSTImpl extends Panel implements GraphTraverseHandler {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 1355629687872757529L;
-
-  // namespace for SProcessingAnnotation sentence index
-  static private final String SENTENCE_INDEX = "sentence_index";
-
-  static private final String SENTENCE_LEFT = "sentence_left";
-
-  static private final String SENTENCE_RIGHT = "sentence_right";
-
   // implements the AbstractComponent and talks to the VJITWrapperWidget
   private final JITWrapper jit;
 
@@ -143,6 +132,13 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
   // result graph
   private SDocumentGraph graph;
 
+  // namespace for SProcessingAnnotation sentence index
+  static private final String SENTENCE_INDEX = "sentence_index";
+
+  static private final String SENTENCE_LEFT = "sentence_left";
+
+  static private final String SENTENCE_RIGHT = "sentence_right";
+
   // contains all nodes which are marked as matches and child nodes of matches
   private final Map<SNode, Long> markedAndCovered;
 
@@ -150,15 +146,19 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   private String namespace;
 
-  private final Map<SToken, Integer> token2index = new HashMap<>();
+  private Set<SNode> visitedNodes;
 
-  private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
+  private Map<String, List<SStructure>> secondaryEdges;
+
 
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for mapping the sentence
    * to a number by the order of the SStructures in the list.
    */
   private final TreeSet<SStructure> sentences;
+
+
+  private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
   public RSTImpl(VisualizerInput visInput) {
 
@@ -171,6 +171,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     visId = "rst_" + uniqueID.toString();
 
     int tokIdx = 0;
+    Map<SToken, Integer> token2index = new HashMap<>();
     for (SToken tok : visInput.getDocument().getDocumentGraph().getSortedTokenByText()) {
       token2index.put(tok, tokIdx++);
     }
@@ -218,7 +219,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
         return pos;
       }
     });
-
     jit = new JITWrapper();
     jit.setWidth("100%");
     jit.setHeight("-1px");
@@ -242,6 +242,228 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     this.getContent().setSizeUndefined();
   }
 
+  private boolean isSecondaryEdgeNode(SNode sNode) {
+    return sNode.getAnnotation("sec", "relname") != null;
+  }
+
+  private boolean isSignalNode(SNode sNode) {
+    return sNode.getAnnotation("default_ns", "signal_type") != null;
+  }
+
+  private boolean isPrimarySignalNode(SNode sNode) {
+    return sNode.getAnnotation("default_ns", "signal_type") != null
+        && sNode.getAnnotation("sec", "signaled_relation") == null;
+  }
+
+  private boolean isSecondarySignalNode(SNode sNode) {
+    return sNode.getAnnotation("default_ns", "signal_type") != null
+        && sNode.getAnnotation("sec", "signaled_relation") != null;
+  }
+
+  private String transformSaltToJSON(VisualizerInput visInput) {
+    graph = visInput.getSResult().getDocumentGraph();
+    List<SNode> rootSNodes = graph.getRoots();
+    List<SNode> rstRoots = new ArrayList<SNode>();
+
+    for (SNode sNode : rootSNodes) {
+      if (Helper.checkSLayer(namespace, sNode) && !isSignalNode(sNode)
+          && !isSecondaryEdgeNode(sNode)) {
+        rstRoots.add(sNode);
+
+      }
+    }
+
+    secondaryEdges = new HashMap<>();
+    for (SNode n : graph.getNodes()) {
+      if (n.getAnnotation("sec", "relname") != null) {
+        String key = null;
+        for (SRelation r : n.getOutRelations()) {
+          SAnnotation ann = r.getAnnotation("default_ns", "end");
+          if (r instanceof SDominanceRelation && ann != null && ann.getValue().equals("source")) {
+            key = r.getTarget().getId();
+          }
+        }
+
+        if (!secondaryEdges.containsKey(key)) {
+          secondaryEdges.put(key, new ArrayList<>());
+        }
+        secondaryEdges.get(key).add((SStructure) n);
+      }
+    }
+
+    if (rootSNodes.size() > 0) {
+
+      // collect all sentence and sort them.
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "getSentences",
+          new GraphTraverseHandler() {
+            @Override
+            public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                SNode currNode, SRelation sRelation, SNode fromNode, long order) {
+              if (currNode instanceof SStructure && isSegment(currNode) && !isSignalNode(currNode)
+                  && !isSecondaryEdgeNode(currNode)) {
+                sentences.add((SStructure) currNode);
+              }
+            }
+
+            @Override
+            public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                SNode currNode, SRelation edge, SNode fromNode, long order) {}
+
+            @Override
+            public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
+                SRelation edge, SNode currNode, long order) {
+
+              // token are not needed
+              if (currNode instanceof SToken || edge instanceof SPointingRelation) {
+                return false;
+              }
+              if (sentences.contains((SStructure) currNode)) {
+                return false;
+              }
+
+              return true;
+            }
+          }, false);
+
+      // decorate segments with sentence number
+      int i = 1;
+      for (SStructure sentence : sentences) {
+        sentence.createProcessingAnnotation(SENTENCE_INDEX, SENTENCE_INDEX, Integer.toString(i));
+        i++;
+      }
+
+      visitedNodes = new HashSet<SNode>();
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this, false);
+    } else {
+      log.debug("does not find an annotation which matched {}", ANNOTATION_KEY);
+      visitedNodes = new HashSet<SNode>();
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this, false);
+    }
+
+    return result.toString();
+  }
+
+  private JSONObject jsonizeSignalNode(SNode node) {
+    JSONObject signal = new JSONObject();
+    signal.put("type", node.getAnnotation("default_ns", "signal_type").getValue());
+    signal.put("subtype", node.getAnnotation("default_ns", "signal_subtype").getValue());
+    JSONArray indexes = new JSONArray();
+    SAnnotation indexesAnn = node.getAnnotation("default_ns", "signal_indexes");
+    if (indexesAnn != null && ((String) indexesAnn.getValue()).length() > 0) {
+      for (String index : ((String) indexesAnn.getValue()).split(" ")) {
+        indexes.put(index);
+      }
+    }
+    signal.put("indexes", indexes);
+    return signal;
+  }
+
+  private JSONArray jsonizeSecondarySignals(SNode currNode) {
+    JSONArray secondarySignals = new JSONArray();
+    // for each incoming relation
+    for (SRelation<SNode, SNode> relation : currNode.getInRelations()) {
+
+      SNode source = relation.getSource();
+      if (source.getAnnotation("sec", "signaled_relation") != null) {
+        secondarySignals.put(jsonizeSignalNode(source));
+      }
+    }
+    return secondarySignals;
+  }
+
+  private JSONObject createJsonEntry(SNode currNode) {
+    JSONObject jsonData = new JSONObject();
+    JSONObject data = new JSONObject();
+    StringBuilder sb = new StringBuilder();
+    // use a hash set so we don't get any duplicate entries
+    LinkedHashSet<SToken> token = new LinkedHashSet<>();
+    List<SRelation<SNode, SNode>> edges;
+
+    if (currNode instanceof SStructure) {
+
+      edges = currNode.getGraph().getOutRelations(currNode.getId());
+
+      // get all tokens directly dominated tokens and build a string
+      for (SRelation<SNode, SNode> sedge : edges) {
+        if (sedge.getTarget() instanceof SToken) {
+          token.add((SToken) sedge.getTarget());
+        }
+      }
+
+      // build strings
+      Iterator<SToken> tokIterator = token.iterator();
+      while (tokIterator.hasNext()) {
+        SToken tok = tokIterator.next();
+        String text = getText(tok);
+        String color = getHTMLColor(tok);
+
+        if (color != null) {
+          sb.append("<span class=\"rst-token\" style=\"color : ").append(color).append(";\">");
+        } else {
+          sb.append("<span class=\"rst-token\">");
+        }
+
+        if (tokIterator.hasNext()) {
+          sb.append(text).append(" ");
+        } else {
+          sb.append(text);
+        }
+
+        sb.append("</span>");
+      }
+
+      // add signals
+      JSONArray signals = new JSONArray();
+      for (SRelation<SNode, SNode> relation : currNode.getInRelations()) {
+        if (isPrimarySignalNode(relation.getSource())) {
+          signals.put(jsonizeSignalNode(relation.getSource()));
+        }
+      }
+      if (signals.length() > 0) {
+        data.put("signals", signals);
+      }
+    }
+
+    // add secondary signals and edges
+    JSONArray secondarySignals = jsonizeSecondarySignals(currNode);
+    JSONArray secEdges = jsonizeSecondaryEdges(currNode);
+    data.put("secondarySignals", secondarySignals);
+    data.put("secondaryEdges", secEdges);
+
+    // build unique id, cause is used for an unique html element id.
+    jsonData.put("id", getUniStrId(currNode));
+    jsonData.put("name", currNode.getName());
+
+    /**
+     * additional data oject for edge labels and rendering sentences
+     */
+    JSONArray edgesJSON = getOutGoingEdgeTypeAnnotation(currNode);
+
+
+    // since we have found some tokens, it must be a sentence in RST.
+    if (token.size() > 0) {
+      data.put("sentence", sb.toString());
+    }
+
+
+    if (edgesJSON != null) {
+      data.put("edges", edgesJSON);
+    }
+
+    if (currNode instanceof SStructure && isSegment(currNode)) {
+      SProcessingAnnotation sentence_idx =
+          currNode.getProcessingAnnotation(SENTENCE_INDEX + "::" + SENTENCE_INDEX);
+      int index = sentence_idx == null ? -1 : Integer.parseInt(sentence_idx.getValue_STEXT());
+
+      data.put(SENTENCE_LEFT, index);
+      data.put(SENTENCE_RIGHT, index);
+    }
+
+    jsonData.put("data", data);
+
+    return jsonData;
+  }
+
   private JSONObject appendChild(JSONObject root, JSONObject node, SNode currSnode) {
     try {
       // is set to true, when currNode is reached by an rst edge
@@ -252,8 +474,10 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       if (in != null) {
 
         for (SRelation<SNode, SNode> e : in) {
-          if (hasRSTType(e)) {
+          // Don't follow SPointingRelations for secondary edges
+          if (hasRSTType(e) && SDominanceRelation.class.isInstance(e)) {
             JSONObject tmp;
+
 
             if (st.size() > 1) {
               tmp = st.pop();
@@ -283,108 +507,214 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     return node;
   }
 
+  private JSONArray jsonizeSecondaryEdges(SNode node) throws JSONException {
+    Set<SAnnotation> annos;
+    JSONArray edgeData = new JSONArray();
+
+    if (!secondaryEdges.containsKey(node.getId())) {
+      return edgeData;
+    }
+
+    List<SStructure> secEdges = secondaryEdges.get(node.getId());
+
+    for (SStructure edge : secEdges) {
+      JSONObject jsonEdge = new JSONObject();
+      edgeData.put(jsonEdge);
+
+      jsonEdge.put("sType", "rst");
+      String from = getUniStrId(node);
+      SNode toNode = null;
+      for (SRelation r : edge.getOutRelations()) {
+        SAnnotation ann = r.getAnnotation("default_ns", "end");
+        if (r instanceof SDominanceRelation && ann != null && ann.getValue().equals("target")) {
+          toNode = (SNode) r.getTarget();
+        }
+      }
+      if (toNode == null) {
+        // This shouldn't happen!
+        log.error("Couldn't determine a target node for a secondary edge!");
+        continue;
+      }
+      String to = getUniStrId(toNode);
+      jsonEdge.put("from", from);
+      jsonEdge.put("to", to);
+
+      annos = edge.getAnnotations();
+
+      if (annos != null) {
+        for (SAnnotation anno : annos) {
+          // Exclude is_signaled and reversed annotations, which we don't want to visualize
+          if (!anno.getName().equals("is_signaled") && !anno.getName().equals("reverse")) {
+            getOrCreateArray(jsonEdge, "annotation").put(anno.getValue_STEXT());
+          }
+        }
+      }
+
+    }
+
+    return edgeData;
+  }
+
+  @Override
+  public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
+      SRelation sRelation, SNode fromNode, long order) {
+
+    st.push(createJsonEntry(currNode));
+
+  }
+
+  @Override
+  public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
+      SRelation edge, SNode fromNode, long order) {
+    assert st.size() > 0;
+
+    if (st.size() == 1) {
+      try {
+        getOrCreateArray(result, "children").put(st.pop());
+        sortChildren(result);
+      } catch (JSONException ex) {
+        log.error("Problems with adding roots", ex);
+      }
+    } else {
+      JSONObject jsonNode = st.pop();
+      appendChild(st.peek(), jsonNode, currNode);
+    }
+  }
+
   @Override
   public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
       SRelation incomingEdge, SNode currNode, long order) {
-    // token data structures are not needed and we also ignore any pointing relations
+    // token data structures are not needed
     if (currNode instanceof SToken || incomingEdge instanceof SPointingRelation) {
       return false;
-    } else if (Helper.checkSLayer(namespace, currNode)) {
+    } else if (Helper.checkSLayer(namespace, currNode) && !visitedNodes.contains(currNode)) {
+      visitedNodes.add(currNode);
       return true;
     }
 
     return false;
   }
 
-  private JSONObject createJsonEntry(SNode currNode) {
-    JSONObject jsonData = new JSONObject();
-    JSONObject data = new JSONObject();
-    StringBuilder sb = new StringBuilder();
-    // use a hash set so we don't get any duplicate entries
-    LinkedHashSet<SToken> token = new LinkedHashSet<>();
-    List<SRelation<SNode, SNode>> edges;
+  private JSONArray getOrCreateArray(JSONObject parent, String key) throws JSONException {
+    JSONArray array = parent.has(key) ? parent.getJSONArray(key) : null;
+    if (array == null) {
+      array = new JSONArray();
+      parent.put(key, array);
+    }
+    return array;
+  }
 
-    if (currNode instanceof SStructure) {
+  /**
+   * Gets the overlapping token as string from a node, which are direct dominated by this node.
+   *
+   * @param currNode
+   * @return is null, if there is no relation to a token, or there is more then one STEXT is
+   *         overlapped by this node
+   */
+  private String getText(SToken currNode) {
 
-      SDocumentGraph dgraph = ((SStructure) currNode).getGraph();
-      edges = currNode.getGraph().getOutRelations(currNode.getId());
-      List<SToken> overlappedToken = new LinkedList<>();
-      // get all tokens directly dominated tokens and build a string
-      for (SRelation<SNode, SNode> sedge : edges) {
-        if (sedge.getTarget() instanceof SToken) {
-          overlappedToken.add((SToken) sedge.getTarget());
-        }
-      }
-      token.addAll(dgraph.getSortedTokenByText(overlappedToken));
+    List<DataSourceSequence> sSequences = ((SDocumentGraph) currNode.getGraph())
+        .getOverlappedDataSourceSequence(currNode, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
 
-      // build strings
-      Iterator<SToken> tokIterator = token.iterator();
-      while (tokIterator.hasNext()) {
-        SToken tok = tokIterator.next();
-        String text = getText(tok);
-        String color = getHTMLColor(tok);
-
-        if (color != null) {
-          sb.append("<span class=\"rst-token\" style=\"color : ").append(color).append(";\">");
-        } else {
-          sb.append("<span class=\"rst-token\">");
-        }
-
-        if (tokIterator.hasNext()) {
-          sb.append(text).append(" ");
-        } else {
-          sb.append(text);
-        }
-
-        sb.append("</span>");
-      }
-
-      // add signals
-      JSONArray signals = new JSONArray();
-      for (SRelation<SNode, SNode> relation : currNode.getInRelations()) {
-        if (isSignalNode(relation.getSource())) {
-          signals.put(jsonizeSignalNode(relation.getSource()));
-        }
-      }
-      if (signals.length() > 0) {
-        data.put("signals", signals);
-      }
+    // only support one text for spanns
+    if (sSequences == null || sSequences.size() != 1) {
+      log.error("rst supports only one text and only text level");
+      return null;
     }
 
-    try {
-      // build unique id, cause is used for an unique html element id.
-      jsonData.put("id", getUniStrId(currNode));
-      jsonData.put("name", currNode.getName());
+    log.debug("sSequences {}", sSequences.toString());
 
-      /**
-       * additional data oject for edge labels and rendering sentences
-       */
-      JSONArray edgesJSON = getOutGoingEdgeTypeAnnotation(currNode);
+    /**
+     * Check if it is a text data structure. As described in the salt manual in chapter "5.8 More
+     * specific nodes and relations" the start and end point of a range of token is stored in
+     * superordinate node of type SSequentialDS
+     */
+    if (sSequences.get(0).getDataSource() instanceof STextualDS) {
+      STextualDS text = ((STextualDS) sSequences.get(0).getDataSource());
+      int start = sSequences.get(0).getStart().intValue();
+      int end = sSequences.get(0).getEnd().intValue();
+      return text.getText().substring(start, end);
 
-      // since we have found some tokens, it must be a sentence in RST.
-      if (token.size() > 0) {
-        data.put("sentence", sb.toString());
-      }
 
-      if (edgesJSON != null) {
-        data.put("edges", edgesJSON);
-      }
-
-      if (currNode instanceof SStructure && isSegment(currNode)) {
-        SProcessingAnnotation sentence_idx =
-            currNode.getProcessingAnnotation(SENTENCE_INDEX + "::" + SENTENCE_INDEX);
-        int index = sentence_idx == null ? -1 : Integer.parseInt(sentence_idx.getValue_STEXT());
-
-        data.put(SENTENCE_LEFT, index);
-        data.put(SENTENCE_RIGHT, index);
-      }
-
-      jsonData.put("data", data);
-    } catch (JSONException ex) {
-      log.error("problems create entry for {}", currNode, ex);
     }
 
-    return jsonData;
+    // something fundamentally goes wrong
+    log.error("{} instead of {}", sSequences.get(0).getDataSource().getClass().getName(),
+        STextualDS.class.getName());
+
+
+    return null;
+  }
+
+  private JSONArray getOutGoingEdgeTypeAnnotation(SNode node) throws JSONException {
+    List<SRelation<SNode, SNode>> out = node.getGraph().getOutRelations(node.getId());
+    String type;
+    Set<SAnnotation> annos;
+    JSONArray edgeData = new JSONArray();
+
+
+    // check if there is a pointing relation
+    if (out == null) {
+      return edgeData;
+    }
+
+    for (SRelation<SNode, SNode> edge : out) {
+      // Skip secondary edges
+      if (SPointingRelation.class.isInstance(edge) && edge.getType().equals("rst")) {
+        continue;
+      }
+      if (edge.getTarget() instanceof SToken) {
+        continue;
+      }
+
+      type = ((SRelation) edge).getType();
+      String sTypeAsString = "edge";
+      if (type != null && !type.isEmpty()) {
+        sTypeAsString = type;
+      }
+
+      JSONObject jsonEdge = new JSONObject();
+      edgeData.put(jsonEdge);
+
+      jsonEdge.put("sType", sTypeAsString);
+
+
+      if (((SRelation) edge).getTarget() instanceof SNode) {
+        /**
+         * Invert the direction of the RST-edge.
+         */
+        if (getRSTType().equals(sTypeAsString)) {
+          jsonEdge.put("to", getUniStrId(node));
+          jsonEdge.put("from", getUniStrId((SNode) ((SRelation) edge).getTarget()));
+        } else {
+          jsonEdge.put("from", getUniStrId(node));
+          jsonEdge.put("to", getUniStrId((SNode) ((SRelation) edge).getTarget()));
+        }
+      } else {
+        throw new JSONException("could not cast to SNode");
+      }
+
+      annos = edge.getAnnotations();
+
+      if (annos != null) {
+        for (SAnnotation anno : annos) {
+          // Exclude is_signaled annotations, which we don't want to visualize
+          if (!anno.getName().equals("is_signaled")) {
+            getOrCreateArray(jsonEdge, "annotation").put(anno.getValue_STEXT());
+          }
+        }
+      }
+
+    }
+
+    return edgeData;
+  }
+
+  /**
+   * Build a unique HTML id.
+   */
+  private String getUniStrId(SNode node) {
+    return visId + "_" + node.getId();
   }
 
   /**
@@ -408,134 +738,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     return MatchedNodeColors.values()[color].getHTMLColor();
   }
 
-  private JSONArray getOrCreateArray(JSONObject parent, String key) throws JSONException {
-    JSONArray array = parent.has(key) ? parent.getJSONArray(key) : null;
-    if (array == null) {
-      array = new JSONArray();
-      parent.put(key, array);
-    }
-    return array;
-  }
-
-  private JSONArray getOutGoingEdgeTypeAnnotation(SNode node) throws JSONException {
-    List<SRelation<SNode, SNode>> out = node.getGraph().getOutRelations(node.getId());
-    String type;
-    Set<SAnnotation> annos;
-    JSONArray edgeData = new JSONArray();
-
-    // check if there is a pointing relation
-    if (out == null) {
-      return edgeData;
-    }
-
-    for (SRelation<SNode, SNode> edge : out) {
-      if (edge.getTarget() instanceof SToken) {
-        continue;
-      }
-
-      type = ((SRelation) edge).getType();
-      String sTypeAsString = "edge";
-      if (type != null && !type.isEmpty()) {
-        sTypeAsString = type;
-      }
-
-      JSONObject jsonEdge = new JSONObject();
-      edgeData.put(jsonEdge);
-
-      jsonEdge.put("sType", sTypeAsString);
-
-      if (((SRelation) edge).getTarget() instanceof SNode) {
-        /**
-         * Invert the direction of the RST-edge.
-         */
-        if (getRSTType().equals(sTypeAsString)) {
-          jsonEdge.put("to", getUniStrId(node));
-          jsonEdge.put("from", getUniStrId((SNode) ((SRelation) edge).getTarget()));
-        } else {
-          jsonEdge.put("from", getUniStrId(node));
-          jsonEdge.put("to", getUniStrId((SNode) ((SRelation) edge).getTarget()));
-        }
-      } else {
-        throw new JSONException("could not cast to SNode");
-      }
-
-      annos = edge.getAnnotations();
-
-      if (annos != null) {
-        for (SAnnotation anno : annos) {
-          getOrCreateArray(jsonEdge, "annotation").put(anno.getValue_STEXT());
-        }
-      }
-
-    }
-
-    return edgeData;
-  }
-
-  private String getRSTType() {
-    return mappings.getOrDefault("edge", RST_RELATION);
-  }
-
-  /**
-   * Gets the overlapping token as string from a node, which are direct dominated by this node.
-   *
-   * @param currNode
-   * @return is null, if there is no relation to a token, or there is more then one STEXT is
-   *         overlapped by this node
-   */
-  private String getText(SToken currNode) {
-
-    List<DataSourceSequence> sSequences = currNode.getGraph()
-        .getOverlappedDataSourceSequence(currNode, SALT_TYPE.STEXT_OVERLAPPING_RELATION);
-
-    // only support one text for spanns
-    if (sSequences == null || sSequences.size() != 1) {
-      log.error("rst supports only one text and only text level");
-      return null;
-    }
-
-    log.debug("sSequences {}", sSequences.toString());
-
-    /**
-     * Check if it is a text data structure. As described in the salt manual in chapter "5.8 More
-     * specific nodes and relations" the start and end point of a range of token is stored in
-     * superordinate node of type SSequentialDS
-     */
-    if (sSequences.get(0).getDataSource() instanceof STextualDS) {
-      STextualDS text = ((STextualDS) sSequences.get(0).getDataSource());
-      int start = sSequences.get(0).getStart().intValue();
-      int end = sSequences.get(0).getEnd().intValue();
-      return text.getText().substring(start, end);
-
-    }
-
-    // something fundamentally goes wrong
-    log.error("{} instead of {}", sSequences.get(0).getDataSource().getClass().getName(),
-        STextualDS.class.getName());
-
-    return null;
-  }
-
-  /**
-   * Build a unique HTML id.
-   */
-  private String getUniStrId(SNode node) {
-    return visId + "_" + node.getId();
-  }
-
-  private boolean hasRSTType(SRelation e) {
-    String type = e.getType();
-
-    if (e.getTarget() instanceof SToken && e.getType() == null) {
-      return true;
-    } else if (type != null) {
-      if (getRSTType().equalsIgnoreCase(type)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   /**
    * Checks, if there exists an SRelation which targets a SToken.
    */
@@ -552,51 +754,6 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     }
 
     return false;
-  }
-
-  private boolean isSignalNode(SNode sNode) {
-    return sNode.getAnnotation("default_ns", "signal_type") != null;
-  }
-
-  private JSONObject jsonizeSignalNode(SNode node) {
-    JSONObject signal = new JSONObject();
-    signal.put("type", node.getAnnotation("default_ns", "signal_type").getValue());
-    signal.put("subtype", node.getAnnotation("default_ns", "signal_subtype").getValue());
-    JSONArray indexes = new JSONArray();
-    SAnnotation indexesAnn = node.getAnnotation("default_ns", "signal_indexes");
-    if (indexesAnn != null) {
-      for (String index : ((String) indexesAnn.getValue()).split(" ")) {
-        indexes.put(index);
-      }
-    }
-    signal.put("indexes", indexes);
-    return signal;
-  }
-
-  @Override
-  public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
-      SRelation edge, SNode fromNode, long order) {
-    assert st.size() > 0;
-
-    if (st.size() == 1) {
-      try {
-        getOrCreateArray(result, "children").put(st.pop());
-        sortChildren(result);
-      } catch (JSONException ex) {
-        log.error("Problems with adding roots", ex);
-      }
-    } else {
-      JSONObject jsonNode = st.pop();
-      appendChild(st.peek(), jsonNode, currNode);
-    }
-  }
-
-  @Override
-  public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId, SNode currNode,
-      SRelation sRelation, SNode fromNode, long order) {
-
-    st.push(createJsonEntry(currNode));
-
   }
 
   /**
@@ -647,28 +804,31 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       childrenSorted.add(children.getJSONObject(i));
     }
 
-    Collections.sort(childrenSorted, (o1, o2) -> {
-      int o1IdxLeft = 0;
-      int o1IdxRight = 0;
-      int o2IdxLeft = 0;
-      int o2IdxRight = 0;
-      try {
-        o1IdxLeft = ((JSONObject) o1).getJSONObject("data").getInt(SENTENCE_LEFT);
-        o1IdxRight = ((JSONObject) o1).getJSONObject("data").getInt(SENTENCE_RIGHT);
-        o2IdxLeft = ((JSONObject) o2).getJSONObject("data").getInt(SENTENCE_LEFT);
-        o2IdxRight = ((JSONObject) o2).getJSONObject("data").getInt(SENTENCE_RIGHT);
-      } catch (JSONException ex) {
-        log.error("Could not compare sentence indizes.", ex);
-      }
+    Collections.sort(childrenSorted, new Comparator<Object>() {
+      @Override
+      public int compare(Object o1, Object o2) {
+        int o1IdxLeft = 0;
+        int o1IdxRight = 0;
+        int o2IdxLeft = 0;
+        int o2IdxRight = 0;
+        try {
+          o1IdxLeft = ((JSONObject) o1).getJSONObject("data").getInt(SENTENCE_LEFT);
+          o1IdxRight = ((JSONObject) o1).getJSONObject("data").getInt(SENTENCE_RIGHT);
+          o2IdxLeft = ((JSONObject) o2).getJSONObject("data").getInt(SENTENCE_LEFT);
+          o2IdxRight = ((JSONObject) o2).getJSONObject("data").getInt(SENTENCE_RIGHT);
+        } catch (JSONException ex) {
+          log.error("Could not compare sentence indizes.", ex);
+        }
 
-      if (o1IdxLeft + o1IdxRight > o2IdxLeft + o2IdxRight) {
-        return 1;
-      }
+        if (o1IdxLeft + o1IdxRight > o2IdxLeft + o2IdxRight) {
+          return 1;
+        }
 
-      if (o1IdxLeft + o1IdxRight == o2IdxLeft + o2IdxRight) {
-        return 0;
-      } else {
-        return -1;
+        if (o1IdxLeft + o1IdxRight == o2IdxLeft + o2IdxRight) {
+          return 0;
+        } else {
+          return -1;
+        }
       }
     });
 
@@ -676,66 +836,21 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     root.put("children", children);
   }
 
-  private String transformSaltToJSON(VisualizerInput visInput) {
-    graph = visInput.getSResult().getDocumentGraph();
-    List<SNode> rootSNodes = graph.getRoots();
-    List<SNode> rstRoots = new ArrayList<SNode>();
+  private boolean hasRSTType(SRelation e) {
+    String type = e.getType();
 
-    for (SNode sNode : rootSNodes) {
-      if (Helper.checkSLayer(namespace, sNode) && !isSignalNode(sNode)) {
-        rstRoots.add(sNode);
+    if (e.getTarget() instanceof SToken && e.getType() == null) {
+      return true;
+    }
+    else if (type != null) {
+      if (getRSTType().equalsIgnoreCase(type)) {
+        return true;
       }
     }
+    return false;
+  }
 
-    if (rootSNodes.size() > 0) {
-
-      // collect all sentence and sort them.
-      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "getSentences",
-          new GraphTraverseHandler() {
-            @Override
-            public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                SRelation edge, SNode currNode, long order) {
-
-              // token are not needed and we also ignore any pointing relations
-              if (currNode instanceof SToken || edge instanceof SPointingRelation) {
-                return false;
-              }
-
-              return true;
-            }
-
-            @Override
-            public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                SNode currNode, SRelation edge, SNode fromNode, long order) {}
-
-            @Override
-            public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType, String traversalId,
-                SNode currNode, SRelation sRelation, SNode fromNode, long order) {
-              if (currNode instanceof SStructure && isSegment(currNode)
-                  && !isSignalNode(currNode)) {
-                boolean added = sentences.add((SStructure) currNode);
-                if (!added) {
-                  log.warn(
-                      "Did not add node {} because another node with the same index already existed",
-                      currNode.getId());
-                }
-              }
-            }
-          });
-
-      // decorate segments with sentence number
-      int i = 1;
-      for (SStructure sentence : sentences) {
-        sentence.createProcessingAnnotation(SENTENCE_INDEX, SENTENCE_INDEX, Integer.toString(i));
-        i++;
-      }
-
-      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
-    } else {
-      log.debug("does not find an annotation which matched {}", ANNOTATION_KEY);
-      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "jsonBuild", this);
-    }
-
-    return result.toString();
+  private String getRSTType() {
+    return mappings.getOrDefault("edge", RST_RELATION);
   }
 }
