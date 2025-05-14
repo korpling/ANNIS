@@ -5,10 +5,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## Added
+### Added
 
 - Backport support for RST++/RS4 features (secondary edges with signals) from ANNIS 3. 
 See <https://github.com/gucorpling/peppermodules-rs4module> and <https://github.com/korpling/pepperModules-RSTModules/pull/7>. 
+
+### Fixed
+
+- Updated to [graphANNIS 3.8.0](https://github.com/korpling/graphANNIS/releases/tag/v3.8.0). 
+  It fixes amongst other things performance issues when querying complex `@*`
+  queries and limits the output of logging information about the corpus cache.
+  **To utilise the performance improvement, you have to reimport existing
+  corpora.** 
 
 ## [4.13.0] - 2025-04-15
 
