@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.14.0] - 2025-05-14
+
 ### Added
 
 - Backport support for RST++/RS4 features (secondary edges with signals) from ANNIS 3. 
@@ -1457,7 +1459,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.13.0...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.14.0...HEAD
+[4.14.0]: https://github.com/korpling/ANNIS/compare/v4.13.0...v4.14.0
 [4.13.0]: https://github.com/korpling/ANNIS/compare/v4.12.4...v4.13.0
 [4.12.4]: https://github.com/korpling/ANNIS/compare/v4.12.3...v4.12.4
 [4.12.3]: https://github.com/korpling/ANNIS/compare/v4.12.2...v4.12.3
