@@ -209,7 +209,7 @@ public class CorpusBrowserPanel extends Panel {
         }
       }
 
-      getUI().access(() -> {
+      ui.access(() -> {
 
         TreeSet<CorpusBrowserEntry> nodeAnnoItems = new TreeSet<>();
         TreeSet<CorpusBrowserEntry> edgeAnnoItems = new TreeSet<>();
