@@ -5,6 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `grid` visualizer has a mapping `hide_text_name` (bool) that allows to hide the text name. It defaults to false.
+
 ## [4.14.0] - 2025-05-14
 
 ### Added
