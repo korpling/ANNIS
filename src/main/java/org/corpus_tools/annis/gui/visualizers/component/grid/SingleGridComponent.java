@@ -410,6 +410,10 @@ public class SingleGridComponent extends Panel implements GridComponent {
     return Boolean.parseBoolean(input.getMappings().getOrDefault(MAPPING_HIDE_TOK_KEY, "false"));
 
   }
+  
+  protected boolean isHidingTextName() {
+	  return Boolean.parseBoolean(input.getMappings().getOrDefault(MAPPING_HIDE_TEXT_NAME, "false"));
+  }
 
   protected boolean isShowingSpanAnnotations() {
     return true;

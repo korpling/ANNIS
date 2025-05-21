@@ -25,10 +25,16 @@ public class MultipleGridComponent extends CssLayout implements GridComponent {
 
         GridComponent g =
             new SingleGridComponent(visInput, mediaController, pdfController, forceToken, text);
-        Label label = new Label(text.getName());
-        label.setStyleName("text-name");
+        boolean hideTextName = ((SingleGridComponent) g).isHidingTextName();
+        Label label = null;
+        if (!hideTextName) {
+	        label = new Label(text.getName());
+	        label.setStyleName("text-name");
+        }
         addComponent(g);
-        addComponent(label);
+        if (label != null) {
+        	addComponent(label);
+        }
       }
     }
   }
