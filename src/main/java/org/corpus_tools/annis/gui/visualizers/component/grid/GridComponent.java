@@ -24,5 +24,5 @@ public interface GridComponent extends Component {
   public static final String MAPPING_ESCAPE_HTML = "escape_html";
   public static final String MAPPING_SHOW_NAMESPACE = "show_ns";
   public static final String MAPPING_GRID_TEMPLATES = "templates";
-
+  public static final String MAPPING_HIDE_TEXT_NAME = "hide_text_name";
 }
