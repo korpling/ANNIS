@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [4.15.0] - 2025-05-22
+
 ### Added
 
 - `grid` visualizer has a mapping `hide_text_name` (bool) that allows to hide the text name. It defaults to false.
@@ -1471,7 +1473,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.14.0...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.15.0...HEAD
+[4.15.0]: https://github.com/korpling/ANNIS/compare/v4.14.0...v4.15.0
 [4.14.0]: https://github.com/korpling/ANNIS/compare/v4.13.0...v4.14.0
 [4.13.0]: https://github.com/korpling/ANNIS/compare/v4.12.4...v4.13.0
 [4.12.4]: https://github.com/korpling/ANNIS/compare/v4.12.3...v4.12.4
