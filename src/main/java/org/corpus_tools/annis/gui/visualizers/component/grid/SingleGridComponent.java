@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import org.corpus_tools.annis.gui.AnnisUI;
 import org.corpus_tools.annis.gui.Helper;
@@ -44,11 +45,13 @@ import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.STextualDS;
+import org.corpus_tools.salt.common.STimeline;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
 import org.corpus_tools.salt.core.SFeature;
 import org.corpus_tools.salt.core.SNode;
 import org.corpus_tools.salt.core.SRelation;
+import org.corpus_tools.salt.util.DataSourceSequence;
 
 /**
  *
@@ -227,6 +230,16 @@ public class SingleGridComponent extends Panel implements GridComponent {
 
     return tokenRow;
   }
+  
+  private Row computeTimelineRow(STimeline timeline) {
+    Row timelineRow = new Row();
+    for (int i = timeline.getStart(); i < timeline.getEnd(); i++) {
+      GridEvent event = new GridEvent(timeline.getId() + "-" + i, i, i, "" + i);
+      timelineRow.addEvent(event);
+    }
+
+    return timelineRow;
+  }
 
   private boolean createAnnotationGrid() {
     String resultID = input.getId();
@@ -303,8 +316,6 @@ public class SingleGridComponent extends Panel implements GridComponent {
                   if (origValue.equals(targetValue)) {
                     ev.setValue(unit_split[1]);
                   }
-                  // String newValue = unit_split[1].replaceAll("%%value%%",origValue);
-
                 }
 
               }
@@ -314,47 +325,109 @@ public class SingleGridComponent extends Panel implements GridComponent {
       }
     }
 
-    // add tokens as row
-    Row tokenRow = computeTokenRow(sortedSegmentationNodes, graph, rowsByAnnotation, token2index);
+    boolean tokenRowIsEmpty = true;
+    STimeline timeline = graph.getTimeline();
+    if (timeline != null) {
+      Row timelineRow = computeTimelineRow(timeline);
+      timelineRow.setStyle("invisible_token");
 
-    String tokenRowCaption = "tok";
-    if (isHidingToken()) {
-
-      // We have to add the invisible token row avoid issues with the layout
-      // (see https://github.com/korpling/ANNIS/issues/524)
-      // but we don't want the invisible token layer to override an actual "tok"
-      // annotation layer (see https://github.com/korpling/ANNIS/issues/596)
-      tokenRow.setStyle("invisible_token");
-      tokenRowCaption = "";
+      tokenRowIsEmpty = false;
       grid.setTokRowKey("");
-    }
+      rowsByAnnotation.put("", Lists.newArrayList(timelineRow));
+      if (!isHidingToken()) {
+        TreeMap<String, Row> allTokenRows = new TreeMap<>();
+        // also calculate tokens from *all* texts as rows and display them aligned by the timeline
+        for (STextualDS ds : graph.getTextualDSs()) {
+          Row tokenRow = new Row();
 
-    if (isTokenFirst()) {
-      // copy original list but add token row at the beginning
-      LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
+          final DataSourceSequence<Number> seq = new DataSourceSequence<>();
+          seq.setDataSource(ds);
+          seq.setStart(0);
+          seq.setEnd(ds.getText() != null ? ds.getText().length() : 0);
+          List<SToken> tokensForDs = graph.getTokensBySequence(seq);
 
-      newList.put(tokenRowCaption, Lists.newArrayList(tokenRow));
-      newList.putAll(rowsByAnnotation);
-      rowsByAnnotation = newList;
+          if (tokensForDs != null) {
+            for (SToken t : tokensForDs) {
+              Range<Integer> tokenRange = TimelineSpanCollector.getRange(graph, t);
+              GridEvent event = new GridEvent(t.getId(), tokenRange.lowerEndpoint(),
+                  tokenRange.upperEndpoint(), graph.getText(t));
+              event.setTextID(ds.getId());
+              for (Range<Integer> coveredRange : TimelineSpanCollector.getAllRanges(graph, t)) {
+                for (int i = coveredRange.lowerEndpoint(); i <= coveredRange.upperEndpoint(); i++) {
+                  event.getCoveredIDs().add(timeline.getId() + "-" + i);
+                }
+              }
+              tokenRow.addEvent(event);
+            }
+          }
+
+          allTokenRows.put(ds.getName(), tokenRow);
+        }
+
+        if (isTokenFirst()) {
+          // copy original list but add token row at the beginning
+          LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
+
+          for (Map.Entry<String, Row> entry : allTokenRows.entrySet()) {
+            newList.put(entry.getKey(), Lists.newArrayList(entry.getValue()));
+          }
+          newList.putAll(rowsByAnnotation);
+          rowsByAnnotation = newList;
+        } else {
+          for (Map.Entry<String, Row> entry : allTokenRows.entrySet()) {
+            rowsByAnnotation.put(entry.getKey(), Lists.newArrayList(entry.getValue()));
+          }
+        }
+
+        for (Row tokenRow : allTokenRows.values()) {
+          EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
+        }
+      }
+
 
     } else {
-      // just add the token row to the end of the list
-      rowsByAnnotation.put(tokenRowCaption, Lists.newArrayList(tokenRow));
-    }
+      // add tokens as row
+      Row tokenRow = computeTokenRow(sortedSegmentationNodes, graph, rowsByAnnotation, token2index);
 
-    EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
+      String tokenRowCaption = "tok";
+      if (isHidingToken()) {
 
-    // check if the token row only contains empty values
-    boolean tokenRowIsEmpty = true;
-    for (GridEvent tokenEvent : tokenRow.getEvents()) {
-      if (tokenEvent.getValue() != null && !tokenEvent.getValue().trim().isEmpty()) {
-        tokenRowIsEmpty = false;
-        break;
+        // We have to add the invisible token row avoid issues with the layout
+        // (see https://github.com/korpling/ANNIS/issues/524)
+        // but we don't want the invisible token layer to override an actual "tok"
+        // annotation layer (see https://github.com/korpling/ANNIS/issues/596)
+        tokenRow.setStyle("invisible_token");
+        tokenRowCaption = "";
+        grid.setTokRowKey("");
+      }
+
+      if (isTokenFirst()) {
+        // copy original list but add token row at the beginning
+        LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
+
+        newList.put(tokenRowCaption, Lists.newArrayList(tokenRow));
+        newList.putAll(rowsByAnnotation);
+        rowsByAnnotation = newList;
+
+      } else {
+        // just add the token row to the end of the list
+        rowsByAnnotation.put(tokenRowCaption, Lists.newArrayList(tokenRow));
+      }
+
+      EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
+
+      // check if the token row only contains empty values
+      for (GridEvent tokenEvent : tokenRow.getEvents()) {
+        if (tokenEvent.getValue() != null && !tokenEvent.getValue().trim().isEmpty()) {
+          tokenRowIsEmpty = false;
+          break;
+        }
+      }
+      if (!isHidingToken() && canShowEmptyTokenWarning()) {
+        lblEmptyToken.setVisible(tokenRowIsEmpty);
       }
     }
-    if (!isHidingToken() && canShowEmptyTokenWarning()) {
-      lblEmptyToken.setVisible(tokenRowIsEmpty);
-    }
+
     grid.setRowsByAnnotation(rowsByAnnotation);
 
     return !tokenRowIsEmpty;
