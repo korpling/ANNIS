@@ -19,6 +19,7 @@ import org.corpus_tools.annis.gui.media.MediaController;
 import org.corpus_tools.annis.gui.media.PDFController;
 import org.corpus_tools.annis.gui.visualizers.AbstractVisualizer;
 import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
+import org.corpus_tools.salt.common.SDocumentGraph;
 import org.corpus_tools.salt.common.STextualDS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,9 +65,9 @@ public class GridVisualizer extends AbstractVisualizer { // NO_UCD (unused code)
     PDFController pdfController = visInput.getUI().getSession().getAttribute(PDFController.class);
     GridComponent component = null;
     try {
-
-      List<STextualDS> texts = visInput.getDocument().getDocumentGraph().getTextualDSs();
-      if (texts.size() == 1) {
+      SDocumentGraph documentGraph = visInput.getDocument().getDocumentGraph();
+      List<STextualDS> texts = documentGraph.getTextualDSs();
+      if (texts.size() == 1 || documentGraph.getTimeline() != null) {
         component = new SingleGridComponent(visInput, mediaController, pdfController, true, null);
       } else {
         component = new MultipleGridComponent(visInput, mediaController, pdfController, true);
