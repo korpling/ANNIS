@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="light sidebar-visible" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
@@ -7,10 +7,10 @@
 
 
         <!-- Custom HTML head -->
-        
+
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff">
 
         <link rel="icon" href="../favicon.svg">
         <link rel="shortcut icon" href="../favicon.png">
@@ -24,26 +24,41 @@
         <link rel="stylesheet" href="../fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="../highlight.css">
-        <link rel="stylesheet" href="../tomorrow-night.css">
-        <link rel="stylesheet" href="../ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
     </head>
     <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
     <div id="body-container">
-        <!-- Provide site root to javascript -->
-        <script>
-            var path_to_root = "../";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
-        </script>
-
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
         <script>
             try {
-                var theme = localStorage.getItem('mdbook-theme');
-                var sidebar = localStorage.getItem('mdbook-sidebar');
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
 
                 if (theme.startsWith('"') && theme.endsWith('"')) {
                     localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
@@ -57,79 +72,68 @@
 
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script>
-            var theme;
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
-            var html = document.querySelector('html');
-            html.classList.remove('no-js')
+            const html = document.documentElement;
             html.classList.remove('light')
             html.classList.add(theme);
-            html.classList.add('js');
+            html.classList.add("js");
         </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var html = document.querySelector('html');
-            var sidebar = null;
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
+                sidebar_toggle.checked = false;
             }
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="../index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../interface/index.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../interface/search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="../interface/result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="../interface/query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li class="chapter-item expanded "><a href="../aql/index.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../aql/word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="../aql/annotations.html"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="../aql/regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="../aql/trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="../aql/pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="../aql/negation.html"><strong aria-hidden="true">3.6.</strong> Operator Negation</a></li><li class="chapter-item expanded "><a href="../aql/export.html"><strong aria-hidden="true">3.7.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="../aql/frequency.html"><strong aria-hidden="true">3.8.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="../aql/operators.html" class="active"><strong aria-hidden="true">3.9.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="../aql/compatibility-mode.html"><strong aria-hidden="true">3.10.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
             </div>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
-
-        <!-- Track and set sidebar scroll position -->
-        <script>
-            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
-            sidebarScrollbox.addEventListener('click', function(e) {
-                if (e.target.tagName === 'A') {
-                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
-                }
-            }, { passive: true });
-            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
-            sessionStorage.removeItem('sidebar-scroll');
-            if (sidebarScrollTop) {
-                // preserve sidebar scroll position when navigating via links within sidebar
-                sidebarScrollbox.scrollTop = sidebarScrollTop;
-            } else {
-                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
-                var activeSection = document.querySelector('#sidebar .active');
-                if (activeSection) {
-                    activeSection.scrollIntoView({ block: 'center' });
-                }
-            }
-        </script>
 
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
-                        </button>
+                        </label>
                         <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
@@ -146,7 +150,12 @@
 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -168,27 +177,26 @@
                     <main>
                         <h1 id="complete-list-of-operators"><a class="header" href="#complete-list-of-operators">Complete List of Operators</a></h1>
 <p>AQL currently includes the following operators:</p>
-<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Operator</th><th style="text-align: left">Description</th><th style="text-align: center">Illustration</th><th style="text-align: left">Notes</th><th></th></tr></thead><tbody>
-<tr><td style="text-align: center"><code>.</code></td><td style="text-align: left">direct precedence</td><td style="text-align: center"><img src="../images/A-pred-B.svg" alt="" /></td><td style="text-align: left">For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>.*</code></td><td style="text-align: left">indirect precedence</td><td style="text-align: center"><img src="../images/A-pred-ind-B.svg" alt="" /></td><td style="text-align: left">For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>^</code></td><td style="text-align: left">directly near</td><td style="text-align: center"><img src="../images/A-pred-B.svg" alt="" /> or <img src="../images/B-pred-A.svg" alt="" /></td><td style="text-align: left">Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>^*</code></td><td style="text-align: left">indirectly near</td><td style="text-align: center"><img src="../images/A-pred-ind-B.svg" alt="" /> or <img src="../images/B-pred-ind-A.svg" alt="" /></td><td style="text-align: left">Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>&gt;</code></td><td style="text-align: left">direct dominance</td><td style="text-align: center"><img src="../images/A-dom-B.svg" alt="" /></td><td style="text-align: left">A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func=&quot;OA&quot;]</code> for an edge with the function 'object, accusative'</td><td></td></tr>
-<tr><td style="text-align: center"><code>&gt;*</code></td><td style="text-align: left">indirect dominance</td><td style="text-align: center"><img src="../images/A-dom-ind-B.svg" alt="" /></td><td style="text-align: left">For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance</td><td></td></tr>
-<tr><td style="text-align: center"><code>@*</code></td><td style="text-align: left">part of sub-corpus</td><td style="text-align: center"></td><td style="text-align: left">Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.</td><td></td></tr>
-<tr><td style="text-align: center"><code>_=_</code></td><td style="text-align: left">identical coverage</td><td style="text-align: center"><img src="../images/A-cov-ident-B.svg" alt="" /></td><td style="text-align: left">Applies when two annotations cover the exact same span of tokens</td><td></td></tr>
-<tr><td style="text-align: center"><code>_i_</code></td><td style="text-align: left">inclusion</td><td style="text-align: center"><img src="../images/A-cov-incl-B.svg" alt="" /></td><td style="text-align: left">Applies when one annotation covers a span identical to or larger than  another</td><td></td></tr>
-<tr><td style="text-align: center"><code>_o_</code></td><td style="text-align: left">overlap</td><td style="text-align: center"><img src="../images/A-cov-over-B.svg" alt="" /></td><td style="text-align: left"></td><td></td></tr>
-<tr><td style="text-align: center"><code>_l_</code></td><td style="text-align: left">left aligned</td><td style="text-align: center"><img src="../images/A-cov-left-B.svg" alt="" /></td><td style="text-align: left">Both elements span an area beginning with the same token</td><td></td></tr>
-<tr><td style="text-align: center"><code>_r_</code></td><td style="text-align: left">right aligned</td><td style="text-align: center"><img src="../images/A-cov-right-B.svg" alt="" /></td><td style="text-align: left">Both elements span an area ending with the same token</td><td></td></tr>
-<tr><td style="text-align: center"><code>==</code></td><td style="text-align: left">value identity</td><td style="text-align: center"><strong>A = B</strong></td><td style="text-align: left">The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
-<tr><td style="text-align: center"><code>!=</code></td><td style="text-align: left">value difference</td><td style="text-align: center"><strong>A ≠ B</strong></td><td style="text-align: left">The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
-<tr><td style="text-align: center"><code>-&gt;LABEL</code></td><td style="text-align: left">labeled pointing relation</td><td style="text-align: center"><img src="../images/A-point-direct-B.svg" alt="" /></td><td style="text-align: left">A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation=&quot;VALUE&quot;]</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>-&gt;LABEL *</code></td><td style="text-align: left">indirect pointing relation</td><td style="text-align: center"><img src="../images/A-point-ind-B.svg" alt="" /></td><td style="text-align: left">An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m</td><td></td></tr>
-<tr><td style="text-align: center"><code>#x:arity=n</code></td><td style="text-align: left">arity</td><td style="text-align: center"><img src="../images/A-arity.svg" alt="" /></td><td style="text-align: left">Specifies the amount of directly dominated children that the searched node has</td><td></td></tr>
-<tr><td style="text-align: center"><code>_ident_</code></td><td style="text-align: left">node identity</td><td style="text-align: center"></td><td style="text-align: left">True for two attributes that belong to the same node</td><td></td></tr>
-</tbody></table>
-</div>
+<p>| Operator     | Description                | Illustration                                                 | Notes                                                                                                                                                                                                                                       | |
+| : -------:   | :-------------------       |       :---------------------------------------------:        | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | |
+| <code>.</code>          | direct precedence          | <img src="../images/A-pred-B.svg" alt="" />                                     | For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code>                            | |
+| <code>.*</code>         | indirect precedence        | <img src="../images/A-pred-ind-B.svg" alt="" />                                 | For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code>             | |
+| <code>^</code>          | directly near              | <img src="../images/A-pred-B.svg" alt="" /> or <img src="../images/B-pred-A.svg" alt="" />         | Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code>                                                                                       | |
+| <code>^*</code>         | indirectly near            | <img src="../images/A-pred-ind-B.svg" alt="" /> or <img src="../images/B-pred-ind-A.svg" alt="" /> | Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code>  | |
+| <code>&gt;</code>          | direct dominance           | <img src="../images/A-dom-B.svg" alt="" />                                      | A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func="OA"]</code> for an edge with the function 'object, accusative'                                               | |
+| <code>&gt;*</code>         | indirect dominance         | <img src="../images/A-dom-ind-B.svg" alt="" />                                  | For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance                                                                                                                                  | |
+| <code>@*</code>         | part of sub-corpus         |                             | Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.                                                                                                                                  | |
+| <code>_=_</code>        | identical coverage         | <img src="../images/A-cov-ident-B.svg" alt="" />                                | Applies when two annotations cover the exact same span of tokens                                                                                                                                                                            | |
+| <code>_i_</code>        | inclusion                  | <img src="../images/A-cov-incl-B.svg" alt="" />                                 | Applies when one annotation covers a span identical to or larger than  another                                                                                                                                                              | |
+| <code>_o_</code>        | overlap                    | <img src="../images/A-cov-over-B.svg" alt="" />                                 |                                                                                                                                                               | |
+| <code>_l_</code>        | left aligned               | <img src="../images/A-cov-left-B.svg" alt="" />                                 | Both elements span an area beginning with the same token                                                                                                                                                                                    | |
+| <code>_r_</code>        | right aligned              | <img src="../images/A-cov-right-B.svg" alt="" />                                | Both elements span an area ending with the same token                                                                                                                                                                                       | |
+| <code>==</code>         | value identity             | <strong>A = B</strong>                                                    | The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)                                                                                 | |
+| <code>!=</code>         | value difference           | <strong>A ≠ B</strong>                                                    | The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)                                                                                       | |
+| <code>-&gt;LABEL</code>    | labeled pointing relation  | <img src="../images/A-point-direct-B.svg" alt="" />                            | A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation="VALUE"]</code>                                                                                                                      | |
+| <code>-&gt;LABEL *</code>  | indirect pointing relation | <img src="../images/A-point-ind-B.svg" alt="" />                               | An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m                                                                                     | |
+| <code>#x:arity=n</code> | arity                      | <img src="../images/A-arity.svg" alt="" />                                     | Specifies the amount of directly dominated children that the searched node has                                                                                                                                                              | |
+| <code>_ident_</code>    | node identity       |                                                                         |       True for two attributes that belong to the same node                                                                                                                                                                        | |</p>
 <h2 id="unsupported-operators"><a class="header" href="#unsupported-operators">Unsupported operators</a></h2>
 <p>The following operators have been available in the legacy version ANNIS3, but are not yet implemented in the newest ANNIS version.</p>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Operator</th><th style="text-align: left">Description</th><th style="text-align: center">Illustration</th><th style="text-align: left">Notes</th></tr></thead><tbody>
@@ -209,7 +217,7 @@
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="../aql/compatibility-mode.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../aql/compatibility-mode.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -223,7 +231,7 @@
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="../aql/compatibility-mode.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../aql/compatibility-mode.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
@@ -247,6 +255,7 @@
         <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
+
 
 
     </div>

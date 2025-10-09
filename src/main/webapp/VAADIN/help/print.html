@@ -1,17 +1,17 @@
 <!DOCTYPE HTML>
-<html lang="en" class="sidebar-visible no-js light">
+<html lang="en" class="light sidebar-visible" dir="ltr">
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
         <title>ANNIS Help</title>
-        <meta name="robots" content="noindex" />
+        <meta name="robots" content="noindex">
 
 
         <!-- Custom HTML head -->
-        
+
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff">
 
         <link rel="icon" href="favicon.svg">
         <link rel="shortcut icon" href="favicon.png">
@@ -25,26 +25,41 @@
         <link rel="stylesheet" href="fonts/fonts.css">
 
         <!-- Highlight.js Stylesheets -->
-        <link rel="stylesheet" href="highlight.css">
-        <link rel="stylesheet" href="tomorrow-night.css">
-        <link rel="stylesheet" href="ayu-highlight.css">
+        <link rel="stylesheet" id="highlight-css" href="highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="ayu-highlight.css">
 
         <!-- Custom theme stylesheets -->
 
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "searchindex.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
     </head>
     <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
     <div id="body-container">
-        <!-- Provide site root to javascript -->
-        <script>
-            var path_to_root = "";
-            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
-        </script>
-
         <!-- Work around some values being stored in localStorage wrapped in quotes -->
         <script>
             try {
-                var theme = localStorage.getItem('mdbook-theme');
-                var sidebar = localStorage.getItem('mdbook-sidebar');
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
 
                 if (theme.startsWith('"') && theme.endsWith('"')) {
                     localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
@@ -58,79 +73,68 @@
 
         <!-- Set the theme before any content is loaded, prevents flash -->
         <script>
-            var theme;
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
             try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
             if (theme === null || theme === undefined) { theme = default_theme; }
-            var html = document.querySelector('html');
-            html.classList.remove('no-js')
+            const html = document.documentElement;
             html.classList.remove('light')
             html.classList.add(theme);
-            html.classList.add('js');
+            html.classList.add("js");
         </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
 
         <!-- Hide / unhide sidebar before it is displayed -->
         <script>
-            var html = document.querySelector('html');
-            var sidebar = null;
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
             if (document.body.clientWidth >= 1080) {
                 try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
                 sidebar = sidebar || 'visible';
             } else {
                 sidebar = 'hidden';
+                sidebar_toggle.checked = false;
             }
-            html.classList.remove('sidebar-visible');
-            html.classList.add("sidebar-" + sidebar);
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
         </script>
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
-            <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="interface/index.html"><strong aria-hidden="true">2.</strong> Using the ANNIS interface</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="interface/search-form.html"><strong aria-hidden="true">2.1.</strong> Search Form</a></li><li class="chapter-item expanded "><a href="interface/result-window.html"><strong aria-hidden="true">2.2.</strong> Result Window</a></li><li class="chapter-item expanded "><a href="interface/query-builder.html"><strong aria-hidden="true">2.3.</strong> Query Builder</a></li></ol></li><li class="chapter-item expanded "><a href="aql/index.html"><strong aria-hidden="true">3.</strong> ANNIS Query Language (AQL)</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="aql/word-forms.html"><strong aria-hidden="true">3.1.</strong> Searching for Word Forms</a></li><li class="chapter-item expanded "><a href="aql/annotations.html"><strong aria-hidden="true">3.2.</strong> Searching for Annotations</a></li><li class="chapter-item expanded "><a href="aql/regex.html"><strong aria-hidden="true">3.3.</strong> Searching using Regular Expressions</a></li><li class="chapter-item expanded "><a href="aql/trees.html"><strong aria-hidden="true">3.4.</strong> Searching for Trees</a></li><li class="chapter-item expanded "><a href="aql/pointing.html"><strong aria-hidden="true">3.5.</strong> Searching for Pointing Relations</a></li><li class="chapter-item expanded "><a href="aql/negation.html"><strong aria-hidden="true">3.6.</strong> Operator Negation</a></li><li class="chapter-item expanded "><a href="aql/export.html"><strong aria-hidden="true">3.7.</strong> Exporting Results</a></li><li class="chapter-item expanded "><a href="aql/frequency.html"><strong aria-hidden="true">3.8.</strong> Frequency Analysis</a></li><li class="chapter-item expanded "><a href="aql/operators.html"><strong aria-hidden="true">3.9.</strong> Complete List of Operators</a></li><li class="chapter-item expanded "><a href="aql/compatibility-mode.html"><strong aria-hidden="true">3.10.</strong> Differences in Compatibility Mode</a></li></ol></li></ol>
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
             </div>
-            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
-
-        <!-- Track and set sidebar scroll position -->
-        <script>
-            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
-            sidebarScrollbox.addEventListener('click', function(e) {
-                if (e.target.tagName === 'A') {
-                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
-                }
-            }, { passive: true });
-            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
-            sessionStorage.removeItem('sidebar-scroll');
-            if (sidebarScrollTop) {
-                // preserve sidebar scroll position when navigating via links within sidebar
-                sidebarScrollbox.scrollTop = sidebarScrollTop;
-            } else {
-                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
-                var activeSection = document.querySelector('#sidebar .active');
-                if (activeSection) {
-                    activeSection.scrollIntoView({ block: 'center' });
-                }
-            }
-        </script>
 
         <div id="page-wrapper" class="page-wrapper">
 
             <div class="page">
-                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar-hover-placeholder"></div>
                 <div id="menu-bar" class="menu-bar sticky">
                     <div class="left-buttons">
-                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
                             <i class="fa fa-bars"></i>
-                        </button>
+                        </label>
                         <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
                             <i class="fa fa-paint-brush"></i>
                         </button>
                         <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
                             <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
                         </ul>
-                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                        <button id="search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="searchbar">
                             <i class="fa fa-search"></i>
                         </button>
                     </div>
@@ -147,7 +151,12 @@
 
                 <div id="search-wrapper" class="hidden">
                     <form id="searchbar-outer" class="searchbar-outer">
-                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                        <div class="search-wrapper">
+                            <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <i class="fa fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
                     </form>
                     <div id="searchresults-outer" class="searchresults-outer hidden">
                         <div id="searchresults-header" class="searchresults-header"></div>
@@ -184,21 +193,21 @@ on the line with the corpus name, it is possible to select which corpora
 should be searched in (hold down 'ctrl' to select multiple corpora
 simultaneously). You may also configure groups of corpora or type in the
 filter box to view subsets of the corpora.</p>
-<p>The &quot;AQL&quot; field at the top of the form is used for inputting queries
+<p>The "AQL" field at the top of the form is used for inputting queries
 manually (see the tutorials on the ANNIS Query Language from the ANNIS
 website). As soon as one or several corpora are selected and a query is
 entered or modified, the query will be validated automatically and
 possible errors in the query syntax will be commented on in the
-&quot;Status&quot; box below (which says &quot;valid query&quot; in the image above).</p>
-<p>Once a valid query has been entered, pressing the &quot;Search&quot; button will
+"Status" box below (which says "valid query" in the image above).</p>
+<p>Once a valid query has been entered, pressing the "Search" button will
 retrieve the number of matching positions and documents in the selected
 corpora in the Status box and open the Result tab to display the first
 set of matches.</p>
 <p><img src="interface/searchoptions.png" alt="ANNIS search options" /></p>
-<p>In order to get more control over the search you can click on &quot;Search
-Options&quot; to unfold more detailed search options. The context
+<p>In order to get more control over the search you can click on "Search
+Options" to unfold more detailed search options. The context
 surrounding the matching expressions in the result list ist determined
-by the &quot;Left Context&quot; and &quot;Right Context&quot; options and can be changed
+by the "Left Context" and "Right Context" options and can be changed
 on each side (by default up to 20 tokens). You can also configure how
 many results are shown per page, what order results are shown in
 (ascending, descending or random) and for some corpora, you can select
@@ -206,22 +215,22 @@ alternative segmentation layers to visualize data (relevant for
 languages with multiple tokens per word form, etc., such as Arabic).
 Entire texts can also be viewed using special document visualizations or
 by clicking on the document icon next to each corpus name, if available.</p>
-<p>The &quot;Query Language&quot; option allows to switch between the default AQL dialect 
+<p>The "Query Language" option allows to switch between the default AQL dialect
 and an <a href="interface/../aql-compatibility-mode.html">compatibility mode</a> emulating the behavior of the older ANNIS3.
 Make sure to use the latest version for all new queries.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="result-window"><a class="header" href="#result-window">Result Window</a></h1>
 <p><img src="interface/search_bar.png" alt="ANNIS result window toolbar" /></p>
 <p>The result window shows search results in pages of 10 hits each by
 default (this can be changed in the Search Form). The toolbar at the top
-of the window allows you to navigate between these pages. The &quot;Token
-Annotations&quot; button on the toolbar allows you to toggle the token based
+of the window allows you to navigate between these pages. The "Token
+Annotations" button on the toolbar allows you to toggle the token based
 annotations, such as lemmas and parts-of-speech, on or off for you
 convenience. You can use hyperlinks to your queries by copying the
 current browser URL for e-mail or citation purposes, allowing others to
 reproduce your query.</p>
 <p>If your corpus contains multiple alternative text layers or
 segmentations (e.g. normalized and un-normalized text), you may switch
-between these on the fly by using the &quot;base text&quot; menu.</p>
+between these on the fly by using the "base text" menu.</p>
 <p><img src="interface/KWIC_narrow.png" alt="KWIC concordance in ANNIS" /></p>
 <p>The result list itself initially shows a KWIC (key word in context)
 concordance of matching positions in the selected corpora, with the
@@ -246,7 +255,7 @@ immediately update the AQL field in the Search Form with your query,
 though updating the query on the Search Form will not create a new graph
 in the Query Builder.</p>
 <p><img src="interface/query_builder_empty.png" alt="The Query Builder tab and the Create Node button" /></p>
-<p>In each node you create you may click on <img src="interface/list-add.png" alt="The Add Node button" /> to specify an 
+<p>In each node you create you may click on <img src="interface/list-add.png" alt="The Add Node button" /> to specify an
 annotation value. The annotation name can be typed in or selected from a drop down list once a corpus is
 selected. The operator field in the middle allows you to choose between
 an exact match (the '=' symbol) or wildcard search using Regular
@@ -256,18 +265,18 @@ below). It is also possible to specify multiple annotations applying to
 the same position by clicking on <img src="interface/list-add.png" alt="The Add Node button" />
 multiple times. Clicking on <img src="interface/edit-clear.png" alt="The Clear all nodes button" />
 will delete the values in the node. To search
-for word forms, simply choose &quot;tok&quot; as the field name on the left. A
+for word forms, simply choose "tok" as the field name on the left. A
 node with no data entered will match any node, that is an underspecified
 token or non-terminal node or annotation.</p>
 <p><img src="interface/node.png" alt="Query Builder node" /></p>
-<p>To specify the relationship between nodes, first click on the &quot;Edge&quot;
-link at the top left of one node, and then click the &quot;Dock&quot; link which
+<p>To specify the relationship between nodes, first click on the "Edge"
+link at the top left of one node, and then click the "Dock" link which
 becomes available on the other nodes. An edge will connect the nodes
 with an extra box from which operators may be selected (see below). For
 operators allowing additional labels (e.g. the dominance operator <code>&gt;</code>
 allows edge labels to be specified), you may type directly into the
-edge's operator box, as in the example with a &quot;func&quot; label in the
-image below. Note that the node clicked on first (where the &quot;Edge&quot;
+edge's operator box, as in the example with a "func" label in the
+image below. Note that the node clicked on first (where the "Edge"
 button was clicked) will be the first node in the resulting quey, i.e.
 if this is the first node it will dominate the second node (<code>#1 &gt; #2</code>)
 and not the other way around, as also represented by the arrows along
@@ -276,20 +285,20 @@ the edge.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="annis-query-language-aql"><a class="header" href="#annis-query-language-aql">ANNIS Query Language (AQL)</a></h1>
 <p>ANNIS comes with its own query language called ANNIS Query Language (AQL).
 AQL is based on the concept of searching for annotation attributes and relations between them.</p>
-<p>A search is formulated by defining each token, non-terminal node or annotation being searched for as an element. An element can be a token (simply text between quotes: <code>&quot;dogs&quot;</code> or else <code>tok=&quot;dogs&quot;</code>) or an attribute-value pair (such as <code>tok=&quot;dogs&quot;</code>, or optionally with a namespace: <code>tiger:cat=&quot;PP&quot;</code>). Note that different corpora can have completely different annotation names and values - these are not specified by ANNIS. Underspecified tokens or nodes in general may be specified using <code>tok</code> and <code>node</code> respectively.</p>
-<p>Once all elements are declared, relations between the elements (or edges) are specified which must hold between them. The elements are referred back to serially using variable numbers, and linguistic operators bind them together, e.g. <code>#1 &gt; #2</code> meaning the first element dominates the second in a tree or graph. 
-Operators define the possible overlap and adjacency relations between annotation spans, as well as recursive hierarchical relations between nodes. Some operators also allow specific labes to be specified in addition to the operator (see the <a href="aql/operators.html">operator list</a>). </p>
+<p>A search is formulated by defining each token, non-terminal node or annotation being searched for as an element. An element can be a token (simply text between quotes: <code>"dogs"</code> or else <code>tok="dogs"</code>) or an attribute-value pair (such as <code>tok="dogs"</code>, or optionally with a namespace: <code>tiger:cat="PP"</code>). Note that different corpora can have completely different annotation names and values - these are not specified by ANNIS. Underspecified tokens or nodes in general may be specified using <code>tok</code> and <code>node</code> respectively.</p>
+<p>Once all elements are declared, relations between the elements (or edges) are specified which must hold between them. The elements are referred back to serially using variable numbers, and linguistic operators bind them together, e.g. <code>#1 &gt; #2</code> meaning the first element dominates the second in a tree or graph.
+Operators define the possible overlap and adjacency relations between annotation spans, as well as recursive hierarchical relations between nodes. Some operators also allow specific labes to be specified in addition to the operator (see the <a href="aql/operators.html">operator list</a>).</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="searching-for-word-forms"><a class="header" href="#searching-for-word-forms">Searching for Word Forms</a></h1>
 <p>To search for word forms in ANNIS, simply select a corpus (in this
 example the freely available <a href="https://corpling.uis.georgetown.edu/gum/">GUM corpus</a>) and enter a search string
 between double quotation marks, e.g.:</p>
-<pre><code>&quot;do&quot;
+<pre><code>"do"
 </code></pre>
 <p>Note that the search is <strong>case sensitive</strong>, so it will not find cases of
 capitalized 'Do', for example at the beginning of a sentence. In order
 to find both options, you can either look for one form OR the other
 using the pipe sign ( <code>|</code> ):</p>
-<pre><code>&quot;do&quot; | &quot;Do&quot;
+<pre><code>"do" | "Do"
 </code></pre>
 <p>or else you can use <a href="aql/aql-regex.html">regular expressions</a>, which must
 be surrounded by slashes ( <code>/</code> ) instead of quotation marks:</p>
@@ -299,31 +308,31 @@ be surrounded by slashes ( <code>/</code> ) instead of quotation marks:</p>
 separated by <code>&amp;</code> and then specify that the relation between the elements
 is one of <strong>precedence</strong>, as signified by the period ( <strong><code>.</code></strong> )
 operator:</p>
-<pre><code>&quot;do&quot; &amp; &quot;n't&quot; &amp; #1 . #2
+<pre><code>"do" &amp; "n't" &amp; #1 . #2
 </code></pre>
-<p>The expression <code>#1 . #2</code> signifies that the first element (&quot;do&quot;)
-precedes the second element (&quot;n't&quot;). Alternatively, you can also place
+<p>The expression <code>#1 . #2</code> signifies that the first element ("do")
+precedes the second element ("n't"). Alternatively, you can also place
 the operator directly between the search elements as a <strong>shortcut</strong>. The
 following shortcut query is equivalent to the one above:</p>
-<pre><code>&quot;do&quot; . &quot;n't&quot;`
+<pre><code>"do" . "n't"`
 </code></pre>
 <p>For <strong>indirect precedence</strong> (where other tokens may stand between the
 search terms), use the <strong><code>.*</code></strong> operator:</p>
-<pre><code>/[Dd]o/ &amp; &quot;n't&quot; &amp; &quot;any&quot; &amp; #1 . #2 &amp; #2 .* #3 
+<pre><code>/[Dd]o/ &amp; "n't" &amp; "any" &amp; #1 . #2 &amp; #2 .* #3 
 </code></pre>
 <p><strong>OR using shortcuts:</strong></p>
-<pre><code>/[Dd]o/ . &quot;n't&quot; .* &quot;any&quot;
+<pre><code>/[Dd]o/ . "n't" .* "any"
 </code></pre>
-<p>The queries above find sequences beginning with the token &quot;Do&quot; or &quot;do&quot;,
-followed directly by &quot;n't&quot;, which must be followed either directly or
-indirectly (.*) by &quot;any&quot;. A range of allowed distances can also be
+<p>The queries above find sequences beginning with the token "Do" or "do",
+followed directly by "n't", which must be followed either directly or
+indirectly (.*) by "any". A range of allowed distances can also be
 specified numerically as follows:</p>
-<pre><code>/[Nn]ot/ &amp; &quot;all&quot; &amp; #1 .1,5 #2
+<pre><code>/[Nn]ot/ &amp; "all" &amp; #1 .1,5 #2
 </code></pre>
 <p><strong>OR:</strong></p>
-<pre><code>/[Nn]ot/ .1,5 &quot;all&quot;
+<pre><code>/[Nn]ot/ .1,5 "all"
 </code></pre>
-<p>Meaning the two words &quot;not&quot; and &quot;all&quot; may appear at a distance of 1 to 5
+<p>Meaning the two words "not" and "all" may appear at a distance of 1 to 5
 tokens. The operator <code>.*</code> allows a distance of up to 50 tokens by
 default, so searching with <code>.1,50</code> is the same as using <code>.*</code> instead.
 Greater distances (e.g. <code>.1,100</code> for 'within 100 tokens') should always
@@ -331,10 +340,10 @@ be specified explicitly.</p>
 <p>Finally, we can add metadata restrictions to the query, which filter out
 documents not matching our definitions. Metadata attributes must be connected to
 other non-meta attributes with the <code>@*</code> (part-of) operator:</p>
-<pre><code>&quot;want&quot; &amp; &quot;to&quot; &amp; #1 .1,5 #2
-&amp; type=&quot;interview&quot; &amp; #1 @* #2 
+<pre><code>"want" &amp; "to" &amp; #1 .1,5 #2
+&amp; type="interview" &amp; #1 @* #2 
 </code></pre>
-<p>To view metadata for a search result or for a corpus, press the &quot;i&quot; icon
+<p>To view metadata for a search result or for a corpus, press the "i" icon
 next to it in the result window or in the search form respectively.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="searching-for-annotations"><a class="header" href="#searching-for-annotations">Searching for Annotations</a></h1>
 <p>Annotations may be searched for using an annotation name and value. The
@@ -343,26 +352,26 @@ contain part-of-speech and lemma annotations with the names <code>pos</code> and
 <code>lemma</code> respectively (annotation names are <strong>case sensitive</strong>). For
 example, to search for all forms of the verb <em>be</em> in the GUM corpus,
 simply select the GUM corpus and enter:</p>
-<pre><code>lemma=&quot;be&quot;
+<pre><code>lemma="be"
 </code></pre>
 <p>Negative searches are also possible using <code>!=</code> instead of <code>=</code>. For negated
 tokens (word forms) use the reserved attribute tok. For example:</p>
-<pre><code>lemma!=&quot;be&quot;
+<pre><code>lemma!="be"
 </code></pre>
 <p>or:</p>
-<pre><code>tok!=&quot;be&quot; 
+<pre><code>tok!="be" 
 </code></pre>
 <p>Metadata attributes can also be negated:</p>
-<pre><code>lemma=&quot;be&quot; @* type!=&quot;interview&quot;
+<pre><code>lemma="be" @* type!="interview"
 </code></pre>
 <p>To only find finite forms of a verb in GUM, use the part-of-speech (pos)
 annotation concurrently with lemma, and specify that both the lemma and
 pos should apply to the same element. For example for inflected forms of
 the verb <em>give</em>:</p>
-<pre><code>lemma=&quot;give&quot; &amp; pos=/VV.+/ &amp; #1 _=_ #2
+<pre><code>lemma="give" &amp; pos=/VV.+/ &amp; #1 _=_ #2
 </code></pre>
 <p>OR (using a shortcut):</p>
-<pre><code>lemma=&quot;give&quot; _=_ pos=/VV.+/
+<pre><code>lemma="give" _=_ pos=/VV.+/
 </code></pre>
 <p>The regular expression <code>/VV.+/</code> means a part of speach that begins with
 VV (verb), but has additional characters (.+), such as for past tense
@@ -374,12 +383,12 @@ example, in GUM, the annotation <code>entity</code> signifies the entity type of
 discourse referent. This annotation can also apply to phrases longer
 than one token. The following query finds spans containing a discourse
 referent who is a person:</p>
-<pre><code>entity=&quot;person&quot;
+<pre><code>entity="person"
 </code></pre>
 <p>If the corpus contains more than one annotation type named <code>entity</code>, a
 namespace may be added to disambiguate these annotations (for example,
 the entity annotation in the GUM corpus has the namespace <code>ref:</code>, so we
-can search for <code>ref:entity=&quot;person&quot;</code>). The namespace may always be
+can search for <code>ref:entity="person"</code>). The namespace may always be
 dropped, but if there are multiple annotations with the same name but
 different namespaces, dropping the namespace will find all of those
 annotations. If you drop the value of the annotation, you can also
@@ -389,41 +398,41 @@ annotated entities in the GUM corpus, whether or not they are a person:</p>
 <pre><code>entity
 </code></pre>
 <p>In order to view the span of tokens to which the entity annotation
-applies, enter the query and click on &quot;Search&quot;, then open the
+applies, enter the query and click on "Search", then open the
 <em>referents</em> layer to view the grid containing the span.</p>
 <p>Further operators can test the relationships between potentially
 overlapping annotations in spans. For example, the operator <code>_i_</code>
 examines whether one annotation fully contains the span of another
 annotation (the <em>i</em> stands for 'includes'):</p>
-<pre><code>head &amp; infstat=&quot;new&quot; &amp; #1 _i_ #2
+<pre><code>head &amp; infstat="new" &amp; #1 _i_ #2
 </code></pre>
 <p>OR (using a shortcut):</p>
-<pre><code>head _i_ infstat=&quot;new&quot;
+<pre><code>head _i_ infstat="new"
 </code></pre>
 <p>This query finds information structurally new discourse referents
-(<code>infstat=&quot;new&quot;</code>) contained within headings (<code>head</code>).</p>
+(<code>infstat="new"</code>) contained within headings (<code>head</code>).</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="searching-using-regular-expressions"><a class="header" href="#searching-using-regular-expressions">Searching using Regular Expressions</a></h1>
 <p>When searching for word forms and annotation values, it is possible to
 employ wildcards as placeholders for a variety of characters, using
 Regular Expression syntax (see e.g.
-<a href="http://www.regular-expressions.info/">http://www.regular-expressions.info/</a> for detailed information).<sup class="footnote-reference"><a href="#regex-engine">1</a></sup>
+<a href="http://www.regular-expressions.info/">http://www.regular-expressions.info/</a> for detailed information).<sup class="footnote-reference" id="fr-regex-engine-1"><a href="#footnote-regex-engine">1</a></sup>
 To search for wildcards use slashes instead of quotation marks to
 surround your search term. For example, you can use the <strong>period (<code>.</code>)</strong>
 to replace any single character:</p>
 <pre><code>tok=/ca./
 </code></pre>
-<p>This finds word forms such as &quot;cat&quot;, &quot;can&quot;, &quot;car&quot;, &quot;cap&quot; etc. It is also
+<p>This finds word forms such as "cat", "can", "car", "cap" etc. It is also
 possible to make characters optional by following them with a <strong>question
-mark (<code>?</code>)</strong>. The following example finds cases of &quot;car&quot; and &quot;cart&quot;,
-since the &quot;t&quot; is optional:</p>
+mark (<code>?</code>)</strong>. The following example finds cases of "car" and "cart",
+since the "t" is optional:</p>
 <pre><code>tok=/cart?/
 </code></pre>
 <p>It is also possible to specify an arbitrary number of repetitions, with
 an <strong>asterisk (<code>*</code>)</strong> signifying zero or more occurrences and a <strong>plus
 (<code>+</code>)</strong> signifying at least one occurrence. For example, the first query
-below finds &quot;o&quot;, &quot;of&quot;, and &quot;off&quot; (since the asterisk means zero or more
-times the preceding &quot;f&quot;), while the second finds &quot;of&quot; and &quot;off&quot;, since
-at least one &quot;f&quot; must be found:</p>
+below finds "o", "of", and "off" (since the asterisk means zero or more
+times the preceding "f"), while the second finds "of" and "off", since
+at least one "f" must be found:</p>
 <pre><code>tok=/of*/
 </code></pre>
 <pre><code>tok=/of+/
@@ -431,20 +440,20 @@ at least one &quot;f&quot; must be found:</p>
 <p>It is possible to combine these operators with the period operator to
 mean any number of occurrences of an arbitrary character. For example,
 the query below searches for pos (part-of-speech) annotations that begin
-with &quot;VV&quot;, corresponding to all forms of lexical verbs (the auxiliaries
-&quot;be&quot; and &quot;have&quot; are tagged VB... and VH... respectively). The string
-&quot;VV&quot; means that the result must begin with &quot;VV&quot;, the period stands for
+with "VV", corresponding to all forms of lexical verbs (the auxiliaries
+"be" and "have" are tagged VB... and VH... respectively). The string
+"VV" means that the result must begin with "VV", the period stands for
 any character, and the asterisk means that 'any character' can be
 repeated zero or more time, as above.</p>
 <pre><code>pos=/VV.*/
 </code></pre>
-<p>This finds both finite verbs (&quot;VVZ&quot;, &quot;VVP&quot;, &quot;VVD&quot;) and non-finite ones
-(&quot;VV&quot;) or gerunds (&quot;VVG&quot;). It is also possible to search for explicit
+<p>This finds both finite verbs ("VVZ", "VVP", "VVD") and non-finite ones
+("VV") or gerunds ("VVG"). It is also possible to search for explicit
 alternatives by either specifying characters in <strong>square brackets</strong> or
 longer strings in <strong>round brackets separated by pipe symbols</strong>. The
-first example below finds either &quot;of&quot; or &quot;on&quot; (i.e. &quot;o&quot; followed by
-either &quot;f&quot; or &quot;n&quot;) while the second example finds lemma annotations that
-are either &quot;be&quot; or &quot;have&quot;.</p>
+first example below finds either "of" or "on" (i.e. "o" followed by
+either "f" or "n") while the second example finds lemma annotations that
+are either "be" or "have".</p>
 <pre><code>tok=/o[nf]/
 </code></pre>
 <pre><code>lemma=/(be|have)/
@@ -461,36 +470,37 @@ all non-object dependants of lexical verbs:</p>
 <p>OR (using a shortcut):</p>
 <pre><code>pos=/VV.*/ -&gt;dep[func!=/.*obj.*/] tok
 </code></pre>
-<div class="footnote-definition" id="regex-engine"><sup class="footnote-definition-label">1</sup>
+<hr>
+<ol class="footnote-definition"><li id="footnote-regex-engine">
 <p>While there is the POSIX-standard for regular expressions, different search engines might use slightly different syntax and support different types of search constraints, e.g. when searching for Unicode characters.
-ANNIS used to rely on the <a href="https://www.postgresql.org/docs/9.4/functions-matching.html">PostgreSQL regular expression implementation</a> but now uses the Rust library <code>regex</code>. See <a href="https://docs.rs/regex#syntax">https://docs.rs/regex#syntax</a> for the currently supported regular expresssion syntax, as provided by this library.</p>
-</div>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="searching-for-trees"><a class="header" href="#searching-for-trees">Searching for Trees</a></h1>
+ANNIS used to rely on the <a href="https://www.postgresql.org/docs/9.4/functions-matching.html">PostgreSQL regular expression implementation</a> but now uses the Rust library <code>regex</code>. See <a href="https://docs.rs/regex#syntax">https://docs.rs/regex#syntax</a> for the currently supported regular expresssion syntax, as provided by this library. <a href="#fr-regex-engine-1">↩</a></p>
+</li>
+</ol><div style="break-before: page; page-break-before: always;"></div><h1 id="searching-for-trees"><a class="header" href="#searching-for-trees">Searching for Trees</a></h1>
 <p>In corpora containing hierarchical structures, annotations such as
 syntax trees can be searched for by defining terminal or none-terminal
 node annotations, functional dependencies and their values (for
 dependencies see see <a href="aql/aql-pointing.html">Searching for Pointing
 Relations</a>). A simple search for
 prepostional phrases in the GUM corpus looks like this:</p>
-<pre><code>const:cat=&quot;PP&quot;
+<pre><code>const:cat="PP"
 </code></pre>
 <p>If the corpus contains no more than one annotation called <code>cat</code>, the
 optional namespace, in this case <code>const:</code>, may be dropped. This finds
 all PP nodes in the corpus. You can also search for the NP being
 dominated by the PP like this:</p>
-<pre><code>cat=&quot;PP&quot; &amp; cat=&quot;NP&quot; &amp; #1 &gt; #2
+<pre><code>cat="PP" &amp; cat="NP" &amp; #1 &gt; #2
 </code></pre>
 <p>OR (using a shortcut):</p>
-<pre><code>cat=&quot;PP&quot; &gt; cat=&quot;NP&quot;
+<pre><code>cat="PP" &gt; cat="NP"
 </code></pre>
 <p>To find all PP nodes directly dominating an adverb, you can combine a
 search for syntactic category and part-of-speech (pos) values (in this
-case &quot;RB&quot; for adverb). The query below gives the shortcut form:</p>
-<pre><code>cat=&quot;PP&quot; &gt; pos=&quot;RB&quot;
+case "RB" for adverb). The query below gives the shortcut form:</p>
+<pre><code>cat="PP" &gt; pos="RB"
 </code></pre>
 <p>The operator <strong>&gt;</strong> signifies <strong>direct dominance</strong>, which must hold
 between the first and the second element. Once the Query Result tab is
-shown you may open the &quot;constituents&quot; annotation layer to see the
+shown you may open the "constituents" annotation layer to see the
 corresponding tree.</p>
 <p><img src="aql/../images/tree_expanded.png" alt="" /></p>
 <p>Note that since the context is set to a number of tokens left and right
@@ -501,7 +511,7 @@ make sure that the whole clause is always included, you may want to
 specifically search for the clause or sentence dominating the PP. To do
 so, specify the sentence in another element and use the <strong>indirect
 dominance</strong> ( <strong>&gt;*</strong> ) operator:</p>
-<pre><code>cat=&quot;ROOT&quot; &gt;* cat=&quot;PP&quot; &gt; pos=&quot;RB&quot;
+<pre><code>cat="ROOT" &gt;* cat="PP" &gt; pos="RB"
 </code></pre>
 <p>If the annotations in the corpus support it, you may also look for edge
 labels. Using the following query will find all adverbial modifier NPs,
@@ -509,15 +519,15 @@ dominated by some node through an edge labeled ADV. Since we do not know
 anything about the modified node, we simply use the <code>node</code> element as a
 place holder. This element can match any node or annotation in the
 graph:</p>
-<pre><code>node &gt;[const:func=&quot;ADV&quot;] cat=&quot;NP&quot;
+<pre><code>node &gt;[const:func="ADV"] cat="NP"
 </code></pre>
 <p>Again, the namespace <code>const:</code> is optional and only important if there
 are multiple 'func' annotations. It is also possible to negate the label
 of the dominance edge as in the following query:</p>
-<pre><code>cat &gt;[func!=&quot;TMP&quot;] cat
+<pre><code>cat &gt;[func!="TMP"] cat
 </code></pre>
 <p>which finds all syntactic categories (value unspecified) dominating
-another syntactic category with a label other than &quot;TMP&quot;.</p>
+another syntactic category with a label other than "TMP".</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="searching-for-pointing-relations"><a class="header" href="#searching-for-pointing-relations">Searching for Pointing Relations</a></h1>
 <p>Pointing relations are used to express an arbitrary directed
 relationship between two elements (terminals or non-terminals) without
@@ -526,12 +536,12 @@ corpus, elements in the <code>ref:</code> namespace may point to each other to
 express coreference or anaphoric relations. The following query searches
 for two <code>entity</code> annotations, which specify whether a discourse referent
 is a person, or an animal, a location, an object, an abstract etc.</p>
-<pre><code>entity=&quot;person&quot; &amp; entity!=&quot;person&quot; &amp; #1 -&gt;coref #2
+<pre><code>entity="person" &amp; entity!="person" &amp; #1 -&gt;coref #2
 </code></pre>
 <p>Using the pointing relation operator <code>-&gt;</code> with the type <code>coref</code>, the
 first <code>entity</code>, which should be a person, is said to be coreferent with
 its antecedent, the second entity, which is not a person. In practice,
-this will usually occur due to &quot;bridging&quot;, where something like a whole
+this will usually occur due to "bridging", where something like a whole
 (e.g. an organization such as a 'research team') implies the existence
 of its part (e.g. persons, such as 'the scientists'). To see a
 visualization of the coreference relations, open the coreference
@@ -549,7 +559,7 @@ each relation can be viewed by hovering of the appropriate underline.</p>
 <p><img src="aql/../images/coref.png" alt="" /></p>
 <p>The pointing relation operator can also search for longer chains of
 coreference, using the asterisk extension shown below:</p>
-<pre><code>entity=&quot;organization&quot; -&gt;coref* entity=&quot;person&quot;
+<pre><code>entity="organization" -&gt;coref* entity="person"
 </code></pre>
 <p>This finds all organizations that point back to a person at any point
 along the preceding coreference chain. It is also possible to specify
@@ -557,20 +567,20 @@ annotations of pointing relations, which for coreference in the GUM
 corpus mark what kind of coreference is used: anaphoric, cataphoric,
 lexical coreference, apposition, or bridging. To find appositions of
 place entities, use the following query:</p>
-<pre><code>entity=&quot;place&quot; -&gt;coref[type=&quot;appos&quot;] entity=&quot;place&quot;
+<pre><code>entity="place" -&gt;coref[type="appos"] entity="place"
 </code></pre>
 <p>Another way to use pointing relations is found in syntactic dependency
 trees. The queries in this case can use both pointing relation types and
 annotations too, as in the following query:</p>
-<pre><code>pos=/VV[PZ]/ &amp; tok &amp; #1 -&gt;dep[func=&quot;dobj&quot;] #2
+<pre><code>pos=/VV[PZ]/ &amp; tok &amp; #1 -&gt;dep[func="dobj"] #2
 </code></pre>
 <p>OR (using a shortcut):</p>
-<pre><code>pos=/VV[PZ]/ -&gt;dep[func=&quot;dobj&quot;] tok
+<pre><code>pos=/VV[PZ]/ -&gt;dep[func="dobj"] tok
 </code></pre>
 <p>This query searches for a present tense lexical verb (with the
 part-of-speech VVZ or VVP) and a token, with a pointing relation of the
 type 'dep' (for dependency) between the two, annotated with
-<code>func=&quot;dobj&quot;</code> (the function 'direct object'). The result can be viewed
+<code>func="dobj"</code> (the function 'direct object'). The result can be viewed
 with the arch dependency visualizer, which shows the verb 'shows' and
 its object 'location'.</p>
 <p><img src="aql/../images/dep_vis.png" alt="" /></p>
@@ -578,22 +588,22 @@ its object 'location'.</p>
 <h2 id="negation-with-assumption-that-all-annotations-exists"><a class="header" href="#negation-with-assumption-that-all-annotations-exists">Negation with assumption that all annotations exists</a></h2>
 <p>Sometimes, you need to find instances in a corpus where a relation is not true between to annotations.
 For example, you can search for sentences with a noun and a verb like this:</p>
-<pre><code>cat=&quot;ROOT&quot;
+<pre><code>cat="ROOT"
 &amp; pos=/N.*/ . pos=/V.*/ 
 &amp; #1 &gt;* #2 &amp; #1 &gt;* #3
 </code></pre>
 <p>We search for three nodes: the root node, a noun and a verb, and specify that both nodes should be dominated by the root node.
 If we now want to get all the instances, where both nodes form a conjunction, we could add another constraint on the noun and verb node using a dependency relation.</p>
-<pre><code>cat=&quot;ROOT&quot;
+<pre><code>cat="ROOT"
 &amp; pos=/N.*/ . pos=/V.*/ 
 &amp; #1 &gt;* #2 &amp; #1 &gt;* #3
-&amp; #2 -&gt;dep[func=&quot;conj&quot;] #3
+&amp; #2 -&gt;dep[func="conj"] #3
 </code></pre>
 <p>If we instead want to get all instances where there is <strong>no such dependency relation between the two nodes</strong>, we can use the negated operator <code>!-&gt;</code>.</p>
-<pre><code>cat=&quot;ROOT&quot;
+<pre><code>cat="ROOT"
 &amp; pos=/N.*/ . pos=/V.*/ 
 &amp; #1 &gt;* #2 &amp; #1 &gt;* #3
-&amp; #2 !-&gt;dep[func=&quot;conj&quot;] #3
+&amp; #2 !-&gt;dep[func="conj"] #3
 </code></pre>
 <p>We can negate all binary operators by adding the <code>!</code> prefix to them.
 Per default, these operators only act as a filter mechanism, the annotations they refer to still have to exist and have to be bound by other non-negated operators.
@@ -601,17 +611,17 @@ In our example, both tokens (the noun defined by <code>pos/N.*/</code> and the v
 <h2 id="negation-without-the-assumption-of-existence"><a class="header" href="#negation-without-the-assumption-of-existence">Negation without the assumption of existence</a></h2>
 <p>If we want to allow that e.g. the verb might not exist, we have to mark it as <strong>optional</strong> in the AQL query by adding a <code>?</code> after the annotation definition (<code>pos=/V.*/</code> becomes <code>pos=/V.*/?</code>).
 For example, to search for root segments without any verb, we can combine the negated dominance operator with an optional verb:</p>
-<pre><code>cat=&quot;ROOT&quot; !&gt;* pos=/V.*/?
+<pre><code>cat="ROOT" !&gt;* pos=/V.*/?
 </code></pre>
 <p>Since optional annotations might not exist, they are not part of the match result, and they are also not highlighted.</p>
-<p>Negated operators must have at least one operand which is non-optional, so </p>
-<pre><code>pos=&quot;DT&quot;? &amp; &quot;amazing&quot; &amp; #1 !. #2
+<p>Negated operators must have at least one operand which is non-optional, so</p>
+<pre><code>pos="DT"? &amp; "amazing" &amp; #1 !. #2
 </code></pre>
-<p>is fine and finds all occurrences of &quot;amazing&quot; without a determiner before it (even if &quot;amazing&quot; is at the beginning of the text), but <code>pos=&quot;DT&quot;? &amp; &quot;amazing&quot;? &amp; #1 !. #2</code> would be invalid because both operands are optional.
+<p>is fine and finds all occurrences of "amazing" without a determiner before it (even if "amazing" is at the beginning of the text), but <code>pos="DT"? &amp; "amazing"? &amp; #1 !. #2</code> would be invalid because both operands are optional.
 Also, you can only use optional operands for negated operators.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="exporting-results"><a class="header" href="#exporting-results">Exporting Results</a></h1>
-<p>To export search results, open the menu &quot;More&quot; between the Search and
-History buttons and select &quot;Export&quot;:</p>
+<p>To export search results, open the menu "More" between the Search and
+History buttons and select "Export":</p>
 <p><img src="aql/../images/export.png" alt="" /></p>
 <p>Enter the query whose results you want to export as usual in the AQL
 box. Note that you <strong>do not need to carry out the query first</strong>. You can
@@ -626,8 +636,8 @@ example:</p>
 <pre><code>    0. of the International Brotherhood of [Magicians] Wednesday , October 9 , 
     1. Magic Month in the United [States] . Wikinews spoke with William 
     2. of the International Brotherhood of [Magicians] , about the current state 
-    3. - &quot; Scarne on Card [Tricks] &quot; and &quot; Scarne on 
-    4. and &quot; Scarne on Magic [Tricks] &quot; . That started me 
+    3. - " Scarne on Card [Tricks] " and " Scarne on 
+    4. and " Scarne on Magic [Tricks] " . That started me 
 </code></pre>
 <p>The <strong>TokenExporter</strong> adds all annotations of each token separated by slashes
 (e.g. dogs/NNS/dog for a token dogs annotated with a part-of-speech NNS
@@ -651,7 +661,7 @@ syntactic category annotations looks as follows.</p>
     pos  IN[1-1] DT[2-2] NP[3-3] NP[4-4] IN[5-5] NPS[6-6] NP[7-7] 
     cat  S[1-6] VP[1-6] NP[1-6] PP[1-6] NP[2-4] PP[5-6] NP[6-6] NP[7-12] 
 </code></pre>
-<p>Meaning that the annotation cat=&quot;NP&quot; applies to tokens 1-6 in the search
+<p>Meaning that the annotation cat="NP" applies to tokens 1-6 in the search
 result, and so on. Note that when specifying annotation layers, if the
 reserved name 'tok' is not specified, the tokens themselves will not be
 exported (annotations only).</p>
@@ -711,27 +721,26 @@ by the first and second tokens' parts-of-speech, as well as the first
 token's lemma.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="complete-list-of-operators"><a class="header" href="#complete-list-of-operators">Complete List of Operators</a></h1>
 <p>AQL currently includes the following operators:</p>
-<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Operator</th><th style="text-align: left">Description</th><th style="text-align: center">Illustration</th><th style="text-align: left">Notes</th><th></th></tr></thead><tbody>
-<tr><td style="text-align: center"><code>.</code></td><td style="text-align: left">direct precedence</td><td style="text-align: center"><img src="aql/../images/A-pred-B.svg" alt="" /></td><td style="text-align: left">For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>.*</code></td><td style="text-align: left">indirect precedence</td><td style="text-align: center"><img src="aql/../images/A-pred-ind-B.svg" alt="" /></td><td style="text-align: left">For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>^</code></td><td style="text-align: left">directly near</td><td style="text-align: center"><img src="aql/../images/A-pred-B.svg" alt="" /> or <img src="aql/../images/B-pred-A.svg" alt="" /></td><td style="text-align: left">Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>^*</code></td><td style="text-align: left">indirectly near</td><td style="text-align: center"><img src="aql/../images/A-pred-ind-B.svg" alt="" /> or <img src="aql/../images/B-pred-ind-A.svg" alt="" /></td><td style="text-align: left">Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>&gt;</code></td><td style="text-align: left">direct dominance</td><td style="text-align: center"><img src="aql/../images/A-dom-B.svg" alt="" /></td><td style="text-align: left">A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func=&quot;OA&quot;]</code> for an edge with the function 'object, accusative'</td><td></td></tr>
-<tr><td style="text-align: center"><code>&gt;*</code></td><td style="text-align: left">indirect dominance</td><td style="text-align: center"><img src="aql/../images/A-dom-ind-B.svg" alt="" /></td><td style="text-align: left">For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance</td><td></td></tr>
-<tr><td style="text-align: center"><code>@*</code></td><td style="text-align: left">part of sub-corpus</td><td style="text-align: center"></td><td style="text-align: left">Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.</td><td></td></tr>
-<tr><td style="text-align: center"><code>_=_</code></td><td style="text-align: left">identical coverage</td><td style="text-align: center"><img src="aql/../images/A-cov-ident-B.svg" alt="" /></td><td style="text-align: left">Applies when two annotations cover the exact same span of tokens</td><td></td></tr>
-<tr><td style="text-align: center"><code>_i_</code></td><td style="text-align: left">inclusion</td><td style="text-align: center"><img src="aql/../images/A-cov-incl-B.svg" alt="" /></td><td style="text-align: left">Applies when one annotation covers a span identical to or larger than  another</td><td></td></tr>
-<tr><td style="text-align: center"><code>_o_</code></td><td style="text-align: left">overlap</td><td style="text-align: center"><img src="aql/../images/A-cov-over-B.svg" alt="" /></td><td style="text-align: left"></td><td></td></tr>
-<tr><td style="text-align: center"><code>_l_</code></td><td style="text-align: left">left aligned</td><td style="text-align: center"><img src="aql/../images/A-cov-left-B.svg" alt="" /></td><td style="text-align: left">Both elements span an area beginning with the same token</td><td></td></tr>
-<tr><td style="text-align: center"><code>_r_</code></td><td style="text-align: left">right aligned</td><td style="text-align: center"><img src="aql/../images/A-cov-right-B.svg" alt="" /></td><td style="text-align: left">Both elements span an area ending with the same token</td><td></td></tr>
-<tr><td style="text-align: center"><code>==</code></td><td style="text-align: left">value identity</td><td style="text-align: center"><strong>A = B</strong></td><td style="text-align: left">The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
-<tr><td style="text-align: center"><code>!=</code></td><td style="text-align: left">value difference</td><td style="text-align: center"><strong>A ≠ B</strong></td><td style="text-align: left">The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
-<tr><td style="text-align: center"><code>-&gt;LABEL</code></td><td style="text-align: left">labeled pointing relation</td><td style="text-align: center"><img src="aql/../images/A-point-direct-B.svg" alt="" /></td><td style="text-align: left">A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation=&quot;VALUE&quot;]</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>-&gt;LABEL *</code></td><td style="text-align: left">indirect pointing relation</td><td style="text-align: center"><img src="aql/../images/A-point-ind-B.svg" alt="" /></td><td style="text-align: left">An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m</td><td></td></tr>
-<tr><td style="text-align: center"><code>#x:arity=n</code></td><td style="text-align: left">arity</td><td style="text-align: center"><img src="aql/../images/A-arity.svg" alt="" /></td><td style="text-align: left">Specifies the amount of directly dominated children that the searched node has</td><td></td></tr>
-<tr><td style="text-align: center"><code>_ident_</code></td><td style="text-align: left">node identity</td><td style="text-align: center"></td><td style="text-align: left">True for two attributes that belong to the same node</td><td></td></tr>
-</tbody></table>
-</div>
+<p>| Operator     | Description                | Illustration                                                 | Notes                                                                                                                                                                                                                                       | |
+| : -------:   | :-------------------       |       :---------------------------------------------:        | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | |
+| <code>.</code>          | direct precedence          | <img src="aql/../images/A-pred-B.svg" alt="" />                                     | For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code>                            | |
+| <code>.*</code>         | indirect precedence        | <img src="aql/../images/A-pred-ind-B.svg" alt="" />                                 | For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code>             | |
+| <code>^</code>          | directly near              | <img src="aql/../images/A-pred-B.svg" alt="" /> or <img src="aql/../images/B-pred-A.svg" alt="" />         | Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code>                                                                                       | |
+| <code>^*</code>         | indirectly near            | <img src="aql/../images/A-pred-ind-B.svg" alt="" /> or <img src="aql/../images/B-pred-ind-A.svg" alt="" /> | Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code>  | |
+| <code>&gt;</code>          | direct dominance           | <img src="aql/../images/A-dom-B.svg" alt="" />                                      | A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func="OA"]</code> for an edge with the function 'object, accusative'                                               | |
+| <code>&gt;*</code>         | indirect dominance         | <img src="aql/../images/A-dom-ind-B.svg" alt="" />                                  | For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance                                                                                                                                  | |
+| <code>@*</code>         | part of sub-corpus         |                             | Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.                                                                                                                                  | |
+| <code>_=_</code>        | identical coverage         | <img src="aql/../images/A-cov-ident-B.svg" alt="" />                                | Applies when two annotations cover the exact same span of tokens                                                                                                                                                                            | |
+| <code>_i_</code>        | inclusion                  | <img src="aql/../images/A-cov-incl-B.svg" alt="" />                                 | Applies when one annotation covers a span identical to or larger than  another                                                                                                                                                              | |
+| <code>_o_</code>        | overlap                    | <img src="aql/../images/A-cov-over-B.svg" alt="" />                                 |                                                                                                                                                               | |
+| <code>_l_</code>        | left aligned               | <img src="aql/../images/A-cov-left-B.svg" alt="" />                                 | Both elements span an area beginning with the same token                                                                                                                                                                                    | |
+| <code>_r_</code>        | right aligned              | <img src="aql/../images/A-cov-right-B.svg" alt="" />                                | Both elements span an area ending with the same token                                                                                                                                                                                       | |
+| <code>==</code>         | value identity             | <strong>A = B</strong>                                                    | The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)                                                                                 | |
+| <code>!=</code>         | value difference           | <strong>A ≠ B</strong>                                                    | The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)                                                                                       | |
+| <code>-&gt;LABEL</code>    | labeled pointing relation  | <img src="aql/../images/A-point-direct-B.svg" alt="" />                            | A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation="VALUE"]</code>                                                                                                                      | |
+| <code>-&gt;LABEL *</code>  | indirect pointing relation | <img src="aql/../images/A-point-ind-B.svg" alt="" />                               | An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m                                                                                     | |
+| <code>#x:arity=n</code> | arity                      | <img src="aql/../images/A-arity.svg" alt="" />                                     | Specifies the amount of directly dominated children that the searched node has                                                                                                                                                              | |
+| <code>_ident_</code>    | node identity       |                                                                         |       True for two attributes that belong to the same node                                                                                                                                                                        | |</p>
 <h2 id="unsupported-operators"><a class="header" href="#unsupported-operators">Unsupported operators</a></h2>
 <p>The following operators have been available in the legacy version ANNIS3, but are not yet implemented in the newest ANNIS version.</p>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Operator</th><th style="text-align: left">Description</th><th style="text-align: center">Illustration</th><th style="text-align: left">Notes</th></tr></thead><tbody>
@@ -746,7 +755,7 @@ token's lemma.</p>
 </div><div style="break-before: page; page-break-before: always;"></div><h1 id="differences-in-compatibility-mode"><a class="header" href="#differences-in-compatibility-mode">Differences in Compatibility Mode</a></h1>
 <p>Previous versions of ANNIS might have a slightly different interpretation of the semantics of AQL.
 By choosing the compatibility mode in the search options, you can emulate the old behavior.
-The compatibility mode (also called &quot;quirks mode&quot;) has the following differences to the standard AQL semantics.</p>
+The compatibility mode (also called "quirks mode") has the following differences to the standard AQL semantics.</p>
 <h2 id="indirect-precedence-is-limited-to-a-maximum-distance-of-50"><a class="header" href="#indirect-precedence-is-limited-to-a-maximum-distance-of-50">Indirect Precedence is limited to a maximum distance of 50</a></h2>
 <p>Indirect precedence (<code>.*</code>) was limited to a maximum distance of 50 in older versions for performance reasons.
 E.g. the query <code>tok .* tok</code> is effectively <code>tok .1,50 tok</code>.
@@ -759,7 +768,7 @@ E.g. in the query</p>
 <pre><code>node  &amp; node &amp; node &amp; #1 _o_ #2 &amp; #2 _o_ #3
 </code></pre>
 <p>the first node must be different from the second node and the second node must be different from the third.
-In compatibility mode, it is allowed that <code>#1</code> and <code>#3</code> reference the same match because there is no 
+In compatibility mode, it is allowed that <code>#1</code> and <code>#3</code> reference the same match because there is no
 non-reflexive operator directly between them.
 You would need to change the query to</p>
 <pre><code>node  &amp; node &amp; node &amp; #1 _o_ #2 &amp; #2 _o_ #3 &amp; #1 _o_ #3
@@ -771,12 +780,12 @@ This does not affect the addition of matches if the operator is reflexive.</p>
 <p>Meta data constraints have been replaced with the part-of operator <code>@*</code> and will result
 in a syntax error for the normal query mode.
 In the compatibility mode, <code>meta::</code> is still allowed.</p>
-<p>Be aware that meta data constraints like <code>meta::doc=&quot;mydocumentname&quot;</code> are applied to all conjunctions of the disjunction, which is seems counter-intuitive.
+<p>Be aware that meta data constraints like <code>meta::doc="mydocumentname"</code> are applied to all conjunctions of the disjunction, which is seems counter-intuitive.
 E.g the query.</p>
-<pre><code>(pos=&quot;NN&quot; | lemma=&quot;be&quot; &amp; meta::age=&quot;20&quot;)
+<pre><code>(pos="NN" | lemma="be" &amp; meta::age="20")
 </code></pre>
 <p>effectively becomes</p>
-<pre><code>(pos=&quot;NN&quot; &amp; meta::age=&quot;20&quot; | lemma=&quot;be&quot; &amp; meta::age=&quot;20&quot;)
+<pre><code>(pos="NN" &amp; meta::age="20" | lemma="be" &amp; meta::age="20")
 </code></pre>
 
                     </main>
@@ -819,6 +828,7 @@ E.g the query.</p>
             window.setTimeout(window.print, 100);
         });
         </script>
+
 
     </div>
     </body>
