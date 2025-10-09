@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Update to graphANNIS 4.0.1 that fixes performance issues with `@*` queries and has improved
+timeout support for frequency queries (which otherwise could use all the resources of the server).
+
 ## [4.15.0] - 2025-05-22
 
 ### Added
