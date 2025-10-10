@@ -147,6 +147,30 @@ You have to replace <code>&lt;version&gt;</code> with the version of ANNIS you a
 <p>This will start a REST service on port 5711 and the user interface on port 5712.
 The user interface service will accept requests from all IPs and the embedded REST service only from <code>localhost</code>.
 We recommend using a Nginx or Apache server as proxy for the user interface service for production to enable important features like HTTPS encryption.</p>
+<h2 id="configuring-a-proxy-server"><a class="header" href="#configuring-a-proxy-server">Configuring a proxy server</a></h2>
+<p>To configure a proxy that uses a different path than <code>/</code>, e.g. <code>https://example.com/annis</code>, first make sure that the context path is set in the <a href="../configuration/"><code>application.properties</code> file</a>.</p>
+<pre><code>server.servlet.context-path=/annis
+</code></pre>
+<h3 id="nginx"><a class="header" href="#nginx">Nginx</a></h3>
+<p>You can configure the location to act as a proxy.
+The <code>location</code> must match the context path and end with an <code>/</code>.
+The <code>proxy_pass</code> directive does not contain the context path, but only specifies the server host and port.</p>
+<pre><code>location /annis/ {
+   proxy_pass http://127.0.0.1:5712;
+   # Optimize for Web Sockets
+   # https://www.nginx.com/blog/websocket-nginx/
+   proxy_http_version 1.1;
+   proxy_set_header Upgrade $http_upgrade;
+   proxy_set_header Connection: $connection_upgrade;
+   client_max_body_size 2G;
+}
+</code></pre>
+<h3 id="apache"><a class="header" href="#apache">Apache</a></h3>
+<p>Recent versions of Apache have support for proxying web socket connects, but the <code>mod_proxy</code> module must be enabled: <a href="https://httpd.apache.org/docs/2.4/mod/mod_proxy.html">https://httpd.apache.org/docs/2.4/mod/mod_proxy.html</a></p>
+<p>Then add the following configuration to your site:</p>
+<pre><code>ProxyPass /annis/ http://localhost:5712/annis/ upgrade=websocket
+ProxyPassReverse /annis/ http://localhost:5712/annis/
+</code></pre>
 <h2 id="use-systemd-to-run-annis-as-a-service"><a class="header" href="#use-systemd-to-run-annis-as-a-service">Use systemd to run ANNIS as a service</a></h2>
 <p>You can create a simple systemd configuration file with the name <code>annis.service</code> and save it under one of the valid configuration folders, e.g. <code>/etc/systemd/system</code> to register ANNIS as a system service.</p>
 <pre><code>[Unit]
@@ -154,7 +178,7 @@ Description=ANNIS corpus search and visualization
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/annis-gui-&lt;version&gt;-desktop.jar
+ExecStart=/usr/local/bin/annis-gui-&lt;version&gt;-desktop.jar --spring.config.location=file:/&lt;location-on-disk&gt;
 Environment=&quot;&quot;
 User=annis
 Group=annis
@@ -163,7 +187,8 @@ WorkingDirectory=/usr/local
 [Install]
 WantedBy=multi-user.target
 </code></pre>
-<p>This configuration assumes that there is a “annis” user and group on the server.</p>
+<p>This configuration assumes that there is a “annis” user and group on the server.
+The <code>WorkingDirectory</code> is not used to locate the <code>application.properties</code> file and thus it is best to specify its location with the <code>--spring.config.location</code> argument.</p>
 <p>You can permanently enable this service by calling</p>
 <pre><code class="language-bash">$ systemctl enable annis.service
 </code></pre>

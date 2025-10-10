@@ -187,6 +187,30 @@ You have to replace <code>&lt;version&gt;</code> with the version of ANNIS you a
 <p>This will start a REST service on port 5711 and the user interface on port 5712.
 The user interface service will accept requests from all IPs and the embedded REST service only from <code>localhost</code>.
 We recommend using a Nginx or Apache server as proxy for the user interface service for production to enable important features like HTTPS encryption.</p>
+<h2 id="configuring-a-proxy-server"><a class="header" href="#configuring-a-proxy-server">Configuring a proxy server</a></h2>
+<p>To configure a proxy that uses a different path than <code>/</code>, e.g. <code>https://example.com/annis</code>, first make sure that the context path is set in the <a href="installation/../configuration/"><code>application.properties</code> file</a>.</p>
+<pre><code>server.servlet.context-path=/annis
+</code></pre>
+<h3 id="nginx"><a class="header" href="#nginx">Nginx</a></h3>
+<p>You can configure the location to act as a proxy.
+The <code>location</code> must match the context path and end with an <code>/</code>.
+The <code>proxy_pass</code> directive does not contain the context path, but only specifies the server host and port.</p>
+<pre><code>location /annis/ {
+   proxy_pass http://127.0.0.1:5712;
+   # Optimize for Web Sockets
+   # https://www.nginx.com/blog/websocket-nginx/
+   proxy_http_version 1.1;
+   proxy_set_header Upgrade $http_upgrade;
+   proxy_set_header Connection: $connection_upgrade;
+   client_max_body_size 2G;
+}
+</code></pre>
+<h3 id="apache"><a class="header" href="#apache">Apache</a></h3>
+<p>Recent versions of Apache have support for proxying web socket connects, but the <code>mod_proxy</code> module must be enabled: <a href="https://httpd.apache.org/docs/2.4/mod/mod_proxy.html">https://httpd.apache.org/docs/2.4/mod/mod_proxy.html</a></p>
+<p>Then add the following configuration to your site:</p>
+<pre><code>ProxyPass /annis/ http://localhost:5712/annis/ upgrade=websocket
+ProxyPassReverse /annis/ http://localhost:5712/annis/
+</code></pre>
 <h2 id="use-systemd-to-run-annis-as-a-service"><a class="header" href="#use-systemd-to-run-annis-as-a-service">Use systemd to run ANNIS as a service</a></h2>
 <p>You can create a simple systemd configuration file with the name <code>annis.service</code> and save it under one of the valid configuration folders, e.g. <code>/etc/systemd/system</code> to register ANNIS as a system service.</p>
 <pre><code>[Unit]
@@ -194,7 +218,7 @@ Description=ANNIS corpus search and visualization
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/annis-gui-&lt;version&gt;-desktop.jar
+ExecStart=/usr/local/bin/annis-gui-&lt;version&gt;-desktop.jar --spring.config.location=file:/&lt;location-on-disk&gt;
 Environment=&quot;&quot;
 User=annis
 Group=annis
@@ -203,7 +227,8 @@ WorkingDirectory=/usr/local
 [Install]
 WantedBy=multi-user.target
 </code></pre>
-<p>This configuration assumes that there is a “annis” user and group on the server.</p>
+<p>This configuration assumes that there is a “annis” user and group on the server.
+The <code>WorkingDirectory</code> is not used to locate the <code>application.properties</code> file and thus it is best to specify its location with the <code>--spring.config.location</code> argument.</p>
 <p>You can permanently enable this service by calling</p>
 <pre><code class="language-bash">$ systemctl enable annis.service
 </code></pre>
@@ -795,25 +820,25 @@ by the first and second tokens' parts-of-speech, as well as the first
 token's lemma.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="complete-list-of-operators"><a class="header" href="#complete-list-of-operators">Complete List of Operators</a></h1>
 <p>AQL currently includes the following operators:</p>
-<table><thead><tr><th style="text-align: center">Operator</th><th style="text-align: left">Description</th><th style="text-align: center">Illustration</th><th style="text-align: left">Notes</th><th></th></tr></thead><tbody>
-<tr><td style="text-align: center"><code>.</code></td><td style="text-align: left">direct precedence</td><td style="text-align: center"><img src="aql/../images/A-pred-B.svg" alt="" /></td><td style="text-align: left">For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>.*</code></td><td style="text-align: left">indirect precedence</td><td style="text-align: center"><img src="aql/../images/A-pred-ind-B.svg" alt="" /></td><td style="text-align: left">For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>^</code></td><td style="text-align: left">directly near</td><td style="text-align: center"><img src="aql/../images/A-pred-B.svg" alt="" /> or <img src="aql/../images/B-pred-A.svg" alt="" /></td><td style="text-align: left">Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>^*</code></td><td style="text-align: left">indirectly near</td><td style="text-align: center"><img src="aql/../images/A-pred-ind-B.svg" alt="" /> or <img src="aql/../images/B-pred-ind-A.svg" alt="" /></td><td style="text-align: left">Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>&gt;</code></td><td style="text-align: left">direct dominance</td><td style="text-align: center"><img src="aql/../images/A-dom-B.svg" alt="" /></td><td style="text-align: left">A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func=&quot;OA&quot;]</code> for an edge with the function 'object, accusative'</td><td></td></tr>
-<tr><td style="text-align: center"><code>&gt;*</code></td><td style="text-align: left">indirect dominance</td><td style="text-align: center"><img src="aql/../images/A-dom-ind-B.svg" alt="" /></td><td style="text-align: left">For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance</td><td></td></tr>
-<tr><td style="text-align: center"><code>@*</code></td><td style="text-align: left">part of sub-corpus</td><td style="text-align: center"></td><td style="text-align: left">Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.</td><td></td></tr>
-<tr><td style="text-align: center"><code>_=_</code></td><td style="text-align: left">identical coverage</td><td style="text-align: center"><img src="aql/../images/A-cov-ident-B.svg" alt="" /></td><td style="text-align: left">Applies when two annotations cover the exact same span of tokens</td><td></td></tr>
-<tr><td style="text-align: center"><code>_i_</code></td><td style="text-align: left">inclusion</td><td style="text-align: center"><img src="aql/../images/A-cov-incl-B.svg" alt="" /></td><td style="text-align: left">Applies when one annotation covers a span identical to or larger than  another</td><td></td></tr>
-<tr><td style="text-align: center"><code>_o_</code></td><td style="text-align: left">overlap</td><td style="text-align: center"><img src="aql/../images/A-cov-over-B.svg" alt="" /></td><td style="text-align: left"></td><td></td></tr>
-<tr><td style="text-align: center"><code>_l_</code></td><td style="text-align: left">left aligned</td><td style="text-align: center"><img src="aql/../images/A-cov-left-B.svg" alt="" /></td><td style="text-align: left">Both elements span an area beginning with the same token</td><td></td></tr>
-<tr><td style="text-align: center"><code>_r_</code></td><td style="text-align: left">right aligned</td><td style="text-align: center"><img src="aql/../images/A-cov-right-B.svg" alt="" /></td><td style="text-align: left">Both elements span an area ending with the same token</td><td></td></tr>
-<tr><td style="text-align: center"><code>==</code></td><td style="text-align: left">value identity</td><td style="text-align: center"><strong>A = B</strong></td><td style="text-align: left">The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
-<tr><td style="text-align: center"><code>!=</code></td><td style="text-align: left">value difference</td><td style="text-align: center"><strong>A ≠ B</strong></td><td style="text-align: left">The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td><td></td></tr>
-<tr><td style="text-align: center"><code>-&gt;LABEL</code></td><td style="text-align: left">labeled pointing relation</td><td style="text-align: center"><img src="aql/../images/A-point-direct-B.svg" alt="" /></td><td style="text-align: left">A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation=&quot;VALUE&quot;]</code></td><td></td></tr>
-<tr><td style="text-align: center"><code>-&gt;LABEL *</code></td><td style="text-align: left">indirect pointing relation</td><td style="text-align: center"><img src="aql/../images/A-point-ind-B.svg" alt="" /></td><td style="text-align: left">An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m</td><td></td></tr>
-<tr><td style="text-align: center"><code>#x:arity=n</code></td><td style="text-align: left">arity</td><td style="text-align: center"><img src="aql/../images/A-arity.svg" alt="" /></td><td style="text-align: left">Specifies the amount of directly dominated children that the searched node has</td><td></td></tr>
-<tr><td style="text-align: center"><code>_ident_</code></td><td style="text-align: left">node identity</td><td style="text-align: center"></td><td style="text-align: left">True for two attributes that belong to the same node</td><td></td></tr>
+<table><thead><tr><th style="text-align: left">Operator</th><th style="text-align: right">Description</th><th style="text-align: left">Illustration</th><th style="text-align: left">Notes</th></tr></thead><tbody>
+<tr><td style="text-align: left"><code>.</code></td><td style="text-align: right">direct precedence</td><td style="text-align: left"><img src="aql/../images/A-pred-B.svg" alt="" /></td><td style="text-align: left">For non-terminal nodes, precedence is determined by the right-most and left-most terminal children. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>.layer</code></td></tr>
+<tr><td style="text-align: left"><code>.*</code></td><td style="text-align: right">indirect precedence</td><td style="text-align: left"><img src="aql/../images/A-pred-ind-B.svg" alt="" /></td><td style="text-align: left">For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>.*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>.layer,3,4</code></td></tr>
+<tr><td style="text-align: left"><code>^</code></td><td style="text-align: right">directly near</td><td style="text-align: left"><img src="aql/../images/A-pred-B.svg" alt="" /> or <img src="aql/../images/B-pred-A.svg" alt="" /></td><td style="text-align: left">Same as precedence, but in either order. In corpora with multiple segmentations the layer on which consecutivity holds may be specified with <code>^layer</code></td></tr>
+<tr><td style="text-align: left"><code>^*</code></td><td style="text-align: right">indirectly near</td><td style="text-align: left"><img src="aql/../images/A-pred-ind-B.svg" alt="" /> or <img src="aql/../images/B-pred-ind-A.svg" alt="" /></td><td style="text-align: left">Like indirect precedence in either order. The form <code>^n,m</code> can be used, e.g. <code>^3,4</code> - between 3 and 4 token distance; the default maximum distance for <code>^*</code> is 50 tokens. As above, segmentation layers may be specified, e.g. <code>^layer,3,4</code></td></tr>
+<tr><td style="text-align: left"><code>&gt;</code></td><td style="text-align: right">direct dominance</td><td style="text-align: left"><img src="aql/../images/A-dom-B.svg" alt="" /></td><td style="text-align: left">A specific edge type may be specified, e.g. <code>&gt;secedge</code> to find secondary edges. Edge labels are specified in brackets, e.g. <code>&gt;[func=&quot;OA&quot;]</code> for an edge with the function 'object, accusative'</td></tr>
+<tr><td style="text-align: left"><code>&gt;*</code></td><td style="text-align: right">indirect dominance</td><td style="text-align: left"><img src="aql/../images/A-dom-ind-B.svg" alt="" /></td><td style="text-align: left">For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance</td></tr>
+<tr><td style="text-align: left"><code>@*</code></td><td style="text-align: right">part of sub-corpus</td><td style="text-align: left"></td><td style="text-align: left">Left attribute is part of a sub-corpus having the attribute of the right-hand side. For specific distance range in the sub-corpus hierarchy, <code>@n,m</code> can be used.</td></tr>
+<tr><td style="text-align: left"><code>_=_</code></td><td style="text-align: right">identical coverage</td><td style="text-align: left"><img src="aql/../images/A-cov-ident-B.svg" alt="" /></td><td style="text-align: left">Applies when two annotations cover the exact same span of tokens</td></tr>
+<tr><td style="text-align: left"><code>_i_</code></td><td style="text-align: right">inclusion</td><td style="text-align: left"><img src="aql/../images/A-cov-incl-B.svg" alt="" /></td><td style="text-align: left">Applies when one annotation covers a span identical to or larger than another</td></tr>
+<tr><td style="text-align: left"><code>_o_</code></td><td style="text-align: right">overlap</td><td style="text-align: left"><img src="aql/../images/A-cov-over-B.svg" alt="" /></td><td style="text-align: left"></td></tr>
+<tr><td style="text-align: left"><code>_l_</code></td><td style="text-align: right">left aligned</td><td style="text-align: left"><img src="aql/../images/A-cov-left-B.svg" alt="" /></td><td style="text-align: left">Both elements span an area beginning with the same token</td></tr>
+<tr><td style="text-align: left"><code>_r_</code></td><td style="text-align: right">right aligned</td><td style="text-align: left"><img src="aql/../images/A-cov-right-B.svg" alt="" /></td><td style="text-align: left">Both elements span an area ending with the same token</td></tr>
+<tr><td style="text-align: left"><code>==</code></td><td style="text-align: right">value identity</td><td style="text-align: left"><strong>A = B</strong></td><td style="text-align: left">The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td></tr>
+<tr><td style="text-align: left"><code>!=</code></td><td style="text-align: right">value difference</td><td style="text-align: left"><strong>A ≠ B</strong></td><td style="text-align: left">The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td></tr>
+<tr><td style="text-align: left"><code>-&gt;LABEL</code></td><td style="text-align: right">labeled pointing relation</td><td style="text-align: left"><img src="aql/../images/A-point-direct-B.svg" alt="" /></td><td style="text-align: left">A labeled, directed relationship between two elements. Annotations can be specified with <code>-&gt;LABEL[annotation=&quot;VALUE&quot;]</code></td></tr>
+<tr><td style="text-align: left"><code>-&gt;LABEL *</code></td><td style="text-align: right">indirect pointing relation</td><td style="text-align: left"><img src="aql/../images/A-point-ind-B.svg" alt="" /></td><td style="text-align: left">An indirect labeled relationship between two elements. The length of the chain may be specified with <code>-&gt;LABEL n,m</code> for relation chains of length n to m</td></tr>
+<tr><td style="text-align: left"><code>#x:arity=n</code></td><td style="text-align: right">arity</td><td style="text-align: left"><img src="aql/../images/A-arity.svg" alt="" /></td><td style="text-align: left">Specifies the amount of directly dominated children that the searched node has</td></tr>
+<tr><td style="text-align: left"><code>_ident_</code></td><td style="text-align: right">node identity</td><td style="text-align: left"></td><td style="text-align: left">True for two attributes that belong to the same node</td></tr>
 </tbody></table>
 <h2 id="unsupported-operators"><a class="header" href="#unsupported-operators">Unsupported operators</a></h2>
 <p>The following operators have been available in the legacy version ANNIS3, but are not yet implemented in the newest ANNIS version.</p>
@@ -824,7 +849,7 @@ token's lemma.</p>
 <tr><td style="text-align: center"><code>$</code></td><td style="text-align: left">common parent node</td><td style="text-align: center"><img src="aql/../images/A-parent-B.svg" alt="" /></td><td style="text-align: left"></td></tr>
 <tr><td style="text-align: center"><code>$*</code></td><td style="text-align: left">common ancestor node</td><td style="text-align: center"><img src="aql/../images/A-ancestor-B.svg" alt="" /></td><td style="text-align: left"></td></tr>
 <tr><td style="text-align: center"><code>#x:tokenarity=n</code></td><td style="text-align: left">tokenarity</td><td style="text-align: center"><img src="aql/../images/A-tokenarity.svg" alt="" /></td><td style="text-align: left">Specifies the length of the span of tokens covered by the node</td></tr>
-<tr><td style="text-align: center"><code>#x:root</code></td><td style="text-align: left">root</td><td style="text-align: center"><img src="aql/../images/A-root.svg" alt="" /></td><td style="text-align: left">Specifies that the node is not dominated by any other node within its namespace       <strong>s</strong></td></tr>
+<tr><td style="text-align: center"><code>#x:root</code></td><td style="text-align: left">root</td><td style="text-align: center"><img src="aql/../images/A-root.svg" alt="" /></td><td style="text-align: left">Specifies that the node is not dominated by any other node within its namespace <strong>s</strong></td></tr>
 </tbody></table>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="differences-in-compatibility-mode"><a class="header" href="#differences-in-compatibility-mode">Differences in Compatibility Mode</a></h1>
 <p>Previous versions of ANNIS might have a slightly different interpretation of the semantics of AQL.
@@ -1275,9 +1300,14 @@ namespace is not specified, null is assumed). &quot;ascending&quot; is &quot;tru
 <p>For the desktop version of ANNIS, you most probably don't need to change any of the default configuration and you can skip this section.
 If you are installing ANNIS on a server however, you might want to tweak the settings.
 The <a href="http://en.wikipedia.org/w/index.php?title=.properties&amp;oldid=521500688">Java Properties</a>, <a href="https://toml.io/">TOML</a> and <a href="http://www.json.org/">JSON</a> file formats are used for different kind of configuration.</p>
-<p>ANNIS uses the Spring Boot configuration system and thus it will search for a Java Properties based configuration file named <code>application.properties</code> in the current working directory or a <code>config</code> sub-directory of the working directory.<sup class="footnote-reference"><a href="#working-dir">1</a></sup>
-You can also use the command line argument <code>--spring.config.location=file:/&lt;location-on-disk&gt;</code> to specify a specific configuration file.
-More search paths for configurations files are documented in the <a href="https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files">Spring Boot documentation</a>.</p>
+<p>ANNIS uses the Spring Boot configuration system and thus it will search for a Java Properties based configuration file named <code>application.properties</code> in the current working directory or a <code>config</code> sub-directory of the working directory.</p>
+<div class="warning">
+Depending on how you start ANNIS, the working directory can be different.
+<p>When using <code>java -jar /path/to/annis-server.jar</code>, the working directory is the same as the working directory of your current shell.
+If you start ANNIS by treating it like an executable file, e.g. by running <code>/path/to/annis-server.jar</code> directly, <strong>the directory containing the jar is used as the working directory</strong> of the application per default.</p>
+</div>
+<p>To avoid confusion from where the file is loaded from, you can specify the configuration file location by passing the command line argument <code>--spring.config.location=file:/&lt;location-on-disk&gt;</code> when starting ANNIS.</p>
+<p>More search paths for configurations files are documented in the <a href="https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files">Spring Boot documentation</a>.</p>
 <p>The following is an example configuration with ANNIS-specific configuration values.</p>
 <pre><code class="language-properties"># The port on which this service is listening
 server.port=5712
@@ -1313,11 +1343,6 @@ annis.shorten-reference-links=true
 spring.datasource.url=jdbc:h2:file:${user.home}/.annis/v4/frontend_data.h2
 </code></pre>
 <p>Being a Spring Boot application, ANNIS configuration properties also be directly given as <a href="https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-command-line-args">command line argument</a>.</p>
-<div class="footnote-definition" id="working-dir"><sup class="footnote-definition-label">1</sup>
-<p>Depending on how you start ANNIS, the working directory can be different.
-When using <code>java -jar /path/to/annis-server.jar</code>, the working directory is the same as the working directory of your current shell.
-If you start ANNIS by treating it like an executable file, e.g. by running <code>/path/to/annis-server.jar</code> directly, the directory containing the jar is used as the working directory of the application per default.</p>
-</div>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="user-configuration-on-server"><a class="header" href="#user-configuration-on-server">User Configuration on Server</a></h1>
 <p>ANNIS has an authorization system based on <a href="https://www.oauth.com/">OAuth2</a> which allows handling multiple users on a server installation using an external identity provider service.
 A user will see different corpora depending on which groups the user is part of.

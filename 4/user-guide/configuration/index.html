@@ -138,9 +138,14 @@
 <p>For the desktop version of ANNIS, you most probably don't need to change any of the default configuration and you can skip this section.
 If you are installing ANNIS on a server however, you might want to tweak the settings.
 The <a href="http://en.wikipedia.org/w/index.php?title=.properties&amp;oldid=521500688">Java Properties</a>, <a href="https://toml.io/">TOML</a> and <a href="http://www.json.org/">JSON</a> file formats are used for different kind of configuration.</p>
-<p>ANNIS uses the Spring Boot configuration system and thus it will search for a Java Properties based configuration file named <code>application.properties</code> in the current working directory or a <code>config</code> sub-directory of the working directory.<sup class="footnote-reference"><a href="#working-dir">1</a></sup>
-You can also use the command line argument <code>--spring.config.location=file:/&lt;location-on-disk&gt;</code> to specify a specific configuration file.
-More search paths for configurations files are documented in the <a href="https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files">Spring Boot documentation</a>.</p>
+<p>ANNIS uses the Spring Boot configuration system and thus it will search for a Java Properties based configuration file named <code>application.properties</code> in the current working directory or a <code>config</code> sub-directory of the working directory.</p>
+<div class="warning">
+Depending on how you start ANNIS, the working directory can be different.
+<p>When using <code>java -jar /path/to/annis-server.jar</code>, the working directory is the same as the working directory of your current shell.
+If you start ANNIS by treating it like an executable file, e.g. by running <code>/path/to/annis-server.jar</code> directly, <strong>the directory containing the jar is used as the working directory</strong> of the application per default.</p>
+</div>
+<p>To avoid confusion from where the file is loaded from, you can specify the configuration file location by passing the command line argument <code>--spring.config.location=file:/&lt;location-on-disk&gt;</code> when starting ANNIS.</p>
+<p>More search paths for configurations files are documented in the <a href="https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-application-property-files">Spring Boot documentation</a>.</p>
 <p>The following is an example configuration with ANNIS-specific configuration values.</p>
 <pre><code class="language-properties"># The port on which this service is listening
 server.port=5712
@@ -176,11 +181,6 @@ annis.shorten-reference-links=true
 spring.datasource.url=jdbc:h2:file:${user.home}/.annis/v4/frontend_data.h2
 </code></pre>
 <p>Being a Spring Boot application, ANNIS configuration properties also be directly given as <a href="https://docs.spring.io/spring-boot/docs/2.3.x/reference/html/spring-boot-features.html#boot-features-external-config-command-line-args">command line argument</a>.</p>
-<div class="footnote-definition" id="working-dir"><sup class="footnote-definition-label">1</sup>
-<p>Depending on how you start ANNIS, the working directory can be different.
-When using <code>java -jar /path/to/annis-server.jar</code>, the working directory is the same as the working directory of your current shell.
-If you start ANNIS by treating it like an executable file, e.g. by running <code>/path/to/annis-server.jar</code> directly, the directory containing the jar is used as the working directory of the application per default.</p>
-</div>
 
                     </main>
 
