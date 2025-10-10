@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.15.0
-date-released: 2025-05-22
+version: 4.15.1
+date-released: 2025-10-10
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -346,7 +346,7 @@ references:
   title: AspectJ Weaver
   version: 1.9.7
   abbreviation: org.aspectj:aspectjweaver
-  license: EPL-2.0
+  license: EPL-1.0
   notes: More license information can be found in the THIRD-PARTY/AspectJ_Weaver directory.
   authors:
   - name: Andy Clement
@@ -407,7 +407,7 @@ references:
   title: Flute
   version: 1.3.0.gg2
   abbreviation: com.vaadin.external.flute:flute
-  license: NOASSERTION
+  license: W3C-19980720
   notes: More license information can be found in the THIRD-PARTY/Flute directory.
   authors:
   - name: Flute Dev
@@ -725,7 +725,7 @@ references:
   title: Jakarta Annotations API
   version: 1.3.5
   abbreviation: jakarta.annotation:jakarta.annotation-api
-  license: EPL-2.0 OR GPL-2.0-only WITH Classpath-exception-2.0
+  license: EPL-2.0 AND GPL-2.0-only AND NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/Jakarta_Annotations_API
     directory.
   authors:
@@ -735,7 +735,7 @@ references:
   title: Jakarta Persistence API
   version: 2.2.3
   abbreviation: jakarta.persistence:jakarta.persistence-api
-  license: EPL-2.0 OR BSD-3-Clause
+  license: BSD-3-Clause OR EPL-2.0
   notes: More license information can be found in the THIRD-PARTY/Jakarta_Persistence_API
     directory.
   authors:
@@ -765,7 +765,7 @@ references:
   title: Java Servlet API
   version: 4.0.1
   abbreviation: javax.servlet:javax.servlet-api
-  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
+  license: CDDL-1.0 AND GPL-2.0-only AND NOASSERTION
   notes: More license information can be found in the THIRD-PARTY/Java_Servlet_API
     directory.
   authors:
@@ -795,7 +795,7 @@ references:
   title: JavaMail API
   version: 1.5.6
   abbreviation: com.sun.mail:javax.mail
-  license: CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0
+  license: NOASSERTION OR CDDL-1.0
   notes: More license information can be found in the THIRD-PARTY/JavaMail_API directory.
   authors:
   - name: Bill Shannon
@@ -804,7 +804,7 @@ references:
   title: Javassist
   version: 3.27.0-GA
   abbreviation: org.javassist:javassist
-  license: MPL-1.1 OR LGPL-2.1-or-later OR Apache-2.0
+  license: Apache-2.0 OR LGPL-2.1-or-later OR MPL-1.1
   notes: More license information can be found in the THIRD-PARTY/Javassist directory.
   authors:
   - name: Shigeru Chiba
@@ -895,7 +895,7 @@ references:
   title: 'OWNER :: Core'
   version: 1.0.10
   abbreviation: org.aeonbits.owner:owner
-  license: NOASSERTION
+  license: BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/OWNER_Core directory.
   authors:
   - name: Luigi R. Viggiano
@@ -1115,7 +1115,7 @@ references:
   title: Stax2 API
   version: 4.2.1
   abbreviation: org.codehaus.woodstox:stax2-api
-  license: BSD-2-Clause
+  license: BSD-2-Clause AND BSD-3-Clause
   notes: More license information can be found in the THIRD-PARTY/Stax2_API directory.
   authors:
   - name: Tatu Saloranta
@@ -1209,7 +1209,7 @@ references:
   title: atmosphere-runtime
   version: 2.4.30.vaadin4
   abbreviation: com.vaadin.external.atmosphere:atmosphere-runtime
-  license: Apache-2.0
+  license-url: https://glassfish.dev.java.net/public/CDDLv1.0.html
   notes: More license information can be found in the THIRD-PARTY/atmosphere_runtime
     directory.
   authors:
@@ -1240,7 +1240,7 @@ references:
   title: gwt-elemental
   version: 2.8.2
   abbreviation: com.google.gwt:gwt-elemental
-  license: NOASSERTION
+  license-url: http://www.gwtproject.org/terms.html
   notes: More license information can be found in the THIRD-PARTY/gwt_elemental directory.
   authors:
   - name: The gwt-elemental 2.8.2 Team
@@ -1289,7 +1289,7 @@ references:
   title: javax.interceptor API
   version: 1.2.2
   abbreviation: javax.interceptor:javax.interceptor-api
-  license: NOASSERTION
+  license: (CDDL-1.1 OR GPL-2.0-only WITH Classpath-exception-2.0) AND LicenseRef-scancode-unknown
   notes: More license information can be found in the THIRD-PARTY/javax.interceptor_API
     directory.
   authors:
@@ -1360,7 +1360,7 @@ references:
   title: larvalabs collections
   version: '4.01'
   abbreviation: net.sourceforge.collections:collections-generic
-  license: Apache-2.0
+  license: Apache-2.0 OR (Apache-1.1 AND Apache-2.0)
   notes: More license information can be found in the THIRD-PARTY/larvalabs_collections
     directory.
   authors:
@@ -1662,7 +1662,7 @@ references:
   title: vaadin-client-compiled
   version: 8.14.3
   abbreviation: com.vaadin:vaadin-client-compiled
-  license: Apache-2.0
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_client_compiled
     directory.
   authors:
@@ -1722,7 +1722,7 @@ references:
   title: vaadin-push
   version: 8.14.3
   abbreviation: com.vaadin:vaadin-push
-  license: Apache-2.0
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_push directory.
   authors:
   - name: Henri Sara
@@ -1740,7 +1740,7 @@ references:
   title: vaadin-shared
   version: 8.14.3
   abbreviation: com.vaadin:vaadin-shared
-  license: Apache-2.0
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_shared directory.
   authors:
   - name: Henri Sara
@@ -1749,7 +1749,7 @@ references:
   title: vaadin-slf4j-jdk14
   version: 1.6.1
   abbreviation: com.vaadin.external.slf4j:vaadin-slf4j-jdk14
-  license: MIT
+  license-url: http://opensource.org/licenses/MIT
   notes: More license information can be found in the THIRD-PARTY/vaadin_slf4j_jdk14
     directory.
   authors:
@@ -1809,7 +1809,7 @@ references:
   title: vaadin-themes
   version: 8.14.3
   abbreviation: com.vaadin:vaadin-themes
-  license: Apache-2.0
+  license-url: http://www.apache.org/licenses/LICENSE-2.0
   notes: More license information can be found in the THIRD-PARTY/vaadin_themes directory.
   authors:
   - name: Henri Sara
