@@ -39,7 +39,7 @@
         <vaadin.version>8.14.3</vaadin.version>
         <vaadin.productionMode>true</vaadin.productionMode>
         <start-class>org.corpus_tools.annis.gui.AnnisUiApplication</start-class>
-        <graphannis.version>4.0.1</graphannis.version>
+        <graphannis.version>4.1.3</graphannis.version>
         <antlr4.version>4.7.2</antlr4.version>
         <spring.profiles.active>server</spring.profiles.active>
         <swagger-core-version>1.5.24</swagger-core-version>
@@ -261,7 +261,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-unknown-linux-gnu.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>bbd0a6456f24c1b6594e569267302f54a142775b86ff63d2d9e4ea3b12f835de</sha256>
+                            <sha256>b64c63cf721ed40c9e59dd7cba464f9ede588a2d3ae544b889e67228b6e9c7a7</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -276,7 +276,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-pc-windows-msvc.zip</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/win32-x86-64/</outputDirectory>
-                            <sha256>3d553737863c3dabf9fc80cbdec3aa3b909b42616ca75baa93547b24e79672df</sha256>
+                            <sha256>3c3a259999e6b988836ee42f301364fcc4b9da995eeb4e0bab29b05523e3cb81</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -291,7 +291,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-aarch64-apple-darwin.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>9c7a7bb65b3467a77330fa04856bc1169213b0c34584db6bd52ef9bc4f12d990</sha256>
+                            <sha256>0595e02f2446315564a22982803cf05dbd6ebe4f055c6ebf0f7674e952dfd97f</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
@@ -306,7 +306,7 @@
                                 https://github.com/korpling/graphANNIS/releases/download/v${graphannis.version}/graphannis-webservice-x86_64-apple-darwin.tar.xz</url>
                             <outputDirectory>
                                 ${project.build.directory}/native/</outputDirectory>
-                            <sha256>659258a57a8c175910e1c3120211e732d5909a1e1cd57e822289c0535be20d9f</sha256>
+                            <sha256>92adb2cd4e548a4316f8c6960073a5b931aa2bcf913f1e493a511195f54a90b7</sha256>
                             <unpack>true</unpack>
                         </configuration>
                     </execution>
