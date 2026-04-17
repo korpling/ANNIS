@@ -100,7 +100,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - run: misc/download-mdbook.sh 0.4.17
+      - run: misc/download-mdbook.sh 0.5.2
         env:
           OS_NAME: linux
       - run: mdbook build docs/user-guide/
