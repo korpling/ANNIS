@@ -132,7 +132,7 @@ public class BinaryRequestHandler implements RequestHandler {
     // Execute the call and return the response
     Call call;
     try {
-      call = client.buildCall(localVarPath, "GET", localVarQueryParams,
+      call = client.buildCall(null, localVarPath, "GET", localVarQueryParams,
           localVarCollectionQueryParams, null, localVarHeaderParams, localVarCookieParams,
           localVarFormParams, localVarAuthNames, null);
 
