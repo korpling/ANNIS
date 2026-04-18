@@ -7,14 +7,16 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 ## [Unreleased]
 
+### Changed
+
+- 💥 Drop support for Java 8 (**breaking change**). The lowest support Java version is now 11.
+- Update some of the dependencies of the project: Spring Boot to 2.7.x and OpenApi to 5.4.x.
+
 ### Fixed
 
 - Update to graphANNIS 4.1.4 which includes a bugfix for including token in subgraph even if the
  token is not covered by a segmentation node
 
-### Changed
-
-- Update some of the dependencies of the project: Spring Boot to 2.7.x and OpenApi to 5.4.x.
 
 ## [4.15.1] - 2025-10-10
 

@@ -6,32 +6,6 @@ on:
     branches: [main]
 
 jobs:
-  test_jdk8:
-    name: Execute all automated tests JDK 8
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Cache local Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-8-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-8-
-      - name: Cache test corpora
-        uses: actions/cache@v4
-        with:
-          path: "*.zip"
-          key: ${{ runner.os }}-corpora-${{ hashFiles('misc/import-test-corpora.sh') }}
-      - name: Set JAVA_HOME to included JDK 8
-        run: echo JAVA_HOME=$JAVA_HOME_8_X64 >> $GITHUB_ENV
-      - run: misc/download-annis-cli.sh
-        env:
-          OS_NAME: linux
-      - run: misc/import-test-corpora.sh
-      - name: Run Maven install (includes tests)
-        run: mvn install
   test_jdk11:
     name: Execute all automated tests on JDK 11
     runs-on: ubuntu-24.04
