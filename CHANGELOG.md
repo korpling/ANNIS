@@ -9,7 +9,7 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 ### Fixed
 
-- Update to graphANNIS 4.1.3 which includes a bugfix for including token in subgraph even if the
+- Update to graphANNIS 4.1.4 which includes a bugfix for including token in subgraph even if the
  token is not covered by a segmentation node
 
 ### Changed
