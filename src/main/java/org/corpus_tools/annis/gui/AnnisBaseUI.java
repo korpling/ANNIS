@@ -172,7 +172,8 @@ public class AnnisBaseUI extends UI implements Serializable {
     TreeMap<String, InstanceConfig> result = new TreeMap<>();
 
     JsonMapper mapper = new JsonMapper();
-    mapper.registerModule(new JaxbAnnotationModule());
+    JaxbAnnotationModule module = new JaxbAnnotationModule();
+    mapper.registerModule(module);
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     // get a list of all directories that contain instance informations
