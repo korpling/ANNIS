@@ -12,6 +12,10 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 - Update to graphANNIS 4.1.3 which includes a bugfix for including token in subgraph even if the
  token is not covered by a segmentation node
 
+### Changed
+
+- Update some of the dependencies of the project: Spring Boot to 2.7.x and OpenApi to 5.4.x.
+
 ## [4.15.1] - 2025-10-10
 
 ### Fixed
