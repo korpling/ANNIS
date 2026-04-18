@@ -9,7 +9,9 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 ### Changed
 
-- 💥 Drop support for Java 8 (**breaking change**). The lowest support Java version is now 11.
+- 💥 Drop support for Java 8 (**breaking change**). The lowest supported Java version is now 11.
+  The documentation and homepage stated to use Java 11 for a while now, so this hopefully should
+  have limited impact for the users.
 - Update some of the dependencies of the project: Spring Boot to 2.7.x and OpenApi to 5.4.x.
 
 ### Fixed
