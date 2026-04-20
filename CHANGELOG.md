@@ -7,6 +7,8 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 ## [Unreleased]
 
+## [4.15.2] - 2026-04-20
+
 ### Changed
 
 - 💥 Drop support for Java 8 (**breaking change**). The lowest supported Java version is now 11.
@@ -1495,7 +1497,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.15.1...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.15.2...HEAD
+[4.15.2]: https://github.com/korpling/ANNIS/compare/v4.15.1...v4.15.2
 [4.15.1]: https://github.com/korpling/ANNIS/compare/v4.15.0...v4.15.1
 [4.15.0]: https://github.com/korpling/ANNIS/compare/v4.14.0...v4.15.0
 [4.14.0]: https://github.com/korpling/ANNIS/compare/v4.13.0...v4.14.0
