@@ -46,9 +46,9 @@ jobs:
       - name: Remove old files for this version
         run: rm -Rf gh-pages/$SHORT_VERSION
       - name: Generate the user documentation
-        run: mdbook build --dest-dir gh-pages/${SHORT_VERSION}/user-guide/  docs/user-guide/
+        run: mdbook build --dest-dir gh-pages/${SHORT_VERSION}/user-guide/ docs/user-guide/
       - name: Generate the developer documentation
-        run: mdbook build --dest-dir gh-pages/${SHORT_VERSION}/developer-guide/book/  docs/developer-guide/
+        run: mdbook build --dest-dir gh-pages/${SHORT_VERSION}/developer-guide/ docs/developer-guide/
       - run: git add $SHORT_VERSION
         working-directory: gh-pages
       - run: git -c user.name='gh-actions' -c user.email='gh-actions' commit --allow-empty -m "add documentation for version $SHORT_VERSION"
