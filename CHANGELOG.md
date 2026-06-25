@@ -7,6 +7,10 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 ## [Unreleased]
 
+### Fixed
+
+- Displaying error lints in the AQL text field was broken.
+
 ## [4.15.2] - 2026-04-20
 
 ### Changed

@@ -126,10 +126,23 @@ window.org_corpus_tools_annis_gui_components_codemirror_AqlCodeEditor = function
       for(var i=0; i < connector.getState().errors.length; i++)
       {
         var err = connector.getState().errors[i];
-        var endColumn = err.endColumn+1;
+		// The line starts at 0, but the columns start at 1
+		var startLine = err.startLine;
+		var startColumn = err.startColumn - 1;
+		
+		var endLine;
+        var endColumn;
+		if(err.endLine == 0 && err.endColumn == 0 ) {
+			// Use the start column if there is not end given
+			endLine = startLine;
+			endColumn = startColumn + 2;
+		} else {
+			endColumn = err.endColumn;
+			endLine = err.endLine;
+		}
         errorList.push({
-          from: CodeMirror.Pos(err.startLine-1, err.startColumn-1),
-          to: CodeMirror.Pos(err.endLine-1, endColumn-1),
+          from: CodeMirror.Pos(startLine, startColumn),
+          to: CodeMirror.Pos(endLine, endColumn),
           message: err.message
         });
       }
