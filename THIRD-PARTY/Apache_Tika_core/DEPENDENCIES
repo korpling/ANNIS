@@ -8,13 +8,13 @@ Apache Tika core
 
 From: 'QOS.ch' (http://www.qos.ch)
 
-  - SLF4J API Module (http://www.slf4j.org) org.slf4j:slf4j-api:jar:2.0.17
+  - SLF4J API Module (http://www.slf4j.org) org.slf4j:slf4j-api:jar:2.0.18
     License: MIT  (https://opensource.org/license/mit)
 
 
 From: 'The Apache Software Foundation' (https://www.apache.org/)
 
-  - Apache Commons IO (https://commons.apache.org/proper/commons-io/) commons-io:commons-io:jar:2.21.0
+  - Apache Commons IO (https://commons.apache.org/proper/commons-io/) commons-io:commons-io:jar:2.22.0
     License: Apache-2.0  (https://www.apache.org/licenses/LICENSE-2.0.txt)
 
 
