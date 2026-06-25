@@ -10,6 +10,9 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 ### Fixed
 
 - Displaying error lints in the AQL text field was broken.
+- Update to graphANNIS 4.1.5 that fixed a bug when handling node numbers in
+  queries with multiple alternatives and improved the query optimizer in case of
+  cyclic graph components.
 
 ## [4.15.2] - 2026-04-20
 
