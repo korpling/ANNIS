@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
+import org.corpus_tools.salt.SaltFactory;
+import org.corpus_tools.salt.common.SCorpusGraph;
+import org.corpus_tools.salt.common.SDocument;
+import org.eclipse.emf.common.util.URI;
 import org.junit.jupiter.api.Test;
 
 class HelperTest {
@@ -51,6 +55,23 @@ class HelperTest {
         Helper.buildDocumentQuery("corpus/doc", Arrays.asList("ns:pos"), true));
 
 
+  }
+
+  @Test
+  void testGetCorpusPathFromSpecialCharacterDocument() {
+    // Corpus graphs for matches are created from the raw (percent encoded) node IDs,
+    // see ResultFetchJob#createSaltFromMatch
+    SCorpusGraph corpusGraph = SaltFactory.createSaltProject().createCorpusGraph();
+    SDocument doc =
+        corpusGraph.createDocument(URI.createURI("salt:/rootcorpus/L%C3%BCb._HistB._L"));
+
+    // Both the corpus and the document name must be decoded for display
+    assertEquals(Arrays.asList("Lüb._HistB._L", "rootcorpus"),
+        Helper.getCorpusPath(corpusGraph, doc, true));
+
+    // Without decoding, the raw names are kept
+    assertEquals(Arrays.asList("L%C3%BCb._HistB._L", "rootcorpus"),
+        Helper.getCorpusPath(corpusGraph, doc, false));
   }
 
 }

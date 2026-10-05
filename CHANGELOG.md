@@ -7,6 +7,11 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 ## [Unreleased]
 
+### Fixed
+
+- Document names containing an umlaut or other special characters were shown
+  percent encoded in the match list ([#837](https://github.com/korpling/ANNIS/issues/837)).
+
 ## [4.15.3] - 2026-06-25
 
 ### Fixed

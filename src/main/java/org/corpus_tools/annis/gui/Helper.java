@@ -133,7 +133,7 @@ public class Helper {
       boolean decodeElements) {
     final List<String> result = new LinkedList<String>();
 
-    result.add(doc.getName());
+    result.add(decodeName(doc.getName(), decodeElements));
     final SCorpus c = corpusGraph.getCorpus(doc);
     final List<SNode> cAsList = new ArrayList<>();
     cAsList.add(c);
@@ -153,20 +153,29 @@ public class Helper {
           @Override
           public void nodeReached(final GRAPH_TRAVERSE_TYPE traversalType, final String traversalId,
               final SNode currNode, final SRelation edge, final SNode fromNode, final long order) {
-            if (decodeElements) {
-              try {
-                result.add(URLDecoder.decode(currNode.getName(), UTF_8));
-              } catch (final UnsupportedEncodingException ex) {
-                log.error(null, ex);
-                // fallback
-                result.add(currNode.getName());
-              }
-            } else {
-              result.add(currNode.getName());
-            }
+            result.add(decodeName(currNode.getName(), decodeElements));
           }
         });
     return result;
+  }
+
+  /**
+   * Decodes a single element of a corpus path.
+   *
+   * @param name The raw name of the corpus or document.
+   * @param decodeElements If false, the name is returned unchanged.
+   * @return The decoded name or the original one if it could not be decoded.
+   */
+  private static String decodeName(final String name, final boolean decodeElements) {
+    if (decodeElements) {
+      try {
+        return URLDecoder.decode(name, UTF_8);
+      } catch (final UnsupportedEncodingException ex) {
+        log.error(null, ex);
+      }
+    }
+    // fallback
+    return name;
   }
 
   /**
