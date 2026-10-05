@@ -198,9 +198,14 @@ public class ServiceStarterDesktop extends ServiceStarter { // NO_UCD (unused co
   private void openBrowser(String webURL) {
     log.info("Opening {} in browser", webURL);
     boolean supported = true;
+    Desktop desktop = Desktop.getDesktop();
     try {
-      supported = com.github.jjYBdx4IL.utils.awt.Desktop.browse(new URI(webURL));
-    } catch (URISyntaxException ex) {
+      if(desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+    	  desktop.browse(new URI(webURL));
+      } else {
+    	  supported = false;
+      }
+    } catch (URISyntaxException | IOException ex) {
       log.error("Could not open " + webURL + " in browser.", ex);
       supported = false;
     } catch (UnsupportedOperationException ex) {
