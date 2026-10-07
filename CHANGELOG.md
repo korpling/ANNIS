@@ -15,6 +15,8 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 - Document names containing an umlaut or other special characters were shown
   percent encoded in the match list ([#837](https://github.com/korpling/ANNIS/issues/837)).
+- RST segments did not sort their token theirself, but relied on external mechanisms to 
+  already get sorted tokens. Changed to explicitly sort the output. (#913)
  
 ## [4.15.3] - 2026-06-25
 

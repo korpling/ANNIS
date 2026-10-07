@@ -262,6 +262,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
   private String transformSaltToJSON(VisualizerInput visInput) {
     graph = visInput.getSResult().getDocumentGraph();
+    
     List<SNode> rootSNodes = graph.getRoots();
     List<SNode> rstRoots = new ArrayList<SNode>();
 
@@ -376,7 +377,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
     JSONObject data = new JSONObject();
     StringBuilder sb = new StringBuilder();
     // use a hash set so we don't get any duplicate entries
-    LinkedHashSet<SToken> token = new LinkedHashSet<>();
+    HashSet<SToken> tokenSet = new HashSet<>();
     List<SRelation<SNode, SNode>> edges;
 
     if (currNode instanceof SStructure) {
@@ -386,11 +387,12 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
       // get all tokens directly dominated tokens and build a string
       for (SRelation<SNode, SNode> sedge : edges) {
         if (sedge.getTarget() instanceof SToken) {
-          token.add((SToken) sedge.getTarget());
+          tokenSet.add((SToken) sedge.getTarget());
         }
       }
 
-      // build strings
+      // build strings from sorted token
+      List<SToken> token = graph.getSortedTokenByText(new ArrayList<>(tokenSet));
       Iterator<SToken> tokIterator = token.iterator();
       while (tokIterator.hasNext()) {
         SToken tok = tokIterator.next();
@@ -441,7 +443,7 @@ public class RSTImpl extends Panel implements GraphTraverseHandler {
 
 
     // since we have found some tokens, it must be a sentence in RST.
-    if (token.size() > 0) {
+    if (!tokenSet.isEmpty()) {
       data.put("sentence", sb.toString());
     }
 
