@@ -7,6 +7,8 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 ## [Unreleased]
 
+## [4.16.0] - 2026-10-09
+
 ### Added
 
 - Updated to graphANNIS 4.2.0 that adds support for partitioned GraphML files.
@@ -1517,7 +1519,8 @@ https://github.com/korpling/ANNIS/issues?milestone=4&state=closed
 - [#37](https://github.com/korpling/ANNIS/issues/37) Allow to migrate corpora in database initialization
 
 
-[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.15.3...HEAD
+[Unreleased]: https://github.com/korpling/ANNIS/compare/v4.16.0...HEAD
+[4.16.0]: https://github.com/korpling/ANNIS/compare/v4.15.3...v4.16.0
 [4.15.3]: https://github.com/korpling/ANNIS/compare/v4.15.2...v4.15.3
 [4.15.2]: https://github.com/korpling/ANNIS/compare/v4.15.1...v4.15.2
 [4.15.1]: https://github.com/korpling/ANNIS/compare/v4.15.0...v4.15.1

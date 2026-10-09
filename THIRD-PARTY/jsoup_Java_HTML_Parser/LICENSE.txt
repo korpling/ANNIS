@@ -1,0 +1,71 @@
+<!doctype html><html lang="en"><head>
+<title>jsoup License</title>
+<meta charset="UTF-8">
+<meta name="keywords" content="jsoup license,open source,mit">
+<meta name="description" content="jsoup is licensed under the MIT open source license">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/rez/style@MNitmF.css">
+<link rel="icon" href="/favicon@0nJgOf.ico">
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="BNd+27/EeZUNI1YBDi5YUw" data-track-visibility async></script>
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@jhy">
+<meta name="twitter:title" content="jsoup License">
+<meta property="og:title" content="jsoup License">
+<meta name="twitter:description" content="jsoup is licensed under the MIT open source license">
+<meta name="twitter:image" content="https://jsoup.org/rez/jsoup-logo-social.png">
+<link rel="alternate" type="application/atom+xml" title="jsoup News (Atom feed)" href="/feed.xml">
+<link rel="canonical" href="https://jsoup.org/license">
+<meta property="og:image" content="https://jsoup.org/rez/jsoup-logo-social@Dy5HqE.png">
+<meta property="og:description" content="jsoup is licensed under the MIT open source license">
+<meta property="og:url" content="https://jsoup.org/license">
+<meta property="og:type" content="article">
+</head>
+<body class="n1-">
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="wrap">
+<header>
+<nav class="nav-sections" aria-label="Primary">
+<ul>
+<li class="n1-home"><a class="brand" href="/">jsoup</a>
+<li class="n1-news"><a href="/news/">News</a>
+<li class="n1-bugs"><a href="/bugs">Bugs</a>
+<li class="n1-discussion"><a href="/discussion">Discussion</a>
+<li class="n1-download"><a href="/download">Download</a>
+<li class="n1-api"><a href="/apidocs/">API Reference</a>
+<li class="n1-cookbook"><a href="/cookbook/">Cookbook</a>
+<li class="n1-try"><a href="//try.jsoup.org/">Try jsoup</a>
+</ul>
+</nav>
+<nav class="breadcrumb" aria-label="Breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+<a href="/" itemid="https://jsoup.org/" itemprop="item" itemscope itemtype="https://schema.org/WebPage">
+<span itemprop="name">jsoup</span>
+</a>
+<meta itemprop="position" content="1">
+</span>
+<span class="seperator">»</span>
+<span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+<span itemprop="name">jsoup License</span>
+<meta itemprop="position" content="2">
+</span>
+</nav>
+</header>
+<main id="main-content">
+<div class="content content-single">
+<div class="body layout-reading layout-entry">
+<div class="entry-head"><h1 id="jsoup-license">jsoup License</h1></div>
+<p>The jsoup code-base (including source and compiled packages) are distributed under the open source MIT license as described below.
+<h2 id="the-mit-license">The MIT License</h2>
+<p>Copyright © 2009 - 2026 <a href="https://jhedley.com/">Jonathan Hedley</a> (<a href="https://jsoup.org/">https://jsoup.org/</a>)
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+<p>THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</div>
+</div>
+</main>
+<footer>
+<b>jsoup HTML parser</b> © 2009 - 2026 <a href="//jhedley.com" rel="author"><b>Jonathan Hedley</b></a>
+</footer>
+</div>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4bc70e2c01a94c73b74392e4234840661791215815920" integrity="sha512-L0ha0OXavK/8okipN9F8BtP84dg9DUhPERbBXzwI6dgTA55d2+yweo3pn5CSFYs45/r8md2+xvUPtTdvTNRfjA==" data-cf-beacon='{"version":"2024.11.0","token":"f8604c6f9ba34864b7f448e726f79933","r":1,"spa":2}' crossorigin="anonymous"></script>
+</body></html>

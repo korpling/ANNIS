@@ -38,8 +38,8 @@ authors:
   affiliation: Ruhr-Universitaet Bochum
 repository-code: https://github.com/korpling/ANNIS
 license: Apache-2.0
-version: 4.15.3
-date-released: 2026-06-25
+version: 4.16.0
+date-released: 2026-10-09
 references:
 - type: article
   title: 'ANNIS3: A new architecture for generic corpus query and visualization'
@@ -384,15 +384,6 @@ references:
   - name: Tatu Saloranta
   - name: Brian Langel
   repository-code: https://github.com/FasterXML/java-classmate
-- type: software
-  title: Env Utils
-  version: '1.0'
-  abbreviation: com.github.jjYBdx4IL.utils:env-utils
-  license: Apache-2.0
-  notes: More license information can be found in the THIRD-PARTY/Env_Utils directory.
-  authors:
-  - name: The Env Utils 1.0 Team
-  repository-code: https://github.com/jjYBdx4IL/misc/env-utils
 - type: software
   title: FindBugs-jsr305
   version: 3.0.2
@@ -958,15 +949,6 @@ references:
   - name: Square, Inc.
   repository-code: https://github.com/square/okio/
 - type: software
-  title: Process Utils
-  version: '1.0'
-  abbreviation: com.github.jjYBdx4IL.utils:proc-utils
-  license: Apache-2.0
-  notes: More license information can be found in the THIRD-PARTY/Process_Utils directory.
-  authors:
-  - name: The Process Utils 1.0 Team
-  repository-code: https://github.com/jjYBdx4IL/misc/proc-utils
-- type: software
   title: SLF4J API Module
   version: 1.7.36
   abbreviation: org.slf4j:slf4j-api
@@ -1157,15 +1139,6 @@ references:
   - name: The StringTemplate 4 4.1 Team
   repository-code: https://github.com/antlr/stringtemplate4/tree/master
 - type: software
-  title: Swing Utils
-  version: '1.0'
-  abbreviation: com.github.jjYBdx4IL.utils:swing-utils
-  license: Apache-2.0
-  notes: More license information can be found in the THIRD-PARTY/Swing_Utils directory.
-  authors:
-  - name: The Swing Utils 1.0 Team
-  repository-code: https://github.com/jjYBdx4IL/misc/swing-utils
-- type: software
   title: TXW2 Runtime
   version: 2.3.9
   abbreviation: org.glassfish.jaxb:txw2
@@ -1204,16 +1177,6 @@ references:
   - name: Tatu Saloranta
   repository-code: https://github.com/FasterXML/woodstox
 - type: software
-  title: XML Commons External Components XML APIs
-  version: 1.0.b2
-  abbreviation: xml-apis:xml-apis
-  license: Apache-2.0
-  notes: More license information can be found in the THIRD-PARTY/XML_Commons_External_Components_XML_APIs
-    directory.
-  authors:
-  - name: The XML Commons External Components XML APIs 1.0.b2 Team
-  repository-code: http://svn.apache.org/viewvc/xml/commons/tags/xml-commons-1_0_b2
-- type: software
   title: abego TreeLayout Core
   version: 1.0.3
   abbreviation: org.abego.treelayout:org.abego.treelayout.core
@@ -1247,27 +1210,6 @@ references:
   - name: Hubert Iwaniuk
   - name: Sebastian Lövdahl
   repository-code: http://github.com/Atmosphere/atmosphere/atmosphere-runtime
-- type: software
-  title: dom4j
-  version: 1.6.1
-  abbreviation: dom4j:dom4j
-  authors:
-  - name: Curt Arnold
-  - name: David Lucas
-  - name: David White
-  - name: Jakob Jenkov
-  - name: James Strachan
-  - name: Laramie Crocker
-  - name: Maarten Coene
-  - name: Michael Skells
-  - name: Nick Sanderson
-  - name: Steen Lehmann
-  - name: Tobias Rademacher
-  - name: Bob McWhirter
-  - name: Todd Wolff
-  - name: OuYang Chen
-  - name: Yuxin Ruan
-  repository-code: http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/dom4j/dom4j/
 - type: software
   title: error-prone annotations
   version: 2.0.12
@@ -1359,9 +1301,9 @@ references:
   repository-code: http://svn.sonatype.org/spice/tags/oss-parent-4/jsinterop/jsinterop-annotations
 - type: software
   title: jsoup Java HTML Parser
-  version: 1.15.3
+  version: 1.23.1
   abbreviation: org.jsoup:jsoup
-  license: MIT
+  license-url: https://jsoup.org/license
   notes: More license information can be found in the THIRD-PARTY/jsoup_Java_HTML_Parser
     directory.
   authors:
