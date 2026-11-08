@@ -17,11 +17,13 @@ package org.corpus_tools.annis.gui.visualizers.iframe.dependency;
 import com.google.common.collect.Range;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +33,9 @@ import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.iframe.WriterVisualizer;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocumentGraph;
+import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SPointingRelation;
+import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
@@ -77,6 +81,11 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
    * the token level.
    */
   private final String MAPPING_NODE_KEY = "node_key";
+  /** 
+   * If this mapping is set to a string value, any edge holding an edge label with said value
+   * will be considered a root edge and displayed as such.
+   * */
+  private final String MAPPING_ROOT_LABEL = "root_label";
 
   private Map<String, String> mappings;
 
@@ -142,11 +151,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
       }
     }
 
-
     Map<SNode, Integer> node2Int = new HashMap<SNode, Integer>();
     int count = 0;
     for (SNode tok : selectedNodes) {
-      node2Int.put(tok, count++);
+      node2Int.put(tok, count++); 
     }
 
 
@@ -180,6 +188,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
       println("tokens=new Object();", writer);
 
       count = 0;
+      
       for (SNode node : selectedNodes) {
         JSONObject vakyarthaObject = new JSONObject();
 
@@ -226,7 +235,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
               String label = sRelation.getAnnotations().stream().findFirst()
                   .map(SAnnotation::getValue_STEXT).orElse("");
 
-              if (sRelation.getSource() != null && node2Int.containsKey(source)) {
+              if (label != null && label.equals(mappings.get(MAPPING_ROOT_LABEL))) {
+            	  govs.put("root", label);  
+              }
+              else if (sRelation.getSource() != null && node2Int.containsKey(source)) {
                 govs.put(String.valueOf(node2Int.get(source)), label);
               }
             }
