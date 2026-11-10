@@ -14,18 +14,16 @@
 package org.corpus_tools.annis.gui.visualizers.iframe.dependency;
 
 
-import com.google.common.collect.Range;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+
 import org.apache.commons.lang3.StringUtils;
 import org.corpus_tools.annis.gui.Helper;
 import org.corpus_tools.annis.gui.MatchedNodeColors;
@@ -33,9 +31,7 @@ import org.corpus_tools.annis.gui.visualizers.VisualizerInput;
 import org.corpus_tools.annis.gui.visualizers.iframe.WriterVisualizer;
 import org.corpus_tools.salt.SALT_TYPE;
 import org.corpus_tools.salt.common.SDocumentGraph;
-import org.corpus_tools.salt.common.SOrderRelation;
 import org.corpus_tools.salt.common.SPointingRelation;
-import org.corpus_tools.salt.common.SSpan;
 import org.corpus_tools.salt.common.STextualDS;
 import org.corpus_tools.salt.common.SToken;
 import org.corpus_tools.salt.core.SAnnotation;
@@ -47,6 +43,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.google.common.collect.Range;
 
 /**
  * Provides a dependence visualization based on vakyartha visualization, which was developed by Kim
