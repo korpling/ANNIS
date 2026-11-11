@@ -7,6 +7,11 @@ ANNIS is a frontend to the graphANNIS webservice, which has its [own changelog](
 
 ## [Unreleased]
 
+### Added
+
+- Visualizer `arch_dependency` allows to highlight roots with explicit edges by setting a label value that identifies such edges.
+  The value is set with mapping `root_label`.
+
 ## [4.16.0] - 2026-10-09
 
 ### Added
