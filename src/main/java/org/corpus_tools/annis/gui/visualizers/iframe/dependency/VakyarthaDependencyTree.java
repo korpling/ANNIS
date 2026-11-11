@@ -57,7 +57,12 @@ import com.google.common.collect.Range;
  * 
  * Mappings: <br />
  * If a annotation key is specified with <b>node_key:key</b>, all nodes which carry this annotation
- * are searched for pointing relations and instead of the token span the annotation value is used.
+ * are searched for pointing relations and instead of the token span the annotation value is used. <br />
+ * If root edges should be display, this can be achieved by setting <b>root_label</b> to the edge label
+ * value that identifies root edges. This, of course, requires these edges to exist.<br />
+ * If the label for root edges is actually contained in a node annotation, the key for the node annotation
+ * needs to be provided <i>additionally</i> by setting <b>root_label_node_key</b> to the respective qualified
+ * annotation name.
  *
  * @author Thomas Krause {@literal <krauseto@hu-berlin.de>}
  * @author Benjamin Weißenfels{@literal <b.pixeldrama@gmail.com>}
@@ -84,6 +89,11 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
    * will be considered a root edge and displayed as such.
    * */
   private final String MAPPING_ROOT_LABEL = "root_label";
+  /**
+   * If this is set to an annotation qname, the root label will be looked for on target nodes
+   * rather than edges. This only works when root_label is set.
+   */
+  private static final String MAPPING_ROOT_LABEL_NODE_KEY = "root_label_node_key"; 
 
   private Map<String, String> mappings;
 
@@ -186,6 +196,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
       println("tokens=new Object();", writer);
 
       count = 0;
+      String nodeRootQname = mappings.get(MAPPING_ROOT_LABEL_NODE_KEY);
       
       for (SNode node : selectedNodes) {
         JSONObject vakyarthaObject = new JSONObject();
@@ -206,6 +217,12 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
 
         JSONObject govs = new JSONObject();
         List<SRelation<SNode, SNode>> sEdges = node.getGraph().getInRelations(node.getId());
+        
+        // if root edges are determined by node labels, this needs to be checked here
+        String node_label = nodeRootQname == null? null : node.getAnnotation(nodeRootQname).getValue_STEXT();
+        if ((node_label != null) && (node_label.equals(mappings.get(MAPPING_ROOT_LABEL)))) {
+      	  govs.put("root", node_label);
+        }
 
         for (SRelation<? extends SNode, ? extends SNode> e : sEdges) {
           if (e instanceof SPointingRelation) {
@@ -232,8 +249,8 @@ public class VakyarthaDependencyTree extends WriterVisualizer { // NO_UCD (unuse
 
               String label = sRelation.getAnnotations().stream().findFirst()
                   .map(SAnnotation::getValue_STEXT).orElse("");
-
-              if (label != null && label.equals(mappings.get(MAPPING_ROOT_LABEL))) {
+              
+              if ((nodeRootQname == null) && (label.equals(mappings.get(MAPPING_ROOT_LABEL)))) {
             	  govs.put("root", label);  
               }
               else if (sRelation.getSource() != null && node2Int.containsKey(source)) {
